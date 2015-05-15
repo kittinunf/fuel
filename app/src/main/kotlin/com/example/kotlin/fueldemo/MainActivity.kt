@@ -2,9 +2,11 @@ package com.example.kotlin.fueldemo
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
+import android.widget.Button
+import android.widget.TextView
 import fuel.Fuel
 
 public class MainActivity : AppCompatActivity() {
@@ -13,8 +15,27 @@ public class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val str = Fuel().greet("Octto")
-        Toast.makeText(this, str, Toast.LENGTH_LONG).show()
+        val textView = findViewById(R.id.main_result_text) as TextView
+        val goButton = findViewById(R.id.main_go_button) as Button
+        val clearButton = findViewById(R.id.main_clear_button) as TextView
+
+        clearButton.setOnClickListener {
+            textView.setText("")
+        }
+
+        goButton.setOnClickListener {
+            Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
+//                either.fold({ err ->
+//
+//                }, { bytes ->
+//                    runOnUiThread { textView.setText(String(bytes)) }
+//                })
+
+                val (exception, data) = either
+                runOnUiThread { textView.setText(data)  }
+            }
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
