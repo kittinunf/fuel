@@ -25,7 +25,7 @@
     <ScrollView
         android:layout_below="@id/main_go_button"
         android:layout_width="match_parent"
-        android:layout_height="250dp">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/main_result_text"

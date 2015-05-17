@@ -3,6 +3,7 @@ package fuel.core
 import java.net.URL
 import java.util.concurrent.Callable
 import kotlin.properties.Delegates
+import kotlin.test.expect
 
 /**
  * Created by Kittinun Vantasin on 5/13/15.
@@ -18,42 +19,78 @@ public class Request {
 
     val timeoutInMillisecond = 1500
 
-    public fun response(handler: (Request, Response) -> Unit) {
-        val task = TaskRequest()
-        task.callback = { response ->
-            handler(this@Request, response)
+    public fun response(handler: (Request, Response?) -> Unit) {
+        val task = TaskRequest(this) {
+            successCallback = { response ->
+                handler(this@Request, response)
+            }
+
+            failureCallback = { exception, response ->
+                handler(this@Request, response)
+            }
         }
 
-        Executor.execute(task)
+        Executor.submit(task)
     }
 
-    public fun response(handler: (Request, Response, Either<Exception, ByteArray>) -> Unit) {
-        val task = TaskRequest()
-        task.callback = { response ->
-            handler(this@Request, response, Right(response.data))
+    public fun response(handler: (Request, Response?, Either<Exception, ByteArray>) -> Unit) {
+        val task = TaskRequest(this) {
+            successCallback = { response ->
+                handler(this@Request, response, Right(response.data))
+            }
+
+            failureCallback = { exception, response ->
+                handler(this@Request, response, Left(exception))
+            }
         }
 
-        Executor.execute(task)
+        Executor.submit(task)
     }
 
-    public fun responseString(handler: (Request, Response, Either<Exception, String>) -> Unit) {
-        val task = TaskRequest()
-        task.callback = { response ->
-            handler(this@Request, response, Right(String(response.data)))
+    public fun responseString(handler: (Request, Response?, Either<Exception, String>) -> Unit) {
+        val task = TaskRequest(this) {
+            successCallback = { response ->
+                handler(this@Request, response, Right(String(response.data)))
+            }
+
+            failureCallback = { exception, response ->
+                handler(this@Request, response, Left(exception))
+
+            }
         }
 
-        Executor.execute(task)
+        Executor.submit(task)
     }
 
-    //TODO: possibly change to static inner class?
-    inner class TaskRequest : Runnable {
+    companion object {
 
-        var callback: ((Response) -> Unit)? = null
+        class TaskRequest(val request: Request) : Callable<Unit> {
 
-        override fun run() {
-            val response = Manager.sharedInstance.client.executeRequest(this@Request)
-            callback?.invoke(response)
+            var successCallback: ((Response) -> Unit)? = null
+            var failureCallback: ((Exception, Response?) -> Unit)? = null
+
+            override fun call() {
+                try {
+                    val response = Manager.sharedInstance.client.executeRequest(request);
+                    dispatchCallback(response)
+                } catch (e: Exception) {
+                    failureCallback?.invoke(e, null)
+                }
+            }
+
+            fun dispatchCallback(response: Response) {
+                //validate
+                successCallback?.invoke(response)
+            }
+
         }
+
+        inline fun TaskRequest(request: Request, builder: TaskRequest.() -> Unit): TaskRequest {
+            val taskRequest = TaskRequest(request)
+            taskRequest.builder()
+            return taskRequest
+        }
+
     }
 
 }

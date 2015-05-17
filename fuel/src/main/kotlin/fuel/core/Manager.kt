@@ -3,6 +3,7 @@ package fuel.core
 import fuel.Fuel
 import fuel.toolbox.HttpClient
 import fuel.util.readWriteLazy
+import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.properties.Delegates
@@ -53,8 +54,8 @@ object Executor {
 
     private var executor: ExecutorService = Executors.newScheduledThreadPool(2 * Runtime.getRuntime().availableProcessors())
 
-    fun execute(f: Runnable) {
-        executor.execute(f)
+    fun <T> submit(call: Callable<T>) {
+        executor.submit(call)
     }
 
 }

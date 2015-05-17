@@ -11,6 +11,8 @@ import fuel.Fuel
 
 public class MainActivity : AppCompatActivity() {
 
+    val TAG = "MainActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -26,14 +28,16 @@ public class MainActivity : AppCompatActivity() {
         goButton.setOnClickListener {
             Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
 //                either.fold({ err ->
-//
-//                }, { bytes ->
-//                    runOnUiThread { textView.setText(String(bytes)) }
+//                    Log.e(TAG, err.getMessage())
+//                }, { data ->
+//                    runOnUiThread { textView.setText(data) }
 //                })
 
                 val (exception, data) = either
-                runOnUiThread { textView.setText(data)  }
+                runOnUiThread { textView.setText(data) }
+
             }
+
         }
 
     }
