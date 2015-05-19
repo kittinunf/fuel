@@ -2,6 +2,7 @@ package fuel.core
 
 import fuel.Fuel
 import fuel.toolbox.HttpClient
+import fuel.util.build
 import fuel.util.readWriteLazy
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
@@ -14,48 +15,47 @@ import kotlin.properties.Delegates
 
 public class Manager {
 
-    companion object Singleton {
+    companion object Shared {
+
         var sharedInstance by Delegates.readWriteLazy {
             val manager = Manager()
-            manager.client = HttpClient()
-            manager
+            build(manager) {
+                manager.client = HttpClient()
+            }
         }
+
+        private var executor = Executors.newScheduledThreadPool(2 * Runtime.getRuntime().availableProcessors())
+
+        fun submit(request: Request): Response {
+            return sharedInstance.client.executeRequest(request)
+        }
+
+        fun <T> submit(call: Callable<T>) {
+            executor.submit(call)
+        }
+
     }
 
     var client: Client by Delegates.notNull()
 
-    public fun request(m: Method, path: String): Request {
-        return Request {
-            method = m
+    fun request(method: Method, path: String, param: Map<String, Any?>? = null): Request {
+        return request(build(Encoding()) {
+            httpMethod = method
             urlString = path
-        }
+            parameters = param
+        })
     }
 
-    public fun request(m: Method, convertible: Fuel.StringConvertible): Request {
-        return Request {
-            method = m
+    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: Map<String, Any?>? = null): Request {
+        return request(build(Encoding()) {
+            httpMethod = method
             urlString = convertible.path
-        }
+            parameters = param
+        })
     }
 
-    public fun request(convertible: Fuel.RequestConvertible): Request {
+    fun request(convertible: Fuel.RequestConvertible): Request {
         return convertible.request
-    }
-
-}
-
-public inline fun Manager(builder: Manager.() -> Unit): Manager {
-    val manager = Manager()
-    manager.builder()
-    return manager
-}
-
-object Executor {
-
-    private var executor: ExecutorService = Executors.newScheduledThreadPool(2 * Runtime.getRuntime().availableProcessors())
-
-    fun <T> submit(call: Callable<T>) {
-        executor.submit(call)
     }
 
 }

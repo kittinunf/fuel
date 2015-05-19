@@ -10,7 +10,7 @@ import fuel.core.Request
 
 public class Fuel {
 
-    public trait StringConvertible {
+    public trait PathStringConvertible {
         val path: String
     }
 
@@ -22,12 +22,12 @@ public class Fuel {
 
         //convenience methods
         //get
-        public fun get(path: String): Request {
-            return request(Method.GET, path)
+        public fun get(path: String, parameters: Map<String, Any?>? = null): Request {
+            return request(Method.GET, path, parameters)
         }
 
-        public fun get(convertible: StringConvertible): Request {
-            return request(Method.GET, convertible)
+        public fun get(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+            return request(Method.GET, convertible, parameters)
         }
 
         public fun get(convertible: RequestConvertible): Request {
@@ -41,12 +41,12 @@ public class Fuel {
         //delete
 
         //request
-        public fun request(method: Method, path: String): Request {
-            return Manager.sharedInstance.request(method, path)
+        public fun request(method: Method, path: String, parameters: Map<String, Any?>? = null): Request {
+            return Manager.sharedInstance.request(method, path, parameters)
         }
 
-        public fun request(method: Method, convertible: StringConvertible): Request {
-            return Manager.sharedInstance.request(method, convertible)
+        public fun request(method: Method, convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+            return Manager.sharedInstance.request(method, convertible, parameters)
         }
 
         public fun request(convertible: RequestConvertible): Request {

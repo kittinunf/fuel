@@ -10,18 +10,19 @@ import kotlin.properties.Delegates
 
 public class Response {
 
-    var httpStatusCode: Int = -1
+    var httpStatusCode: Int by Delegates.notNull()
+    var httpResponseMessage: String by Delegates.notNull()
 
-    var dataStream: InputStream by Delegates.notNull()
-
+    var dataStream: InputStream? = null
     val data: ByteArray by Delegates.lazy {
-        IOUtils.toByteArray(dataStream)
+        var bytes = ByteArray(0)
+        if (dataStream != null) {
+            bytes = IOUtils.toByteArray(dataStream)
+        }
+        bytes
     }
 
-}
-
-public inline fun Response(builder: Response.() -> Unit): Response {
-    val response = Response()
-    response.builder()
-    return response
+    override fun toString(): String {
+        return "Response: { StatusCode: $httpStatusCode, ResponseMessage: $httpResponseMessage }"
+    }
 }

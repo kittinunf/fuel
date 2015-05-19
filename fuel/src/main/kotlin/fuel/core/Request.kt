@@ -1,9 +1,12 @@
 package fuel.core
 
+import fuel.util.build
+import fuel.util.readWriteLazy
 import java.net.URL
+import java.net.URLEncoder
+import java.util.ArrayList
 import java.util.concurrent.Callable
 import kotlin.properties.Delegates
-import kotlin.test.expect
 
 /**
  * Created by Kittinun Vantasin on 5/13/15.
@@ -11,16 +14,30 @@ import kotlin.test.expect
 
 public class Request {
 
-    var method: Method = Method.GET
-
-    var urlString: String by Delegates.notNull()
-
-    val url: URL by Delegates.lazy { URL(urlString) }
+    var httpMethod: Method = Method.GET
+    var path: String by Delegates.notNull()
+    val url: URL by Delegates.lazy { URL(path) }
 
     val timeoutInMillisecond = 1500
 
+    val task: TaskRequest
+
+    init {
+        task = TaskRequest(this)
+    }
+
+    //interfaces
+    public fun validate(statusCodeRange: IntRange): Request {
+        build(task) {
+            validator = { response ->
+                statusCodeRange.contains(response.httpStatusCode)
+            }
+        }
+        return this
+    }
+
     public fun response(handler: (Request, Response?) -> Unit) {
-        val task = TaskRequest(this) {
+        build(task) {
             successCallback = { response ->
                 handler(this@Request, response)
             }
@@ -30,11 +47,11 @@ public class Request {
             }
         }
 
-        Executor.submit(task)
+        Manager.submit(task)
     }
 
     public fun response(handler: (Request, Response?, Either<Exception, ByteArray>) -> Unit) {
-        val task = TaskRequest(this) {
+        build(task) {
             successCallback = { response ->
                 handler(this@Request, response, Right(response.data))
             }
@@ -44,11 +61,11 @@ public class Request {
             }
         }
 
-        Executor.submit(task)
+        Manager.submit(task)
     }
 
     public fun responseString(handler: (Request, Response?, Either<Exception, String>) -> Unit) {
-        val task = TaskRequest(this) {
+        build(task) {
             successCallback = { response ->
                 handler(this@Request, response, Right(String(response.data)))
             }
@@ -59,7 +76,7 @@ public class Request {
             }
         }
 
-        Executor.submit(task)
+        Manager.submit(task)
     }
 
     companion object {
@@ -67,36 +84,32 @@ public class Request {
         class TaskRequest(val request: Request) : Callable<Unit> {
 
             var successCallback: ((Response) -> Unit)? = null
-            var failureCallback: ((Exception, Response?) -> Unit)? = null
+            var failureCallback: ((Exception, Response) -> Unit)? = null
+
+            var validator: (Response) -> Boolean = { response ->
+                (200..299).contains(response.httpStatusCode)
+            }
 
             override fun call() {
                 try {
-                    val response = Manager.sharedInstance.client.executeRequest(request);
+                    val response = Manager.submit(request)
                     dispatchCallback(response)
-                } catch (e: Exception) {
-                    failureCallback?.invoke(e, null)
+                } catch (error: FuelError) {
+                    failureCallback?.invoke(error.exception, error.response)
                 }
             }
 
             fun dispatchCallback(response: Response) {
                 //validate
-                successCallback?.invoke(response)
+                if (validator.invoke(response)) {
+                    successCallback?.invoke(response)
+                } else {
+                    failureCallback?.invoke(IllegalStateException("Validation failed"), response)
+                }
             }
 
         }
 
-        inline fun TaskRequest(request: Request, builder: TaskRequest.() -> Unit): TaskRequest {
-            val taskRequest = TaskRequest(request)
-            taskRequest.builder()
-            return taskRequest
-        }
-
     }
 
-}
-
-public inline fun Request(builder: Request.() -> Unit): Request {
-    val request = Request()
-    request.builder()
-    return request
 }

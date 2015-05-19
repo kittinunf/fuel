@@ -26,15 +26,24 @@ public class MainActivity : AppCompatActivity() {
         }
 
         goButton.setOnClickListener {
-            Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
+//            Fuel.get("http://httpbin.org/get", mapOf("abc" to "def" , "ghi" to null, "jkl" to 193)).responseString { request, response, either ->
 //                either.fold({ err ->
-//                    Log.e(TAG, err.getMessage())
+//                    val text = "$response, ${err.getMessage()}"
+//                    Log.e(TAG, text)
+//                    runOnUiThread { textView.setText(text) }
 //                }, { data ->
 //                    runOnUiThread { textView.setText(data) }
 //                })
+//            }
 
-                val (exception, data) = either
-                runOnUiThread { textView.setText(data) }
+            Fuel.get("http://httpbin.org/status/202").validate(200..201).responseString { req, resp, either ->
+                either.fold({ err ->
+                    val text = "$resp, ${err.getMessage()}"
+                    Log.e(TAG, text)
+                    runOnUiThread { textView.setText(text) }
+                }, { data ->
+                    runOnUiThread { textView.setText(data) }
+                })
 
             }
 

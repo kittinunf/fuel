@@ -10,3 +10,4 @@ public enum class Method(val value: String) {
     PUT : Method("PUT")
     DELETE : Method("DELETE")
 }
+

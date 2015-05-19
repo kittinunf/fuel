@@ -1,10 +1,11 @@
 package fuel.toolbox
 
 import fuel.core.Client
+import fuel.core.FuelError
 import fuel.core.Request
 import fuel.core.Response
-import fuel.util.HttpURLConnection
-import java.io.BufferedInputStream
+import fuel.util.build
+import java.net.HttpURLConnection
 
 /**
  * Created by Kittinun Vantasin on 5/15/15.
@@ -15,20 +16,28 @@ class HttpClient : Client {
     override fun executeRequest(request: Request): Response {
         val url = request.url
 
-        val connection = HttpURLConnection(url) {
+        val connection = url.openConnection() as HttpURLConnection
+        build(connection) {
             val timeout = request.timeoutInMillisecond
             setConnectTimeout(timeout)
             setReadTimeout(timeout)
             setDoInput(true)
-            setRequestMethod(request.method.value)
+            setRequestMethod(request.httpMethod.value)
         }
 
-        val response = Response {
+        val response = Response()
+        return build(response) {
             httpStatusCode = connection.getResponseCode()
-            dataStream = connection.getInputStream()
+            httpResponseMessage = connection.getResponseMessage()
+            try {
+                dataStream = connection.getInputStream()
+            } catch(exception: Exception) {
+                throw build(FuelError()) {
+                    this.exception = exception
+                    this.response = response
+                }
+            }
         }
-
-        return response
     }
 
 }
