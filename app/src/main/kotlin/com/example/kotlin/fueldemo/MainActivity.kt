@@ -8,6 +8,8 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import fuel.Fuel
+import fuel.core.Left
+import fuel.core.Manager
 
 public class MainActivity : AppCompatActivity() {
 
@@ -26,9 +28,10 @@ public class MainActivity : AppCompatActivity() {
         }
 
         goButton.setOnClickListener {
-//            Fuel.get("http://httpbin.org/get", mapOf("abc" to "def" , "ghi" to null, "jkl" to 193)).responseString { request, response, either ->
+
+//            Fuel.get("http://httpbin.org/status/202").validate(200..201).responseString { req, resp, either ->
 //                either.fold({ err ->
-//                    val text = "$response, ${err.getMessage()}"
+//                    val text = "$resp, ${err.getMessage()}"
 //                    Log.e(TAG, text)
 //                    runOnUiThread { textView.setText(text) }
 //                }, { data ->
@@ -36,15 +39,16 @@ public class MainActivity : AppCompatActivity() {
 //                })
 //            }
 
-            Fuel.get("http://httpbin.org/status/202").validate(200..201).responseString { req, resp, either ->
+            Manager.sharedInstance.additionalHeaders = mapOf("Device-Type" to "Android")
+
+            Fuel.post("http://httpbin.org/post", mapOf("abc" to "def", "ghi" to "jkl")).header("Page-Index" to 4).responseString { request, response, either ->
                 either.fold({ err ->
-                    val text = "$resp, ${err.getMessage()}"
+                    val text = "$response, ${err.getMessage()}"
                     Log.e(TAG, text)
                     runOnUiThread { textView.setText(text) }
                 }, { data ->
                     runOnUiThread { textView.setText(data) }
                 })
-
             }
 
         }

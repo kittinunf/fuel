@@ -3,8 +3,7 @@ package fuel.core
 import fuel.util.build
 import fuel.util.readWriteLazy
 import java.net.URL
-import java.net.URLEncoder
-import java.util.ArrayList
+import java.util.HashMap
 import java.util.concurrent.Callable
 import kotlin.properties.Delegates
 
@@ -14,11 +13,22 @@ import kotlin.properties.Delegates
 
 public class Request {
 
+    val timeoutInMillisecond = 1500
+
     var httpMethod: Method = Method.GET
     var path: String by Delegates.notNull()
     val url: URL by Delegates.lazy { URL(path) }
+    var httpBody: ByteArray? = null
 
-    val timeoutInMillisecond = 1500
+    var httpHeaders by Delegates.readWriteLazy {
+        val headers = hashMapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
+        val additionalHeaders = Manager.sharedInstance.additionalHeaders
+
+        if (additionalHeaders != null) {
+            headers += additionalHeaders
+        }
+        headers
+    }
 
     val task: TaskRequest
 
@@ -27,6 +37,13 @@ public class Request {
     }
 
     //interfaces
+    public fun header(pair: Pair<String, Any>?): Request {
+        if (pair != null) {
+            httpHeaders.plusAssign(Pair(pair.first, pair.second.toString()))
+        }
+        return this
+    }
+
     public fun validate(statusCodeRange: IntRange): Request {
         build(task) {
             validator = { response ->

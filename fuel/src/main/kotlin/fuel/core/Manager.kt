@@ -38,6 +38,8 @@ public class Manager {
 
     var client: Client by Delegates.notNull()
 
+    var additionalHeaders: Map<String, String>? = null
+
     fun request(method: Method, path: String, param: Map<String, Any?>? = null): Request {
         return request(build(Encoding()) {
             httpMethod = method

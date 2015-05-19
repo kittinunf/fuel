@@ -25,6 +25,7 @@ abstract public class Either<L, R> {
             else -> throw UnsupportedOperationException()
         }
     }
+
 }
 
 public class Left<L, R>(val left: L) : Either<L, R>() {

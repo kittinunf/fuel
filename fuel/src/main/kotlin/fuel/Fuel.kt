@@ -30,11 +30,14 @@ public class Fuel {
             return request(Method.GET, convertible, parameters)
         }
 
-        public fun get(convertible: RequestConvertible): Request {
-            return request(convertible)
+        //post
+        public fun post(path: String, parameters: Map<String, Any?>? = null): Request {
+            return request(Method.POST, path, parameters)
         }
 
-        //post
+        public fun post(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+            return request(Method.POST, convertible, parameters)
+        }
 
         //put
 

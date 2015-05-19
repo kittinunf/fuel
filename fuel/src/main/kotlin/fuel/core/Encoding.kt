@@ -11,6 +11,8 @@ import kotlin.properties.Delegates
 
 public class Encoding : Fuel.RequestConvertible {
 
+    val ENCODING = "UTF-8"
+
     var httpMethod: Method by Delegates.notNull()
     var urlString: String by Delegates.notNull()
     var parameters: Map<String, Any?>? = null
@@ -18,16 +20,22 @@ public class Encoding : Fuel.RequestConvertible {
     var encoder: (Method, String, Map<String, Any?>?) -> Request = { method, path, parameters ->
         val request = Request()
         var modifiedPath = path
+        var data: ByteArray? = null
+        var headerPair: Pair<String, String>? = null
+
         if (encodeParameterInUrl(method)) {
             val query = if (path.last().equals("?")) "" else "?"
             modifiedPath += query + queryFromParameters(parameters)
         } else {
-
+            headerPair = ("Content-Type" to "application/x-www-form-urlencoded")
+            data = queryFromParameters(parameters).toByteArray(ENCODING)
         }
 
         build(request) {
             httpMethod = method
             this.path = modifiedPath
+            this.httpBody = data
+            header(headerPair)
         }
     }
 
@@ -43,11 +51,10 @@ public class Encoding : Fuel.RequestConvertible {
     private fun queryFromParameters(params: Map<String, Any?>?): String {
         if (params == null) return ""
 
-        val encoding = "UTF-8"
         val list = arrayListOf<String>()
         for ((key, value) in parameters) {
             if (value != null) {
-                list.add("${URLEncoder.encode(key, encoding)}=${URLEncoder.encode(value.toString(), encoding)}")
+                list.add("${URLEncoder.encode(key, ENCODING)}=${URLEncoder.encode(value.toString(), ENCODING)}")
             }
         }
         return list.join("&")
