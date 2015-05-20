@@ -18,6 +18,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -26,15 +30,20 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:22.1.1'
-
+    compile "com.android.support:appcompat-v7:$android_support_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.anko:anko:$anko_version"
+    compile "io.reactivex:rxjava:$rx_version"
 
     compile project(':fuel')
 }
 
 buildscript {
+    ext.android_support_version = '22.1.1'
     ext.kotlin_version = '0.11.91.4'
+    ext.anko_version = '0.6-15s'
+    ext.rx_version = '1.0.11'
+
     repositories {
         mavenCentral()
     }

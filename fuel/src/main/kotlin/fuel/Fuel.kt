@@ -58,18 +58,17 @@ public class Fuel {
         }
 
         //request
-        public fun request(method: Method, path: String, parameters: Map<String, Any?>? = null): Request {
+        private fun request(method: Method, path: String, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.request(method, path, parameters)
         }
 
-        public fun request(method: Method, convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        private fun request(method: Method, convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.request(method, convertible, parameters)
         }
 
-        public fun request(convertible: RequestConvertible): Request {
+        private fun request(convertible: RequestConvertible): Request {
             return Manager.sharedInstance.request(convertible)
         }
-
 
     }
 

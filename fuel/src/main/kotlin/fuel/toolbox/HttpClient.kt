@@ -31,7 +31,7 @@ class HttpClient : Client {
             httpStatusCode = connection.getResponseCode()
             httpResponseMessage = connection.getResponseMessage()
             try {
-                dataStream = connection.getInputStream()
+                dataStream = if (connection.getErrorStream() != null) connection.getErrorStream() else connection.getInputStream()
             } catch(exception: Exception) {
                 throw build(FuelError()) {
                     this.exception = exception

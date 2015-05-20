@@ -2,8 +2,8 @@ package fuel.core
 
 import fuel.util.build
 import fuel.util.readWriteLazy
+import org.apache.commons.codec.binary.Base64
 import java.net.URL
-import java.util.HashMap
 import java.util.concurrent.Callable
 import kotlin.properties.Delegates
 
@@ -17,7 +17,7 @@ public class Request {
 
     var httpMethod: Method = Method.GET
     var path: String by Delegates.notNull()
-    val url: URL by Delegates.lazy { URL(path) }
+    val url: URL by Delegates.lazy { createUrl() }
     var httpBody: ByteArray? = null
 
     var httpHeaders by Delegates.readWriteLazy {
@@ -42,6 +42,12 @@ public class Request {
             httpHeaders.plusAssign(Pair(pair.first, pair.second.toString()))
         }
         return this
+    }
+
+    public fun authenticate(username: String, password: String): Request {
+        val auth = "$username:$password"
+        val encodedAuth = Base64.encodeBase64(auth.toByteArray())
+        return header("Authorization" to "Basic " + String(encodedAuth))
     }
 
     public fun validate(statusCodeRange: IntRange): Request {
@@ -80,6 +86,15 @@ public class Request {
         }
 
         Manager.submit(task)
+    }
+
+    private fun createUrl(): URL {
+        val basePath = Manager.sharedInstance.basePath
+        if (basePath != null) {
+            return URL(basePath + if (!path.startsWith('/')) '/' + path else path)
+        } else {
+            return URL(path)
+        }
     }
 
     companion object {

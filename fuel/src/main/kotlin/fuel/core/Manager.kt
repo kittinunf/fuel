@@ -15,6 +15,10 @@ import kotlin.properties.Delegates
 
 public class Manager {
 
+    var client: Client by Delegates.notNull()
+    var basePath: String? = null
+    var additionalHeaders: Map<String, String>? = null
+
     companion object Shared {
 
         var sharedInstance by Delegates.readWriteLazy {
@@ -35,10 +39,6 @@ public class Manager {
         }
 
     }
-
-    var client: Client by Delegates.notNull()
-
-    var additionalHeaders: Map<String, String>? = null
 
     fun request(method: Method, path: String, param: Map<String, Any?>? = null): Request {
         return request(build(Encoding()) {

@@ -1,62 +1,135 @@
 package com.example.kotlin.fueldemo
 
+import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.InputType
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import com.example.kotlin.rx.widget.textChanges
 import fuel.Fuel
 import fuel.core.Either
 import fuel.core.Manager
 import fuel.core.Response
+import org.jetbrains.anko.*
+import rx.Observable
+import java.util.regex.Pattern
 import kotlin.properties.Delegates
 
 public class MainActivity : AppCompatActivity() {
 
     val TAG = "MainActivity"
 
-    val textView by Delegates.lazy { findViewById(R.id.main_result_text) as TextView }
+    val EMAIL_PATTERN = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")
+
+    var emailTextChanges: Observable<CharSequence> by Delegates.notNull()
+    var passwordTextChanges: Observable<CharSequence> by Delegates.notNull()
+
+    //widgets
+    var emailEditText: EditText by Delegates.notNull()
+    var passwordEditText: EditText by Delegates.notNull()
+    var resultTextView: TextView by Delegates.notNull()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setLayout()
+    }
 
-        val goButton = findViewById(R.id.main_go_button) as Button
-        val clearButton = findViewById(R.id.main_clear_button) as TextView
+    private fun setLayout() {
+        verticalLayout {
+            padding = dip(30)
 
-        clearButton.setOnClickListener {
-            textView.setText("")
-        }
+            emailEditText = editText {
+                hint = "Email"
+                textSize = 18f
+                inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
 
-        goButton.setOnClickListener {
+                emailTextChanges = textChanges
+            }
 
-            Manager.sharedInstance.additionalHeaders = mapOf("Device-Type" to "Android")
+            passwordEditText = editText {
+                hint = "Password"
+                textSize = 18f
+                inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
 
-            Fuel.get("http://httpbin.org/get", mapOf("abc" to 1, "def" to "ghi")).responseString { request, response, either -> updateUI(response, either) }
+                passwordTextChanges = textChanges
+            }
 
-            Fuel.post("http://httpbin.org/post", mapOf("jkl" to 3.3f)).responseString { request, response, either -> updateUI(response, either) }
+            imageView {
+                imageURI = Uri.parse("android.resource://${getPackageName()}/" + R.mipmap.ic_launcher)
+            }
 
-            Fuel.put("http://httpbin.org/put", mapOf("mno" to "pqr")).responseString { request, response, either -> updateUI(response, either) }
+            button("Login") {
+                textSize = 20f
+                enabled = false
 
-            Fuel.delete("http://httpbin.org/delete", mapOf("stu" to "vwx", "yza" to "bcd")).responseString { request, response, either -> updateUI(response, either) }
+                Observable.combineLatest(emailTextChanges, passwordTextChanges, { emailText, passwordText ->
+                    isValidEmailAddress(emailText) && isValidPassword(passwordText)
+                }).subscribe { valid -> enabled = valid }
 
+                onClick {
+                    logIn(emailEditText.getText().toString(), passwordEditText.getText().toString())
+                }
+            }.layoutParams(wrapContent) {
+                gravity = Gravity.CENTER_HORIZONTAL
+            }
+
+            scrollView {
+                resultTextView = textView {
+                    text = "Result : "
+                }
+            }.layoutParams(width = matchParent, height = matchParent)
         }
     }
 
+    fun isValidEmailAddress(text: CharSequence): Boolean {
+        return EMAIL_PATTERN.matcher(text).matches()
+    }
+
+    fun isValidPassword(text: CharSequence): Boolean {
+        return text.length() >= 6
+    }
+
+    fun logIn(emailText: String, passwordText: String) {
+
+        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
+        Manager.sharedInstance.basePath = "https://httpbin.org"
+
+        Fuel.get("/get", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        Fuel.post("/post", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        Fuel.put("/put", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        Fuel.delete("/delete", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        Fuel.get("/basic-auth/$emailText/$passwordText").authenticate(emailText, passwordText).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+    }
+
     fun updateUI(response: Response, either: Either<Exception, String>) {
-        either.fold({ err ->
-            val text = "$response, ${err.getMessage()}"
-            Log.e(TAG, text)
-            runOnUiThread { textView.setText(text) }
-        }, { data ->
+        val (exception, data) = either
             runOnUiThread {
-                var text = textView.getText().toString()
-                text += data
-                textView.setText(text)
+                if (exception != null) {
+                    Log.e(TAG, "${exception.getMessage()}, ${response}")
+                }
+                val text = resultTextView.getText().toString()
+                resultTextView.setText(text + data)
             }
-        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

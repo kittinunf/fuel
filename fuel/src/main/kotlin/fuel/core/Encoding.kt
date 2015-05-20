@@ -28,7 +28,7 @@ public class Encoding : Fuel.RequestConvertible {
             modifiedPath += query + queryFromParameters(parameters)
         } else {
             headerPair = ("Content-Type" to "application/x-www-form-urlencoded")
-            data = queryFromParameters(parameters).toByteArray(ENCODING)
+            data = queryFromParameters(parameters).toByteArray()
         }
 
         build(request) {
