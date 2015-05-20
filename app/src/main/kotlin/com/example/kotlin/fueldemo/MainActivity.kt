@@ -8,18 +8,21 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import fuel.Fuel
-import fuel.core.Left
+import fuel.core.Either
 import fuel.core.Manager
+import fuel.core.Response
+import kotlin.properties.Delegates
 
 public class MainActivity : AppCompatActivity() {
 
     val TAG = "MainActivity"
 
+    val textView by Delegates.lazy { findViewById(R.id.main_result_text) as TextView }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val textView = findViewById(R.id.main_result_text) as TextView
         val goButton = findViewById(R.id.main_go_button) as Button
         val clearButton = findViewById(R.id.main_clear_button) as TextView
 
@@ -29,30 +32,31 @@ public class MainActivity : AppCompatActivity() {
 
         goButton.setOnClickListener {
 
-//            Fuel.get("http://httpbin.org/status/202").validate(200..201).responseString { req, resp, either ->
-//                either.fold({ err ->
-//                    val text = "$resp, ${err.getMessage()}"
-//                    Log.e(TAG, text)
-//                    runOnUiThread { textView.setText(text) }
-//                }, { data ->
-//                    runOnUiThread { textView.setText(data) }
-//                })
-//            }
-
             Manager.sharedInstance.additionalHeaders = mapOf("Device-Type" to "Android")
 
-            Fuel.post("http://httpbin.org/post", mapOf("abc" to "def", "ghi" to "jkl")).header("Page-Index" to 4).responseString { request, response, either ->
-                either.fold({ err ->
-                    val text = "$response, ${err.getMessage()}"
-                    Log.e(TAG, text)
-                    runOnUiThread { textView.setText(text) }
-                }, { data ->
-                    runOnUiThread { textView.setText(data) }
-                })
-            }
+            Fuel.get("http://httpbin.org/get", mapOf("abc" to 1, "def" to "ghi")).responseString { request, response, either -> updateUI(response, either) }
+
+            Fuel.post("http://httpbin.org/post", mapOf("jkl" to 3.3f)).responseString { request, response, either -> updateUI(response, either) }
+
+            Fuel.put("http://httpbin.org/put", mapOf("mno" to "pqr")).responseString { request, response, either -> updateUI(response, either) }
+
+            Fuel.delete("http://httpbin.org/delete", mapOf("stu" to "vwx", "yza" to "bcd")).responseString { request, response, either -> updateUI(response, either) }
 
         }
+    }
 
+    fun updateUI(response: Response, either: Either<Exception, String>) {
+        either.fold({ err ->
+            val text = "$response, ${err.getMessage()}"
+            Log.e(TAG, text)
+            runOnUiThread { textView.setText(text) }
+        }, { data ->
+            runOnUiThread {
+                var text = textView.getText().toString()
+                text += data
+                textView.setText(text)
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

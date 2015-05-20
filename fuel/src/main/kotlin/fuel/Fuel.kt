@@ -40,8 +40,22 @@ public class Fuel {
         }
 
         //put
+        public fun put(path: String, parameters: Map<String, Any?>? = null): Request {
+            return request(Method.PUT, path, parameters)
+        }
+
+        public fun put(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+            return request(Method.PUT, convertible, parameters)
+        }
 
         //delete
+        public fun delete(path: String, parameters: Map<String, Any?>? = null): Request {
+            return request(Method.DELETE, path, parameters)
+        }
+
+        public fun delete(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+            return request(Method.DELETE, convertible, parameters)
+        }
 
         //request
         public fun request(method: Method, path: String, parameters: Map<String, Any?>? = null): Request {

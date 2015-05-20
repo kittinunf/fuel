@@ -53,21 +53,7 @@ public class Request {
         return this
     }
 
-    public fun response(handler: (Request, Response?) -> Unit) {
-        build(task) {
-            successCallback = { response ->
-                handler(this@Request, response)
-            }
-
-            failureCallback = { exception, response ->
-                handler(this@Request, response)
-            }
-        }
-
-        Manager.submit(task)
-    }
-
-    public fun response(handler: (Request, Response?, Either<Exception, ByteArray>) -> Unit) {
+    public fun response(handler: (Request, Response, Either<Exception, ByteArray>) -> Unit) {
         build(task) {
             successCallback = { response ->
                 handler(this@Request, response, Right(response.data))
@@ -81,7 +67,7 @@ public class Request {
         Manager.submit(task)
     }
 
-    public fun responseString(handler: (Request, Response?, Either<Exception, String>) -> Unit) {
+    public fun responseString(handler: (Request, Response, Either<Exception, String>) -> Unit) {
         build(task) {
             successCallback = { response ->
                 handler(this@Request, response, Right(String(response.data)))

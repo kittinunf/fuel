@@ -1,12 +1,8 @@
 package fuel.toolbox
 
-import fuel.core.Client
-import fuel.core.FuelError
-import fuel.core.Request
-import fuel.core.Response
+import fuel.core.*
 import fuel.util.build
 import java.io.DataOutputStream
-import java.io.ObjectOutputStream
 import java.net.HttpURLConnection
 
 /**
@@ -23,8 +19,7 @@ class HttpClient : Client {
             setConnectTimeout(timeout)
             setReadTimeout(timeout)
             setDoInput(true)
-            setDoOutput(true)
-            setRequestMethod(request.httpMethod.value)
+            setMethod(connection, request.httpMethod)
             for ((key, value) in request.httpHeaders) {
                 setRequestProperty(key, value)
             }
@@ -52,6 +47,20 @@ class HttpClient : Client {
         val outStream = DataOutputStream(connection.getOutputStream());
         outStream.write(bytes);
         outStream.close();
+    }
+
+    private fun setMethod(connection: HttpURLConnection, method: Method) {
+        when(method) {
+            is Method.DELETE -> {
+                //fix known bug of httpURLConnection when use DELETE method and setDoOutput(true)
+                //http://bugs.java.com/view_bug.do?bug_id=7157360
+                connection.setDoOutput(false)
+            }
+            else -> {
+                connection.setDoOutput(true)
+            }
+        }
+        connection.setRequestMethod(method.value)
     }
 
 }
