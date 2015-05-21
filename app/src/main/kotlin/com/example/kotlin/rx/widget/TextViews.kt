@@ -53,8 +53,3 @@ class _TextView_TextWatcher : TextWatcher {
     }
 
 }
-
-
-
-
-

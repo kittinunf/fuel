@@ -13,7 +13,7 @@ import kotlin.properties.Delegates
 
 public class Request {
 
-    val timeoutInMillisecond = 1500
+    val timeoutInMillisecond = 15000
 
     var httpMethod: Method = Method.GET
     var path: String by Delegates.notNull()
@@ -59,28 +59,28 @@ public class Request {
         return this
     }
 
-    public fun response(handler: (Request, Response, Either<Exception, ByteArray>) -> Unit) {
+    public fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit) {
         build(task) {
             successCallback = { response ->
                 handler(this@Request, response, Right(response.data))
             }
 
-            failureCallback = { exception, response ->
-                handler(this@Request, response, Left(exception))
+            failureCallback = { error ->
+                handler(this@Request, error.response, Left(error))
             }
         }
 
         Manager.submit(task)
     }
 
-    public fun responseString(handler: (Request, Response, Either<Exception, String>) -> Unit) {
+    public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) {
         build(task) {
             successCallback = { response ->
                 handler(this@Request, response, Right(String(response.data)))
             }
 
-            failureCallback = { exception, response ->
-                handler(this@Request, response, Left(exception))
+            failureCallback = { error ->
+                handler(this@Request, error.response, Left(error))
 
             }
         }
@@ -99,10 +99,10 @@ public class Request {
 
     companion object {
 
-        class TaskRequest(val request: Request) : Callable<Unit> {
+        open class TaskRequest(open val request: Request) : Callable<Unit> {
 
             var successCallback: ((Response) -> Unit)? = null
-            var failureCallback: ((Exception, Response) -> Unit)? = null
+            var failureCallback: ((FuelError) -> Unit)? = null
 
             var validator: (Response) -> Boolean = { response ->
                 (200..299).contains(response.httpStatusCode)
@@ -113,7 +113,7 @@ public class Request {
                     val response = Manager.submit(request)
                     dispatchCallback(response)
                 } catch (error: FuelError) {
-                    failureCallback?.invoke(error.exception, error.response)
+                    failureCallback?.invoke(error)
                 }
             }
 
@@ -122,9 +122,17 @@ public class Request {
                 if (validator.invoke(response)) {
                     successCallback?.invoke(response)
                 } else {
-                    failureCallback?.invoke(IllegalStateException("Validation failed"), response)
+                    val error = build(FuelError()) {
+                        exception = IllegalStateException("Validation failed")
+                        this.response = response
+                    }
+                    failureCallback?.invoke(error)
                 }
             }
+
+        }
+
+        class DownloadTaskRequest(override val request: Request) : TaskRequest(request) {
 
         }
 

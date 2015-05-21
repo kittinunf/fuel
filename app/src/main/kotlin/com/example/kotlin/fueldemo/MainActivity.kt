@@ -13,6 +13,7 @@ import android.widget.TextView
 import com.example.kotlin.rx.widget.textChanges
 import fuel.Fuel
 import fuel.core.Either
+import fuel.core.FuelError
 import fuel.core.Manager
 import fuel.core.Response
 import org.jetbrains.anko.*
@@ -121,11 +122,11 @@ public class MainActivity : AppCompatActivity() {
 
     }
 
-    fun updateUI(response: Response, either: Either<Exception, String>) {
-        val (exception, data) = either
+    fun updateUI(response: Response, either: Either<FuelError, String>) {
+        val (error, data) = either
             runOnUiThread {
-                if (exception != null) {
-                    Log.e(TAG, "${exception.getMessage()}, ${response}")
+                if (error != null) {
+                    Log.e(TAG, "${error}, ${error.response}")
                 }
                 val text = resultTextView.getText().toString()
                 resultTextView.setText(text + data)

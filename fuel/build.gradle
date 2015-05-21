@@ -1,17 +1,28 @@
 apply plugin: 'kotlin'
 
 dependencies {
-//    compile fileTree(dir: 'libs', include: ['*.jar'])
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "commons-io:commons-io:$commons_io_version"
     compile "commons-codec:commons-codec:$commons_codec_version"
+
+    testCompile "junit:junit:$junit_version"
+
+}
+
+sourceSets {
+    test.java.srcDirs += 'src/test/kotlin'
 }
 
 buildscript {
-    ext.kotlin_version = '0.11.91.4'
-    ext.commons_io_version = '2.4'
-    ext.commons_codec_version = '1.5'
+    ext {
+        kotlin_version = '0.11.91.4'
+        commons_io_version = '2.4'
+        commons_codec_version = '1.5'
+
+        //test
+        junit_version = '4.12'
+    }
 
     repositories {
         mavenCentral()

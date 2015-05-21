@@ -19,6 +19,7 @@ class HttpClient : Client {
             setConnectTimeout(timeout)
             setReadTimeout(timeout)
             setDoInput(true)
+            setUseCaches(false)
             setMethod(connection, request.httpMethod)
             for ((key, value) in request.httpHeaders) {
                 setRequestProperty(key, value)
@@ -30,6 +31,7 @@ class HttpClient : Client {
         return build(response) {
             httpStatusCode = connection.getResponseCode()
             httpResponseMessage = connection.getResponseMessage()
+            httpResponseHeaders = connection.getHeaderFields()
             try {
                 dataStream = if (connection.getErrorStream() != null) connection.getErrorStream() else connection.getInputStream()
             } catch(exception: Exception) {
