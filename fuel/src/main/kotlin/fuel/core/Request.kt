@@ -15,9 +15,9 @@ public class Request {
 
     val timeoutInMillisecond = 15000
 
-    var httpMethod: Method = Method.GET
+    var httpMethod: Method by Delegates.notNull()
     var path: String by Delegates.notNull()
-    val url: URL by Delegates.lazy { createUrl() }
+    var url: URL by Delegates.notNull()
     var httpBody: ByteArray? = null
 
     var httpHeaders by Delegates.readWriteLazy {
@@ -27,7 +27,7 @@ public class Request {
         if (additionalHeaders != null) {
             headers += additionalHeaders
         }
-        headers
+        return@readWriteLazy headers
     }
 
     val task: TaskRequest
@@ -65,8 +65,8 @@ public class Request {
                 handler(this@Request, response, Right(response.data))
             }
 
-            failureCallback = { error ->
-                handler(this@Request, error.response, Left(error))
+            failureCallback = { error, response ->
+                handler(this@Request, response, Left(error))
             }
         }
 
@@ -79,8 +79,8 @@ public class Request {
                 handler(this@Request, response, Right(String(response.data)))
             }
 
-            failureCallback = { error ->
-                handler(this@Request, error.response, Left(error))
+            failureCallback = { error, response ->
+                handler(this@Request, response, Left(error))
 
             }
         }
@@ -88,21 +88,12 @@ public class Request {
         Manager.submit(task)
     }
 
-    private fun createUrl(): URL {
-        val basePath = Manager.sharedInstance.basePath
-        if (basePath != null) {
-            return URL(basePath + if (!path.startsWith('/')) '/' + path else path)
-        } else {
-            return URL(path)
-        }
-    }
-
     companion object {
 
         open class TaskRequest(open val request: Request) : Callable<Unit> {
 
             var successCallback: ((Response) -> Unit)? = null
-            var failureCallback: ((FuelError) -> Unit)? = null
+            var failureCallback: ((FuelError, Response) -> Unit)? = null
 
             var validator: (Response) -> Boolean = { response ->
                 (200..299).contains(response.httpStatusCode)
@@ -113,7 +104,7 @@ public class Request {
                     val response = Manager.submit(request)
                     dispatchCallback(response)
                 } catch (error: FuelError) {
-                    failureCallback?.invoke(error)
+                    failureCallback?.invoke(error, error.response)
                 }
             }
 
@@ -124,9 +115,9 @@ public class Request {
                 } else {
                     val error = build(FuelError()) {
                         exception = IllegalStateException("Validation failed")
-                        this.response = response
+                        errorDataStream = response.dataStream
                     }
-                    failureCallback?.invoke(error)
+                    failureCallback?.invoke(error, response)
                 }
             }
 

@@ -20,7 +20,8 @@ class HttpClient : Client {
             setReadTimeout(timeout)
             setDoInput(true)
             setUseCaches(false)
-            setMethod(connection, request.httpMethod)
+            setRequestMethod(request.httpMethod.value)
+            setDoOutput(connection, request.httpMethod)
             for ((key, value) in request.httpHeaders) {
                 setRequestProperty(key, value)
             }
@@ -29,10 +30,10 @@ class HttpClient : Client {
 
         val response = Response()
         return build(response) {
-            httpStatusCode = connection.getResponseCode()
-            httpResponseMessage = connection.getResponseMessage()
-            httpResponseHeaders = connection.getHeaderFields()
             try {
+                httpStatusCode = connection.getResponseCode()
+                httpResponseMessage = connection.getResponseMessage()
+                httpResponseHeaders = connection.getHeaderFields()
                 dataStream = if (connection.getErrorStream() != null) connection.getErrorStream() else connection.getInputStream()
             } catch(exception: Exception) {
                 throw build(FuelError()) {
@@ -51,18 +52,11 @@ class HttpClient : Client {
         outStream.close();
     }
 
-    private fun setMethod(connection: HttpURLConnection, method: Method) {
-        when(method) {
-            is Method.DELETE -> {
-                //fix known bug of httpURLConnection when use DELETE method and setDoOutput(true)
-                //http://bugs.java.com/view_bug.do?bug_id=7157360
-                connection.setDoOutput(false)
-            }
-            else -> {
-                connection.setDoOutput(true)
-            }
+    private fun setDoOutput(connection: HttpURLConnection, method: Method) {
+        when (method) {
+            Method.GET, Method.DELETE -> connection.setDoOutput(false)
+            Method.POST, Method.PUT -> connection.setDoOutput(true)
         }
-        connection.setRequestMethod(method.value)
     }
 
 }

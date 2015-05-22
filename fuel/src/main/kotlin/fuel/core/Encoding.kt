@@ -2,6 +2,7 @@ package fuel.core
 
 import fuel.Fuel
 import fuel.util.build
+import java.net.URL
 import java.net.URLEncoder
 import kotlin.properties.Delegates
 
@@ -14,6 +15,7 @@ public class Encoding : Fuel.RequestConvertible {
     val ENCODING = "UTF-8"
 
     var httpMethod: Method by Delegates.notNull()
+    var baseUrlString: String? = null
     var urlString: String by Delegates.notNull()
     var parameters: Map<String, Any?>? = null
 
@@ -34,12 +36,21 @@ public class Encoding : Fuel.RequestConvertible {
         build(request) {
             httpMethod = method
             this.path = modifiedPath
+            this.url = createUrl(modifiedPath)
             this.httpBody = data
             header(headerPair)
         }
     }
 
     override val request by Delegates.lazy { encoder(httpMethod, urlString, parameters) }
+
+    private fun createUrl(path: String): URL {
+        if (baseUrlString != null) {
+            return URL(baseUrlString + if (!path.startsWith('/')) '/' + path else path)
+        } else {
+            return URL(path)
+        }
+    }
 
     private fun encodeParameterInUrl(method: Method): Boolean {
         when(method) {

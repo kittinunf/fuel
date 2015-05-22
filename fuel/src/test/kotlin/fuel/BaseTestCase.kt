@@ -20,14 +20,11 @@ abstract class BaseTestCase : TestCase() {
 
     val DEFAULT_TIMEOUT = 5000L
 
-    val expect by Delegates.lazy { CountDownLatch(countTestCases()) }
+    abstract val numberOfTestCase: Int
 
-    fun expectWait(timeout: Long = DEFAULT_TIMEOUT) {
-        expect.await(timeout, TimeUnit.MILLISECONDS)
-    }
+    val countdown by Delegates.lazy { CountDownLatch(numberOfTestCase) }
 
-    fun expectFulfill() {
-        expect.countDown()
-    }
+    fun countdownWait(timeout: Long = DEFAULT_TIMEOUT) = countdown.await(timeout, TimeUnit.MILLISECONDS)
+    fun countdownFulfill() = countdown.countDown()
 
 }

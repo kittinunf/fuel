@@ -1,10 +1,10 @@
 package fuel
 
-import fuel.core.FuelError
-import fuel.core.Manager
-import fuel.core.Request
-import fuel.core.Response
+import fuel.core.*
+import fuel.toolbox.HttpClient
+import fuel.util.build
 import java.net.HttpURLConnection
+import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -15,12 +15,19 @@ import kotlin.test.assertTrue
 
 class RequestHeaderTest : BaseTestCase() {
 
+    override val numberOfTestCase = 1
+
+    val manager: Manager by Delegates.lazy {
+        build(Manager()) {
+            client = HttpClient()
+            basePath = "http://httpbin.org"
+        }
+    }
+
     override fun setUp() {
-        Manager.sharedInstance.basePath = "http://httpbin.org"
     }
 
     public fun testHttpPerRequestHeader() {
-
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -29,7 +36,7 @@ class RequestHeaderTest : BaseTestCase() {
         val headerKey = "Custom"
         val headerValue = "foobar"
 
-        Fuel.get("/get").header(headerKey to headerValue).response { req, res, either ->
+        manager.request(Method.GET, "/get").header(headerKey to headerValue).response { req, res, either ->
             request = req
             response = res
 
@@ -37,10 +44,10 @@ class RequestHeaderTest : BaseTestCase() {
             data = d
             error = err
 
-            expectFulfill()
+            countdownFulfill()
         }
 
-        expectWait()
+        countdownWait()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")

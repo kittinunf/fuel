@@ -1,6 +1,5 @@
 package fuel.core
 
-import org.apache.commons.io.IOUtils
 import java.io.InputStream
 import kotlin.properties.Delegates
 
@@ -13,7 +12,9 @@ public class FuelError : Exception() {
     var exception: Exception by Delegates.notNull()
     var response: Response by Delegates.notNull()
 
-    val errorStream: InputStream? by Delegates.lazy { response.dataStream }
-    val error: ByteArray? by Delegates.lazy { response.data }
+    var errorDataStream: InputStream? = null
+    val errorData: ByteArray by Delegates.lazy {
+        if (errorDataStream != null) errorDataStream!!readBytes(defaultBufferSize) else ByteArray(0)
+    }
 
 }

@@ -22,9 +22,8 @@ public class Manager {
     companion object Shared {
 
         var sharedInstance by Delegates.readWriteLazy {
-            val manager = Manager()
-            build(manager) {
-                manager.client = HttpClient()
+            build(Manager()) {
+                this.client = HttpClient()
             }
         }
 
@@ -43,6 +42,7 @@ public class Manager {
     fun request(method: Method, path: String, param: Map<String, Any?>? = null): Request {
         return request(build(Encoding()) {
             httpMethod = method
+            baseUrlString = basePath
             urlString = path
             parameters = param
         })
@@ -51,6 +51,7 @@ public class Manager {
     fun request(method: Method, convertible: Fuel.PathStringConvertible, param: Map<String, Any?>? = null): Request {
         return request(build(Encoding()) {
             httpMethod = method
+            baseUrlString = basePath
             urlString = convertible.path
             parameters = param
         })

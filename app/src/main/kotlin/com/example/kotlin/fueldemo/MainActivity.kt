@@ -11,11 +11,9 @@ import android.view.MenuItem
 import android.widget.EditText
 import android.widget.TextView
 import com.example.kotlin.rx.widget.textChanges
-import fuel.Fuel
-import fuel.core.Either
-import fuel.core.FuelError
-import fuel.core.Manager
-import fuel.core.Response
+import fuel.core.*
+import fuel.toolbox.HttpClient
+import fuel.util.build
 import org.jetbrains.anko.*
 import rx.Observable
 import java.util.regex.Pattern
@@ -64,17 +62,28 @@ public class MainActivity : AppCompatActivity() {
                 imageURI = Uri.parse("android.resource://${getPackageName()}/" + R.mipmap.ic_launcher)
             }
 
-            button("Login") {
-                textSize = 20f
-                enabled = false
+            linearLayout {
+                button("Login") {
+                    textSize = 20f
+                    enabled = false
 
-                Observable.combineLatest(emailTextChanges, passwordTextChanges, { emailText, passwordText ->
-                    isValidEmailAddress(emailText) && isValidPassword(passwordText)
-                }).subscribe { valid -> enabled = valid }
+                    Observable.combineLatest(emailTextChanges, passwordTextChanges, { emailText, passwordText ->
+                        isValidEmailAddress(emailText) && isValidPassword(passwordText)
+                    }).subscribe { valid -> enabled = valid }
 
-                onClick {
-                    logIn(emailEditText.getText().toString(), passwordEditText.getText().toString())
+                    onClick {
+                        logIn(emailEditText.getText().toString(), passwordEditText.getText().toString())
+                    }
                 }
+
+                button("Clear") {
+                    textSize = 20f
+
+                    onClick {
+                        resultTextView.setText("")
+                    }
+                }
+
             }.layoutParams(wrapContent) {
                 gravity = Gravity.CENTER_HORIZONTAL
             }
@@ -97,40 +106,66 @@ public class MainActivity : AppCompatActivity() {
 
     fun logIn(emailText: String, passwordText: String) {
 
-        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
-        Manager.sharedInstance.basePath = "https://httpbin.org"
+//        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
+//        Manager.sharedInstance.basePath = "https://httpbin.org"
+//
+//        Fuel.get("/get", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+//            updateUI(response, either)
+//        }
+//
+//        Fuel.post("/post", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+//            updateUI(response, either)
+//        }
+//
+//        Fuel.put("/put", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+//            updateUI(response, either)
+//        }
+//
+//        Fuel.delete("/delete", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+//            updateUI(response, either)
+//        }
 
-        Fuel.get("/get", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+        val manager = build(Manager()) {
+            client = HttpClient()
+        }
+
+//        manager.request(Method.GET, "http://httpbin.org/get", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+//            updateUI(response, either)
+//        }
+
+        manager.request(Method.GET, "/get").responseString { request, response, either ->
             updateUI(response, either)
         }
 
-        Fuel.post("/post", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-            updateUI(response, either)
-        }
+//        manager.request(Method.PUT, "http://httpbin.org/put", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+//            updateUI(response, either)
+//        }
+//
+//        manager.request(Method.POST, "http://httpbin.org/post",mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+//            updateUI(response, either)
+//        }
+//
+//        manager.request(Method.DELETE, "http://httpbin.org/delete",mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+//            updateUI(response, either)
+//        }
 
-        Fuel.put("/put", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-            updateUI(response, either)
-        }
-
-        Fuel.delete("/delete", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-            updateUI(response, either)
-        }
-
-        Fuel.get("/basic-auth/$emailText/$passwordText").authenticate(emailText, passwordText).responseString { request, response, either ->
-            updateUI(response, either)
-        }
+//        Fuel.get("/basic-auth/$emailText/$passwordText").authenticate(emailText, passwordText).responseString { request, response, either ->
+//            updateUI(response, either)
+//                }
 
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {
         val (error, data) = either
-            runOnUiThread {
-                if (error != null) {
-                    Log.e(TAG, "${error}, ${error.response}")
-                }
-                val text = resultTextView.getText().toString()
+        runOnUiThread {
+            val text = resultTextView.getText().toString()
+            if (error != null) {
+                Log.e(TAG, "${error}, ${response}")
+                resultTextView.setText(text + String(error.errorData))
+            } else {
                 resultTextView.setText(text + data)
             }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -147,6 +182,8 @@ public class MainActivity : AppCompatActivity() {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            emailEditText.setText("octto@taskworld.com")
+            passwordEditText.setText("123456")
             return true
         }
 

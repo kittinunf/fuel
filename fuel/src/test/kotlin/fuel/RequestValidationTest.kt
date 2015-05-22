@@ -1,9 +1,9 @@
 package fuel
 
-import fuel.core.FuelError
-import fuel.core.Manager
-import fuel.core.Request
-import fuel.core.Response
+import fuel.core.*
+import fuel.toolbox.HttpClient
+import fuel.util.build
+import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -14,21 +14,25 @@ import kotlin.test.assertTrue
 
 class RequestValidationTest : BaseTestCase() {
 
-    override fun setUp() {
-        Manager.sharedInstance.basePath = "http://httpbin.org"
+    override val numberOfTestCase = 2
+
+    val manager: Manager by Delegates.lazy {
+        build(Manager()) {
+            client = HttpClient()
+            basePath = "http://httpbin.org"
+        }
     }
 
     public fun testHttpValidationWithDefaultCase() {
-
-        val preDefineStatusCode = 418
+        val preDefinedStatusCode = 418
 
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        //this validate (200..299)
-        Fuel.get("/status/$preDefineStatusCode").response { req, res, either ->
+        //this validate (200..299) which should fail with 418
+        manager.request(Method.GET, "/status/$preDefinedStatusCode").response { req, res, either ->
             request = req
             response = res
 
@@ -36,20 +40,21 @@ class RequestValidationTest : BaseTestCase() {
             data = d
             error = err
 
-            expectFulfill()
+            countdownFulfill()
         }
 
-        expectWait()
+        countdownWait()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
         assertNotNull(error, "error should not be null")
+        assertNotNull(error?.errorDataStream, "error data stream should not be null")
+        assertNotNull(error?.errorData, "error data should not be null")
         assertNull(data, "data should be null")
-        assertTrue(response?.httpStatusCode == preDefineStatusCode, "http status code should be $preDefineStatusCode" )
+        assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode" )
     }
 
     public fun testHttpValidationWithCustomCase() {
-
         val preDefineStatusCode = 418
 
         var request: Request? = null
@@ -57,7 +62,7 @@ class RequestValidationTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.get("/status/$preDefineStatusCode").validate(400..419).response { req, res, either ->
+        manager.request(Method.GET, "/status/$preDefineStatusCode").validate(400..419).response { req, res, either ->
             request = req
             response = res
 
@@ -65,10 +70,10 @@ class RequestValidationTest : BaseTestCase() {
             data = d
             error = err
 
-            expectFulfill()
+            countdownFulfill()
         }
 
-        expectWait()
+        countdownWait()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")

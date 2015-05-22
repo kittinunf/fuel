@@ -3,7 +3,6 @@ apply plugin: 'kotlin'
 dependencies {
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "commons-io:commons-io:$commons_io_version"
     compile "commons-codec:commons-codec:$commons_codec_version"
 
     testCompile "junit:junit:$junit_version"

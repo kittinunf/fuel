@@ -1,9 +1,8 @@
 package fuel
 
-import fuel.core.FuelError
-import fuel.core.Manager
-import fuel.core.Request
-import fuel.core.Response
+import fuel.core.*
+import fuel.toolbox.HttpClient
+import fuel.util.build
 import java.net.HttpURLConnection
 import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
@@ -16,34 +15,40 @@ import kotlin.test.assertTrue
 
 class RequestAuthenticationTest : BaseTestCase() {
 
+    override val numberOfTestCase = 2
+
+    val manager: Manager by Delegates.lazy {
+        build(Manager()) {
+            client = HttpClient()
+            basePath = "http://httpbin.org"
+        }
+    }
+
     var user: String by Delegates.notNull()
     var password: String by Delegates.notNull()
 
     override fun setUp() {
         user = "user"
         password = "password"
-
-        Manager.sharedInstance.basePath = "http://httpbin.org"
     }
 
     public fun testHttpBasicAuthenticationWithInvalidCase() {
-
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.get("/basic-auth/$user/$password").authenticate("invalid", "authentication").response { req, res, either ->
+        manager.request(Method.GET, "/basic-auth/$user/$password").authenticate("invalid", "authentication").response { req, res, either ->
             request = req
             response = res
             val (err, d) = either
             data = d
             error = err
 
-            expectFulfill()
+            countdownFulfill()
         }
 
-        expectWait()
+        countdownWait()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -55,23 +60,22 @@ class RequestAuthenticationTest : BaseTestCase() {
     }
 
     public fun testHttpBasicAuthenticationWithValidCase() {
-
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.get("/basic-auth/$user/$password").authenticate(user, password).response { req, res, either ->
+        manager.request(Method.GET, "/basic-auth/$user/$password").authenticate(user, password).response { req, res, either ->
             request = req
             response = res
             val (err, d) = either
             data = d
             error = err
 
-            expectFulfill()
+            countdownFulfill()
         }
 
-        expectWait()
+        countdownWait()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
