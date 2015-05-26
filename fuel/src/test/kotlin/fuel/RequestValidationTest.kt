@@ -14,7 +14,7 @@ import kotlin.test.assertTrue
 
 class RequestValidationTest : BaseTestCase() {
 
-    override val numberOfTestCase = 2
+    override val numberOfTestCase = 3
 
     val manager: Manager by Delegates.lazy {
         build(Manager()) {
@@ -54,7 +54,36 @@ class RequestValidationTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode" )
     }
 
-    public fun testHttpValidationWithCustomCase() {
+    public fun testHttpValidationWithCustomValidCase() {
+        val preDefinedStatusCode = 203
+
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        //this validate (200..299) which should fail with 418
+        manager.request(Method.GET, "/status/$preDefinedStatusCode").validate(200..202).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            countdownFulfill()
+        }
+
+        countdownWait()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNotNull(error, "error should not be null")
+        assertNull(data, "data should be null")
+        assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode" )
+    }
+
+    public fun testHttpValidationWithCustomInvalidCase() {
         val preDefineStatusCode = 418
 
         var request: Request? = null

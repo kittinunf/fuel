@@ -4,6 +4,7 @@ import fuel.Fuel
 import fuel.util.build
 import java.net.URL
 import java.net.URLEncoder
+import java.util.HashMap
 import kotlin.properties.Delegates
 
 /**
@@ -23,13 +24,13 @@ public class Encoding : Fuel.RequestConvertible {
         val request = Request()
         var modifiedPath = path
         var data: ByteArray? = null
-        var headerPair: Pair<String, String>? = null
+        var headerPairs: MutableMap<String, Any> = hashMapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
 
         if (encodeParameterInUrl(method)) {
             val query = if (path.last().equals("?")) "" else "?"
             modifiedPath += query + queryFromParameters(parameters)
         } else {
-            headerPair = ("Content-Type" to "application/x-www-form-urlencoded")
+            headerPairs.plusAssign("Content-Type" to "application/x-www-form-urlencoded")
             data = queryFromParameters(parameters).toByteArray()
         }
 
@@ -38,7 +39,7 @@ public class Encoding : Fuel.RequestConvertible {
             this.path = modifiedPath
             this.url = createUrl(modifiedPath)
             this.httpBody = data
-            header(headerPair)
+            header(headerPairs)
         }
     }
 

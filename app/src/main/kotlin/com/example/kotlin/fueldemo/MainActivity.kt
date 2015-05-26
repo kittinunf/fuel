@@ -2,6 +2,7 @@ package com.example.kotlin.fueldemo
 
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.text.InputType
 import android.util.Log
@@ -11,11 +12,15 @@ import android.view.MenuItem
 import android.widget.EditText
 import android.widget.TextView
 import com.example.kotlin.rx.widget.textChanges
-import fuel.core.*
+import fuel.core.Either
+import fuel.core.FuelError
+import fuel.core.Manager
+import fuel.core.Response
 import fuel.toolbox.HttpClient
 import fuel.util.build
 import org.jetbrains.anko.*
 import rx.Observable
+import java.io.File
 import java.util.regex.Pattern
 import kotlin.properties.Delegates
 
@@ -129,13 +134,21 @@ public class MainActivity : AppCompatActivity() {
             client = HttpClient()
         }
 
+        manager.download("http://httpbin.org/bytes/32768").progress { readBytes, totalBytes ->
+            val progress = readBytes.toFloat() / totalBytes.toFloat()
+            Log.e(TAG, progress.toString())
+        }.responseDestination({ response, url ->
+            val sd = Environment.getExternalStorageDirectory();
+            val location = File(sd.getAbsolutePath() + "/test")
+            location.mkdir()
+            File(location, "test.tmp")
+        }) { request, response, either ->
+            updateUIWithBytes(response, either)
+        }
+
 //        manager.request(Method.GET, "http://httpbin.org/get", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
 //            updateUI(response, either)
 //        }
-
-        manager.request(Method.GET, "/get").responseString { request, response, either ->
-            updateUI(response, either)
-        }
 
 //        manager.request(Method.PUT, "http://httpbin.org/put", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
 //            updateUI(response, either)
@@ -160,10 +173,23 @@ public class MainActivity : AppCompatActivity() {
         runOnUiThread {
             val text = resultTextView.getText().toString()
             if (error != null) {
-                Log.e(TAG, "${error}, ${response}")
+                Log.e(TAG, "${error}, ${response}, ${error.exception}")
                 resultTextView.setText(text + String(error.errorData))
             } else {
                 resultTextView.setText(text + data)
+            }
+        }
+    }
+
+    fun updateUIWithBytes(response: Response, either: Either<FuelError, ByteArray>) {
+        val (error, data) = either
+        runOnUiThread {
+            val text = resultTextView.getText().toString()
+            if (error != null) {
+                Log.e(TAG, "${error}, ${response}, ${error.exception}")
+                resultTextView.setText(text + String(error.errorData))
+            } else {
+                resultTextView.setText(text)
             }
         }
     }

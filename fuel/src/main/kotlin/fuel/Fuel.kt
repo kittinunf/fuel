@@ -57,6 +57,10 @@ public class Fuel {
             return request(Method.DELETE, convertible, parameters)
         }
 
+        public fun download(path: String, parameters: Map<String, Any?>? = null): Request {
+            return Manager.sharedInstance.download(path, parameters)
+        }
+
         //request
         private fun request(method: Method, path: String, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.request(method, path, parameters)
@@ -66,7 +70,7 @@ public class Fuel {
             return Manager.sharedInstance.request(method, convertible, parameters)
         }
 
-        private fun request(convertible: RequestConvertible): Request {
+        public fun request(convertible: RequestConvertible): Request {
             return Manager.sharedInstance.request(convertible)
         }
 

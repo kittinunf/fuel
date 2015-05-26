@@ -13,33 +13,34 @@ class HttpClient : Client {
 
     override fun executeRequest(request: Request): Response {
         val connection = request.url.openConnection() as HttpURLConnection
-
-        build(connection) {
-            val timeout = request.timeoutInMillisecond
-            setConnectTimeout(timeout)
-            setReadTimeout(timeout)
-            setDoInput(true)
-            setUseCaches(false)
-            setRequestMethod(request.httpMethod.value)
-            setDoOutput(connection, request.httpMethod)
-            for ((key, value) in request.httpHeaders) {
-                setRequestProperty(key, value)
-            }
-            setBodyIfAny(connection, request.httpBody)
-        }
-
         val response = Response()
-        return build(response) {
-            try {
+
+        try {
+            build(connection) {
+                val timeout = request.timeoutInMillisecond
+                setConnectTimeout(timeout)
+                setReadTimeout(timeout)
+                setDoInput(true)
+                setUseCaches(false)
+                setRequestMethod(request.httpMethod.value)
+                setDoOutput(connection, request.httpMethod)
+                for ((key, value) in request.httpHeaders) {
+                    setRequestProperty(key, value)
+                }
+                setBodyIfAny(connection, request.httpBody)
+            }
+
+            return build(response) {
                 httpStatusCode = connection.getResponseCode()
                 httpResponseMessage = connection.getResponseMessage()
                 httpResponseHeaders = connection.getHeaderFields()
+                httpContentLength = connection.getHeaderField("Content-Length").toLong()
                 dataStream = if (connection.getErrorStream() != null) connection.getErrorStream() else connection.getInputStream()
-            } catch(exception: Exception) {
-                throw build(FuelError()) {
-                    this.exception = exception
-                    this.response = response
-                }
+            }
+        } catch(exception: Exception) {
+            throw build(FuelError()) {
+                this.exception = exception
+                this.response = response
             }
         }
     }

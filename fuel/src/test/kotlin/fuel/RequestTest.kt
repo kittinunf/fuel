@@ -15,7 +15,7 @@ import kotlin.test.assertTrue
 
 class RequestTest : BaseTestCase() {
 
-    override val numberOfTestCase = 7
+    override val numberOfTestCase = 8
 
     val manager: Manager by Delegates.lazy {
         build(Manager()) {
@@ -30,6 +30,19 @@ class RequestTest : BaseTestCase() {
         DELETE : HttpsBin("delete")
 
         override val path = "https://httpbin.org/$relativePath"
+    }
+
+    class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
+        override val request = createRequest()
+
+        fun createRequest(): Request {
+            val encoder = build(Encoding()) {
+                httpMethod = method
+                urlString = "http://httpbin.org/$relativePath"
+                parameters = mapOf("foo" to "bar")
+            }
+            return encoder.request
+        }
     }
 
     public fun testHttpGetRequestWithDataResponse() {
@@ -246,4 +259,31 @@ class RequestTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
         assertTrue(string.contains("user-agent"), "USER_AGENT endpoint must be resolved correctly, and user-agent should be present in this response")
     }
+
+    public fun testHttpGetRequestWithRequestConvertible() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(HttpBinConvertible(Method.GET, "get")).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            countdownFulfill()
+        }
+
+        countdownWait()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
 }

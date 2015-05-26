@@ -12,13 +12,17 @@ public class Response {
     var httpStatusCode = -1
     var httpResponseMessage: String by Delegates.notNull()
     var httpResponseHeaders: Map<String, List<String>> by Delegates.notNull()
+    var httpContentLength = 0L
 
     var dataStream: InputStream? = null
     val data: ByteArray by Delegates.lazy {
-        if (dataStream != null) dataStream!!.readBytes(defaultBufferSize) else ByteArray(0)
+        if (dataStream != null) {
+            val bytes = dataStream!!.readBytes(defaultBufferSize)
+            dataStream!!.close()
+            bytes
+        } else {
+            ByteArray(0)
+        }
     }
 
-    override fun toString(): String {
-        return "Response: { StatusCode: $httpStatusCode, ResponseMessage: $httpResponseMessage }"
-    }
 }

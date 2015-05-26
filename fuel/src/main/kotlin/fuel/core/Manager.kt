@@ -29,10 +29,6 @@ public class Manager {
 
         private var executor = Executors.newScheduledThreadPool(2 * Runtime.getRuntime().availableProcessors())
 
-        fun submit(request: Request): Response {
-            return sharedInstance.client.executeRequest(request)
-        }
-
         fun <T> submit(call: Callable<T>) {
             executor.submit(call)
         }
@@ -55,6 +51,18 @@ public class Manager {
             urlString = convertible.path
             parameters = param
         })
+    }
+
+    fun download(path: String, param: Map<String, Any?>? = null): Request {
+        val requestConvertible = build(Encoding()) {
+            httpMethod = Method.GET
+            baseUrlString = basePath
+            urlString = path
+            parameters = param
+        }
+        val request = requestConvertible.request
+        request.requestType = Request.Type.DOWNLOAD
+        return request
     }
 
     fun request(convertible: Fuel.RequestConvertible): Request {

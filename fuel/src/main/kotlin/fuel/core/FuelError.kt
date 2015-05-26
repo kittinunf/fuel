@@ -14,7 +14,13 @@ public class FuelError : Exception() {
 
     var errorDataStream: InputStream? = null
     val errorData: ByteArray by Delegates.lazy {
-        if (errorDataStream != null) errorDataStream!!readBytes(defaultBufferSize) else ByteArray(0)
+        if (errorDataStream != null) {
+            val bytes = errorDataStream!!.readBytes(defaultBufferSize)
+            errorDataStream!!.close()
+            bytes
+        } else {
+            ByteArray(0)
+        }
     }
 
 }
