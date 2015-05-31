@@ -4,8 +4,7 @@ import fuel.Fuel
 import fuel.toolbox.HttpClient
 import fuel.util.build
 import fuel.util.readWriteLazy
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import kotlin.properties.Delegates
 
@@ -21,16 +20,30 @@ public class Manager {
 
     companion object Shared {
 
+        //manager
         var sharedInstance by Delegates.readWriteLazy {
             build(Manager()) {
                 this.client = HttpClient()
             }
         }
 
-        private var executor = Executors.newScheduledThreadPool(2 * Runtime.getRuntime().availableProcessors())
+        //background executor
+        var executor by Delegates.readWriteLazy {
+            Executors.newCachedThreadPool { command ->
+                Thread {
+                    Thread.currentThread().setPriority(Thread.NORM_PRIORITY)
+                    command.run()
+                }
+            }
+        }
 
-        fun <T> submit(call: Callable<T>) {
-            executor.submit(call)
+        //callback executor
+        var callbackExecutor: Executor by Delegates.readWriteLazy {
+            object : Executor {
+                override fun execute(command: Runnable) {
+                    command.run()
+                }
+            }
         }
 
     }

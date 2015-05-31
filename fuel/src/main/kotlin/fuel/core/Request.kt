@@ -1,11 +1,10 @@
 package fuel.core
 
 import fuel.util.build
-import fuel.util.copyToWithProgress
+import fuel.util.copyTo
 import fuel.util.readWriteLazy
 import org.apache.commons.codec.binary.Base64
-import java.io.File
-import java.io.FileOutputStream
+import java.io.*
 import java.net.URL
 import java.util.HashMap
 import java.util.concurrent.Callable
@@ -18,8 +17,8 @@ import kotlin.properties.Delegates
 public class Request {
 
     enum class Type {
-        REQUEST
-        DOWNLOAD
+        REQUEST,
+        DOWNLOAD,
         UPLOAD
     }
 
@@ -43,7 +42,6 @@ public class Request {
     //underlying task request
     val taskRequest: TaskRequest by Delegates.lazy {
         when (requestType) {
-            Type.REQUEST -> TaskRequest(this)
             Type.DOWNLOAD -> DownloadTaskRequest(this)
             else -> TaskRequest(this)
         }
@@ -66,16 +64,6 @@ public class Request {
         return this
     }
 
-    public fun progress(handler: (Long, Long) -> Unit): Request {
-        val downloadTaskRequest = taskRequest as DownloadTaskRequest
-
-        build(downloadTaskRequest) {
-            progressCallback = handler
-        }
-
-        return this
-    }
-
     public fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
         val encodedAuth = Base64.encodeBase64(auth.toByteArray())
@@ -91,51 +79,66 @@ public class Request {
         return this
     }
 
+    public fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
+        val downloadTaskRequest = taskRequest as? DownloadTaskRequest ?: throw IllegalStateException("progress is only used with RequestType.DOWNLOAD")
+
+        build(downloadTaskRequest) {
+            progressCallback = handler
+        }
+        return this
+    }
+
+    public fun destination(destination: (Response, URL) -> File): Request {
+        val downloadTaskRequest = taskRequest as? DownloadTaskRequest ?: throw IllegalStateException("destination is only used with RequestType.DOWNLOAD")
+
+        build(downloadTaskRequest) {
+            destinationCallback = destination
+        }
+        return this
+    }
+
     public fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit) {
         build(taskRequest) {
             successCallback = { response ->
-                handler(this@Request, response, Right(response.data))
+                callback {
+                    handler(this@Request, response, Right(response.data))
+                }
             }
 
             failureCallback = { error, response ->
-                handler(this@Request, response, Left(error))
+                callback {
+                    handler(this@Request, response, Left(error))
+                }
             }
         }
 
-        Manager.submit(taskRequest)
+        Manager.executor.submit(taskRequest)
     }
 
     public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) {
         build(taskRequest) {
             successCallback = { response ->
-                handler(this@Request, response, Right(String(response.data)))
+                val data = String(response.data)
+                callback {
+                    handler(this@Request, response, Right(data))
+                }
             }
 
             failureCallback = { error, response ->
-                handler(this@Request, response, Left(error))
-
+                callback {
+                    handler(this@Request, response, Left(error))
+                }
             }
         }
 
-        Manager.submit(taskRequest)
+        Manager.executor.submit(taskRequest)
     }
 
-    public fun responseDestination(destination: (Response, URL) -> File, handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit) {
-        val downloadTaskRequest = taskRequest as DownloadTaskRequest
-
-        build(downloadTaskRequest) {
-            destinationCallback = destination
-
-            successCallback = { response ->
-                handler(this@Request, response, Right(ByteArray(0)))
-            }
-
-            failureCallback = { error, response ->
-                handler(this@Request, response, Left(error))
-            }
+    //privates
+    private fun callback(f: () -> Unit) {
+        Manager.callbackExecutor.execute {
+            f.invoke()
         }
-
-        Manager.submit(downloadTaskRequest)
     }
 
     open class TaskRequest(open val request: Request) : Callable<Unit> {
@@ -150,6 +153,8 @@ public class Request {
         override fun call() {
             try {
                 val response = Manager.sharedInstance.client.executeRequest(request)
+
+                //dispatch
                 dispatchCallback(response)
             } catch (error: FuelError) {
                 failureCallback?.invoke(error, error.response)
@@ -163,7 +168,7 @@ public class Request {
             } else {
                 val error = build(FuelError()) {
                     exception = IllegalStateException("Validation failed")
-                    errorDataStream = response.dataStream
+                    errorData = response.data
                 }
                 failureCallback?.invoke(error, response)
             }
@@ -173,23 +178,37 @@ public class Request {
 
     class DownloadTaskRequest(override val request: Request) : TaskRequest(request) {
 
+        val BUFFER_SIZE = 1024
+
         var progressCallback: ((Long, Long) -> Unit)? = null
         var destinationCallback: ((Response, URL) -> File)? = null
+
+        var dataStream: InputStream by Delegates.notNull()
+        var fileOutputStream: FileOutputStream by Delegates.notNull()
 
         override fun call() {
             try {
                 val response = Manager.sharedInstance.client.executeRequest(request)
                 val fileLocation = destinationCallback?.invoke(response, request.url)!!
-                val fileOutputStream = FileOutputStream(fileLocation)
-                response.dataStream?.copyToWithProgress(fileOutputStream) { readBytes ->
+
+                //file output
+                fileOutputStream = FileOutputStream(fileLocation)
+
+                dataStream = ByteArrayInputStream(response.data)
+                dataStream.copyTo(fileOutputStream, BUFFER_SIZE) { readBytes ->
                     progressCallback?.invoke(readBytes, response.httpContentLength)
                 }
-                fileOutputStream.close()
+
+                //dispatch
                 dispatchCallback(response)
             } catch(error: FuelError) {
                 failureCallback?.invoke(error, error.response)
+            } finally {
+                dataStream.close()
+                fileOutputStream.close()
             }
         }
+
     }
 
 }

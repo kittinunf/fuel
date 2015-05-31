@@ -10,11 +10,11 @@ import fuel.core.Request
 
 public class Fuel {
 
-    public trait PathStringConvertible {
+    public interface PathStringConvertible {
         val path: String
     }
 
-    public trait RequestConvertible {
+    public interface RequestConvertible {
         val request: Request
     }
 
@@ -57,6 +57,7 @@ public class Fuel {
             return request(Method.DELETE, convertible, parameters)
         }
 
+        //download
         public fun download(path: String, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.download(path, parameters)
         }

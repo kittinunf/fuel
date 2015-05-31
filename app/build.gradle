@@ -43,8 +43,8 @@ dependencies {
 
 buildscript {
     ext.android_support_version = '22.1.1'
-    ext.kotlin_version = '0.11.91.4'
-    ext.anko_version = '0.6-15s'
+    ext.kotlin_version = '0.12.200'
+    ext.anko_version = '0.6.2-15s'
     ext.rx_version = '1.0.11'
 
     repositories {

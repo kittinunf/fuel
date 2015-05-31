@@ -2,6 +2,7 @@ package fuel
 
 import fuel.core.*
 import fuel.util.build
+import java.io.File
 import java.net.HttpURLConnection
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -13,13 +14,13 @@ import kotlin.test.assertTrue
 
 class RequestSharedInstanceTest : BaseTestCase() {
 
-    override val numberOfTestCase = 9
+    override val numberOfTestCase = 10
 
     enum class HttpsBin(override val path: String) : Fuel.PathStringConvertible {
-        IP : HttpsBin("ip")
-        POST : HttpsBin("post")
-        PUT : HttpsBin("put")
-        DELETE : HttpsBin("delete")
+        IP("ip"),
+        POST("post"),
+        PUT("put"),
+        DELETE("delete")
     }
 
     class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
@@ -59,14 +60,13 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         countdownWait()
 
-        val string = data as String
-
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
 
+        val string = data as String
         assertTrue(string.toLowerCase().contains("foo") && string.toLowerCase().contains("bar"), "additional header must be sent along with request and present in response")
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
@@ -308,6 +308,47 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    public fun testHttpDownloadWithProgressValidCase() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        var read = -1L
+        var total = -1L
+
+        Fuel.download("/bytes/1048576").destination { response, url ->
+            val path = System.getProperty("user.dir") + "/build"
+            val file = File(path)
+            if (!file.exists()) {
+                file.mkdir()
+            }
+            File(file, "downloadFromFuelWithProgress.tmp")
+        }.progress { readBytes, totalBytes ->
+            read = readBytes
+            total = totalBytes
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+            val (err, d) = either
+            data = d
+            error = err
+
+            countdownFulfill()
+        }
+
+        countdownWait()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+
+        assertTrue(read == total, "read bytes and total bytes should be equal")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode")
     }
 
 }

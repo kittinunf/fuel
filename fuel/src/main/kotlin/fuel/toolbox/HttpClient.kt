@@ -35,7 +35,11 @@ class HttpClient : Client {
                 httpResponseMessage = connection.getResponseMessage()
                 httpResponseHeaders = connection.getHeaderFields()
                 httpContentLength = connection.getHeaderField("Content-Length").toLong()
-                dataStream = if (connection.getErrorStream() != null) connection.getErrorStream() else connection.getInputStream()
+                data = if (connection.getErrorStream() != null) {
+                    connection.getErrorStream().readBytes()
+                } else {
+                    connection.getInputStream().readBytes()
+                }
             }
         } catch(exception: Exception) {
             throw build(FuelError()) {

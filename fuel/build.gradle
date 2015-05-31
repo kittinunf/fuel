@@ -15,8 +15,7 @@ sourceSets {
 
 buildscript {
     ext {
-        kotlin_version = '0.11.91.4'
-        commons_io_version = '2.4'
+        kotlin_version = '0.12.200'
         commons_codec_version = '1.5'
 
         //test

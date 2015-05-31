@@ -48,7 +48,6 @@ class RequestValidationTest : BaseTestCase() {
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
         assertNotNull(error, "error should not be null")
-        assertNotNull(error?.errorDataStream, "error data stream should not be null")
         assertNotNull(error?.errorData, "error data should not be null")
         assertNull(data, "data should be null")
         assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode" )
@@ -67,7 +66,7 @@ class RequestValidationTest : BaseTestCase() {
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = either.swap()
             data = d
             error = err
 
@@ -95,9 +94,14 @@ class RequestValidationTest : BaseTestCase() {
             request = req
             response = res
 
-            val (err, d) = either
-            data = d
-            error = err
+            when (either) {
+                is Left -> {
+                    error = either.get()
+                }
+                is Right -> {
+                    data = either.get()
+                }
+            }
 
             countdownFulfill()
         }

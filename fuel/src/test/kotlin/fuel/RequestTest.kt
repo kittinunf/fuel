@@ -24,10 +24,10 @@ class RequestTest : BaseTestCase() {
     }
 
     enum class HttpsBin(val relativePath: String) : Fuel.PathStringConvertible {
-        USER_AGENT : HttpsBin("user-agent")
-        POST : HttpsBin("post")
-        PUT : HttpsBin("put")
-        DELETE : HttpsBin("delete")
+        USER_AGENT("user-agent"),
+        POST("post"),
+        PUT("put"),
+        DELETE("delete");
 
         override val path = "https://httpbin.org/$relativePath"
     }
@@ -270,9 +270,11 @@ class RequestTest : BaseTestCase() {
             request = req
             response = res
 
-            val (err, d) = either
-            data = d
-            error = err
+            either.fold({ err ->
+                error = err
+            }, { d ->
+                data = d
+            })
 
             countdownFulfill()
         }

@@ -35,3 +35,4 @@ build
 *.ipr
 *~
 *.swp
+*.log

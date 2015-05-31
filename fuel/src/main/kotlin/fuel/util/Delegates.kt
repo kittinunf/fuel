@@ -17,7 +17,7 @@ private class ReadWriteLazyVal<T>(private val initializer: () -> T) : ReadWriteP
         if (value == null) {
             value = (initializer()) ?: throw IllegalStateException("Initializer block of property ${desc.name} return null")
         }
-        [suppress("UNCHECKED_CAST")]
+        @suppress("UNCHECKED_CAST")
         return value as T
     }
 

@@ -5,9 +5,9 @@ package fuel.core
  */
 
 public enum class Method(val value: String) {
-    GET : Method("GET")
-    POST : Method("POST")
-    PUT : Method("PUT")
-    DELETE : Method("DELETE")
+    GET("GET"),
+    POST("POST"),
+    PUT("PUT"),
+    DELETE("DELETE")
 }
 

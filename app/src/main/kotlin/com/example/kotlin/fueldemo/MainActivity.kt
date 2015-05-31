@@ -12,12 +12,9 @@ import android.view.MenuItem
 import android.widget.EditText
 import android.widget.TextView
 import com.example.kotlin.rx.widget.textChanges
-import fuel.core.Either
-import fuel.core.FuelError
-import fuel.core.Manager
-import fuel.core.Response
-import fuel.toolbox.HttpClient
-import fuel.util.build
+import com.example.kotlin.util.MainThreadExecutor
+import fuel.Fuel
+import fuel.core.*
 import org.jetbrains.anko.*
 import rx.Observable
 import java.io.File
@@ -111,40 +108,52 @@ public class MainActivity : AppCompatActivity() {
 
     fun logIn(emailText: String, passwordText: String) {
 
-//        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
-//        Manager.sharedInstance.basePath = "https://httpbin.org"
-//
-//        Fuel.get("/get", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-//            updateUI(response, either)
-//        }
-//
-//        Fuel.post("/post", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-//            updateUI(response, either)
-//        }
-//
-//        Fuel.put("/put", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-//            updateUI(response, either)
-//        }
-//
-//        Fuel.delete("/delete", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-//            updateUI(response, either)
-//        }
+        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
+        Manager.sharedInstance.basePath = "https://httpbin.org"
+        Manager.callbackExecutor = MainThreadExecutor()
 
-        val manager = build(Manager()) {
-            client = HttpClient()
+        Fuel.get("/get", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+            updateUI(response, either)
         }
 
-        manager.download("http://httpbin.org/bytes/32768").progress { readBytes, totalBytes ->
-            val progress = readBytes.toFloat() / totalBytes.toFloat()
-            Log.e(TAG, progress.toString())
-        }.responseDestination({ response, url ->
+        Fuel.post("/post", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        Fuel.put("/put", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        Fuel.delete("/delete", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        Fuel.download("/bytes/1048576").destination { response, url ->
             val sd = Environment.getExternalStorageDirectory();
             val location = File(sd.getAbsolutePath() + "/test")
             location.mkdir()
             File(location, "test.tmp")
-        }) { request, response, either ->
-            updateUIWithBytes(response, either)
+        }.progress { readBytes, totalBytes ->
+            Log.e(TAG, (readBytes.toFloat() / totalBytes.toFloat()).toString());
+        }.responseString { request, response, either ->
+            updateUI(response, either)
         }
+
+//        val manager = build(Manager()) {
+//            client = HttpClient()
+//        }
+//
+//        manager.download("http://httpbin.org/bytes/1048576").destination { response, url ->
+//            val sd = Environment.getExternalStorageDirectory();
+//            val location = File(sd.getAbsolutePath() + "/test")
+//            location.mkdir()
+//            File(location, "test.tmp")
+//        }.progress { readBytes, totalBytes ->
+//            val progress = readBytes.toFloat() / totalBytes.toFloat()
+//            Log.e(TAG, progress.toString())
+//        }.responseString { request, response, either ->
+//            updateUI(response, either)
+//        }
 
 //        manager.request(Method.GET, "http://httpbin.org/get", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
 //            updateUI(response, either)
@@ -164,33 +173,27 @@ public class MainActivity : AppCompatActivity() {
 
 //        Fuel.get("/basic-auth/$emailText/$passwordText").authenticate(emailText, passwordText).responseString { request, response, either ->
 //            updateUI(response, either)
-//                }
+//        }
 
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {
         val (error, data) = either
-        runOnUiThread {
-            val text = resultTextView.getText().toString()
-            if (error != null) {
-                Log.e(TAG, "${error}, ${response}, ${error.exception}")
-                resultTextView.setText(text + String(error.errorData))
-            } else {
-                resultTextView.setText(text + data)
-            }
+        val e: FuelError? = when(either) {
+            is Left -> either.get()
+            else -> null
         }
-    }
+        var d: String? = when(either) {
+            is Right -> either.get()
+            else -> null
+        }
 
-    fun updateUIWithBytes(response: Response, either: Either<FuelError, ByteArray>) {
-        val (error, data) = either
-        runOnUiThread {
-            val text = resultTextView.getText().toString()
-            if (error != null) {
-                Log.e(TAG, "${error}, ${response}, ${error.exception}")
-                resultTextView.setText(text + String(error.errorData))
-            } else {
-                resultTextView.setText(text)
-            }
+        val text = resultTextView.getText().toString()
+        if (error != null) {
+            Log.e(TAG, "${error}, ${response}, ${error.exception}")
+            resultTextView.setText(text + String(error.errorData))
+        } else {
+            resultTextView.setText(text + data)
         }
     }
 
