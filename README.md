@@ -90,9 +90,24 @@ Fuel.put("http://httpbin.org/put", mapOf("foo" to "foo", "bar" to "bar")).respon
 }
 ```
 
-### Download file with/without progress handler
+### Download with or without progress handler
+``` Kotlin
+Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
+    File.createTempFile("temp", ".tmp");
+}.response { req, res, either -> {
+
+}
+
+Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
+    File.createTempFile("temp", ".tmp");
+}.progress { readBytes, totalBytes ->
+    val progress = readBytes.toFloat() / totalBytes.toFloat()
+}.response { req, res, either -> {
+
+}
 ```
-```
+
+### Upload (in development)
 
 ### Authentication
 
@@ -122,4 +137,20 @@ Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request,
 
 ## Configuration
 
-* Use singleton ```Manager.sharedInsance``` to manager global config
+* Use singleton ```Manager.sharedInstance``` to manager global configuration
+* ```basePath``` is to manage common root path
+``` Kotlin
+Manager.sharedInstance.basePath = "https://httpbin.org
+
+Fuel.get("/get").response { request, response, either ->
+    //make request to https://httpbin.org/get
+}
+```
+* ```additionalHeaders``` is to manage common HTTP header pair
+``` Kotlin
+Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
+
+Fuel.get("/get").response { request, response, either ->
+    //make request to https://httpbin.org/get with global device header (Device : Android)
+}
+```
