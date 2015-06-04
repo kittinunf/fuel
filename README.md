@@ -33,6 +33,10 @@ Fuel.get("http://httpbin.org/get").response { request, response, either ->
 ```
 
 ### Response Handling
+### Either 
+
+* [Either](http://www.ibm.com/developerworks/java/library/j-ft13/index.html) is a functional style data structure that represents data that contains either *left* or *right* but not both. It represents result of action that can be error or success (with result). The common functional convention is the *left* of an Either class contains an exception (if any), and the *right* contains the result.
+* Work with either is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Either.kt#L13) it, [*muliple declare*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/fuel/RequestAuthenticationTest.kt#L44) it as because it is [data class](http://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *left* or *right*.
 
 ### Response
 ``` response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit) ```
@@ -139,17 +143,24 @@ Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request,
 
 * Use singleton ```Manager.sharedInstance``` to manager global configuration
 * ```basePath``` is to manage common root path
+
 ``` Kotlin
 Manager.sharedInstance.basePath = "https://httpbin.org
+```
 
+``` Kotlin
 Fuel.get("/get").response { request, response, either ->
     //make request to https://httpbin.org/get
 }
 ```
+
 * ```additionalHeaders``` is to manage common HTTP header pair
+
 ``` Kotlin
 Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
+```
 
+```
 Fuel.get("/get").response { request, response, either ->
     //make request to https://httpbin.org/get with global device header (Device : Android)
 }
