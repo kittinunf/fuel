@@ -35,17 +35,13 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:$android_support_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "org.jetbrains.anko:anko:$anko_version"
-    compile "io.reactivex:rxjava:$rx_version"
 
     compile project(':fuel')
 }
 
 buildscript {
-    ext.android_support_version = '22.1.1'
+    ext.android_support_version = '22.2.0'
     ext.kotlin_version = '0.12.200'
-    ext.anko_version = '0.6.2-15s'
-    ext.rx_version = '1.0.11'
 
     repositories {
         mavenCentral()
@@ -53,6 +49,7 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
     }
 }
 

@@ -1,130 +1,54 @@
 package com.example.kotlin.fueldemo
 
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.support.v7.app.AppCompatActivity
-import android.text.InputType
 import android.util.Log
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.EditText
-import android.widget.TextView
-import com.example.kotlin.rx.widget.textChanges
 import com.example.kotlin.util.MainThreadExecutor
 import fuel.Fuel
 import fuel.core.*
-import org.jetbrains.anko.*
-import rx.Observable
+import kotlinx.android.synthetic.activity_main.main_clear_button
+import kotlinx.android.synthetic.activity_main.main_go_button
+import kotlinx.android.synthetic.activity_main.main_result_text
 import java.io.File
-import java.util.regex.Pattern
-import kotlin.properties.Delegates
 
 public class MainActivity : AppCompatActivity() {
 
-    val TAG = "MainActivity"
-
-    val EMAIL_PATTERN = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")
-
-    var emailTextChanges: Observable<CharSequence> by Delegates.notNull()
-    var passwordTextChanges: Observable<CharSequence> by Delegates.notNull()
-
-    //widgets
-    var emailEditText: EditText by Delegates.notNull()
-    var passwordEditText: EditText by Delegates.notNull()
-    var resultTextView: TextView by Delegates.notNull()
+    val TAG = "Main"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setLayout()
-    }
+        setContentView(R.layout.activity_main)
 
-    private fun setLayout() {
-        verticalLayout {
-            padding = dip(30)
+        main_go_button.setOnClickListener {
+            execute()
+        }
 
-            emailEditText = editText {
-                hint = "Email"
-                textSize = 18f
-                inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-
-                emailTextChanges = textChanges
-            }
-
-            passwordEditText = editText {
-                hint = "Password"
-                textSize = 18f
-                inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
-
-                passwordTextChanges = textChanges
-            }
-
-            imageView {
-                imageURI = Uri.parse("android.resource://${getPackageName()}/" + R.mipmap.ic_launcher)
-            }
-
-            linearLayout {
-                button("Login") {
-                    textSize = 20f
-                    enabled = false
-
-                    Observable.combineLatest(emailTextChanges, passwordTextChanges, { emailText, passwordText ->
-                        isValidEmailAddress(emailText) && isValidPassword(passwordText)
-                    }).subscribe { valid -> enabled = valid }
-
-                    onClick {
-                        logIn(emailEditText.getText().toString(), passwordEditText.getText().toString())
-                    }
-                }
-
-                button("Clear") {
-                    textSize = 20f
-
-                    onClick {
-                        resultTextView.setText("")
-                    }
-                }
-
-            }.layoutParams(wrapContent) {
-                gravity = Gravity.CENTER_HORIZONTAL
-            }
-
-            scrollView {
-                resultTextView = textView {
-                    text = "Result : "
-                }
-            }.layoutParams(width = matchParent, height = matchParent)
+        main_clear_button.setOnClickListener {
+            main_result_text.setText("")
         }
     }
 
-    fun isValidEmailAddress(text: CharSequence): Boolean {
-        return EMAIL_PATTERN.matcher(text).matches()
-    }
-
-    fun isValidPassword(text: CharSequence): Boolean {
-        return text.length() >= 6
-    }
-
-    fun logIn(emailText: String, passwordText: String) {
-
+    fun execute() {
         Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
         Manager.sharedInstance.basePath = "https://httpbin.org"
         Manager.callbackExecutor = MainThreadExecutor()
 
-        Fuel.get("/get", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+        Fuel.get("/get", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             updateUI(response, either)
         }
 
-        Fuel.post("/post", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+        Fuel.post("/post", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             updateUI(response, either)
         }
 
-        Fuel.put("/put", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+        Fuel.put("/put", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             updateUI(response, either)
         }
 
-        Fuel.delete("/delete", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
+        Fuel.delete("/delete", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             updateUI(response, either)
         }
 
@@ -139,42 +63,6 @@ public class MainActivity : AppCompatActivity() {
             updateUI(response, either)
         }
 
-//        val manager = build(Manager()) {
-//            client = HttpClient()
-//        }
-//
-//        manager.download("http://httpbin.org/bytes/1048576").destination { response, url ->
-//            val sd = Environment.getExternalStorageDirectory();
-//            val location = File(sd.getAbsolutePath() + "/test")
-//            location.mkdir()
-//            File(location, "test.tmp")
-//        }.progress { readBytes, totalBytes ->
-//            val progress = readBytes.toFloat() / totalBytes.toFloat()
-//            Log.e(TAG, progress.toString())
-//        }.responseString { request, response, either ->
-//            updateUI(response, either)
-//        }
-
-//        manager.request(Method.GET, "http://httpbin.org/get", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-//            updateUI(response, either)
-//        }
-
-//        manager.request(Method.PUT, "http://httpbin.org/put", mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-//            updateUI(response, either)
-//        }
-//
-//        manager.request(Method.POST, "http://httpbin.org/post",mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-//            updateUI(response, either)
-//        }
-//
-//        manager.request(Method.DELETE, "http://httpbin.org/delete",mapOf("email" to emailText, "password" to passwordText)).responseString { request, response, either ->
-//            updateUI(response, either)
-//        }
-
-//        Fuel.get("/basic-auth/$emailText/$passwordText").authenticate(emailText, passwordText).responseString { request, response, either ->
-//            updateUI(response, either)
-//        }
-
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {
@@ -188,12 +76,12 @@ public class MainActivity : AppCompatActivity() {
             else -> null
         }
 
-        val text = resultTextView.getText().toString()
+        val text = main_result_text.getText().toString()
         if (error != null) {
             Log.e(TAG, "${error}, ${response}, ${error.exception}")
-            resultTextView.setText(text + String(error.errorData))
+            main_result_text.setText(text + String(error.errorData))
         } else {
-            resultTextView.setText(text + data)
+            main_result_text.setText(text + data)
         }
     }
 
@@ -211,8 +99,6 @@ public class MainActivity : AppCompatActivity() {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            emailEditText.setText("octto@taskworld.com")
-            passwordEditText.setText("123456")
             return true
         }
 
