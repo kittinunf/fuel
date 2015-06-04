@@ -1,5 +1,6 @@
 # Fuel
-A simplest HTTP networking library in Kotlin
+
+The easiest HTTP networking library in Kotlin
 
 ## Features
 
@@ -11,11 +12,13 @@ A simplest HTTP networking library in Kotlin
 
 ### Gradle
 
+```
 
+```
 
 ## Usage
 
-### Get Request
+### GET
 
 ``` Kotlin
 Fuel.get("http://httpbin.org/get").response { request, response, either ->
@@ -31,35 +34,60 @@ Fuel.get("http://httpbin.org/get").response { request, response, either ->
 ### Response Handling
 
 ### Response
-``` fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit) ```
+``` response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit) ```
 
 ### Response in String
-``` fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) ```
+``` responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) ```
 
-### Post Request
+### POST
 
 ``` Kotlin
-Fuel.post("http://httpbin.org/post", mapOf("foo" to "bar", "foo2" to "bar2")).response { request, response, either ->
+Fuel.post("http://httpbin.org/post").response { request, response, either ->
     
 }
 ```
 
-### Put Request
+### PUT
 
 ``` Kotlin
-Fuel.put("/put", mapOf("foo" to "foo", "bar" to "bar")).response { request, response, either ->
+Fuel.put("http://httpbin.org/put").response { request, response, either ->
 
 }
 ```
 
-### Delete Request
+### DELETE
 
 ``` Kotlin
-Fuel.delete("/delete", mapOf("foo" to "foo", "bar" to "bar")).response { request, response, either ->
+Fuel.delete("http://httpbin.org/delete").response { request, response, either ->
 
 }
 ```
 
+### Parameter Support
+
+* URL encoded style for GET & DELETE request
+
+``` Kotlin
+Fuel.get("http://httpbin.org/get", mapOf("foo" to "foo", "bar" to "bar")).response { request, response, either -> {
+    //resolve to http://httpbin.org/get?foo=foo&bar=bar
+}
+
+Fuel.delete("http://httpbin.org/delete", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+    //resolve to http://httpbin.org/get?foo=foo&bar=bar
+}
+```
+
+* Support x-www-form-urlencoded for PUT & POST
+
+``` Kotlin
+Fuel.post("/post", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+    //http body includes foo=foo&bar=bar
+}
+
+Fuel.put("/put", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+    //http body includes foo=foo&bar=bar
+}
+```
 
 
 
