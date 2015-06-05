@@ -6,13 +6,13 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import com.example.kotlin.util.MainThreadExecutor
 import fuel.Fuel
 import fuel.core.*
+import java.io.File
+
 import kotlinx.android.synthetic.activity_main.main_clear_button
 import kotlinx.android.synthetic.activity_main.main_go_button
 import kotlinx.android.synthetic.activity_main.main_result_text
-import java.io.File
 
 public class MainActivity : AppCompatActivity() {
 
@@ -33,8 +33,7 @@ public class MainActivity : AppCompatActivity() {
 
     fun execute() {
         Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
-        Manager.sharedInstance.basePath = "https://httpbin.org"
-        Manager.callbackExecutor = MainThreadExecutor()
+        Manager.sharedInstance.basePath = "http://httpbin.org"
 
         Fuel.get("/get", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             updateUI(response, either)
@@ -62,7 +61,6 @@ public class MainActivity : AppCompatActivity() {
         }.responseString { request, response, either ->
             updateUI(response, either)
         }
-
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {

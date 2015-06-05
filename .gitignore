@@ -21,6 +21,10 @@ local.properties
 .classpath
 .project
 
+# Bintray support
+install.gradle
+bintray.gradle
+
 # Android Studio
 .idea/
 .gradle

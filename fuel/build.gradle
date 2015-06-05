@@ -1,4 +1,36 @@
-apply plugin: 'kotlin'
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+repositories {
+    jcenter()
+}
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 22
+        versionCode 1
+        versionName "0.1"
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
 
 dependencies {
 
@@ -9,13 +41,13 @@ dependencies {
 
 }
 
-sourceSets {
-    test.java.srcDirs += 'src/test/kotlin'
-}
-
 buildscript {
     ext {
-        kotlin_version = '0.12.200'
+        libraryName = 'Fuel'
+        artifact = 'Fuel'
+
+        //dependencies version
+        kotlin_version = '0.12.213'
         commons_codec_version = '1.5'
 
         //test
@@ -30,3 +62,6 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
+
+//apply from: '../install.gradle'
+//apply from: '../bintray.gradle'
