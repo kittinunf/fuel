@@ -1,6 +1,8 @@
 # Fuel
 
-The easiest HTTP networking library in Kotlin
+The easiest HTTP networking library in Kotlin for Android.
+
+[ ![Download](https://api.bintray.com/packages/kittinunf/maven/Fuel/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel/_latestVersion)
 
 ## Features
 
@@ -13,8 +15,10 @@ The easiest HTTP networking library in Kotlin
 
 ### Gradle
 
-```
-
+``` Groovy
+dependencies {
+    compile 'fuel:fuel:0.1'
+}
 ```
 
 ## Usage
