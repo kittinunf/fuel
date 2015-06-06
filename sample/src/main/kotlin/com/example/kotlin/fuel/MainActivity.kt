@@ -10,9 +10,7 @@ import fuel.Fuel
 import fuel.core.*
 import java.io.File
 
-import kotlinx.android.synthetic.activity_main.main_clear_button
-import kotlinx.android.synthetic.activity_main.main_go_button
-import kotlinx.android.synthetic.activity_main.main_result_text
+import kotlinx.android.synthetic.activity_main.*
 
 public class MainActivity : AppCompatActivity() {
 
