@@ -1,1 +1,1 @@
-include ':app', ':fuel'
+include ':sample', ':lib', ':sample-java'
