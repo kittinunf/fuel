@@ -21,6 +21,10 @@ dependencies {
 }
 ```
 
+### Sample
+
+* There are two sample folders, one is in Kotlin and another one in Java.
+
 ## Usage
 
 ### GET
@@ -144,10 +148,10 @@ Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request,
 }
 ```
 
-## Configuration
+## Advanced Configuration
 
-* Use singleton ```Manager.sharedInstance``` to manager global configuration
-* ```basePath``` is to manage common root path
+* Use singleton ```Manager.sharedInstance``` to manager global configuration.
+* ```basePath``` is to manage common root path. Great usage is for your static API endpoint.
 
 ``` Kotlin
 Manager.sharedInstance.basePath = "https://httpbin.org
@@ -155,21 +159,23 @@ Manager.sharedInstance.basePath = "https://httpbin.org
 
 ``` Kotlin
 Fuel.get("/get").response { request, response, either ->
-    //make request to https://httpbin.org/get
+    //make request to https://httpbin.org/get because Fuel.{get|post|put|delete} use Manager.sharedInstance to make HTTP request
 }
 ```
 
-* ```additionalHeaders``` is to manage common HTTP header pair
+* ```additionalHeaders``` is to manage common HTTP header pairs in format of ``` mapOf<String, String>```.
 
 ``` Kotlin
 Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
 ```
 
-```
+``` Kotlin
 Fuel.get("/get").response { request, response, either ->
     //make request to https://httpbin.org/get with global device header (Device : Android)
 }
 ```
+
+* ```client``` is a raw HTTP client driver. Generally, it is responsible to make [```Request```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [```Response```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [```HttpClient```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [```java.net.HttpUrlConnnection```](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [```client```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Client.kt) protocol, and set back to ```Manager.sharedInstance``` to kick off the effect.
 
 ## Credits
 
@@ -180,7 +186,7 @@ Fuel is brought to you by [contributors](https://github.com/kittinunf/Fuel/wiki/
 Fuel is released under the [MIT](http://opensource.org/licenses/MIT) license.
 >The MIT License (MIT)
 
->Copyright (c) 2015
+>Copyright (c) 2015 by Fuel contributors
 
 >Permission is hereby granted, free of charge, to any person obtaining a copy
 >of this software and associated documentation files (the "Software"), to deal
