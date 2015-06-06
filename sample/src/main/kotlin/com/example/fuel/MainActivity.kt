@@ -1,4 +1,4 @@
-package com.example.kotlin.fuel
+package com.example.fuel
 
 import android.os.Bundle
 import android.os.Environment
