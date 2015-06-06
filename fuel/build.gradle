@@ -43,9 +43,6 @@ dependencies {
 
 buildscript {
     ext {
-        libraryName = 'Fuel'
-        artifact = 'Fuel'
-
         //dependencies version
         kotlin_version = '0.12.213'
         commons_codec_version = '1.5'
