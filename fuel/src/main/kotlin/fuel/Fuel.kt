@@ -22,43 +22,43 @@ public class Fuel {
 
         //convenience methods
         //get
-        public fun get(path: String, parameters: Map<String, Any?>? = null): Request {
+        jvmOverloads public fun get(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.GET, path, parameters)
         }
 
-        public fun get(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        jvmOverloads public fun get(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.GET, convertible, parameters)
         }
 
         //post
-        public fun post(path: String, parameters: Map<String, Any?>? = null): Request {
+        jvmOverloads public fun post(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.POST, path, parameters)
         }
 
-        public fun post(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        jvmOverloads public fun post(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.POST, convertible, parameters)
         }
 
         //put
-        public fun put(path: String, parameters: Map<String, Any?>? = null): Request {
+        jvmOverloads public fun put(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.PUT, path, parameters)
         }
 
-        public fun put(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        jvmOverloads public fun put(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.PUT, convertible, parameters)
         }
 
         //delete
-        public fun delete(path: String, parameters: Map<String, Any?>? = null): Request {
+        jvmOverloads public fun delete(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.DELETE, path, parameters)
         }
 
-        public fun delete(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        jvmOverloads public fun delete(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.DELETE, convertible, parameters)
         }
 
         //download
-        public fun download(path: String, parameters: Map<String, Any?>? = null): Request {
+        jvmOverloads public fun download(path: String, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.download(path, parameters)
         }
 
