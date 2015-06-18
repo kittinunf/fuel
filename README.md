@@ -25,6 +25,25 @@ dependencies {
 
 * There are two sample folders, one is in Kotlin and another one in Java.
 
+* Kotlin
+
+``` Kotlin
+//simplest get
+Fuel.get("/get").responseString { request, response, either ->
+}
+```
+
+* Java
+
+``` Java
+//simplest get
+Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
+    @Override
+    public void handle(Request request, Response response, Either<FuelError, String> either) {
+    }
+});
+```
+
 ## Usage
 
 ### GET
