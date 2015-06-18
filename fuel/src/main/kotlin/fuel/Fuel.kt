@@ -18,7 +18,7 @@ public class Fuel {
         val request: Request
     }
 
-    companion object {
+    companion object Http {
 
         //convenience methods
         //get
@@ -60,6 +60,11 @@ public class Fuel {
         //download
         jvmOverloads public fun download(path: String, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.download(path, parameters)
+        }
+
+        //upload
+        jvmOverloads public fun upload(path: String, parameters: Map<String, Any?>? = null): Request {
+            return Manager.sharedInstance.upload(path, parameters)
         }
 
         //request

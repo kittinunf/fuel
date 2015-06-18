@@ -49,7 +49,7 @@ public class MainActivity : AppCompatActivity() {
             updateUI(response, either)
         }
 
-        Fuel.download("/bytes/1048576").destination { response, url ->
+        Fuel.download("/bytes/1048").destination { response, url ->
             val sd = Environment.getExternalStorageDirectory();
             val location = File(sd.getAbsolutePath() + "/test")
             location.mkdir()
@@ -57,6 +57,21 @@ public class MainActivity : AppCompatActivity() {
         }.progress { readBytes, totalBytes ->
             Log.e(TAG, (readBytes.toFloat() / totalBytes.toFloat()).toString());
         }.responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+//        Fuel.upload("/upload").source { request, url ->
+//            val sd = Environment.getExternalStorageDirectory();
+//            val location = File(sd.getAbsolutePath() + "/test")
+//            location.mkdir()
+//            File(location, "test.tmp")
+//        }.responseString { request, response, either ->
+//
+//        }
+
+        val username = "username"
+        val password = "P@s\$vv0|2|)"
+        Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, either ->
             updateUI(response, either)
         }
     }

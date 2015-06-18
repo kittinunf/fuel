@@ -1,7 +1,5 @@
 package fuel.core
 
-import fuel.util.readWriteLazy
-import java.io.InputStream
 import kotlin.properties.Delegates
 
 /**

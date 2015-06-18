@@ -6,7 +6,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "com.example.kotlin.fueldemo"
+        applicationId "com.example.kotlin.fuel"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
@@ -36,7 +36,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:$android_support_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    compile "fuel:fuel:$fuel_version"
+    compile project(':fuel')
 
 }
 
@@ -56,8 +56,4 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
     }
-}
-
-repositories {
-    mavenCentral()
 }

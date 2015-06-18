@@ -2,9 +2,9 @@ package fuel.core
 
 import fuel.Fuel
 import fuel.util.build
+import fuel.util.toHexString
 import java.net.URL
 import java.net.URLEncoder
-import java.util.HashMap
 import kotlin.properties.Delegates
 
 /**
@@ -15,6 +15,7 @@ public class Encoding : Fuel.RequestConvertible {
 
     val ENCODING = "UTF-8"
 
+    var requestType: Request.Type = Request.Type.REQUEST
     var httpMethod: Method by Delegates.notNull()
     var baseUrlString: String? = null
     var urlString: String by Delegates.notNull()
@@ -29,6 +30,10 @@ public class Encoding : Fuel.RequestConvertible {
         if (encodeParameterInUrl(method)) {
             val query = if (path.last().equals("?")) "" else "?"
             modifiedPath += query + queryFromParameters(parameters)
+        } else if (requestType.equals(Request.Type.UPLOAD)) {
+            val boundary = System.currentTimeMillis().toHexString()
+            headerPairs.plusAssign("Content-Type" to "multipart/form-data; boundary=" + boundary)
+
         } else {
             headerPairs.plusAssign("Content-Type" to "application/x-www-form-urlencoded")
             data = queryFromParameters(parameters).toByteArray()
@@ -39,6 +44,7 @@ public class Encoding : Fuel.RequestConvertible {
             this.path = modifiedPath
             this.url = createUrl(modifiedPath)
             this.httpBody = data
+            this.type = requestType
             header(headerPairs)
         }
     }

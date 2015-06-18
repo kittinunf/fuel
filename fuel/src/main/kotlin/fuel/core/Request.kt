@@ -3,9 +3,12 @@ package fuel.core
 import fuel.util.build
 import fuel.util.copyTo
 import fuel.util.readWriteLazy
-import org.apache.commons.codec.binary.Base64
+import fuel.util.toHexString
 import java.io.*
+import java.net.Authenticator
+import java.net.PasswordAuthentication
 import java.net.URL
+import java.net.URLConnection
 import java.util.HashMap
 import java.util.concurrent.Callable
 import kotlin.properties.Delegates
@@ -24,7 +27,7 @@ public class Request {
 
     val timeoutInMillisecond = 15000
 
-    var requestType: Type = Type.REQUEST
+    var type: Type = Type.REQUEST
     var httpMethod: Method by Delegates.notNull()
     var path: String by Delegates.notNull()
     var url: URL by Delegates.notNull()
@@ -41,8 +44,9 @@ public class Request {
 
     //underlying task request
     val taskRequest: TaskRequest by Delegates.lazy {
-        when (requestType) {
+        when (type) {
             Type.DOWNLOAD -> DownloadTaskRequest(this)
+            Type.UPLOAD -> UploadTaskRequest(this)
             else -> TaskRequest(this)
         }
     }
@@ -64,10 +68,27 @@ public class Request {
         return this
     }
 
+    public fun body(body: ByteArray): Request {
+        httpBody = body
+        return this
+    }
+
+    public fun source(source: (Request, URL) -> File): Request {
+        val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
+
+        build(uploadTaskRequest) {
+            sourceCallback = source
+        }
+        return this
+    }
+
     public fun authenticate(username: String, password: String): Request {
-        val auth = "$username:$password"
-        val encodedAuth = Base64.encodeBase64(auth.toByteArray())
-        return header("Authorization" to "Basic " + String(encodedAuth))
+        Authenticator.setDefault(object : Authenticator() {
+            override fun getPasswordAuthentication(): PasswordAuthentication? {
+                return PasswordAuthentication(username, password.toCharArray())
+            }
+        })
+        return this
     }
 
     public fun validate(statusCodeRange: IntRange): Request {
@@ -189,10 +210,10 @@ public class Request {
         override fun call() {
             try {
                 val response = Manager.sharedInstance.client.executeRequest(request)
-                val fileLocation = destinationCallback?.invoke(response, request.url)!!
+                val file = destinationCallback?.invoke(response, request.url)!!
 
                 //file output
-                fileOutputStream = FileOutputStream(fileLocation)
+                fileOutputStream = FileOutputStream(file)
 
                 dataStream = ByteArrayInputStream(response.data)
                 dataStream.copyTo(fileOutputStream, BUFFER_SIZE) { readBytes ->
@@ -206,6 +227,60 @@ public class Request {
             } finally {
                 dataStream.close()
                 fileOutputStream.close()
+            }
+        }
+
+    }
+
+    class UploadTaskRequest(override val request: Request): TaskRequest(request) {
+
+        val BUFFER_SIZE = 1024
+
+        val CRLF = "\\r\\n"
+        val boundary = System.currentTimeMillis().toHexString()
+
+        var sourceCallback: ((Request, URL) -> File)? = null
+
+        var dataStream: ByteArrayOutputStream by Delegates.notNull()
+        var fileInputStream: FileInputStream by Delegates.notNull()
+
+        override fun call() {
+            try {
+                val file = sourceCallback?.invoke(request, request.url)
+
+                //file input
+                fileInputStream = FileInputStream(file)
+
+                dataStream = build(ByteArrayOutputStream()) {
+                    write(("--" + boundary + CRLF).toByteArray())
+                    write(("Content-Disposition: form-data; filename=\"" + file?.getName() + "\"").toByteArray())
+                    write(CRLF.toByteArray())
+                    write(("Content-Type: " + URLConnection.guessContentTypeFromName(file?.getName())).toByteArray())
+                    write(CRLF.toByteArray())
+                    write(CRLF.toByteArray())
+                    flush()
+
+                    //input file data
+                    fileInputStream.copyTo(dataStream, BUFFER_SIZE)
+
+                    write(CRLF.toByteArray())
+                    flush()
+                    write(("--" + boundary + "--").toByteArray())
+                    write(CRLF.toByteArray())
+                    flush()
+                }
+
+                request.body(dataStream.toByteArray())
+
+                val response = Manager.sharedInstance.client.executeRequest(request)
+
+                //dispatch
+                dispatchCallback(response)
+            } catch(error: FuelError) {
+                failureCallback?.invoke(error, error.response)
+            } finally {
+                dataStream.close()
+                fileInputStream.close()
             }
         }
 
