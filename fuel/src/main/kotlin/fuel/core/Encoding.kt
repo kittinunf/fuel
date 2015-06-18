@@ -22,7 +22,7 @@ public class Encoding : Fuel.RequestConvertible {
     var parameters: Map<String, Any?>? = null
 
     var encoder: (Method, String, Map<String, Any?>?) -> Request = { method, path, parameters ->
-        val request = Request()
+
         var modifiedPath = path
         var data: ByteArray? = null
         var headerPairs: MutableMap<String, Any> = hashMapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
@@ -33,13 +33,12 @@ public class Encoding : Fuel.RequestConvertible {
         } else if (requestType.equals(Request.Type.UPLOAD)) {
             val boundary = System.currentTimeMillis().toHexString()
             headerPairs.plusAssign("Content-Type" to "multipart/form-data; boundary=" + boundary)
-
         } else {
             headerPairs.plusAssign("Content-Type" to "application/x-www-form-urlencoded")
             data = queryFromParameters(parameters).toByteArray()
         }
 
-        build(request) {
+        build(Request()) {
             httpMethod = method
             this.path = modifiedPath
             this.url = createUrl(modifiedPath)
@@ -47,6 +46,7 @@ public class Encoding : Fuel.RequestConvertible {
             this.type = requestType
             header(headerPairs)
         }
+
     }
 
     override val request by Delegates.lazy { encoder(httpMethod, urlString, parameters) }

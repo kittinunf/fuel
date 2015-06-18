@@ -55,25 +55,28 @@ public class MainActivity : AppCompatActivity() {
             location.mkdir()
             File(location, "test.tmp")
         }.progress { readBytes, totalBytes ->
-            Log.e(TAG, (readBytes.toFloat() / totalBytes.toFloat()).toString());
+            Log.e(TAG, "download: ${readBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->
             updateUI(response, either)
         }
-
-//        Fuel.upload("/upload").source { request, url ->
-//            val sd = Environment.getExternalStorageDirectory();
-//            val location = File(sd.getAbsolutePath() + "/test")
-//            location.mkdir()
-//            File(location, "test.tmp")
-//        }.responseString { request, response, either ->
-//
-//        }
 
         val username = "username"
         val password = "P@s\$vv0|2|)"
         Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, either ->
             updateUI(response, either)
         }
+
+        Fuel.upload("/post").source { request, url ->
+            val sd = Environment.getExternalStorageDirectory();
+            val location = File(sd.getAbsolutePath() + "/test")
+            location.mkdir()
+            File(location, "test.tmp")
+        }.progress { writtenBytes, totalBytes ->
+            Log.e(TAG, "upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
+        }.responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {

@@ -101,11 +101,20 @@ public class Request {
     }
 
     public fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
-        val downloadTaskRequest = taskRequest as? DownloadTaskRequest ?: throw IllegalStateException("progress is only used with RequestType.DOWNLOAD")
-
-        build(downloadTaskRequest) {
-            progressCallback = handler
+        if (taskRequest as? DownloadTaskRequest != null) {
+            val download = taskRequest as DownloadTaskRequest
+            build(download) {
+                progressCallback = handler
+            }
+        } else if (taskRequest as? UploadTaskRequest != null) {
+            val upload = taskRequest as UploadTaskRequest
+            build(upload) {
+                progressCallback = handler
+            }
+        } else {
+            throw IllegalStateException("progress is only used with RequestType.DOWNLOAD or RequestType.UPLOAD")
         }
+
         return this
     }
 
@@ -239,29 +248,32 @@ public class Request {
         val CRLF = "\\r\\n"
         val boundary = System.currentTimeMillis().toHexString()
 
-        var sourceCallback: ((Request, URL) -> File)? = null
+        var progressCallback: ((Long, Long) -> Unit)? = null
+        var sourceCallback: ((Request, URL) -> File) by Delegates.notNull()
 
         var dataStream: ByteArrayOutputStream by Delegates.notNull()
         var fileInputStream: FileInputStream by Delegates.notNull()
 
         override fun call() {
             try {
-                val file = sourceCallback?.invoke(request, request.url)
+                val file = sourceCallback.invoke(request, request.url)
 
                 //file input
                 fileInputStream = FileInputStream(file)
 
                 dataStream = build(ByteArrayOutputStream()) {
                     write(("--" + boundary + CRLF).toByteArray())
-                    write(("Content-Disposition: form-data; filename=\"" + file?.getName() + "\"").toByteArray())
+                    write(("Content-Disposition: form-data; filename=\"" + file.getName() + "\"").toByteArray())
                     write(CRLF.toByteArray())
-                    write(("Content-Type: " + URLConnection.guessContentTypeFromName(file?.getName())).toByteArray())
+                    write(("Content-Type: " + URLConnection.guessContentTypeFromName(file.getName())).toByteArray())
                     write(CRLF.toByteArray())
                     write(CRLF.toByteArray())
                     flush()
 
                     //input file data
-                    fileInputStream.copyTo(dataStream, BUFFER_SIZE)
+                    fileInputStream.copyTo(this, BUFFER_SIZE) { writtenBytes ->
+                        progressCallback?.invoke(writtenBytes, file.length())
+                    }
 
                     write(CRLF.toByteArray())
                     flush()

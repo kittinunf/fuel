@@ -112,6 +112,22 @@ public class MainActivity extends AppCompatActivity {
                         return null;
                     }
                 });
+
+                Fuel.Http.upload("http://httpbin.org/post").source(new Function2<Request, URL, File>() {
+                    @Override
+                    public File invoke(Request request, URL url) {
+                        File sd = Environment.getExternalStorageDirectory();
+                        File location = new File(sd.getAbsolutePath() + "/test");
+                        location.mkdir();
+                        return new File(location, "test-java.tmp");
+                    }
+                }).responseString(new Function3<Request, Response, Either<FuelError, String>, Unit>() {
+                    @Override
+                    public Unit invoke(Request request, Response response, Either<FuelError, String> fuelErrorStringEither) {
+                        updateUI(fuelErrorStringEither);
+                        return null;
+                    }
+                });
             }
         });
     }
@@ -123,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
             resultText.setText(resultText.getText() + result);
         } else {
             FuelError error = (FuelError) either.get();
-            Log.e(TAG, error.getMessage());
+            Log.e(TAG, String.valueOf(error.getErrorData()));
             resultText.setText(resultText.getText() + error.getException().getMessage());
         }
     }
