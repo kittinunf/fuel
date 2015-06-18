@@ -73,15 +73,6 @@ public class Request {
         return this
     }
 
-    public fun source(source: (Request, URL) -> File): Request {
-        val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
-
-        build(uploadTaskRequest) {
-            sourceCallback = source
-        }
-        return this
-    }
-
     public fun authenticate(username: String, password: String): Request {
         Authenticator.setDefault(object : Authenticator() {
             override fun getPasswordAuthentication(): PasswordAuthentication? {
@@ -118,6 +109,15 @@ public class Request {
         return this
     }
 
+    public fun source(source: (Request, URL) -> File): Request {
+        val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
+
+        build(uploadTaskRequest) {
+            sourceCallback = source
+        }
+        return this
+    }
+
     public fun destination(destination: (Response, URL) -> File): Request {
         val downloadTaskRequest = taskRequest as? DownloadTaskRequest ?: throw IllegalStateException("destination is only used with RequestType.DOWNLOAD")
 
@@ -145,6 +145,24 @@ public class Request {
         Manager.executor.submit(taskRequest)
     }
 
+    public fun response(handler: Handler<ByteArray>) {
+        build(taskRequest) {
+            successCallback = { response ->
+                callback {
+                    handler.handle(this@Request, response, Right(response.data))
+                }
+            }
+
+            failureCallback = { error, response ->
+                callback {
+                    handler.handle(this@Request, response, Left(error))
+                }
+            }
+        }
+
+        Manager.executor.submit(taskRequest)
+    }
+
     public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) {
         build(taskRequest) {
             successCallback = { response ->
@@ -157,6 +175,25 @@ public class Request {
             failureCallback = { error, response ->
                 callback {
                     handler(this@Request, response, Left(error))
+                }
+            }
+        }
+
+        Manager.executor.submit(taskRequest)
+    }
+
+    public fun responseString(handler: Handler<String>) {
+         build(taskRequest) {
+            successCallback = { response ->
+                val data = String(response.data)
+                callback {
+                    handler.handle(this@Request, response, Right(data))
+                }
+            }
+
+            failureCallback = { error, response ->
+                callback {
+                    handler.handle(this@Request, response, Left(error))
                 }
             }
         }

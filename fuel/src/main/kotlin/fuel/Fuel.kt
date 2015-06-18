@@ -3,6 +3,7 @@ package fuel
 import fuel.core.Manager
 import fuel.core.Method
 import fuel.core.Request
+import kotlin.platform.platformStatic
 
 /**
  * Created by Kittinun Vantasin on 5/13/15.
@@ -18,52 +19,52 @@ public class Fuel {
         val request: Request
     }
 
-    companion object Http {
+    companion object {
 
         //convenience methods
         //get
-        jvmOverloads public fun get(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads public fun get(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.GET, path, parameters)
         }
 
-        jvmOverloads public fun get(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads public fun get(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.GET, convertible, parameters)
         }
 
         //post
-        jvmOverloads public fun post(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads public fun post(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.POST, path, parameters)
         }
 
-        jvmOverloads public fun post(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads public fun post(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.POST, convertible, parameters)
         }
 
         //put
-        jvmOverloads public fun put(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads public fun put(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.PUT, path, parameters)
         }
 
-        jvmOverloads public fun put(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads public fun put(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.PUT, convertible, parameters)
         }
 
         //delete
-        jvmOverloads public fun delete(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads public fun delete(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.DELETE, path, parameters)
         }
 
-        jvmOverloads public fun delete(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads public fun delete(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.DELETE, convertible, parameters)
         }
 
         //download
-        jvmOverloads public fun download(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads public fun download(path: String, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.download(path, parameters)
         }
 
         //upload
-        jvmOverloads public fun upload(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads public fun upload(path: String, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.upload(path, parameters)
         }
 
@@ -76,7 +77,7 @@ public class Fuel {
             return Manager.sharedInstance.request(method, convertible, parameters)
         }
 
-        public fun request(convertible: RequestConvertible): Request {
+        platformStatic public fun request(convertible: RequestConvertible): Request {
             return Manager.sharedInstance.request(convertible)
         }
 
