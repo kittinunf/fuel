@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+
         });
 
         Button clearButton = (Button) findViewById(R.id.main_clear_button);
@@ -128,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 resultText.setText("");
             }
+
         });
     }
 

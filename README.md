@@ -136,7 +136,14 @@ Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
 }
 ```
 
-### Upload (in development)
+### Upload with or without progress handler
+``` Kotlin
+Fuel.upload("/post").source { request, url ->
+    File.createTempFile("temp", ".tmp");
+}.responseString { request, response, either ->
+
+}
+```
 
 ### Authentication
 
