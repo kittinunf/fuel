@@ -80,7 +80,7 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {
-        val (error, data) = either
+        //when checking
         val e: FuelError? = when(either) {
             is Left -> either.get()
             else -> null
@@ -90,6 +90,15 @@ public class MainActivity : AppCompatActivity() {
             else -> null
         }
 
+        //folding
+        either.fold({ e ->
+            //left
+        }, { d ->
+            //right
+        })
+
+        //multi-declaration
+        val (error, data) = either
         val text = main_result_text.getText().toString()
         if (error != null) {
             Log.e(TAG, "${error}, ${response}, ${error.exception}")

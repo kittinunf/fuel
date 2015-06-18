@@ -36,7 +36,11 @@ Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
 //simplest get
 Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
     @Override
-    public void handle(Request request, Response response, Either<FuelError, String> either) {
+    public void failure(Request request, Response response, FuelError error) {
+    }
+
+    @Override
+    public void success(Request request, Response response, String data) {
     }
 });
 ```

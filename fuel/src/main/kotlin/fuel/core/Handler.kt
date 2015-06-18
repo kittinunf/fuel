@@ -6,6 +6,7 @@ package fuel.core
 
 interface Handler<T> {
 
-    fun handle(request: Request, response: Response, either: Either<FuelError, T>);
+    fun success(request: Request, response: Response, t: T);
+    fun failure(request: Request, response: Response, error: FuelError);
 
 }

@@ -16,12 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fuel.Fuel;
-import fuel.core.Either;
 import fuel.core.FuelError;
 import fuel.core.Handler;
 import fuel.core.Request;
 import fuel.core.Response;
-import fuel.core.Right;
 import kotlin.jvm.functions.Function2;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,32 +49,52 @@ public class MainActivity extends AppCompatActivity {
                 //get
                 Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
                     @Override
-                    public void handle(@NotNull Request request, @NotNull Response response, @NotNull Either<FuelError, String> either) {
-                        updateUI(either);
+                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                        updateUI(error, null);
+                    }
+
+                    @Override
+                    public void success(@NotNull Request request, @NotNull Response response, String data) {
+                        updateUI(null, data);
                     }
                 });
 
                 //put
                 Fuel.put("http://httpbin.org/put").responseString(new Handler<String>() {
                     @Override
-                    public void handle(@NotNull Request request, @NotNull Response response, @NotNull Either<FuelError, String> either) {
-                        updateUI(either);
+                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                        updateUI(error, null);
+                    }
+
+                    @Override
+                    public void success(@NotNull Request request, @NotNull Response response, String data) {
+                        updateUI(null, data);
                     }
                 });
 
                 //post
                 Fuel.post("http://httpbin.org/post", params).responseString(new Handler<String>() {
                     @Override
-                    public void handle(@NotNull Request request, @NotNull Response response, @NotNull Either<FuelError, String> either) {
-                        updateUI(either);
+                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                        updateUI(error, null);
+                    }
+
+                    @Override
+                    public void success(@NotNull Request request, @NotNull Response response, String data) {
+                        updateUI(null, data);
                     }
                 });
 
                 //delete
                 Fuel.delete("http://httpbin.org/delete").responseString(new Handler<String>() {
                     @Override
-                    public void handle(@NotNull Request request, @NotNull Response response, @NotNull Either<FuelError, String> either) {
-                        updateUI(either);
+                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                        updateUI(error, null);
+                    }
+
+                    @Override
+                    public void success(@NotNull Request request, @NotNull Response response, String data) {
+                        updateUI(null, data);
                     }
                 });
 
@@ -90,8 +108,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).responseString(new Handler<String>() {
                     @Override
-                    public void handle(@NotNull Request request, @NotNull Response response, @NotNull Either<FuelError, String> either) {
-                        updateUI(either);
+                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                        updateUI(error, null);
+                    }
+
+                    @Override
+                    public void success(@NotNull Request request, @NotNull Response response, String data) {
+                        updateUI(null, data);
                     }
                 });
 
@@ -99,8 +122,13 @@ public class MainActivity extends AppCompatActivity {
                 String password = "P@s$vv0|2|)";
                 Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password).authenticate(username, password).responseString(new Handler<String>() {
                     @Override
-                    public void handle(@NotNull Request request, @NotNull Response response, @NotNull Either<FuelError, String> either) {
-                        updateUI(either);
+                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                        updateUI(error, null);
+                    }
+
+                    @Override
+                    public void success(@NotNull Request request, @NotNull Response response, String data) {
+                        updateUI(null, data);
                     }
                 });
 
@@ -114,8 +142,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).responseString(new Handler<String>() {
                     @Override
-                    public void handle(@NotNull Request request, @NotNull Response response, @NotNull Either<FuelError, String> either) {
-                        updateUI(either);
+                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                        updateUI(error, null);
+                    }
+
+                    @Override
+                    public void success(@NotNull Request request, @NotNull Response response, String data) {
+                        updateUI(null, data);
                     }
                 });
             }
@@ -133,13 +166,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUI(Either<FuelError, String> either) {
-        if (either instanceof Right) {
-            String result = (String) either.get();
+    private void updateUI(FuelError error, String result) {
+        if (error == null) {
             resultText.setText(resultText.getText() + result);
         } else {
-            FuelError error = (FuelError) either.get();
-            Log.e(TAG, String.valueOf(error.getErrorData()));
+            Log.e(TAG, "error: " + error.getException().getMessage());
             resultText.setText(resultText.getText() + error.getException().getMessage());
         }
     }

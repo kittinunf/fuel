@@ -149,13 +149,13 @@ public class Request {
         build(taskRequest) {
             successCallback = { response ->
                 callback {
-                    handler.handle(this@Request, response, Right(response.data))
+                    handler.success(this@Request, response, response.data)
                 }
             }
 
             failureCallback = { error, response ->
                 callback {
-                    handler.handle(this@Request, response, Left(error))
+                    handler.failure(this@Request, response, error)
                 }
             }
         }
@@ -187,13 +187,13 @@ public class Request {
             successCallback = { response ->
                 val data = String(response.data)
                 callback {
-                    handler.handle(this@Request, response, Right(data))
+                    handler.success(this@Request, response, data)
                 }
             }
 
             failureCallback = { error, response ->
                 callback {
-                    handler.handle(this@Request, response, Left(error))
+                    handler.failure(this@Request, response, error)
                 }
             }
         }
