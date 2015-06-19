@@ -183,7 +183,7 @@ public class Request {
     }
 
     public fun responseString(handler: Handler<String>) {
-         build(taskRequest) {
+        build(taskRequest) {
             successCallback = { response ->
                 val data = String(response.data)
                 callback {
@@ -278,7 +278,7 @@ public class Request {
 
     }
 
-    class UploadTaskRequest(override val request: Request): TaskRequest(request) {
+    class UploadTaskRequest(override val request: Request) : TaskRequest(request) {
 
         val BUFFER_SIZE = 1024
 

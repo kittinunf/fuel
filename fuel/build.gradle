@@ -36,7 +36,8 @@ dependencies {
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    testCompile "junit:junit:$junit_version"
+    // Unit testing dependencies
+    testCompile 'junit:junit:4.12'
 
 }
 
@@ -45,9 +46,6 @@ buildscript {
         //dependencies version
         kotlin_version = '0.12.213'
         commons_codec_version = '1.5'
-
-        //test
-        junit_version = '4.12'
     }
 
     repositories {
@@ -59,5 +57,5 @@ buildscript {
     }
 }
 
-//apply from: '../install.gradle'
-//apply from: '../bintray.gradle'
+//apply from: '../gradle/install.gradle'
+//apply from: '../gradle/bintray.gradle'
