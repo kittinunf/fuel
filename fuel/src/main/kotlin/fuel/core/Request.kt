@@ -1,12 +1,11 @@
 package fuel.core
 
+import android.util.Base64
 import fuel.util.build
 import fuel.util.copyTo
 import fuel.util.readWriteLazy
 import fuel.util.toHexString
 import java.io.*
-import java.net.Authenticator
-import java.net.PasswordAuthentication
 import java.net.URL
 import java.net.URLConnection
 import java.util.HashMap
@@ -74,12 +73,9 @@ public class Request {
     }
 
     public fun authenticate(username: String, password: String): Request {
-        Authenticator.setDefault(object : Authenticator() {
-            override fun getPasswordAuthentication(): PasswordAuthentication? {
-                return PasswordAuthentication(username, password.toCharArray())
-            }
-        })
-        return this
+        val auth = "$username:$password"
+        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.DEFAULT)
+        return header("Authorization" to "Basic " + String(encodedAuth))
     }
 
     public fun validate(statusCodeRange: IntRange): Request {

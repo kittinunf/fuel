@@ -18,7 +18,7 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
+        androidTest.java.srcDirs += 'src/test/kotlin'
     }
 
     buildTypes {
@@ -36,16 +36,12 @@ dependencies {
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    // Unit testing dependencies
-    testCompile 'junit:junit:4.12'
-
 }
 
 buildscript {
     ext {
         //dependencies version
         kotlin_version = '0.12.213'
-        commons_codec_version = '1.5'
     }
 
     repositories {
