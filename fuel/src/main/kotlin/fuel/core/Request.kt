@@ -1,11 +1,13 @@
 package fuel.core
 
+import android.util.Base64
 import fuel.util.build
 import fuel.util.copyTo
 import fuel.util.readWriteLazy
-import org.apache.commons.codec.binary.Base64
+import fuel.util.toHexString
 import java.io.*
 import java.net.URL
+import java.net.URLConnection
 import java.util.HashMap
 import java.util.concurrent.Callable
 import kotlin.properties.Delegates
@@ -24,7 +26,7 @@ public class Request {
 
     val timeoutInMillisecond = 15000
 
-    var requestType: Type = Type.REQUEST
+    var type: Type = Type.REQUEST
     var httpMethod: Method by Delegates.notNull()
     var path: String by Delegates.notNull()
     var url: URL by Delegates.notNull()
@@ -41,8 +43,9 @@ public class Request {
 
     //underlying task request
     val taskRequest: TaskRequest by Delegates.lazy {
-        when (requestType) {
+        when (type) {
             Type.DOWNLOAD -> DownloadTaskRequest(this)
+            Type.UPLOAD -> UploadTaskRequest(this)
             else -> TaskRequest(this)
         }
     }
@@ -64,9 +67,14 @@ public class Request {
         return this
     }
 
+    public fun body(body: ByteArray): Request {
+        httpBody = body
+        return this
+    }
+
     public fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
-        val encodedAuth = Base64.encodeBase64(auth.toByteArray())
+        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.DEFAULT)
         return header("Authorization" to "Basic " + String(encodedAuth))
     }
 
@@ -80,10 +88,28 @@ public class Request {
     }
 
     public fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
-        val downloadTaskRequest = taskRequest as? DownloadTaskRequest ?: throw IllegalStateException("progress is only used with RequestType.DOWNLOAD")
+        if (taskRequest as? DownloadTaskRequest != null) {
+            val download = taskRequest as DownloadTaskRequest
+            build(download) {
+                progressCallback = handler
+            }
+        } else if (taskRequest as? UploadTaskRequest != null) {
+            val upload = taskRequest as UploadTaskRequest
+            build(upload) {
+                progressCallback = handler
+            }
+        } else {
+            throw IllegalStateException("progress is only used with RequestType.DOWNLOAD or RequestType.UPLOAD")
+        }
 
-        build(downloadTaskRequest) {
-            progressCallback = handler
+        return this
+    }
+
+    public fun source(source: (Request, URL) -> File): Request {
+        val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
+
+        build(uploadTaskRequest) {
+            sourceCallback = source
         }
         return this
     }
@@ -115,6 +141,24 @@ public class Request {
         Manager.executor.submit(taskRequest)
     }
 
+    public fun response(handler: Handler<ByteArray>) {
+        build(taskRequest) {
+            successCallback = { response ->
+                callback {
+                    handler.success(this@Request, response, response.data)
+                }
+            }
+
+            failureCallback = { error, response ->
+                callback {
+                    handler.failure(this@Request, response, error)
+                }
+            }
+        }
+
+        Manager.executor.submit(taskRequest)
+    }
+
     public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) {
         build(taskRequest) {
             successCallback = { response ->
@@ -127,6 +171,25 @@ public class Request {
             failureCallback = { error, response ->
                 callback {
                     handler(this@Request, response, Left(error))
+                }
+            }
+        }
+
+        Manager.executor.submit(taskRequest)
+    }
+
+    public fun responseString(handler: Handler<String>) {
+        build(taskRequest) {
+            successCallback = { response ->
+                val data = String(response.data)
+                callback {
+                    handler.success(this@Request, response, data)
+                }
+            }
+
+            failureCallback = { error, response ->
+                callback {
+                    handler.failure(this@Request, response, error)
                 }
             }
         }
@@ -189,10 +252,10 @@ public class Request {
         override fun call() {
             try {
                 val response = Manager.sharedInstance.client.executeRequest(request)
-                val fileLocation = destinationCallback?.invoke(response, request.url)!!
+                val file = destinationCallback?.invoke(response, request.url)!!
 
                 //file output
-                fileOutputStream = FileOutputStream(fileLocation)
+                fileOutputStream = FileOutputStream(file)
 
                 dataStream = ByteArrayInputStream(response.data)
                 dataStream.copyTo(fileOutputStream, BUFFER_SIZE) { readBytes ->
@@ -206,6 +269,63 @@ public class Request {
             } finally {
                 dataStream.close()
                 fileOutputStream.close()
+            }
+        }
+
+    }
+
+    class UploadTaskRequest(override val request: Request) : TaskRequest(request) {
+
+        val BUFFER_SIZE = 1024
+
+        val CRLF = "\\r\\n"
+        val boundary = System.currentTimeMillis().toHexString()
+
+        var progressCallback: ((Long, Long) -> Unit)? = null
+        var sourceCallback: ((Request, URL) -> File) by Delegates.notNull()
+
+        var dataStream: ByteArrayOutputStream by Delegates.notNull()
+        var fileInputStream: FileInputStream by Delegates.notNull()
+
+        override fun call() {
+            try {
+                val file = sourceCallback.invoke(request, request.url)
+
+                //file input
+                fileInputStream = FileInputStream(file)
+
+                dataStream = build(ByteArrayOutputStream()) {
+                    write(("--" + boundary + CRLF).toByteArray())
+                    write(("Content-Disposition: form-data; filename=\"" + file.getName() + "\"").toByteArray())
+                    write(CRLF.toByteArray())
+                    write(("Content-Type: " + URLConnection.guessContentTypeFromName(file.getName())).toByteArray())
+                    write(CRLF.toByteArray())
+                    write(CRLF.toByteArray())
+                    flush()
+
+                    //input file data
+                    fileInputStream.copyTo(this, BUFFER_SIZE) { writtenBytes ->
+                        progressCallback?.invoke(writtenBytes, file.length())
+                    }
+
+                    write(CRLF.toByteArray())
+                    flush()
+                    write(("--" + boundary + "--").toByteArray())
+                    write(CRLF.toByteArray())
+                    flush()
+                }
+
+                request.body(dataStream.toByteArray())
+
+                val response = Manager.sharedInstance.client.executeRequest(request)
+
+                //dispatch
+                dispatchCallback(response)
+            } catch(error: FuelError) {
+                failureCallback?.invoke(error, error.response)
+            } finally {
+                dataStream.close()
+                fileInputStream.close()
             }
         }
 

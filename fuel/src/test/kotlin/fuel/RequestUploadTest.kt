@@ -15,10 +15,10 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
- * Created by Kittinun Vantasin on 5/29/15.
+ * Created by Kittinun Vantasin on 6/22/15.
  */
 
-class RequestDownloadTest : BaseTestCase() {
+class RequestUploadTest : BaseTestCase() {
 
     override val numberOfTestCase = 3
 
@@ -36,16 +36,14 @@ class RequestDownloadTest : BaseTestCase() {
         return@lazy location
     }
 
-    public fun testHttpDownloadCase() {
+    public fun testHttpUploadCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        val numberOfBytes = 32768L
-
-        manager.download("/bytes/$numberOfBytes").destination { response, url ->
-            File(currentDir, "download_$numberOfBytes.tmp")
+        manager.upload("/post").source { request, url ->
+            File(currentDir, "download_32768.tmp")
         }.responseString { req, res, either ->
             request = req
             response = res
@@ -66,7 +64,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
     }
 
-    public fun testHttpDownloadWithProgressValidCase() {
+    public fun testHttpUploadWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -75,9 +73,8 @@ class RequestDownloadTest : BaseTestCase() {
         var read = -1L
         var total = -1L
 
-        val numberOfBytes = 1048576L
-        manager.download("/bytes/$numberOfBytes").destination { response, url ->
-            File(currentDir, "downloadWithProgressValid_$numberOfBytes.tmp")
+        manager.upload("/post").source { request, url ->
+            File(currentDir, "downloadWithProgressValid_1048576.tmp")
         }.progress { readBytes, totalBytes ->
             read = readBytes
             total = totalBytes
@@ -103,13 +100,13 @@ class RequestDownloadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
     }
 
-    public fun testHttpDownloadWithProgressInvalidCase() {
+    public fun testHttpUploadWithProgressInvalidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.download("/byte/1048576").destination { response, url ->
+        manager.upload("/pos").source { request, url ->
             File(currentDir, "downloadWithProgressInvalid.tmp")
         }.progress { readBytes, totalBytes ->
 

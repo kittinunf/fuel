@@ -49,20 +49,38 @@ public class MainActivity : AppCompatActivity() {
             updateUI(response, either)
         }
 
-        Fuel.download("/bytes/1048576").destination { response, url ->
+        Fuel.download("/bytes/1048").destination { response, url ->
             val sd = Environment.getExternalStorageDirectory();
             val location = File(sd.getAbsolutePath() + "/test")
             location.mkdir()
             File(location, "test.tmp")
         }.progress { readBytes, totalBytes ->
-            Log.e(TAG, (readBytes.toFloat() / totalBytes.toFloat()).toString());
+            Log.e(TAG, "download: ${readBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->
             updateUI(response, either)
         }
+
+        val username = "username"
+        val password = "P@s\$vv0|2|)"
+        Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        Fuel.upload("/post").source { request, url ->
+            val sd = Environment.getExternalStorageDirectory();
+            val location = File(sd.getAbsolutePath() + "/test")
+            location.mkdir()
+            File(location, "test.tmp")
+        }.progress { writtenBytes, totalBytes ->
+            Log.e(TAG, "upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
+        }.responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {
-        val (error, data) = either
+        //when checking
         val e: FuelError? = when(either) {
             is Left -> either.get()
             else -> null
@@ -72,6 +90,15 @@ public class MainActivity : AppCompatActivity() {
             else -> null
         }
 
+        //folding
+        either.fold({ e ->
+            //left
+        }, { d ->
+            //right
+        })
+
+        //multi-declaration
+        val (error, data) = either
         val text = main_result_text.getText().toString()
         if (error != null) {
             Log.e(TAG, "${error}, ${response}, ${error.exception}")

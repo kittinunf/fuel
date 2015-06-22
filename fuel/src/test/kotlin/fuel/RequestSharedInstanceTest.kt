@@ -1,5 +1,6 @@
 package fuel
 
+import android.os.Environment
 import fuel.core.*
 import fuel.util.build
 import java.io.File
@@ -320,12 +321,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var total = -1L
 
         Fuel.download("/bytes/1048576").destination { response, url ->
-            val path = System.getProperty("user.dir") + "/build"
-            val file = File(path)
-            if (!file.exists()) {
-                file.mkdir()
-            }
-            File(file, "downloadFromFuelWithProgress.tmp")
+            val sd = Environment.getExternalStorageDirectory();
+            val location = File(sd.getAbsolutePath() + "/test")
+            location.mkdir()
+            File(location, "downloadFromFuelWithProgress.tmp")
         }.progress { readBytes, totalBytes ->
             read = readBytes
             total = totalBytes

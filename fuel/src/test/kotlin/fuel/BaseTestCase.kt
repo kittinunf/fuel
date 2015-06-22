@@ -18,13 +18,13 @@ import kotlin.test.assertTrue
 
 abstract class BaseTestCase : TestCase() {
 
-    val DEFAULT_TIMEOUT = 5000L
+    val DEFAULT_TIMEOUT = 15L
 
     abstract val numberOfTestCase: Int
 
     val countdown by Delegates.lazy { CountDownLatch(numberOfTestCase) }
 
-    fun countdownWait(timeout: Long = DEFAULT_TIMEOUT) = countdown.await(timeout, TimeUnit.MILLISECONDS)
+    fun countdownWait(timeout: Long = DEFAULT_TIMEOUT) = countdown.await(timeout, TimeUnit.SECONDS)
     fun countdownFulfill() = countdown.countDown()
 
 }

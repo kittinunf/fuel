@@ -67,9 +67,21 @@ public class Manager {
             baseUrlString = basePath
             urlString = path
             parameters = param
+            requestType = Request.Type.DOWNLOAD
         }
         val request = requestConvertible.request
-        request.requestType = Request.Type.DOWNLOAD
+        return request
+    }
+
+    fun upload(path: String, param: Map<String, Any?>? = null): Request {
+        val requestConvertible = build(Encoding()) {
+            httpMethod = Method.POST
+            baseUrlString = basePath
+            urlString = path
+            parameters = param
+            requestType = Request.Type.UPLOAD
+        }
+        val request = requestConvertible.request
         return request
     }
 

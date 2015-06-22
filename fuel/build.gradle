@@ -13,12 +13,12 @@ android {
         minSdkVersion 9
         targetSdkVersion 22
         versionCode 1
-        versionName "0.1"
+        versionName "0.2"
     }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
+        androidTest.java.srcDirs += 'src/test/kotlin'
     }
 
     buildTypes {
@@ -35,9 +35,6 @@ android {
 dependencies {
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "commons-codec:commons-codec:$commons_codec_version"
-
-    testCompile "junit:junit:$junit_version"
 
 }
 
@@ -45,10 +42,6 @@ buildscript {
     ext {
         //dependencies version
         kotlin_version = '0.12.213'
-        commons_codec_version = '1.5'
-
-        //test
-        junit_version = '4.12'
     }
 
     repositories {
@@ -60,5 +53,5 @@ buildscript {
     }
 }
 
-//apply from: '../install.gradle'
-//apply from: '../bintray.gradle'
+//apply from: '../gradle/install.gradle'
+//apply from: '../gradle/bintray.gradle'

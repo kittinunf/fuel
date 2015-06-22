@@ -5,5 +5,7 @@ package fuel.core
  */
 
 interface Client {
+
     fun executeRequest(request: Request): Response
+
 }

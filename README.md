@@ -8,7 +8,7 @@ The easiest HTTP networking library in Kotlin for Android.
 
 - [x] Support basic HTTP GET/POST/PUT/DELETE in a fluent style interface
 - [x] Download File
-- [ ] Upload File
+- [x] Upload File (multipart/form-data)
 - [x] Configuration manager
 
 ## Installation
@@ -24,6 +24,26 @@ dependencies {
 ### Sample
 
 * There are two sample folders, one is in Kotlin and another one in Java.
+* Kotlin
+``` Kotlin
+//simplest get
+Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
+}
+```
+
+* Java
+``` Java
+//simplest get
+Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
+    @Override
+    public void failure(Request request, Response response, FuelError error) {
+    }
+
+    @Override
+    public void success(Request request, Response response, String data) {
+    }
+});
+```
 
 ## Usage
 
@@ -120,7 +140,14 @@ Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
 }
 ```
 
-### Upload (in development)
+### Upload with or without progress handler
+``` Kotlin
+Fuel.upload("/post").source { request, url ->
+    File.createTempFile("temp", ".tmp");
+}.responseString { request, response, either ->
+
+}
+```
 
 ### Authentication
 

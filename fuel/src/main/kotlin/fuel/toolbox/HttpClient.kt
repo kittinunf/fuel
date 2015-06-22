@@ -2,7 +2,7 @@ package fuel.toolbox
 
 import fuel.core.*
 import fuel.util.build
-import java.io.DataOutputStream
+import java.io.BufferedOutputStream
 import java.net.HttpURLConnection
 
 /**
@@ -46,13 +46,15 @@ class HttpClient : Client {
                 this.exception = exception
                 this.response = response
             }
+        } finally {
+            connection.disconnect()
         }
     }
 
     private fun setBodyIfAny(connection: HttpURLConnection, bytes: ByteArray?) {
         if (bytes == null) return
 
-        val outStream = DataOutputStream(connection.getOutputStream());
+        val outStream = BufferedOutputStream(connection.getOutputStream());
         outStream.write(bytes);
         outStream.close();
     }
