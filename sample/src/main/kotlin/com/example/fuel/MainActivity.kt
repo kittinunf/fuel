@@ -4,13 +4,12 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import fuel.Fuel
 import fuel.core.*
+import kotlinx.android.synthetic.activity_main.main_clear_button
+import kotlinx.android.synthetic.activity_main.main_go_button
+import kotlinx.android.synthetic.activity_main.main_result_text
 import java.io.File
-
-import kotlinx.android.synthetic.activity_main.*
 
 public class MainActivity : AppCompatActivity() {
 
@@ -30,7 +29,7 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun execute() {
-        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
+                Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
         Manager.sharedInstance.basePath = "http://httpbin.org"
 
         Fuel.get("/get", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
@@ -77,15 +76,22 @@ public class MainActivity : AppCompatActivity() {
             updateUI(response, either)
         }
 
+        Fuel.get("https://api.themoviedb.org/3/discover/movie", mapOf("api_key" to "11a11c4dcdc3909ab42b09a5e531b74f")).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        Fuel.post("https://jsonplaceholder.typicode.com/posts/", mapOf("hello" to "world")).responseString { request, response, either ->
+            updateUI(response, either)
+        }
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {
         //when checking
-        val e: FuelError? = when(either) {
+        val e: FuelError? = when (either) {
             is Left -> either.get()
             else -> null
         }
-        var d: String? = when(either) {
+        var d: String? = when (either) {
             is Right -> either.get()
             else -> null
         }

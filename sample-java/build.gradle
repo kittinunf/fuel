@@ -5,7 +5,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "com.example.kotlin.fuel"
+        applicationId "com.example.java.fuel"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1

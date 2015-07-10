@@ -8,7 +8,7 @@ import java.util.concurrent.Executor
  * Created by Kittinun Vantasin on 6/5/15.
  */
 
-class MainThreadExecutor : Executor {
+class AndroidMainThreadExecutor : Executor {
 
     val handler = Handler(Looper.getMainLooper())
 

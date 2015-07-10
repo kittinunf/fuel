@@ -2,7 +2,7 @@ package fuel.core
 
 import fuel.Fuel
 import fuel.toolbox.HttpClient
-import fuel.util.MainThreadExecutor
+import fuel.util.AndroidMainThreadExecutor
 import fuel.util.build
 import fuel.util.readWriteLazy
 import java.util.concurrent.Executor
@@ -39,7 +39,7 @@ public class Manager {
         }
 
         //callback executor
-        var callbackExecutor: Executor by Delegates.readWriteLazy { MainThreadExecutor() }
+        var callbackExecutor: Executor by Delegates.readWriteLazy { AndroidMainThreadExecutor() }
 
     }
 

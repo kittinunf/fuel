@@ -4,15 +4,30 @@ import fuel.core.*
 import fuel.util.build
 import java.io.BufferedOutputStream
 import java.net.HttpURLConnection
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import java.util.zip.GZIPInputStream
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.X509TrustManager
 
 /**
  * Created by Kittinun Vantasin on 5/15/15.
  */
 
-class HttpClient : Client {
+class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()) : Client {
 
     override fun executeRequest(request: Request): Response {
-        val connection = request.url.openConnection() as HttpURLConnection
+        val connection = if (request.url.getProtocol().equals("https")) {
+            val conn = request.url.openConnection() as HttpsURLConnection
+            conn.setSSLSocketFactory(sslSocketFactory)
+            conn.setHostnameVerifier { s, SSLSession -> true }
+            conn
+        } else {
+            request.url.openConnection() as HttpURLConnection
+        }
+
         val response = Response()
 
         try {
@@ -34,11 +49,20 @@ class HttpClient : Client {
                 httpStatusCode = connection.getResponseCode()
                 httpResponseMessage = connection.getResponseMessage()
                 httpResponseHeaders = connection.getHeaderFields()
-                httpContentLength = connection.getHeaderField("Content-Length").toLong()
-                data = if (connection.getErrorStream() != null) {
-                    connection.getErrorStream().readBytes()
+                httpContentLength = connection.getContentLength().toLong()
+
+                val contentEncoding = connection.getContentEncoding() ?: ""
+
+                val dataStream = if (connection.getErrorStream() != null) {
+                    connection.getErrorStream()
                 } else {
-                    connection.getInputStream().readBytes()
+                    connection.getInputStream()
+                }
+
+                data = if (contentEncoding.compareTo("gzip", true) == 0) {
+                    GZIPInputStream(dataStream).readBytes()
+                } else {
+                    dataStream.readBytes()
                 }
             }
         } catch(exception: Exception) {
@@ -66,4 +90,25 @@ class HttpClient : Client {
         }
     }
 
+}
+
+fun defaultSocketFactory(): SSLSocketFactory {
+    val trustAllCerts = arrayOf(object : X509TrustManager {
+
+        override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String) {
+        }
+
+        override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String) {
+        }
+
+        override fun getAcceptedIssuers(): Array<out X509Certificate>? {
+            return null
+        }
+
+    })
+
+    val sslContext = SSLContext.getInstance("SSL")
+    sslContext.init(null, trustAllCerts, SecureRandom())
+
+    return sslContext.getSocketFactory()
 }
