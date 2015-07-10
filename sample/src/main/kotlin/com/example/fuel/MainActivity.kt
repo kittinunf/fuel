@@ -29,7 +29,7 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun execute() {
-                Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
+        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
         Manager.sharedInstance.basePath = "http://httpbin.org"
 
         Fuel.get("/get", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
@@ -76,11 +76,7 @@ public class MainActivity : AppCompatActivity() {
             updateUI(response, either)
         }
 
-        Fuel.get("https://api.themoviedb.org/3/discover/movie", mapOf("api_key" to "11a11c4dcdc3909ab42b09a5e531b74f")).responseString { request, response, either ->
-            updateUI(response, either)
-        }
-
-        Fuel.post("https://jsonplaceholder.typicode.com/posts/", mapOf("hello" to "world")).responseString { request, response, either ->
+        Fuel.post("https://jsonplaceholder.typicode.com/posts/").responseString { request, response, either ->
             updateUI(response, either)
         }
     }
