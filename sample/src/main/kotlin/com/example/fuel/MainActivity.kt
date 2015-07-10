@@ -4,13 +4,12 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import fuel.Fuel
 import fuel.core.*
+import kotlinx.android.synthetic.activity_main.main_clear_button
+import kotlinx.android.synthetic.activity_main.main_go_button
+import kotlinx.android.synthetic.activity_main.main_result_text
 import java.io.File
-
-import kotlinx.android.synthetic.activity_main.*
 
 public class MainActivity : AppCompatActivity() {
 
@@ -77,15 +76,18 @@ public class MainActivity : AppCompatActivity() {
             updateUI(response, either)
         }
 
+        Fuel.post("https://jsonplaceholder.typicode.com/posts/").responseString { request, response, either ->
+            updateUI(response, either)
+        }
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {
         //when checking
-        val e: FuelError? = when(either) {
+        val e: FuelError? = when (either) {
             is Left -> either.get()
             else -> null
         }
-        var d: String? = when(either) {
+        var d: String? = when (either) {
             is Right -> either.get()
             else -> null
         }

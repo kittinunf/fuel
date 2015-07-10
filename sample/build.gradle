@@ -43,7 +43,7 @@ buildscript {
 
     ext {
         android_support_version = '22.2.0'
-        kotlin_version = '0.12.213'
+        kotlin_version = '0.12.613'
         fuel_version = '0.2'
     }
 
