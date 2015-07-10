@@ -44,7 +44,7 @@ buildscript {
     ext {
         android_support_version = '22.2.0'
         kotlin_version = '0.12.613'
-        fuel_version = '0.2'
+        fuel_version = '0.3'
     }
 
     repositories {
