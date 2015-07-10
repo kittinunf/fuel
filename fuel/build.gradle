@@ -13,7 +13,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 22
         versionCode 1
-        versionName "0.2"
+        versionName "0.3"
     }
 
     sourceSets {
@@ -41,7 +41,7 @@ dependencies {
 buildscript {
     ext {
         //dependencies version
-        kotlin_version = '0.12.213'
+        kotlin_version = '0.12.613'
     }
 
     repositories {
