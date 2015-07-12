@@ -36,7 +36,8 @@ dependencies {
     compile "com.android.support:appcompat-v7:$android_support_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    compile "fuel:fuel:$fuel_version"
+//    compile "fuel:fuel:$fuel_version"
+    compile project(':fuel')
 }
 
 buildscript {

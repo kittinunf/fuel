@@ -29,8 +29,9 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun execute() {
-        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
         Manager.sharedInstance.basePath = "http://httpbin.org"
+        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
+        Manager.sharedInstance.additionalParams = mapOf("key" to "value")
 
         Fuel.get("/get", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             updateUI(response, either)
@@ -76,7 +77,7 @@ public class MainActivity : AppCompatActivity() {
             updateUI(response, either)
         }
 
-        Fuel.post("https://jsonplaceholder.typicode.com/posts/").responseString { request, response, either ->
+        Fuel.post("http://jsonplaceholder.typicode.com/posts/").responseString { request, response, either ->
             updateUI(response, either)
         }
     }

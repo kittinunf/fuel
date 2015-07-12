@@ -17,7 +17,9 @@ public class Manager {
 
     var client: Client by Delegates.notNull()
     var basePath: String? = null
+
     var additionalHeaders: Map<String, String>? = null
+    var additionalParams: Map<String, Any?> = mapOf()
 
     companion object Shared {
 
@@ -48,7 +50,7 @@ public class Manager {
             httpMethod = method
             baseUrlString = basePath
             urlString = path
-            parameters = param
+            parameters = if (param == null) additionalParams else param + additionalParams
         })
     }
 
@@ -57,7 +59,7 @@ public class Manager {
             httpMethod = method
             baseUrlString = basePath
             urlString = convertible.path
-            parameters = param
+            parameters = if (param == null) additionalParams else param + additionalParams
         })
     }
 
@@ -66,7 +68,7 @@ public class Manager {
             httpMethod = Method.GET
             baseUrlString = basePath
             urlString = path
-            parameters = param
+            parameters = if (param == null) additionalParams else param + additionalParams
             requestType = Request.Type.DOWNLOAD
         }
         val request = requestConvertible.request
@@ -78,7 +80,7 @@ public class Manager {
             httpMethod = Method.POST
             baseUrlString = basePath
             urlString = path
-            parameters = param
+            parameters = if (param == null) additionalParams else param + additionalParams
             requestType = Request.Type.UPLOAD
         }
         val request = requestConvertible.request

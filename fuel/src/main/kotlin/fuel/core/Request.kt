@@ -138,7 +138,7 @@ public class Request {
             }
         }
 
-        Manager.executor.submit(taskRequest)
+        submit(taskRequest)
     }
 
     public fun response(handler: Handler<ByteArray>) {
@@ -156,7 +156,7 @@ public class Request {
             }
         }
 
-        Manager.executor.submit(taskRequest)
+        submit(taskRequest)
     }
 
     public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) {
@@ -175,7 +175,7 @@ public class Request {
             }
         }
 
-        Manager.executor.submit(taskRequest)
+        submit(taskRequest)
     }
 
     public fun responseString(handler: Handler<String>) {
@@ -194,7 +194,11 @@ public class Request {
             }
         }
 
-        Manager.executor.submit(taskRequest)
+        submit(taskRequest)
+    }
+
+    fun submit(callable: Callable<Unit>) {
+        Manager.executor.submit(callable)
     }
 
     //privates

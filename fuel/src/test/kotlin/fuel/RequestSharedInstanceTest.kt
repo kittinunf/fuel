@@ -40,6 +40,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     override fun setUp() {
         Manager.sharedInstance.basePath = "https://httpbin.org"
         Manager.sharedInstance.additionalHeaders = mapOf("foo" to "bar")
+        Manager.sharedInstance.additionalParams = mapOf("key" to "value")
     }
 
     public fun testHttpGetRequestWithSharedInstance() {
@@ -69,6 +70,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         val string = data as String
         assertTrue(string.toLowerCase().contains("foo") && string.toLowerCase().contains("bar"), "additional header must be sent along with request and present in response")
+        assertTrue(string.toLowerCase().contains("key") && string.toLowerCase().contains("value"), "additional param must be sent along with request and present in response")
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
@@ -100,6 +102,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
 
         assertTrue(string.toLowerCase().contains("foo") && string.toLowerCase().contains("bar"), "additional header must be sent along with request and present in response")
+        assertTrue(string.toLowerCase().contains("key") && string.toLowerCase().contains("value"), "additional param must be sent along with request and present in response")
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
@@ -131,6 +134,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
 
         assertTrue(string.toLowerCase().contains("foo") && string.toLowerCase().contains("bar"), "additional header must be sent along with request and present in response")
+        assertTrue(string.toLowerCase().contains("key") && string.toLowerCase().contains("value"), "additional param must be sent along with request and present in response")
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
@@ -162,6 +166,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
 
         assertTrue(string.toLowerCase().contains("foo") && string.toLowerCase().contains("bar"), "additional header must be sent along with request and present in response")
+        assertTrue(string.toLowerCase().contains("key") && string.toLowerCase().contains("value"), "additional param must be sent along with request and present in response")
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
