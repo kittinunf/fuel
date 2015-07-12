@@ -17,7 +17,7 @@ The easiest HTTP networking library in Kotlin for Android.
 
 ``` Groovy
 dependencies {
-    compile 'fuel:fuel:0.3'
+    compile 'fuel:fuel:0.4'
 }
 ```
 
@@ -201,6 +201,19 @@ Fuel.get("/get").response { request, response, either ->
     //make request to https://httpbin.org/get with global device header (Device : Android)
 }
 ```
+
+* ```additionalParams``` is to manage common `key=value` param which is automatically include in all of your request in format of ``` mapOf<String, Any>``` (`Any` is converted to `String` by `toString()` method)
+
+``` Kotlin
+Manager.sharedInstance.additionalParams = mapOf("api_key" to "1234567890")
+```
+
+``` Kotlin
+Fuel.get("/get").response { request, response, either ->
+    //make request to https://httpbin.org/get?api_key=1234567890 
+}
+```
+
 
 * ```client``` is a raw HTTP client driver. Generally, it is responsible to make [```Request```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [```Response```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [```HttpClient```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [```java.net.HttpUrlConnnection```](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [```client```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Client.kt) protocol, and set back to ```Manager.sharedInstance``` to kick off the effect.
 
