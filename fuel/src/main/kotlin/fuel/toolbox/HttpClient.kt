@@ -3,6 +3,7 @@ package fuel.toolbox
 import fuel.core.*
 import fuel.util.build
 import java.io.BufferedOutputStream
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
@@ -29,6 +30,7 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
         }
 
         val response = Response()
+        response.url = request.url
 
         try {
             build(connection) {
@@ -46,9 +48,8 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
             }
 
             return build(response) {
-                httpStatusCode = connection.getResponseCode()
-                httpResponseMessage = connection.getResponseMessage()
-                httpResponseHeaders = connection.getHeaderFields()
+
+                httpResponseHeaders = connection.getHeaderFields() ?: emptyMap()
                 httpContentLength = connection.getContentLength().toLong()
 
                 val contentEncoding = connection.getContentEncoding() ?: ""
@@ -64,6 +65,17 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
                 } else {
                     dataStream.readBytes()
                 }
+
+                //try - catch just in case both methods throw
+                try {
+                    httpStatusCode = connection.getResponseCode()
+                    httpResponseMessage = connection.getResponseMessage()
+                } catch(exception: IOException) {
+                    throw build(FuelError()) {
+                        this.exception = exception
+                        this.response = response
+                    }
+                }
             }
         } catch(exception: Exception) {
             throw build(FuelError()) {
@@ -75,8 +87,8 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
         }
     }
 
-    private fun setBodyIfAny(connection: HttpURLConnection, bytes: ByteArray?) {
-        if (bytes == null) return
+    private fun setBodyIfAny(connection: HttpURLConnection, bytes: ByteArray) {
+        if (bytes.size() == 0) return
 
         val outStream = BufferedOutputStream(connection.getOutputStream());
         outStream.write(bytes);

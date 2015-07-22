@@ -14,4 +14,10 @@ public class FuelError : Exception() {
     //data
     var errorData = ByteArray(0)
 
+    override fun toString(): String {
+        return StringBuilder {
+            append(response.toString())
+            append("Exception : ${exception.getMessage()}\n")
+        }.toString()
+    }
 }

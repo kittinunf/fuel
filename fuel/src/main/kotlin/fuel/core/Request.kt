@@ -30,7 +30,7 @@ public class Request {
     var httpMethod: Method by Delegates.notNull()
     var path: String by Delegates.notNull()
     var url: URL by Delegates.notNull()
-    var httpBody: ByteArray? = null
+    var httpBody: ByteArray = ByteArray(0)
 
     var httpHeaders by Delegates.readWriteLazy {
         val additionalHeaders = Manager.sharedInstance.additionalHeaders
@@ -197,7 +197,7 @@ public class Request {
         submit(taskRequest)
     }
 
-    fun submit(callable: Callable<Unit>) {
+    public fun submit(callable: Callable<Unit>) {
         Manager.executor.submit(callable)
     }
 
@@ -234,8 +234,9 @@ public class Request {
                 successCallback?.invoke(response)
             } else {
                 val error = build(FuelError()) {
-                    exception = IllegalStateException("Validation failed")
-                    errorData = response.data
+                    this.exception = IllegalStateException("Validation failed")
+                    this.response = response
+                    this.errorData = response.data
                 }
                 failureCallback?.invoke(error, response)
             }
@@ -335,4 +336,14 @@ public class Request {
 
     }
 
+    override fun toString(): String {
+        return StringBuilder {
+            append("--> $httpMethod (${url.toString()})\n")
+            append("Body : ${ if (httpBody.size() != 0) String(httpBody) else "(empty)"}\n")
+            append("Headers : (${httpHeaders.size()})\n")
+            for ((key, value) in httpHeaders) {
+                append("$key : $value\n")
+            }
+        }.toString()
+    }
 }
