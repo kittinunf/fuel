@@ -36,14 +36,13 @@ dependencies {
     compile "com.android.support:appcompat-v7:$android_support_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-//    compile "fuel:fuel:$fuel_version"
     compile project(':fuel')
 }
 
 buildscript {
 
     ext {
-        android_support_version = '22.2.0'
+        android_support_version = '22.2.1'
         kotlin_version = '0.12.613'
         fuel_version = '0.4'
     }
