@@ -6,9 +6,9 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import fuel.Fuel
 import fuel.core.*
-import kotlinx.android.synthetic.activity_main.main_clear_button
-import kotlinx.android.synthetic.activity_main.main_go_button
-import kotlinx.android.synthetic.activity_main.main_result_text
+import kotlinx.android.synthetic.activity_main.mainClearButton
+import kotlinx.android.synthetic.activity_main.mainGoButton
+import kotlinx.android.synthetic.activity_main.mainResultText
 import java.io.File
 
 public class MainActivity : AppCompatActivity() {
@@ -19,12 +19,12 @@ public class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        main_go_button.setOnClickListener {
+        mainGoButton.setOnClickListener {
             execute()
         }
 
-        main_clear_button.setOnClickListener {
-            main_result_text.setText("")
+        mainClearButton.setOnClickListener {
+            mainResultText.setText("")
         }
     }
 
@@ -76,10 +76,6 @@ public class MainActivity : AppCompatActivity() {
         }.responseString { request, response, either ->
             updateUI(response, either)
         }
-
-        Fuel.post("http://jsonplaceholder.typicode.com/posts/").responseString { request, response, either ->
-            updateUI(response, either)
-        }
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {
@@ -102,12 +98,13 @@ public class MainActivity : AppCompatActivity() {
 
         //multi-declaration
         val (error, data) = either
-        val text = main_result_text.getText().toString()
+        val text = mainResultText.getText().toString()
         if (error != null) {
-            Log.e(TAG, "${error}, ${response}, ${error.exception}")
-            main_result_text.setText(text + String(error.errorData))
+            Log.e(TAG, error.toString())
+            mainResultText.setText(text + String(error.errorData))
         } else {
-            main_result_text.setText(text + data)
+            Log.d(TAG, response.toString())
+            mainResultText.setText(text + data)
         }
     }
 

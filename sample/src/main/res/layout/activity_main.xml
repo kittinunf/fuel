@@ -15,27 +15,27 @@
         android:text="Kotlin" />
 
     <Button
-        android:id="@+id/main_go_button"
+        android:id="@+id/mainGoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title_text"
         android:text="Go"/>
 
     <Button
-        android:id="@+id/main_clear_button"
+        android:id="@+id/mainClearButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/main_go_button"
-        android:layout_toRightOf="@id/main_go_button"
+        android:layout_alignTop="@id/mainGoButton"
+        android:layout_toRightOf="@id/mainGoButton"
         android:text="Clear" />
 
     <ScrollView
-        android:layout_below="@id/main_go_button"
+        android:layout_below="@id/mainGoButton"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/main_result_text"
+            android:id="@+id/mainResultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
