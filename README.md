@@ -17,7 +17,7 @@ The easiest HTTP networking library in Kotlin for Android.
 
 ``` Groovy
 dependencies {
-    compile 'fuel:fuel:0.4'
+    compile 'fuel:fuel:0.41'
 }
 ```
 
