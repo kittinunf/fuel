@@ -2,7 +2,9 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 repositories {
+
     jcenter()
+
 }
 
 android {
@@ -18,7 +20,7 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
-        androidTest.java.srcDirs += 'src/test/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
     }
 
     buildTypes {
@@ -30,11 +32,17 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    testCompile "junit:junit:$junit_version"
 
 }
 
@@ -42,6 +50,7 @@ buildscript {
     ext {
         //dependencies version
         kotlin_version = '0.12.613'
+        junit_version = '4.12'
     }
 
     repositories {
