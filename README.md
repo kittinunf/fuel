@@ -10,6 +10,7 @@ The easiest HTTP networking library in Kotlin for Android.
 - [x] Download File
 - [x] Upload File (multipart/form-data)
 - [x] Configuration manager
+- [x] Automatically invoke handler on Android Main Thread
 
 ## Installation
 
@@ -31,6 +32,15 @@ dependencies {
 "http://httpbin.org/get".get().responseString { request, response, either ->	
 	//do something with response
 }
+
+//if we set baseURL beforehand, it is simply get()
+
+Manager.sharedInstance.basePath = "http://httpbin.org"
+"/get".get().responseString { request, response, either ->    
+    //make a GET to http://httpbin.org/get and do something with response
+}
+
+//if you prefer this a little longer way
 
 //get
 Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
