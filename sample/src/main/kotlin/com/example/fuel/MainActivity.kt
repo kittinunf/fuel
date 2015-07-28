@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import fuel.Fuel
+import fuel.*
 import fuel.core.*
 import kotlinx.android.synthetic.activity_main.mainClearButton
 import kotlinx.android.synthetic.activity_main.mainGoButton
@@ -19,6 +19,10 @@ public class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Manager.sharedInstance.basePath = "http://httpbin.org"
+        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
+        Manager.sharedInstance.additionalParams = mapOf("key" to "value")
+
         mainGoButton.setOnClickListener {
             execute()
         }
@@ -29,26 +33,59 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun execute() {
-        Manager.sharedInstance.basePath = "http://httpbin.org"
-        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
-        Manager.sharedInstance.additionalParams = mapOf("key" to "value")
+        httpGet()
+        httpPut()
+        httpPost()
+        httpDelete()
+        httpDownload()
+        httpUpload()
+        httpBasicAuthentication()
+    }
 
+    fun httpGet() {
         Fuel.get("/get", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             updateUI(response, either)
         }
 
-        Fuel.post("/post", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        "/get".get().responseString { request, response, either ->
             updateUI(response, either)
         }
+    }
 
+    fun httpPut() {
         Fuel.put("/put", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             updateUI(response, either)
         }
 
+        "/put".put(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+    }
+
+    fun httpPost() {
+        Fuel.post("/post", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        "/post".post(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+    }
+
+    fun httpDelete() {
         Fuel.delete("/delete", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             updateUI(response, either)
         }
 
+        "/delete".delete(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+    }
+
+    fun httpDownload() {
         Fuel.download("/bytes/1048").destination { response, url ->
             val sd = Environment.getExternalStorageDirectory();
             val location = File(sd.getAbsolutePath() + "/test")
@@ -59,13 +96,9 @@ public class MainActivity : AppCompatActivity() {
         }.responseString { request, response, either ->
             updateUI(response, either)
         }
+    }
 
-        val username = "username"
-        val password = "P@s\$vv0|2|)"
-        Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, either ->
-            updateUI(response, either)
-        }
-
+    fun httpUpload() {
         Fuel.upload("/post").source { request, url ->
             val sd = Environment.getExternalStorageDirectory();
             val location = File(sd.getAbsolutePath() + "/test")
@@ -74,6 +107,18 @@ public class MainActivity : AppCompatActivity() {
         }.progress { writtenBytes, totalBytes ->
             Log.e(TAG, "upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->
+            updateUI(response, either)
+        }
+    }
+
+    fun httpBasicAuthentication() {
+        val username = "username"
+        val password = "P@s\$vv0|2|)"
+        Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, either ->
+            updateUI(response, either)
+        }
+
+        "/basic-auth/$username/$password".get().authenticate(username, password).responseString { request, response, either ->
             updateUI(response, either)
         }
     }

@@ -10,6 +10,7 @@ The easiest HTTP networking library in Kotlin for Android.
 - [x] Download File
 - [x] Upload File (multipart/form-data)
 - [x] Configuration manager
+- [x] Automatically invoke handler on Android Main Thread
 
 ## Installation
 
@@ -17,30 +18,49 @@ The easiest HTTP networking library in Kotlin for Android.
 
 ``` Groovy
 dependencies {
-    compile 'fuel:fuel:0.41'
+    compile 'fuel:fuel:0.45'
 }
 ```
 
 ### Sample
 
-* There are two sample folders, one is in Kotlin and another one in Java.
+* There are two samples, one is in Kotlin and another one in Java.
 * Kotlin
 ``` Kotlin
-//simplest get
-Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
+//an extension over string (support GET, PUT, POST, DELETE)
+
+"http://httpbin.org/get".get().responseString { request, response, either ->	
+	//do something with response
 }
+
+//if we set baseURL beforehand, it is simply get()
+
+Manager.sharedInstance.basePath = "http://httpbin.org"
+"/get".get().responseString { request, response, either ->    
+    //make a GET to http://httpbin.org/get and do something with response
+}
+
+//if you prefer this a little longer way
+
+//get
+Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
+	//do something with response
+}
+
 ```
 
 * Java
 ``` Java
-//simplest get
+//get
 Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
     @Override
     public void failure(Request request, Response response, FuelError error) {
+    	//do something when it is failure
     }
 
     @Override
     public void success(Request request, Response response, String data) {
+    	//do something when it is successful
     }
 });
 ```
@@ -202,7 +222,7 @@ Fuel.get("/get").response { request, response, either ->
 }
 ```
 
-* ```additionalParams``` is to manage common `key=value` param which is automatically include in all of your request in format of ``` mapOf<String, Any>``` (`Any` is converted to `String` by `toString()` method)
+* ```additionalParams``` is to manage common `key=value` query param which is automatically included in all of your subsequent requests in format of ``` mapOf<String, Any>``` (`Any` is converted to `String` by `toString()` method)
 
 ``` Kotlin
 Manager.sharedInstance.additionalParams = mapOf("api_key" to "1234567890")

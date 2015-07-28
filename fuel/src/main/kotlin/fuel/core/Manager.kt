@@ -75,11 +75,35 @@ public class Manager {
         return request
     }
 
+    fun download(convertible: Fuel.PathStringConvertible, param: Map<String, Any?>? = null): Request {
+        val requestConvertible = build(Encoding()) {
+            httpMethod = Method.GET
+            baseUrlString = basePath
+            urlString = convertible.path
+            parameters = if (param == null) additionalParams else param + additionalParams
+            requestType = Request.Type.DOWNLOAD
+        }
+        val request = requestConvertible.request
+        return request
+    }
+
     fun upload(path: String, param: Map<String, Any?>? = null): Request {
         val requestConvertible = build(Encoding()) {
             httpMethod = Method.POST
             baseUrlString = basePath
             urlString = path
+            parameters = if (param == null) additionalParams else param + additionalParams
+            requestType = Request.Type.UPLOAD
+        }
+        val request = requestConvertible.request
+        return request
+    }
+
+    fun upload(convertible: Fuel.PathStringConvertible, param: Map<String, Any?>? = null): Request {
+        val requestConvertible = build(Encoding()) {
+            httpMethod = Method.POST
+            baseUrlString = basePath
+            urlString = convertible.path
             parameters = if (param == null) additionalParams else param + additionalParams
             requestType = Request.Type.UPLOAD
         }
