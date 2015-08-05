@@ -12,7 +12,7 @@ public class Response {
     var url: URL by Delegates.notNull()
     var httpStatusCode = -1
     var httpResponseMessage = ""
-    var httpResponseHeaders: Map<String, List<String>> by Delegates.notNull()
+    var httpResponseHeaders = emptyMap<String, List<String>>()
     var httpContentLength = 0L
 
     //data

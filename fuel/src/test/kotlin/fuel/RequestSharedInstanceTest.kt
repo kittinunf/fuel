@@ -39,8 +39,8 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
     override fun setUp() {
         Manager.sharedInstance.basePath = "https://httpbin.org"
-        Manager.sharedInstance.additionalHeaders = mapOf("foo" to "bar")
-        Manager.sharedInstance.additionalParams = mapOf("key" to "value")
+        Manager.sharedInstance.baseHeaders = mapOf("foo" to "bar")
+        Manager.sharedInstance.baseParams = mapOf("key" to "value")
     }
 
     public fun testHttpGetRequestWithSharedInstance() {

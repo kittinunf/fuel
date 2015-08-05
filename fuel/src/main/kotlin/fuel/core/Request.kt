@@ -33,7 +33,7 @@ public class Request {
     var httpBody: ByteArray = ByteArray(0)
 
     var httpHeaders by Delegates.readWriteLazy {
-        val additionalHeaders = Manager.sharedInstance.additionalHeaders
+        val additionalHeaders = Manager.sharedInstance.baseHeaders
         val headers = HashMap<String, String>()
         if (additionalHeaders != null) {
             headers.putAll(additionalHeaders)
@@ -336,14 +336,44 @@ public class Request {
 
     }
 
-    override fun toString(): String {
-        return StringBuilder {
-            append("--> $httpMethod (${url.toString()})\n")
-            append("Body : ${ if (httpBody.size() != 0) String(httpBody) else "(empty)"}\n")
-            append("Headers : (${httpHeaders.size()})\n")
-            for ((key, value) in httpHeaders) {
-                append("$key : $value\n")
-            }
-        }.toString()
+    public fun cUrlString(): String {
+        val elements = arrayListOf("$ curl -i")
+
+        //method
+        if (!httpMethod.equals(Method.GET)) {
+            elements.add("-X $httpMethod")
+        }
+
+        //body
+        val escapedBody = String(httpBody).replace("\"", "\\\"")
+        if (escapedBody.isNotEmpty()) {
+            elements.add("-d \"$escapedBody\"")
+        }
+
+        //headers
+        for ((key, value) in httpHeaders) {
+            elements.add("-H \"$key:$value\"")
+        }
+
+        //url
+        elements.add("\"${url.toString()}\"")
+
+        return elements.join(" ").toString()
     }
+
+    override fun toString(): String {
+        val elements = arrayListOf("--> $httpMethod (${url.toString()})")
+
+        //body
+        elements.add("Body : ${ if (httpBody.size() != 0) String(httpBody) else "(empty)"}")
+
+        //headers
+        elements.add("Headers : (${httpHeaders.size()})")
+        for ((key, value) in httpHeaders) {
+            elements.add("$key : $value")
+        }
+
+        return elements.join("\n").toString()
+    }
+
 }
