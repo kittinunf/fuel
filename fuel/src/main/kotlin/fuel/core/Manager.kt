@@ -18,8 +18,8 @@ public class Manager {
     var client: Client by Delegates.notNull()
     var basePath: String? = null
 
-    var additionalHeaders: Map<String, String>? = null
-    var additionalParams: Map<String, Any?> = mapOf()
+    var baseHeaders: Map<String, String>? = null
+    var baseParams: Map<String, Any?> = mapOf()
 
     companion object Shared {
 
@@ -50,7 +50,7 @@ public class Manager {
             httpMethod = method
             baseUrlString = basePath
             urlString = path
-            parameters = if (param == null) additionalParams else param + additionalParams
+            parameters = if (param == null) baseParams else param + baseParams
         })
     }
 
@@ -59,7 +59,7 @@ public class Manager {
             httpMethod = method
             baseUrlString = basePath
             urlString = convertible.path
-            parameters = if (param == null) additionalParams else param + additionalParams
+            parameters = if (param == null) baseParams else param + baseParams
         })
     }
 
@@ -68,7 +68,7 @@ public class Manager {
             httpMethod = Method.GET
             baseUrlString = basePath
             urlString = path
-            parameters = if (param == null) additionalParams else param + additionalParams
+            parameters = if (param == null) baseParams else param + baseParams
             requestType = Request.Type.DOWNLOAD
         }
         val request = requestConvertible.request
@@ -80,7 +80,7 @@ public class Manager {
             httpMethod = Method.GET
             baseUrlString = basePath
             urlString = convertible.path
-            parameters = if (param == null) additionalParams else param + additionalParams
+            parameters = if (param == null) baseParams else param + baseParams
             requestType = Request.Type.DOWNLOAD
         }
         val request = requestConvertible.request
@@ -92,7 +92,7 @@ public class Manager {
             httpMethod = Method.POST
             baseUrlString = basePath
             urlString = path
-            parameters = if (param == null) additionalParams else param + additionalParams
+            parameters = if (param == null) baseParams else param + baseParams
             requestType = Request.Type.UPLOAD
         }
         val request = requestConvertible.request
@@ -104,7 +104,7 @@ public class Manager {
             httpMethod = Method.POST
             baseUrlString = basePath
             urlString = convertible.path
-            parameters = if (param == null) additionalParams else param + additionalParams
+            parameters = if (param == null) baseParams else param + baseParams
             requestType = Request.Type.UPLOAD
         }
         val request = requestConvertible.request

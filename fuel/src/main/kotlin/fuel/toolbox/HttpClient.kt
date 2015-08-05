@@ -49,7 +49,7 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
 
             return build(response) {
 
-                httpResponseHeaders = connection.getHeaderFields() ?: emptyMap()
+                httpResponseHeaders = connection.getHeaderFields()
                 httpContentLength = connection.getContentLength().toLong()
 
                 val contentEncoding = connection.getContentEncoding() ?: ""

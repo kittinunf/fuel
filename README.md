@@ -10,6 +10,7 @@ The easiest HTTP networking library in Kotlin for Android.
 - [x] Download File
 - [x] Upload File (multipart/form-data)
 - [x] Configuration manager
+- [x] Debug log / cUrl log
 - [x] Automatically invoke handler on Android Main Thread
 
 ## Installation
@@ -17,31 +18,40 @@ The easiest HTTP networking library in Kotlin for Android.
 ### Gradle
 
 ``` Groovy
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
 dependencies {
-    compile 'fuel:fuel:0.45'
+    compile 'fuel:fuel:0.5'
 }
 ```
 
 ### Sample
 
 * There are two samples, one is in Kotlin and another one in Java.
+
+### Quick Glance Usage
+
 * Kotlin
 ``` Kotlin
-//an extension over string (support GET, PUT, POST, DELETE)
+//an extension over string (support GET, PUT, POST, DELETE with httpGet(), httpPut(), httpPost(), httpDelete())
 
-"http://httpbin.org/get".get().responseString { request, response, either ->	
+"http://httpbin.org/get".httpGet().responseString { request, response, either ->	
 	//do something with response
 }
 
-//if we set baseURL beforehand, it is simply get()
+//if we set baseURL beforehand, simply use relativePath
 
 Manager.sharedInstance.basePath = "http://httpbin.org"
-"/get".get().responseString { request, response, either ->    
+"/get".httpGet().responseString { request, response, either ->    
     //make a GET to http://httpbin.org/get and do something with response
 }
 
-//if you prefer this a little longer way
-
+//if you prefer this a little longer way, you can always do
 //get
 Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
 	//do something with response
@@ -65,7 +75,7 @@ Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() 
 });
 ```
 
-## Usage
+## Detail Usage
 
 ### GET
 
@@ -115,6 +125,37 @@ Fuel.put("http://httpbin.org/put").response { request, response, either ->
 Fuel.delete("http://httpbin.org/delete").response { request, response, either ->
 
 }
+```
+
+### Debug Logging
+* Use `toString()` method to Log (request|response)
+
+``` Kotlin
+Log.d("log", request.toString())
+```
+
+``` 
+//print and header detail
+//request
+--> GET (http://httpbin.org/get?key=value)
+    Body : (empty)
+    Headers : (2)
+    Accept-Encoding : compress;q=0.5, gzip;q=1.0
+    Device : Android
+
+//response
+<-- 200 (http://httpbin.org/get?key=value)
+```
+
+* Also support cUrl string to Log request
+
+``` Kotlin
+Log.d("cUrl log", request.cUrlString())
+```
+
+``` Bash
+//print
+curl -i -X POST -d "foo=foo&bar=bar&key=value" -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" -H "Device:Android" -H "Content-Type:application/x-www-form-urlencoded" "http://httpbin.org/post"
 ```
 
 ### Parameter Support
@@ -210,10 +251,10 @@ Fuel.get("/get").response { request, response, either ->
 }
 ```
 
-* ```additionalHeaders``` is to manage common HTTP header pairs in format of ``` mapOf<String, String>```.
+* ```baseHeaders``` is to manage common HTTP header pairs in format of ``` mapOf<String, String>```.
 
 ``` Kotlin
-Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
+Manager.sharedInstance.baseHeaders = mapOf("Device" to "Android")
 ```
 
 ``` Kotlin
@@ -222,10 +263,10 @@ Fuel.get("/get").response { request, response, either ->
 }
 ```
 
-* ```additionalParams``` is to manage common `key=value` query param which is automatically included in all of your subsequent requests in format of ``` mapOf<String, Any>``` (`Any` is converted to `String` by `toString()` method)
+* ```baseParams``` is to manage common `key=value` query param which will be automatically included in all of your subsequent requests in format of ``` mapOf<String, Any>``` (`Any` is converted to `String` by `toString()` method)
 
 ``` Kotlin
-Manager.sharedInstance.additionalParams = mapOf("api_key" to "1234567890")
+Manager.sharedInstance.baseParams = mapOf("api_key" to "1234567890")
 ```
 
 ``` Kotlin
@@ -233,7 +274,6 @@ Fuel.get("/get").response { request, response, either ->
     //make request to https://httpbin.org/get?api_key=1234567890 
 }
 ```
-
 
 * ```client``` is a raw HTTP client driver. Generally, it is responsible to make [```Request```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [```Response```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [```HttpClient```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [```java.net.HttpUrlConnnection```](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [```client```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Client.kt) protocol, and set back to ```Manager.sharedInstance``` to kick off the effect.
 

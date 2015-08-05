@@ -20,8 +20,8 @@ public class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         Manager.sharedInstance.basePath = "http://httpbin.org"
-        Manager.sharedInstance.additionalHeaders = mapOf("Device" to "Android")
-        Manager.sharedInstance.additionalParams = mapOf("key" to "value")
+        Manager.sharedInstance.baseHeaders = mapOf("Device" to "Android")
+        Manager.sharedInstance.baseParams = mapOf("key" to "value")
 
         mainGoButton.setOnClickListener {
             execute()
@@ -44,20 +44,24 @@ public class MainActivity : AppCompatActivity() {
 
     fun httpGet() {
         Fuel.get("/get", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            Log.d(TAG, request.cUrlString())
             updateUI(response, either)
         }
 
-        "/get".get().responseString { request, response, either ->
+        "/get".httpGet().responseString { request, response, either ->
+            Log.d(TAG, request.toString())
             updateUI(response, either)
         }
     }
 
     fun httpPut() {
         Fuel.put("/put", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            Log.d(TAG, request.cUrlString())
             updateUI(response, either)
         }
 
-        "/put".put(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        "/put".httpPut(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            Log.d(TAG, request.toString())
             updateUI(response, either)
         }
 
@@ -65,10 +69,12 @@ public class MainActivity : AppCompatActivity() {
 
     fun httpPost() {
         Fuel.post("/post", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            Log.d(TAG, request.cUrlString())
             updateUI(response, either)
         }
 
-        "/post".post(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        "/post".httpPost(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            Log.d(TAG, request.toString())
             updateUI(response, either)
         }
 
@@ -76,10 +82,12 @@ public class MainActivity : AppCompatActivity() {
 
     fun httpDelete() {
         Fuel.delete("/delete", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            Log.d(TAG, request.cUrlString())
             updateUI(response, either)
         }
 
-        "/delete".delete(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        "/delete".httpDelete(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+            Log.d(TAG, request.toString())
             updateUI(response, either)
         }
 
@@ -92,8 +100,9 @@ public class MainActivity : AppCompatActivity() {
             location.mkdir()
             File(location, "test.tmp")
         }.progress { readBytes, totalBytes ->
-            Log.e(TAG, "download: ${readBytes.toFloat() / totalBytes.toFloat()}")
+            Log.v(TAG, "Download: ${readBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->
+            Log.d(TAG, request.toString())
             updateUI(response, either)
         }
     }
@@ -105,8 +114,9 @@ public class MainActivity : AppCompatActivity() {
             location.mkdir()
             File(location, "test.tmp")
         }.progress { writtenBytes, totalBytes ->
-            Log.e(TAG, "upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
+            Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->
+            Log.d(TAG, request.toString())
             updateUI(response, either)
         }
     }
@@ -115,10 +125,12 @@ public class MainActivity : AppCompatActivity() {
         val username = "username"
         val password = "P@s\$vv0|2|)"
         Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, either ->
+            Log.d(TAG, request.toString())
             updateUI(response, either)
         }
 
-        "/basic-auth/$username/$password".get().authenticate(username, password).responseString { request, response, either ->
+        "/basic-auth/$username/$password".httpGet().authenticate(username, password).responseString { request, response, either ->
+            Log.d(TAG, request.toString())
             updateUI(response, either)
         }
     }
