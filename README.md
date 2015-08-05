@@ -38,21 +38,20 @@ dependencies {
 
 * Kotlin
 ``` Kotlin
-//an extension over string (support GET, PUT, POST, DELETE with httpGet, httpPut, httpPost, httpDelete)
+//an extension over string (support GET, PUT, POST, DELETE with httpGet(), httpPut(), httpPost(), httpDelete())
 
 "http://httpbin.org/get".httpGet().responseString { request, response, either ->	
 	//do something with response
 }
 
-//if we set baseURL beforehand, it is simply get()
+//if we set baseURL beforehand, simply use relativePath
 
 Manager.sharedInstance.basePath = "http://httpbin.org"
 "/get".httpGet().responseString { request, response, either ->    
     //make a GET to http://httpbin.org/get and do something with response
 }
 
-//if you prefer this a little longer way
-
+//if you prefer this a little longer way, you can always do
 //get
 Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
 	//do something with response
@@ -126,6 +125,37 @@ Fuel.put("http://httpbin.org/put").response { request, response, either ->
 Fuel.delete("http://httpbin.org/delete").response { request, response, either ->
 
 }
+```
+
+### Debug Logging
+* Use `toString()` method to Log (request|response)
+
+``` Kotlin
+Log.d("log", request.toString())
+```
+
+``` 
+//print and header detail
+//request
+--> GET (http://httpbin.org/get?key=value)
+    Body : (empty)
+    Headers : (2)
+    Accept-Encoding : compress;q=0.5, gzip;q=1.0
+    Device : Android
+
+//response
+<-- 200 (http://httpbin.org/get?key=value)
+```
+
+* Also support cUrl string to Log request
+
+``` Kotlin
+Log.d("cUrl log", request.cUrlString())
+```
+
+``` Bash
+//print
+curl -i -X POST -d "foo=foo&bar=bar&key=value" -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" -H "Device:Android" -H "Content-Type:application/x-www-form-urlencoded" "http://httpbin.org/post"
 ```
 
 ### Parameter Support
@@ -206,37 +236,6 @@ Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request,
 }
 ```
 
-### Loging
-* Use `toString()` method to Log (request|response)
-
-``` Kotlin
-Log.d("log", request.toString())
-```
-
-``` 
-//print and header detail
-//request
---> GET (http://httpbin.org/get?key=value)
-    Body : (empty)
-    Headers : (2)
-    Accept-Encoding : compress;q=0.5, gzip;q=1.0
-    Device : Android
-
-//response
-<-- 200 (http://httpbin.org/get?key=value)
-```
-
-* Also support cUrl string
-
-``` Kotlin
-Log.d("cUrl log", request.cUrlString())
-```
-
-``` Bash
-//print
-curl -i -X POST -d "foo=foo&bar=bar&key=value" -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" -H "Device:Android" -H "Content-Type:application/x-www-form-urlencoded" "http://httpbin.org/post"
-```
-
 ## Advanced Configuration
 
 * Use singleton ```Manager.sharedInstance``` to manager global configuration.
@@ -264,7 +263,7 @@ Fuel.get("/get").response { request, response, either ->
 }
 ```
 
-* ```baseParams``` is to manage common `key=value` query param which is automatically included in all of your subsequent requests in format of ``` mapOf<String, Any>``` (`Any` is converted to `String` by `toString()` method)
+* ```baseParams``` is to manage common `key=value` query param which will be automatically included in all of your subsequent requests in format of ``` mapOf<String, Any>``` (`Any` is converted to `String` by `toString()` method)
 
 ``` Kotlin
 Manager.sharedInstance.baseParams = mapOf("api_key" to "1234567890")
@@ -275,7 +274,6 @@ Fuel.get("/get").response { request, response, either ->
     //make request to https://httpbin.org/get?api_key=1234567890 
 }
 ```
-
 
 * ```client``` is a raw HTTP client driver. Generally, it is responsible to make [```Request```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [```Response```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [```HttpClient```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [```java.net.HttpUrlConnnection```](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [```client```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Client.kt) protocol, and set back to ```Manager.sharedInstance``` to kick off the effect.
 
