@@ -3,6 +3,7 @@ package fuel
 import fuel.core.*
 import fuel.toolbox.HttpClient
 import fuel.util.build
+import org.junit.Test
 import java.net.HttpURLConnection
 import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
@@ -24,10 +25,8 @@ class RequestHeaderTest : BaseTestCase() {
         }
     }
 
-    override fun setUp() {
-    }
-
-    public fun testHttpPerRequestHeader() {
+    Test
+    public fun httpPerRequestHeader() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null

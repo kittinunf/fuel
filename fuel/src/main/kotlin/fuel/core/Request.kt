@@ -74,7 +74,7 @@ public class Request {
 
     public fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
-        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.DEFAULT)
+        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
         return header("Authorization" to "Basic " + String(encodedAuth))
     }
 

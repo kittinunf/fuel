@@ -3,7 +3,13 @@ package fuel
 import fuel.core.*
 import fuel.toolbox.HttpClient
 import fuel.util.build
+import org.hamcrest.MatcherAssert
+import org.junit.Before
+import org.junit.Test
 import java.net.HttpURLConnection
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -18,6 +24,13 @@ class RequestAuthenticationTest : BaseTestCase() {
     override val numberOfTestCase = 2
 
     val manager: Manager by Delegates.lazy {
+
+        Manager.callbackExecutor = object : Executor {
+            override fun execute(command: Runnable) {
+                command.run()
+            }
+        }
+
         build(Manager()) {
             client = HttpClient()
             basePath = "http://httpbin.org"
@@ -27,12 +40,18 @@ class RequestAuthenticationTest : BaseTestCase() {
     var user: String by Delegates.notNull()
     var password: String by Delegates.notNull()
 
-    override fun setUp() {
-        user = "user"
+    var lock: CountDownLatch by Delegates.notNull()
+
+    Before
+    fun setUp() {
+        user = "username"
         password = "password"
+
+        lock = CountDownLatch(1)
     }
 
-    public fun testHttpBasicAuthenticationWithInvalidCase() {
+    Test
+    public fun httpBasicAuthenticationWithInvalidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -45,10 +64,10 @@ class RequestAuthenticationTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        lock.await(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -56,10 +75,11 @@ class RequestAuthenticationTest : BaseTestCase() {
         assertNull(data, "data should be null")
 
         val statusCode = HttpURLConnection.HTTP_UNAUTHORIZED
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode")
     }
 
-    public fun testHttpBasicAuthenticationWithValidCase() {
+    Test
+    public fun httpBasicAuthenticationWithValidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -72,10 +92,10 @@ class RequestAuthenticationTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        lock.await(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -83,7 +103,7 @@ class RequestAuthenticationTest : BaseTestCase() {
         assertNotNull(data, "data should not be null")
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of valid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code of valid credential should be $statusCode")
     }
 
 }

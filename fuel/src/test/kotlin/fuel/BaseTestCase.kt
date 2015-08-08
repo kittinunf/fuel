@@ -1,22 +1,20 @@
 package fuel
 
-import fuel.core.Either
-import fuel.core.Request
-import fuel.core.Response
-import junit.framework.TestCase
-import java.net.HttpURLConnection
+import org.junit.Before
+import org.junit.BeforeClass
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.properties.Delegates
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 /**
  * Created by Kittinun Vantasin on 5/21/15.
  */
 
-abstract class BaseTestCase : TestCase() {
+RunWith(CustomRobolectricGradleTestRunner::class)
+Config(constants = BuildConfig::class, sdk = intArrayOf(21))
+abstract class BaseTestCase {
 
     val DEFAULT_TIMEOUT = 15L
 

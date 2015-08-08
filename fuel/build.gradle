@@ -20,7 +20,7 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
-        androidTest.java.srcDirs += 'src/test/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
     }
 
     buildTypes {
@@ -33,9 +33,6 @@ android {
         abortOnError false
     }
 
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
 }
 
 dependencies {
@@ -43,14 +40,16 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     testCompile "junit:junit:$junit_version"
-
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    testCompile "org.robolectric:robolectric:$robolectric_version"
 }
 
 buildscript {
     ext {
         //dependencies version
-        kotlin_version = '0.12.613'
+        kotlin_version = '0.12.1230'
         junit_version = '4.12'
+        robolectric_version = '3.0'
     }
 
     repositories {
