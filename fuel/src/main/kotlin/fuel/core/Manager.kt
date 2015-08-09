@@ -56,7 +56,6 @@ public class Manager {
 
         request.executor = executor
         request.callbackExecutor = callbackExecutor
-
         return request
     }
 
