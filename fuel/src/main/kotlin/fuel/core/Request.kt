@@ -10,6 +10,8 @@ import java.net.URL
 import java.net.URLConnection
 import java.util.HashMap
 import java.util.concurrent.Callable
+import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 import kotlin.properties.Delegates
 
 /**
@@ -33,7 +35,7 @@ public class Request {
     var httpBody: ByteArray = ByteArray(0)
 
     var httpHeaders by Delegates.readWriteLazy {
-        val additionalHeaders = Manager.sharedInstance.baseHeaders
+        val additionalHeaders = Manager.instance.baseHeaders
         val headers = HashMap<String, String>()
         if (additionalHeaders != null) {
             headers.putAll(additionalHeaders)
@@ -49,6 +51,10 @@ public class Request {
             else -> TaskRequest(this)
         }
     }
+
+    //callers
+    var executor: ExecutorService by Delegates.notNull()
+    var callbackExecutor: Executor by Delegates.notNull()
 
     //interfaces
     public fun header(pair: Pair<String, Any>?): Request {
@@ -197,13 +203,15 @@ public class Request {
         submit(taskRequest)
     }
 
+
     public fun submit(callable: Callable<Unit>) {
-        Manager.executor.submit(callable)
+        executor.submit(callable)
     }
+
 
     //privates
     private fun callback(f: () -> Unit) {
-        Manager.callbackExecutor.execute {
+        callbackExecutor.execute {
             f.invoke()
         }
     }
@@ -219,7 +227,7 @@ public class Request {
 
         override fun call() {
             try {
-                val response = Manager.sharedInstance.client.executeRequest(request)
+                val response = Manager.instance.client.executeRequest(request)
 
                 //dispatch
                 dispatchCallback(response)
@@ -256,7 +264,7 @@ public class Request {
 
         override fun call() {
             try {
-                val response = Manager.sharedInstance.client.executeRequest(request)
+                val response = Manager.instance.client.executeRequest(request)
                 val file = destinationCallback?.invoke(response, request.url)!!
 
                 //file output
@@ -322,7 +330,7 @@ public class Request {
 
                 request.body(dataStream.toByteArray())
 
-                val response = Manager.sharedInstance.client.executeRequest(request)
+                val response = Manager.instance.client.executeRequest(request)
 
                 //dispatch
                 dispatchCallback(response)

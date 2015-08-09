@@ -20,15 +20,14 @@ import kotlin.test.assertTrue
 class RequestHeaderTest : BaseTestCase() {
 
     val manager: Manager by Delegates.lazy {
-        Manager.callbackExecutor = object : Executor {
-            override fun execute(command: Runnable) {
-                command.run()
-            }
-        }
-
         build(Manager()) {
             client = HttpClient()
             basePath = "http://httpbin.org"
+            callbackExecutor = object : Executor {
+                override fun execute(command: Runnable) {
+                    command.run()
+                }
+            }
         }
     }
 

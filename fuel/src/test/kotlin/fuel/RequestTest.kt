@@ -20,14 +20,13 @@ import kotlin.test.assertTrue
 class RequestTest : BaseTestCase() {
 
     val manager: Manager by Delegates.lazy {
-        Manager.callbackExecutor = object : Executor {
-            override fun execute(command: Runnable) {
-                command.run()
-            }
-        }
-
         build(Manager()) {
             client = HttpClient()
+            callbackExecutor = object : Executor {
+                override fun execute(command: Runnable) {
+                    command.run()
+                }
+            }
         }
     }
 

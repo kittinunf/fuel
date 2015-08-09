@@ -69,37 +69,37 @@ public class Fuel {
         //download
         platformStatic jvmOverloads
         public fun download(path: String, parameters: Map<String, Any?>? = null): Request {
-            return Manager.sharedInstance.download(path, parameters)
+            return Manager.instance.download(path, parameters)
         }
 
         platformStatic jvmOverloads
         public fun download(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
-            return Manager.sharedInstance.download(convertible, parameters)
+            return Manager.instance.download(convertible, parameters)
         }
 
         //upload
         platformStatic jvmOverloads
         public fun upload(path: String, parameters: Map<String, Any?>? = null): Request {
-            return Manager.sharedInstance.upload(path, parameters)
+            return Manager.instance.upload(path, parameters)
         }
 
         platformStatic jvmOverloads
         public fun upload(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
-            return Manager.sharedInstance.upload(convertible, parameters)
+            return Manager.instance.upload(convertible, parameters)
         }
 
         //request
         private fun request(method: Method, path: String, parameters: Map<String, Any?>? = null): Request {
-            return Manager.sharedInstance.request(method, path, parameters)
+            return Manager.instance.request(method, path, parameters)
         }
 
         private fun request(method: Method, convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
-            return Manager.sharedInstance.request(method, convertible, parameters)
+            return Manager.instance.request(method, convertible, parameters)
         }
 
         platformStatic
         public fun request(convertible: RequestConvertible): Request {
-            return Manager.sharedInstance.request(convertible)
+            return Manager.instance.request(convertible)
         }
 
     }

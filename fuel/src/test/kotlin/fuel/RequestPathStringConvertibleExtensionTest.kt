@@ -20,7 +20,7 @@ import kotlin.test.assertTrue
 class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
     init {
-        Manager.callbackExecutor = object : Executor {
+        Manager.instance.callbackExecutor = object : Executor {
             override fun execute(command: Runnable) {
                 command.run()
             }

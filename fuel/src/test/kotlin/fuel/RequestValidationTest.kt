@@ -19,15 +19,14 @@ import kotlin.test.assertTrue
 class RequestValidationTest : BaseTestCase() {
 
     val manager: Manager by Delegates.lazy {
-        Manager.callbackExecutor = object : Executor {
-            override fun execute(command: Runnable) {
-                command.run()
-            }
-        }
-
         build(Manager()) {
             client = HttpClient()
             basePath = "http://httpbin.org"
+            callbackExecutor = object : Executor {
+                override fun execute(command: Runnable) {
+                    command.run()
+                }
+            }
         }
     }
 
@@ -64,7 +63,7 @@ class RequestValidationTest : BaseTestCase() {
         assertNotNull(error, "error should not be null")
         assertNotNull(error?.errorData, "error data should not be null")
         assertNull(data, "data should be null")
-        assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode" )
+        assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode")
     }
 
     Test
@@ -94,7 +93,7 @@ class RequestValidationTest : BaseTestCase() {
         assertNotNull(response, "response should not be null")
         assertNotNull(error, "error should not be null")
         assertNull(data, "data should be null")
-        assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode" )
+        assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode")
     }
 
     Test
@@ -128,7 +127,7 @@ class RequestValidationTest : BaseTestCase() {
         assertNotNull(response, "response should not be null")
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == preDefineStatusCode, "http status code should be $preDefineStatusCode" )
+        assertTrue(response?.httpStatusCode == preDefineStatusCode, "http status code should be $preDefineStatusCode")
     }
 
 }

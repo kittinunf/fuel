@@ -19,9 +19,9 @@ public class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Manager.sharedInstance.basePath = "http://httpbin.org"
-        Manager.sharedInstance.baseHeaders = mapOf("Device" to "Android")
-        Manager.sharedInstance.baseParams = mapOf("key" to "value")
+        Manager.instance.basePath = "http://httpbin.org"
+        Manager.instance.baseHeaders = mapOf("Device" to "Android")
+        Manager.instance.baseParams = mapOf("key" to "value")
 
         mainGoButton.setOnClickListener {
             execute()

@@ -19,11 +19,11 @@ import kotlin.test.assertTrue
 class RequestSharedInstanceTest : BaseTestCase() {
 
     init {
-        Manager.sharedInstance.basePath = "https://httpbin.org"
-        Manager.sharedInstance.baseHeaders = mapOf("foo" to "bar")
-        Manager.sharedInstance.baseParams = mapOf("key" to "value")
+        Manager.instance.basePath = "https://httpbin.org"
+        Manager.instance.baseHeaders = mapOf("foo" to "bar")
+        Manager.instance.baseParams = mapOf("key" to "value")
 
-        Manager.callbackExecutor = object : Executor {
+        Manager.instance.callbackExecutor = object : Executor {
             override fun execute(command: Runnable) {
                 command.run()
             }

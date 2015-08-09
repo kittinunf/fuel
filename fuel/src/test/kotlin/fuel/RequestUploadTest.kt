@@ -25,15 +25,14 @@ import kotlin.test.assertTrue
 class RequestUploadTest : BaseTestCase() {
 
     val manager: Manager by Delegates.lazy {
-        Manager.callbackExecutor = object : Executor {
-            override fun execute(command: Runnable) {
-                command.run()
-            }
-        }
-
         build(Manager()) {
             client = HttpClient()
             basePath = "http://httpbin.org"
+            callbackExecutor = object : Executor {
+                override fun execute(command: Runnable) {
+                    command.run()
+                }
+            }
         }
     }
 
@@ -73,7 +72,7 @@ class RequestUploadTest : BaseTestCase() {
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
     Test
@@ -111,7 +110,7 @@ class RequestUploadTest : BaseTestCase() {
 
         assertTrue(read == total && read != -1L && total != -1L, "read bytes and total bytes should be equal")
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
     Test
@@ -143,7 +142,7 @@ class RequestUploadTest : BaseTestCase() {
         assertNull(data, "data should be null")
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
     Test
@@ -176,7 +175,7 @@ class RequestUploadTest : BaseTestCase() {
 
         val statusCode = -1
         assertTrue { error?.exception is FileNotFoundException }
-        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
 }
