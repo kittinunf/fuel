@@ -1,14 +1,18 @@
 package fuel
 
-import android.os.Environment
 import fuel.core.FuelError
 import fuel.core.Manager
 import fuel.core.Request
 import fuel.core.Response
 import fuel.toolbox.HttpClient
 import fuel.util.build
+import org.junit.Before
+import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -20,23 +24,26 @@ import kotlin.test.assertTrue
 
 class RequestDownloadTest : BaseTestCase() {
 
-    override val numberOfTestCase = 3
-
     val manager: Manager by Delegates.lazy {
+        Manager.callbackExecutor = object : Executor {
+            override fun execute(command: Runnable) {
+                command.run()
+            }
+        }
+
         build(Manager()) {
             client = HttpClient()
             basePath = "http://httpbin.org"
         }
     }
 
-    val currentDir by Delegates.lazy {
-        val sd = Environment.getExternalStorageDirectory();
-        val location = File(sd.getAbsolutePath() + "/test")
-        location.mkdir()
-        return@lazy location
+    Before
+    fun setUp() {
+        lock = CountDownLatch(1)
     }
 
-    public fun testHttpDownloadCase() {
+    Test
+    fun httpDownloadCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -45,7 +52,9 @@ class RequestDownloadTest : BaseTestCase() {
         val numberOfBytes = 32768L
 
         manager.download("/bytes/$numberOfBytes").destination { response, url ->
-            File(currentDir, "download_$numberOfBytes.tmp")
+            val f = File.createTempFile(numberOfBytes.toString(), null)
+            println(f.getAbsolutePath())
+            f
         }.responseString { req, res, either ->
             request = req
             response = res
@@ -53,20 +62,21 @@ class RequestDownloadTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    public fun testHttpDownloadWithProgressValidCase() {
+    Test
+    fun httpDownloadWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -77,10 +87,13 @@ class RequestDownloadTest : BaseTestCase() {
 
         val numberOfBytes = 1048576L
         manager.download("/bytes/$numberOfBytes").destination { response, url ->
-            File(currentDir, "downloadWithProgressValid_$numberOfBytes.tmp")
+            val f = File.createTempFile(numberOfBytes.toString(), null)
+            println(f.getAbsolutePath())
+            f
         }.progress { readBytes, totalBytes ->
             read = readBytes
             total = totalBytes
+            println("read: $read, total: $total")
         }.responseString { req, res, either ->
             request = req
             response = res
@@ -88,10 +101,10 @@ class RequestDownloadTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -100,17 +113,21 @@ class RequestDownloadTest : BaseTestCase() {
 
         assertTrue(read == total && read != -1L && total != -1L, "read bytes and total bytes should be equal")
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    public fun testHttpDownloadWithProgressInvalidCase() {
+    Test
+    fun httpDownloadWithProgressInvalidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.download("/byte/1048576").destination { response, url ->
-            File(currentDir, "downloadWithProgressInvalid.tmp")
+        val numberOfBytes = 131072
+        manager.download("/byte/$numberOfBytes").destination { response, url ->
+            val f = File.createTempFile(numberOfBytes.toString(), null)
+            println(f.getAbsolutePath())
+            f
         }.progress { readBytes, totalBytes ->
 
         }.responseString { req, res, either ->
@@ -120,10 +137,10 @@ class RequestDownloadTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -131,7 +148,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertNull(data, "data should be null")
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
 }

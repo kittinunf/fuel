@@ -328,6 +328,12 @@ public class Request {
                 dispatchCallback(response)
             } catch(error: FuelError) {
                 failureCallback?.invoke(error, error.response)
+            } catch(ex: Exception) {
+                val error = build(FuelError()) {
+                    response = Response()
+                    exception = ex
+                }
+                failureCallback?.invoke(error, error.response)
             } finally {
                 dataStream.close()
                 fileInputStream.close()

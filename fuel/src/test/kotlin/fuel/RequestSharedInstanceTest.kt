@@ -1,12 +1,13 @@
 package fuel
 
-import android.os.Environment
 import fuel.core.*
 import fuel.util.build
 import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -17,7 +18,17 @@ import kotlin.test.assertTrue
 
 class RequestSharedInstanceTest : BaseTestCase() {
 
-    override val numberOfTestCase = 10
+    init {
+        Manager.sharedInstance.basePath = "https://httpbin.org"
+        Manager.sharedInstance.baseHeaders = mapOf("foo" to "bar")
+        Manager.sharedInstance.baseParams = mapOf("key" to "value")
+
+        Manager.callbackExecutor = object : Executor {
+            override fun execute(command: Runnable) {
+                command.run()
+            }
+        }
+    }
 
     enum class HttpsBin(override val path: String) : Fuel.PathStringConvertible {
         IP("ip"),
@@ -41,13 +52,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
     Before
     fun setUp() {
-        Manager.sharedInstance.basePath = "https://httpbin.org"
-        Manager.sharedInstance.baseHeaders = mapOf("foo" to "bar")
-        Manager.sharedInstance.baseParams = mapOf("key" to "value")
+        lock = CountDownLatch(1)
     }
 
     Test
-    public fun httpGetRequestWithSharedInstance() {
+    fun httpGetRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -61,10 +70,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -79,7 +88,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
     Test
-    public fun httpPostRequestWithSharedInstance() {
+    fun httpPostRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -93,10 +102,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -112,7 +121,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
     Test
-    public fun httpPutRequestWithSharedInstance() {
+    fun httpPutRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -126,10 +135,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -145,7 +154,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
     Test
-    public fun httpDeleteRequestWithSharedInstance() {
+    fun httpDeleteRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -159,10 +168,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -178,7 +187,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
     Test
-    public fun httpGetRequestWithPathStringConvertibleAndSharedInstance() {
+    fun httpGetRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -192,10 +201,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -209,7 +218,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
     Test
-    public fun httpPostRequestWithPathStringConvertibleAndSharedInstance() {
+    fun httpPostRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -223,10 +232,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -240,7 +249,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
     Test
-    public fun httpPutRequestWithPathStringConvertibleAndSharedInstance() {
+    fun httpPutRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -254,10 +263,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -271,7 +280,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
     Test
-    public fun httpDeleteRequestWithPathStringConvertibleAndSharedInstance() {
+    fun httpDeleteRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -285,10 +294,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -302,7 +311,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
     Test
-    public fun httpPostRequestWithRequestConvertibleAndSharedInstance() {
+    fun httpPostRequestWithRequestConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -316,10 +325,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -329,7 +338,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
     Test
-    public fun httpDownloadWithProgressValidCase() {
+    fun httpDownloadWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -338,11 +347,9 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var read = -1L
         var total = -1L
 
-        Fuel.download("/bytes/1048576").destination { response, url ->
-            val sd = Environment.getExternalStorageDirectory();
-            val location = File(sd.getAbsolutePath() + "/test")
-            location.mkdir()
-            File(location, "downloadFromFuelWithProgress.tmp")
+        val numberOfBytes = 1048576
+        Fuel.download("/bytes/$numberOfBytes").destination { response, url ->
+            File.createTempFile(numberOfBytes.toString(), null)
         }.progress { readBytes, totalBytes ->
             read = readBytes
             total = totalBytes
@@ -353,10 +360,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")

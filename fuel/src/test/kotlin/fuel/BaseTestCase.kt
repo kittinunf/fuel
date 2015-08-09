@@ -1,7 +1,5 @@
 package fuel
 
-import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import java.util.concurrent.CountDownLatch
@@ -18,11 +16,10 @@ abstract class BaseTestCase {
 
     val DEFAULT_TIMEOUT = 15L
 
-    abstract val numberOfTestCase: Int
+    var lock: CountDownLatch by Delegates.notNull()
 
-    val countdown by Delegates.lazy { CountDownLatch(numberOfTestCase) }
-
-    fun countdownWait(timeout: Long = DEFAULT_TIMEOUT) = countdown.await(timeout, TimeUnit.SECONDS)
-    fun countdownFulfill() = countdown.countDown()
+    fun await(seconds: Long = DEFAULT_TIMEOUT) {
+        lock.await(seconds, TimeUnit.SECONDS);
+    }
 
 }

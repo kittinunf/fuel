@@ -3,6 +3,10 @@ package fuel
 import fuel.core.*
 import fuel.toolbox.HttpClient
 import fuel.util.build
+import org.junit.Before
+import org.junit.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -14,16 +18,26 @@ import kotlin.test.assertTrue
 
 class RequestValidationTest : BaseTestCase() {
 
-    override val numberOfTestCase = 3
-
     val manager: Manager by Delegates.lazy {
+        Manager.callbackExecutor = object : Executor {
+            override fun execute(command: Runnable) {
+                command.run()
+            }
+        }
+
         build(Manager()) {
             client = HttpClient()
             basePath = "http://httpbin.org"
         }
     }
 
-    public fun testHttpValidationWithDefaultCase() {
+    Before
+    fun setUp() {
+        lock = CountDownLatch(1)
+    }
+
+    Test
+    fun httpValidationWithDefaultCase() {
         val preDefinedStatusCode = 418
 
         var request: Request? = null
@@ -40,10 +54,10 @@ class RequestValidationTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -53,7 +67,8 @@ class RequestValidationTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode" )
     }
 
-    public fun testHttpValidationWithCustomValidCase() {
+    Test
+    fun httpValidationWithCustomValidCase() {
         val preDefinedStatusCode = 203
 
         var request: Request? = null
@@ -70,10 +85,10 @@ class RequestValidationTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -82,7 +97,8 @@ class RequestValidationTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode" )
     }
 
-    public fun testHttpValidationWithCustomInvalidCase() {
+    Test
+    fun httpValidationWithCustomInvalidCase() {
         val preDefineStatusCode = 418
 
         var request: Request? = null
@@ -103,10 +119,10 @@ class RequestValidationTest : BaseTestCase() {
                 }
             }
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")

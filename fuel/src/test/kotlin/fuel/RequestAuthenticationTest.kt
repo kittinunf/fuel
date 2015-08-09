@@ -3,7 +3,6 @@ package fuel
 import fuel.core.*
 import fuel.toolbox.HttpClient
 import fuel.util.build
-import org.hamcrest.MatcherAssert
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -21,10 +20,15 @@ import kotlin.test.assertTrue
 
 class RequestAuthenticationTest : BaseTestCase() {
 
-    override val numberOfTestCase = 2
+    val user: String
+    val password: String
+
+    init {
+        user = "username"
+        password = "password"
+    }
 
     val manager: Manager by Delegates.lazy {
-
         Manager.callbackExecutor = object : Executor {
             override fun execute(command: Runnable) {
                 command.run()
@@ -37,21 +41,13 @@ class RequestAuthenticationTest : BaseTestCase() {
         }
     }
 
-    var user: String by Delegates.notNull()
-    var password: String by Delegates.notNull()
-
-    var lock: CountDownLatch by Delegates.notNull()
-
     Before
     fun setUp() {
-        user = "username"
-        password = "password"
-
         lock = CountDownLatch(1)
     }
 
     Test
-    public fun httpBasicAuthenticationWithInvalidCase() {
+    fun httpBasicAuthenticationWithInvalidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -67,7 +63,7 @@ class RequestAuthenticationTest : BaseTestCase() {
             lock.countDown()
         }
 
-        lock.await(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -79,7 +75,7 @@ class RequestAuthenticationTest : BaseTestCase() {
     }
 
     Test
-    public fun httpBasicAuthenticationWithValidCase() {
+    fun httpBasicAuthenticationWithValidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -95,7 +91,7 @@ class RequestAuthenticationTest : BaseTestCase() {
             lock.countDown()
         }
 
-        lock.await(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
