@@ -23,56 +23,68 @@ public class Fuel {
 
         //convenience methods
         //get
-        platformStatic jvmOverloads public fun get(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun get(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.GET, path, parameters)
         }
 
-        platformStatic jvmOverloads public fun get(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun get(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.GET, convertible, parameters)
         }
 
         //post
-        platformStatic jvmOverloads public fun post(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun post(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.POST, path, parameters)
         }
 
-        platformStatic jvmOverloads public fun post(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun post(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.POST, convertible, parameters)
         }
 
         //put
-        platformStatic jvmOverloads public fun put(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun put(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.PUT, path, parameters)
         }
 
-        platformStatic jvmOverloads public fun put(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun put(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.PUT, convertible, parameters)
         }
 
         //delete
-        platformStatic jvmOverloads public fun delete(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun delete(path: String, parameters: Map<String, Any?>? = null): Request {
             return request(Method.DELETE, path, parameters)
         }
 
-        platformStatic jvmOverloads public fun delete(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun delete(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return request(Method.DELETE, convertible, parameters)
         }
 
         //download
-        platformStatic jvmOverloads public fun download(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun download(path: String, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.download(path, parameters)
         }
 
-        platformStatic jvmOverloads public fun download(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun download(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.download(convertible, parameters)
         }
 
         //upload
-        platformStatic jvmOverloads public fun upload(path: String, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun upload(path: String, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.upload(path, parameters)
         }
 
-        platformStatic jvmOverloads public fun upload(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
+        platformStatic jvmOverloads
+        public fun upload(convertible: PathStringConvertible, parameters: Map<String, Any?>? = null): Request {
             return Manager.sharedInstance.upload(convertible, parameters)
         }
 
@@ -85,7 +97,8 @@ public class Fuel {
             return Manager.sharedInstance.request(method, convertible, parameters)
         }
 
-        platformStatic public fun request(convertible: RequestConvertible): Request {
+        platformStatic
+        public fun request(convertible: RequestConvertible): Request {
             return Manager.sharedInstance.request(convertible)
         }
 
@@ -93,50 +106,62 @@ public class Fuel {
 
 }
 
-jvmOverloads public fun String.httpGet(parameters: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun String.httpGet(parameters: Map<String, Any?>? = null): Request {
     return Fuel.get(this, parameters)
 }
 
-jvmOverloads public fun Fuel.PathStringConvertible.httpGet(parameter: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun Fuel.PathStringConvertible.httpGet(parameter: Map<String, Any?>? = null): Request {
     return Fuel.get(this, parameter)
 }
 
-jvmOverloads public fun String.httpPost(parameters: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun String.httpPost(parameters: Map<String, Any?>? = null): Request {
     return Fuel.post(this, parameters)
 }
 
-jvmOverloads public fun Fuel.PathStringConvertible.httpPost(parameter: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun Fuel.PathStringConvertible.httpPost(parameter: Map<String, Any?>? = null): Request {
     return Fuel.post(this, parameter)
 }
 
-jvmOverloads public fun String.httpPut(parameters: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun String.httpPut(parameters: Map<String, Any?>? = null): Request {
     return Fuel.put(this, parameters)
 }
 
-jvmOverloads public fun Fuel.PathStringConvertible.httpPut(parameter: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun Fuel.PathStringConvertible.httpPut(parameter: Map<String, Any?>? = null): Request {
     return Fuel.put(this, parameter)
 }
 
-jvmOverloads public fun String.httpDelete(parameters: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun String.httpDelete(parameters: Map<String, Any?>? = null): Request {
     return Fuel.delete(this, parameters)
 }
 
-jvmOverloads public fun Fuel.PathStringConvertible.httpDelete(parameter: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun Fuel.PathStringConvertible.httpDelete(parameter: Map<String, Any?>? = null): Request {
     return Fuel.delete(this, parameter)
 }
 
-jvmOverloads public fun String.httpDownload(parameter: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun String.httpDownload(parameter: Map<String, Any?>? = null): Request {
     return Fuel.download(this, parameter)
 }
 
-jvmOverloads public fun Fuel.PathStringConvertible.httpDownload(parameter: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun Fuel.PathStringConvertible.httpDownload(parameter: Map<String, Any?>? = null): Request {
     return Fuel.download(this, parameter)
 }
 
-jvmOverloads public fun String.httpUpload(parameter: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun String.httpUpload(parameter: Map<String, Any?>? = null): Request {
     return Fuel.upload(this, parameter)
 }
 
-jvmOverloads public fun Fuel.PathStringConvertible.httpUpload(parameter: Map<String, Any?>? = null): Request {
+jvmOverloads
+public fun Fuel.PathStringConvertible.httpUpload(parameter: Map<String, Any?>? = null): Request {
     return Fuel.upload(this, parameter)
 }

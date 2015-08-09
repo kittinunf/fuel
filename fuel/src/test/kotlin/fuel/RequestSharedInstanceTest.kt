@@ -43,7 +43,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         fun createRequest(): Request {
             val encoder = build(Encoding()) {
                 httpMethod = method
-                urlString = "https://httpbin.org/$relativePath"
+                urlString = "https://httpbin.org$relativePath"
                 parameters = mapOf("foo" to "bar")
             }
             return encoder.request
@@ -311,13 +311,13 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
     Test
-    fun httpPostRequestWithRequestConvertibleAndSharedInstance() {
+    fun httpGetRequestWithRequestConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.request(HttpBinConvertible(Method.POST, "post")).responseString { req, res, either ->
+        Fuel.request(HttpBinConvertible(Method.GET, "/get")).responseString { req, res, either ->
             request = req
             response = res
 
@@ -336,6 +336,127 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertNotNull(data, "data should not be null")
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
+
+    Test
+    fun httpPostRequestWithRequestConvertibleAndSharedInstance() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        Fuel.request(HttpBinConvertible(Method.POST, "/post")).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    Test
+    fun httpPutRequestWithRequestConvertibleAndSharedInstance() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        Fuel.request(HttpBinConvertible(Method.PUT, "/put")).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    Test
+    fun httpDeleteRequestWithRequestConvertibleAndSharedInstance() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        Fuel.request(HttpBinConvertible(Method.DELETE, "/delete")).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    Test
+    fun httpUploadWithProgressValidCase() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        var read = -1L
+        var total = -1L
+
+        Fuel.upload("/post").source { request, url ->
+            val dir = System.getProperty("user.dir")
+            File(dir, "src/test/assets/lorem_ipsum_long.tmp")
+        }.progress { readBytes, totalBytes ->
+            read = readBytes
+            total = totalBytes
+            println("read: $read, total: $total")
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+
+        assertTrue(read == total && read != -1L && total != -1L, "read bytes and total bytes should be equal")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+    }
+
 
     Test
     fun httpDownloadWithProgressValidCase() {
@@ -371,8 +492,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertNotNull(data, "data should not be null")
 
         assertTrue(read == total, "read bytes and total bytes should be equal")
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
 }

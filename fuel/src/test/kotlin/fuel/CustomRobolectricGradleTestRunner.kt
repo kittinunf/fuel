@@ -30,4 +30,5 @@ public class CustomRobolectricGradleTestRunner(clazz: Class<*>) : RobolectricGra
         val moduleRoot = config.constants.javaClass.getResource("").toString().replace("file:", "").replace("jar:", "")
         return moduleRoot.substring(0, moduleRoot.indexOf("/build"))
     }
+
 }

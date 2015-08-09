@@ -9,6 +9,7 @@ import fuel.util.build
 import org.junit.Before
 import org.junit.Test
 import java.io.File
+import java.io.FileNotFoundException
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
@@ -72,7 +73,7 @@ class RequestUploadTest : BaseTestCase() {
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
     }
 
     Test
@@ -110,7 +111,7 @@ class RequestUploadTest : BaseTestCase() {
 
         assertTrue(read == total && read != -1L && total != -1L, "read bytes and total bytes should be equal")
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
     }
 
     Test
@@ -142,7 +143,7 @@ class RequestUploadTest : BaseTestCase() {
         assertNull(data, "data should be null")
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
     }
 
     Test
@@ -174,7 +175,8 @@ class RequestUploadTest : BaseTestCase() {
         assertNull(data, "data should be null")
 
         val statusCode = -1
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue { error?.exception is FileNotFoundException }
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
     }
 
 }
