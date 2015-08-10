@@ -95,10 +95,7 @@ public class MainActivity : AppCompatActivity() {
 
     fun httpDownload() {
         Fuel.download("/bytes/1048").destination { response, url ->
-            val sd = Environment.getExternalStorageDirectory();
-            val location = File(sd.getAbsolutePath() + "/test")
-            location.mkdir()
-            File(location, "test.tmp")
+            File(getFilesDir(), "test.tmp")
         }.progress { readBytes, totalBytes ->
             Log.v(TAG, "Download: ${readBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->
@@ -109,10 +106,7 @@ public class MainActivity : AppCompatActivity() {
 
     fun httpUpload() {
         Fuel.upload("/post").source { request, url ->
-            val sd = Environment.getExternalStorageDirectory();
-            val location = File(sd.getAbsolutePath() + "/test")
-            location.mkdir()
-            File(location, "test.tmp")
+            File(getFilesDir(), "test.tmp")
         }.progress { writtenBytes, totalBytes ->
             Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->

@@ -182,6 +182,39 @@ class RequestTest : BaseTestCase() {
     }
 
     Test
+    fun httpPostRequestWithBody() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val body = "{ \"foo\" : \"bar\" }"
+
+        manager.request(Method.POST, "http://httpbin.org/post").body(body).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        val string = data as String
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+
+        assertTrue(string.contains("foo") && string.contains("bar"), "body should be sent along with url and present in response of httpbin.org")
+    }
+
+    Test
     fun httpPutRequestWithParameters() {
         var request: Request? = null
         var response: Response? = null

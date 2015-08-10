@@ -8,6 +8,7 @@ import fuel.util.toHexString
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
+import java.nio.charset.Charset
 import java.util.HashMap
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
@@ -77,6 +78,8 @@ public class Request {
         httpBody = body
         return this
     }
+
+    public fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
 
     public fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
@@ -279,6 +282,13 @@ public class Request {
                 dispatchCallback(response)
             } catch(error: FuelError) {
                 failureCallback?.invoke(error, error.response)
+            } catch(ex: Exception) {
+                val error = build(FuelError()) {
+                    response = Response()
+                    response.url = request.url
+                    exception = ex
+                }
+                failureCallback?.invoke(error, error.response)
             } finally {
                 dataStream.close()
                 fileOutputStream.close()
@@ -339,6 +349,7 @@ public class Request {
             } catch(ex: Exception) {
                 val error = build(FuelError()) {
                     response = Response()
+                    response.url = request.url
                     exception = ex
                 }
                 failureCallback?.invoke(error, error.response)

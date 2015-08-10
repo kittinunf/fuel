@@ -15,9 +15,10 @@ public class FuelError : Exception() {
     var errorData = ByteArray(0)
 
     override fun toString(): String {
-        return StringBuilder {
-            append(response.toString())
-            append("Exception : ${exception.getMessage()}\n")
-        }.toString()
+        val elements = arrayListOf(response.toString())
+        //exception
+        elements.add("Exception : ${exception.getMessage()}")
+        return elements.join("\n").toString()
     }
+
 }

@@ -9,6 +9,7 @@ import fuel.util.build
 import org.junit.Before
 import org.junit.Test
 import java.io.File
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
@@ -115,7 +116,7 @@ class RequestDownloadTest : BaseTestCase() {
     }
 
     Test
-    fun httpDownloadWithProgressInvalidCase() {
+    fun httpDownloadWithProgressInvalidEndPointCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -146,6 +147,41 @@ class RequestDownloadTest : BaseTestCase() {
         assertNull(data, "data should be null")
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
+    }
+
+    Test
+    fun httpDownloadWithProgressInvalidFileCase() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val numberOfBytes = 131072
+        manager.download("/bytes/$numberOfBytes").destination { response, url ->
+            val dir = System.getProperty("user.dir")
+            File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
+        }.progress { readBytes, totalBytes ->
+
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNotNull(error, "error should not be null")
+        assertNull(data, "data should be null")
+
+        val statusCode = -1
+        assertTrue { error?.exception is IOException }
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
