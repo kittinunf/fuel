@@ -15,7 +15,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 22
         versionCode 1
-        versionName "0.5"
+        versionName "0.51"
     }
 
     sourceSets {
@@ -61,5 +61,5 @@ buildscript {
     }
 }
 
-//apply from: '../gradle/install.gradle'
-//apply from: '../gradle/bintray.gradle'
+apply from: '../gradle/install.gradle'
+apply from: '../gradle/bintray.gradle'

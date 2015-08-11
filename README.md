@@ -26,7 +26,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'fuel:fuel:0.5'
+    compile 'fuel:fuel:0.51'
 }
 ```
 
@@ -108,6 +108,11 @@ Fuel.get("http://httpbin.org/get").response { request, response, either ->
 ``` Kotlin
 Fuel.post("http://httpbin.org/post").response { request, response, either ->
     
+}
+
+//if you have body to post manually
+Fuel.post("http://httpbin.org/post").body("{ \"foo\" : \"bar\" }").response { request, response, either -> 
+
 }
 ```
 
