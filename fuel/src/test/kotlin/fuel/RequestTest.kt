@@ -3,7 +3,11 @@ package fuel
 import fuel.core.*
 import fuel.toolbox.HttpClient
 import fuel.util.build
+import org.junit.Before
+import org.junit.Test
 import java.net.HttpURLConnection
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -15,11 +19,14 @@ import kotlin.test.assertTrue
 
 class RequestTest : BaseTestCase() {
 
-    override val numberOfTestCase = 8
-
     val manager: Manager by Delegates.lazy {
         build(Manager()) {
             client = HttpClient()
+            callbackExecutor = object : Executor {
+                override fun execute(command: Runnable) {
+                    command.run()
+                }
+            }
         }
     }
 
@@ -30,6 +37,11 @@ class RequestTest : BaseTestCase() {
         DELETE("delete");
 
         override val path = "https://httpbin.org/$relativePath"
+    }
+
+    Before
+    fun setUp() {
+        lock = CountDownLatch(1)
     }
 
     class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
@@ -45,7 +57,8 @@ class RequestTest : BaseTestCase() {
         }
     }
 
-    public fun testHttpGetRequestWithDataResponse() {
+    Test
+    fun httpGetRequestWithDataResponse() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -59,10 +72,10 @@ class RequestTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -72,7 +85,8 @@ class RequestTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    public fun testHttpGetRequestWithStringResponse() {
+    Test
+    fun httpGetRequestWithStringResponse() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -86,10 +100,10 @@ class RequestTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -99,7 +113,8 @@ class RequestTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    public fun testHttpGetRequestWithParameters() {
+    Test
+    fun httpGetRequestWithParameters() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -116,10 +131,10 @@ class RequestTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -132,7 +147,8 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
     }
 
-    public fun testHttpPostRequestWithParameters() {
+    Test
+    fun httpPostRequestWithParameters() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -149,10 +165,10 @@ class RequestTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -165,7 +181,41 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
     }
 
-    public fun testHttpPutRequestWithParameters() {
+    Test
+    fun httpPostRequestWithBody() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val body = "{ \"foo\" : \"bar\" }"
+
+        manager.request(Method.POST, "http://httpbin.org/post").body(body).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        val string = data as String
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+
+        assertTrue(string.contains("foo") && string.contains("bar"), "body should be sent along with url and present in response of httpbin.org")
+    }
+
+    Test
+    fun httpPutRequestWithParameters() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -182,10 +232,10 @@ class RequestTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -198,7 +248,8 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
     }
 
-    public fun testHttpDeleteRequestWithParameters() {
+    Test
+    fun httpDeleteRequestWithParameters() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -215,10 +266,10 @@ class RequestTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -231,7 +282,8 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
     }
 
-    public fun testHttpGetRequestWithPathStringConvertible() {
+    Test
+    fun httpGetRequestWithPathStringConvertible() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -245,10 +297,10 @@ class RequestTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -260,7 +312,8 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains("user-agent"), "USER_AGENT endpoint must be resolved correctly, and user-agent should be present in this response")
     }
 
-    public fun testHttpGetRequestWithRequestConvertible() {
+    Test
+    fun httpGetRequestWithRequestConvertible() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -276,10 +329,10 @@ class RequestTest : BaseTestCase() {
                 data = d
             })
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")

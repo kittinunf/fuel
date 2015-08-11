@@ -8,8 +8,11 @@ import fuel.util.toHexString
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
+import java.nio.charset.Charset
 import java.util.HashMap
 import java.util.concurrent.Callable
+import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 import kotlin.properties.Delegates
 
 /**
@@ -33,7 +36,7 @@ public class Request {
     var httpBody: ByteArray = ByteArray(0)
 
     var httpHeaders by Delegates.readWriteLazy {
-        val additionalHeaders = Manager.sharedInstance.baseHeaders
+        val additionalHeaders = Manager.instance.baseHeaders
         val headers = HashMap<String, String>()
         if (additionalHeaders != null) {
             headers.putAll(additionalHeaders)
@@ -49,6 +52,10 @@ public class Request {
             else -> TaskRequest(this)
         }
     }
+
+    //callers
+    var executor: ExecutorService by Delegates.notNull()
+    var callbackExecutor: Executor by Delegates.notNull()
 
     //interfaces
     public fun header(pair: Pair<String, Any>?): Request {
@@ -72,9 +79,11 @@ public class Request {
         return this
     }
 
+    public fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
+
     public fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
-        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.DEFAULT)
+        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
         return header("Authorization" to "Basic " + String(encodedAuth))
     }
 
@@ -197,13 +206,15 @@ public class Request {
         submit(taskRequest)
     }
 
+
     public fun submit(callable: Callable<Unit>) {
-        Manager.executor.submit(callable)
+        executor.submit(callable)
     }
+
 
     //privates
     private fun callback(f: () -> Unit) {
-        Manager.callbackExecutor.execute {
+        callbackExecutor.execute {
             f.invoke()
         }
     }
@@ -219,7 +230,7 @@ public class Request {
 
         override fun call() {
             try {
-                val response = Manager.sharedInstance.client.executeRequest(request)
+                val response = Manager.instance.client.executeRequest(request)
 
                 //dispatch
                 dispatchCallback(response)
@@ -256,7 +267,7 @@ public class Request {
 
         override fun call() {
             try {
-                val response = Manager.sharedInstance.client.executeRequest(request)
+                val response = Manager.instance.client.executeRequest(request)
                 val file = destinationCallback?.invoke(response, request.url)!!
 
                 //file output
@@ -270,6 +281,13 @@ public class Request {
                 //dispatch
                 dispatchCallback(response)
             } catch(error: FuelError) {
+                failureCallback?.invoke(error, error.response)
+            } catch(ex: Exception) {
+                val error = build(FuelError()) {
+                    response = Response()
+                    response.url = request.url
+                    exception = ex
+                }
                 failureCallback?.invoke(error, error.response)
             } finally {
                 dataStream.close()
@@ -322,11 +340,18 @@ public class Request {
 
                 request.body(dataStream.toByteArray())
 
-                val response = Manager.sharedInstance.client.executeRequest(request)
+                val response = Manager.instance.client.executeRequest(request)
 
                 //dispatch
                 dispatchCallback(response)
             } catch(error: FuelError) {
+                failureCallback?.invoke(error, error.response)
+            } catch(ex: Exception) {
+                val error = build(FuelError()) {
+                    response = Response()
+                    response.url = request.url
+                    exception = ex
+                }
                 failureCallback?.invoke(error, error.response)
             } finally {
                 dataStream.close()

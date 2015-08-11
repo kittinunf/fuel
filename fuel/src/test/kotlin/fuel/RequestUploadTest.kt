@@ -1,14 +1,18 @@
 package fuel
 
-import android.os.Environment
 import fuel.core.FuelError
 import fuel.core.Manager
 import fuel.core.Request
 import fuel.core.Response
 import fuel.toolbox.HttpClient
 import fuel.util.build
+import org.junit.Before
+import org.junit.Test
 import java.io.File
+import java.io.FileNotFoundException
 import java.net.HttpURLConnection
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -20,30 +24,37 @@ import kotlin.test.assertTrue
 
 class RequestUploadTest : BaseTestCase() {
 
-    override val numberOfTestCase = 3
-
     val manager: Manager by Delegates.lazy {
         build(Manager()) {
             client = HttpClient()
             basePath = "http://httpbin.org"
+            callbackExecutor = object : Executor {
+                override fun execute(command: Runnable) {
+                    command.run()
+                }
+            }
         }
     }
 
-    val currentDir by Delegates.lazy {
-        val sd = Environment.getExternalStorageDirectory();
-        val location = File(sd.getAbsolutePath() + "/test")
-        location.mkdir()
-        return@lazy location
+    val currentDir: File by Delegates.lazy {
+        val dir = System.getProperty("user.dir")
+        File(dir, "src/test/assets")
     }
 
-    public fun testHttpUploadCase() {
+    Before
+    fun setUp() {
+        lock = CountDownLatch(1)
+    }
+
+    Test
+    fun httpUploadCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
         manager.upload("/post").source { request, url ->
-            File(currentDir, "download_32768.tmp")
+            File(currentDir, "lorem_ipsum_short.tmp")
         }.responseString { req, res, either ->
             request = req
             response = res
@@ -51,20 +62,21 @@ class RequestUploadTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    public fun testHttpUploadWithProgressValidCase() {
+    Test
+    fun httpUploadWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -74,10 +86,11 @@ class RequestUploadTest : BaseTestCase() {
         var total = -1L
 
         manager.upload("/post").source { request, url ->
-            File(currentDir, "downloadWithProgressValid_1048576.tmp")
+            File(currentDir, "lorem_ipsum_long.tmp")
         }.progress { readBytes, totalBytes ->
             read = readBytes
             total = totalBytes
+            println("read: $read, total: $total")
         }.responseString { req, res, either ->
             request = req
             response = res
@@ -85,10 +98,10 @@ class RequestUploadTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -97,17 +110,18 @@ class RequestUploadTest : BaseTestCase() {
 
         assertTrue(read == total && read != -1L && total != -1L, "read bytes and total bytes should be equal")
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    public fun testHttpUploadWithProgressInvalidCase() {
+    Test
+    fun httpUploadWithProgressInvalidEndPointCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
         manager.upload("/pos").source { request, url ->
-            File(currentDir, "downloadWithProgressInvalid.tmp")
+            File(currentDir, "lorem_ipsum_short.tmp")
         }.progress { readBytes, totalBytes ->
 
         }.responseString { req, res, either ->
@@ -117,10 +131,10 @@ class RequestUploadTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -128,7 +142,40 @@ class RequestUploadTest : BaseTestCase() {
         assertNull(data, "data should be null")
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode" )
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
+    }
+
+    Test
+    fun httpUploadWithProgressInvalidFileCase() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.upload("/post").source { request, url ->
+            File(currentDir, "not_found_file.tmp")
+        }.progress { readBytes, totalBytes ->
+
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNotNull(error, "error should not be null")
+        assertNull(data, "data should be null")
+
+        val statusCode = -1
+        assertTrue { error?.exception is FileNotFoundException }
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
 }

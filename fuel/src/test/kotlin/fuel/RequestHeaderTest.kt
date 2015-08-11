@@ -3,7 +3,11 @@ package fuel
 import fuel.core.*
 import fuel.toolbox.HttpClient
 import fuel.util.build
+import org.junit.Before
+import org.junit.Test
 import java.net.HttpURLConnection
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -15,19 +19,25 @@ import kotlin.test.assertTrue
 
 class RequestHeaderTest : BaseTestCase() {
 
-    override val numberOfTestCase = 1
-
     val manager: Manager by Delegates.lazy {
         build(Manager()) {
             client = HttpClient()
             basePath = "http://httpbin.org"
+            callbackExecutor = object : Executor {
+                override fun execute(command: Runnable) {
+                    command.run()
+                }
+            }
         }
     }
 
-    override fun setUp() {
+    Before
+    fun setUp() {
+        lock = CountDownLatch(1)
     }
 
-    public fun testHttpPerRequestHeader() {
+    Test
+    fun httpRequestHeader() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -44,10 +54,10 @@ class RequestHeaderTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")

@@ -14,21 +14,26 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
- * Created by Kittinun Vantasin on 7/28/15.
+ * Created by Kittinun Vantasin on 8/10/15.
  */
 
-class RequestStringExtensionTest : BaseTestCase() {
+class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
     init {
-        Manager.instance.basePath = "https://httpbin.org"
-        Manager.instance.baseHeaders = mapOf("foo" to "bar")
-        Manager.instance.baseParams = mapOf("key" to "value")
-
         Manager.instance.callbackExecutor = object : Executor {
             override fun execute(command: Runnable) {
                 command.run()
             }
         }
+    }
+
+    enum class HttpsBin(val relativePath: String) : Fuel.PathStringConvertible {
+        COOKIES("cookies"),
+        POST("post"),
+        PUT("put"),
+        DELETE("delete");
+
+        override val path = "https://httpbin.org/$relativePath"
     }
 
     Before
@@ -37,15 +42,16 @@ class RequestStringExtensionTest : BaseTestCase() {
     }
 
     Test
-    fun httpGet() {
+    fun httpGetRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        "/get".httpGet().responseString { req, res, either ->
+        HttpsBin.COOKIES.httpGet().responseString { req, res, either ->
             request = req
             response = res
+
             val (err, d) = either
             data = d
             error = err
@@ -59,21 +65,20 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertNotNull(response, "response should not be null")
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
     Test
-    fun httpPost() {
+    fun httpPostRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        "/post".httpPost().responseString { req, res, either ->
+        HttpsBin.POST.httpPost().responseString { req, res, either ->
             request = req
             response = res
+
             val (err, d) = either
             data = d
             error = err
@@ -83,25 +88,28 @@ class RequestStringExtensionTest : BaseTestCase() {
 
         await()
 
+        val string = data as String
+
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
     Test
-    fun httpPut() {
+    fun httpPutRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        "/put".httpPut().responseString { req, res, either ->
+        HttpsBin.PUT.httpPut().responseString { req, res, either ->
             request = req
             response = res
+
             val (err, d) = either
             data = d
             error = err
@@ -111,25 +119,28 @@ class RequestStringExtensionTest : BaseTestCase() {
 
         await()
 
+        val string = data as String
+
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
     Test
-    fun httpDelete() {
+    fun httpDeleteRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        "/delete".httpDelete().responseString { req, res, either ->
+        HttpsBin.DELETE.httpDelete().responseString { req, res, either ->
             request = req
             response = res
+
             val (err, d) = either
             data = d
             error = err
@@ -139,13 +150,15 @@ class RequestStringExtensionTest : BaseTestCase() {
 
         await()
 
+        val string = data as String
+
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
 }

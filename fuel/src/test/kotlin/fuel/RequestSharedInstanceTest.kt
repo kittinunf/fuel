@@ -1,10 +1,13 @@
 package fuel
 
-import android.os.Environment
 import fuel.core.*
 import fuel.util.build
+import org.junit.Before
+import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -15,7 +18,17 @@ import kotlin.test.assertTrue
 
 class RequestSharedInstanceTest : BaseTestCase() {
 
-    override val numberOfTestCase = 10
+    init {
+        Manager.instance.basePath = "https://httpbin.org"
+        Manager.instance.baseHeaders = mapOf("foo" to "bar")
+        Manager.instance.baseParams = mapOf("key" to "value")
+
+        Manager.instance.callbackExecutor = object : Executor {
+            override fun execute(command: Runnable) {
+                command.run()
+            }
+        }
+    }
 
     enum class HttpsBin(override val path: String) : Fuel.PathStringConvertible {
         IP("ip"),
@@ -30,20 +43,20 @@ class RequestSharedInstanceTest : BaseTestCase() {
         fun createRequest(): Request {
             val encoder = build(Encoding()) {
                 httpMethod = method
-                urlString = "https://httpbin.org/$relativePath"
+                urlString = "https://httpbin.org$relativePath"
                 parameters = mapOf("foo" to "bar")
             }
             return encoder.request
         }
     }
 
-    override fun setUp() {
-        Manager.sharedInstance.basePath = "https://httpbin.org"
-        Manager.sharedInstance.baseHeaders = mapOf("foo" to "bar")
-        Manager.sharedInstance.baseParams = mapOf("key" to "value")
+    Before
+    fun setUp() {
+        lock = CountDownLatch(1)
     }
 
-    public fun testHttpGetRequestWithSharedInstance() {
+    Test
+    fun httpGetRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -57,10 +70,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -74,7 +87,8 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    public fun testHttpPostRequestWithSharedInstance() {
+    Test
+    fun httpPostRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -88,10 +102,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -106,7 +120,8 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    public fun testHttpPutRequestWithSharedInstance() {
+    Test
+    fun httpPutRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -120,10 +135,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -138,7 +153,8 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    public fun testHttpDeleteRequestWithSharedInstance() {
+    Test
+    fun httpDeleteRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -152,10 +168,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -170,7 +186,8 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    public fun testHttpGetRequestWithPathStringConvertibleAndSharedInstance() {
+    Test
+    fun httpGetRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -184,10 +201,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -200,7 +217,8 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("origin"), "response should contain \"origin\" ")
     }
 
-    public fun testHttpPostRequestWithPathStringConvertibleAndSharedInstance() {
+    Test
+    fun httpPostRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -214,10 +232,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -230,7 +248,8 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    public fun testHttpPutRequestWithPathStringConvertibleAndSharedInstance() {
+    Test
+    fun httpPutRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -244,10 +263,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -260,7 +279,8 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    public fun testHttpDeleteRequestWithPathStringConvertibleAndSharedInstance() {
+    Test
+    fun httpDeleteRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -274,10 +294,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         val string = data as String
 
@@ -290,13 +310,14 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    public fun testHttpPostRequestWithRequestConvertibleAndSharedInstance() {
+    Test
+    fun httpGetRequestWithRequestConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.request(HttpBinConvertible(Method.POST, "post")).responseString { req, res, either ->
+        Fuel.request(HttpBinConvertible(Method.GET, "/get")).responseString { req, res, either ->
             request = req
             response = res
 
@@ -304,10 +325,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -316,7 +337,89 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    public fun testHttpDownloadWithProgressValidCase() {
+    Test
+    fun httpPostRequestWithRequestConvertibleAndSharedInstance() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        Fuel.request(HttpBinConvertible(Method.POST, "/post")).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    Test
+    fun httpPutRequestWithRequestConvertibleAndSharedInstance() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        Fuel.request(HttpBinConvertible(Method.PUT, "/put")).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    Test
+    fun httpDeleteRequestWithRequestConvertibleAndSharedInstance() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        Fuel.request(HttpBinConvertible(Method.DELETE, "/delete")).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    Test
+    fun httpUploadWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -325,11 +428,49 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var read = -1L
         var total = -1L
 
-        Fuel.download("/bytes/1048576").destination { response, url ->
-            val sd = Environment.getExternalStorageDirectory();
-            val location = File(sd.getAbsolutePath() + "/test")
-            location.mkdir()
-            File(location, "downloadFromFuelWithProgress.tmp")
+        Fuel.upload("/post").source { request, url ->
+            val dir = System.getProperty("user.dir")
+            File(dir, "src/test/assets/lorem_ipsum_long.tmp")
+        }.progress { readBytes, totalBytes ->
+            read = readBytes
+            total = totalBytes
+            println("read: $read, total: $total")
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+
+        assertTrue(read == total && read != -1L && total != -1L, "read bytes and total bytes should be equal")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+    }
+
+
+    Test
+    fun httpDownloadWithProgressValidCase() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        var read = -1L
+        var total = -1L
+
+        val numberOfBytes = 1048576
+        Fuel.download("/bytes/$numberOfBytes").destination { response, url ->
+            File.createTempFile(numberOfBytes.toString(), null)
         }.progress { readBytes, totalBytes ->
             read = readBytes
             total = totalBytes
@@ -340,10 +481,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             data = d
             error = err
 
-            countdownFulfill()
+            lock.countDown()
         }
 
-        countdownWait()
+        await()
 
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
@@ -351,8 +492,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertNotNull(data, "data should not be null")
 
         assertTrue(read == total, "read bytes and total bytes should be equal")
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
 }

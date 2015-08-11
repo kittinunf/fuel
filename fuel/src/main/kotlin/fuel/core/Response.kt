@@ -24,6 +24,9 @@ public class Response {
         //response message
         elements.add("Response : $httpResponseMessage")
 
+        //content length
+        elements.add("Length : $httpContentLength")
+
         //body
         elements.add("Body : ${ if (data.size() != 0) String(data) else "(empty)"}")
 

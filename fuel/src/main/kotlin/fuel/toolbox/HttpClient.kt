@@ -57,13 +57,15 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
                 val dataStream = if (connection.getErrorStream() != null) {
                     connection.getErrorStream()
                 } else {
-                    connection.getInputStream()
+                    try { connection.getInputStream() } catch(exception: IOException) { null }
                 }
 
-                data = if (contentEncoding.compareTo("gzip", true) == 0) {
-                    GZIPInputStream(dataStream).readBytes()
-                } else {
-                    dataStream.readBytes()
+                if (dataStream != null) {
+                    data = if (contentEncoding.compareTo("gzip", true) == 0) {
+                        GZIPInputStream(dataStream).readBytes()
+                    } else {
+                        dataStream.readBytes()
+                    }
                 }
 
                 //try - catch just in case both methods throw
