@@ -1,9 +1,6 @@
 package fuel
 
-import fuel.core.FuelError
-import fuel.core.Manager
-import fuel.core.Request
-import fuel.core.Response
+import fuel.core.*
 import fuel.toolbox.HttpClient
 import fuel.util.build
 import org.junit.Before

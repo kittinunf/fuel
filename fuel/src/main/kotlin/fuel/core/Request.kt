@@ -37,7 +37,7 @@ public class Request {
 
     var httpHeaders by Delegates.readWriteLazy {
         val additionalHeaders = Manager.instance.baseHeaders
-        val headers = HashMap<String, String>()
+        val headers = hashMapOf<String, String>()
         if (additionalHeaders != null) {
             headers.putAll(additionalHeaders)
         }
@@ -132,93 +132,73 @@ public class Request {
         return this
     }
 
-    public fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit) {
-        build(taskRequest) {
-            successCallback = { response ->
-                callback {
-                    handler(this@Request, response, Right(response.data))
-                }
-            }
+    companion object {
 
-            failureCallback = { error, response ->
-                callback {
-                    handler(this@Request, response, Left(error))
-                }
+        public fun byteArrayDeserializer(): GenericResponseDeserializer<ByteArray> {
+            return GenericResponseDeserializer { request, response ->
+                Right(response.data)
             }
         }
 
-        submit(taskRequest)
-    }
-
-    public fun response(handler: Handler<ByteArray>) {
-        build(taskRequest) {
-            successCallback = { response ->
-                callback {
-                    handler.success(this@Request, response, response.data)
-                }
-            }
-
-            failureCallback = { error, response ->
-                callback {
-                    handler.failure(this@Request, response, error)
-                }
+        public fun stringDeserializer(): GenericResponseDeserializer<String> {
+            return GenericResponseDeserializer { request, response ->
+                Right(String(response.data))
             }
         }
 
-        submit(taskRequest)
     }
 
-    public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) {
-        build(taskRequest) {
-            successCallback = { response ->
-                val data = String(response.data)
-                callback {
-                    handler(this@Request, response, Right(data))
-                }
-            }
-
-            failureCallback = { error, response ->
-                callback {
-                    handler(this@Request, response, Left(error))
-                }
-            }
-        }
-
-        submit(taskRequest)
-    }
-
-    public fun responseString(handler: Handler<String>) {
-        build(taskRequest) {
-            successCallback = { response ->
-                val data = String(response.data)
-                callback {
-                    handler.success(this@Request, response, data)
-                }
-            }
-
-            failureCallback = { error, response ->
-                callback {
-                    handler.failure(this@Request, response, error)
-                }
-            }
-        }
-
-        submit(taskRequest)
-    }
-
-
-    public fun submit(callable: Callable<Unit>) {
+    fun submit(callable: Callable<Unit>) {
         executor.submit(callable)
     }
 
-
-    //privates
-    private fun callback(f: () -> Unit) {
+    fun call(f: () -> Unit) {
         callbackExecutor.execute {
             f.invoke()
         }
     }
 
+    public fun cUrlString(): String {
+        val elements = arrayListOf("$ curl -i")
+
+        //method
+        if (!httpMethod.equals(Method.GET)) {
+            elements.add("-X $httpMethod")
+        }
+
+        //body
+        val escapedBody = String(httpBody).replace("\"", "\\\"")
+        if (escapedBody.isNotEmpty()) {
+            elements.add("-d \"$escapedBody\"")
+        }
+
+        //headers
+        for ((key, value) in httpHeaders) {
+            elements.add("-H \"$key:$value\"")
+        }
+
+        //url
+        elements.add("\"${url.toString()}\"")
+
+        return elements.join(" ").toString()
+    }
+
+    override fun toString(): String {
+        val elements = arrayListOf("--> $httpMethod (${url.toString()})")
+
+        //body
+        elements.add("Body : ${ if (httpBody.size() != 0) String(httpBody) else "(empty)"}")
+
+        //headers
+        elements.add("Headers : (${httpHeaders.size()})")
+        for ((key, value) in httpHeaders) {
+            elements.add("$key : $value")
+        }
+
+        return elements.join("\n").toString()
+    }
+
+    //underlying requests
     open class TaskRequest(open val request: Request) : Callable<Unit> {
 
         var successCallback: ((Response) -> Unit)? = null
@@ -359,46 +339,6 @@ public class Request {
             }
         }
 
-    }
-
-    public fun cUrlString(): String {
-        val elements = arrayListOf("$ curl -i")
-
-        //method
-        if (!httpMethod.equals(Method.GET)) {
-            elements.add("-X $httpMethod")
-        }
-
-        //body
-        val escapedBody = String(httpBody).replace("\"", "\\\"")
-        if (escapedBody.isNotEmpty()) {
-            elements.add("-d \"$escapedBody\"")
-        }
-
-        //headers
-        for ((key, value) in httpHeaders) {
-            elements.add("-H \"$key:$value\"")
-        }
-
-        //url
-        elements.add("\"${url.toString()}\"")
-
-        return elements.join(" ").toString()
-    }
-
-    override fun toString(): String {
-        val elements = arrayListOf("--> $httpMethod (${url.toString()})")
-
-        //body
-        elements.add("Body : ${ if (httpBody.size() != 0) String(httpBody) else "(empty)"}")
-
-        //headers
-        elements.add("Headers : (${httpHeaders.size()})")
-        for ((key, value) in httpHeaders) {
-            elements.add("$key : $value")
-        }
-
-        return elements.join("\n").toString()
     }
 
 }
