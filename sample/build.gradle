@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
 
     defaultConfig {
         applicationId "com.example.kotlin.fuel"
         minSdkVersion 16
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
@@ -42,9 +42,8 @@ dependencies {
 buildscript {
 
     ext {
-        android_support_version = '22.2.1'
-        kotlin_version = '0.12.613'
-        fuel_version = '0.4'
+        android_support_version = '23.0.0'
+        kotlin_version = '0.12.1230'
     }
 
     repositories {

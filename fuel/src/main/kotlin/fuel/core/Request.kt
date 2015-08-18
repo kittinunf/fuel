@@ -5,11 +5,11 @@ import fuel.util.build
 import fuel.util.copyTo
 import fuel.util.readWriteLazy
 import fuel.util.toHexString
+import org.json.JSONObject
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
 import java.nio.charset.Charset
-import java.util.HashMap
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
@@ -134,15 +134,34 @@ public class Request {
 
     companion object {
 
-        public fun byteArrayDeserializer(): GenericResponseDeserializer<ByteArray> {
-            return GenericResponseDeserializer { request, response ->
-                Right(response.data)
+        public fun byteArrayDeserializer(): ResponseDeserializable<ByteArray> {
+            return object : ResponseDeserializable<ByteArray> {
+                override val deserializer: (Request, Response) -> Either<Exception, ByteArray>
+                    get() = { request, response ->
+                        Right(response.data)
+                    }
             }
         }
 
-        public fun stringDeserializer(): GenericResponseDeserializer<String> {
-            return GenericResponseDeserializer { request, response ->
-                Right(String(response.data))
+        public fun stringDeserializer(): ResponseDeserializable<String> {
+            return object : ResponseDeserializable<String> {
+                override val deserializer: (Request, Response) -> Either<Exception, String>
+                    get() = { request, response ->
+                        Right(String(response.data))
+                    }
+            }
+        }
+
+        public fun jsonDeserializer(): ResponseDeserializable<JSONObject> {
+            return object : ResponseDeserializable<JSONObject> {
+                override val deserializer: (Request, Response) -> Either<Exception, JSONObject>
+                    get() = { request, response ->
+                        try {
+                            Right(JSONObject(String(response.data)))
+                        } catch(exception: Exception) {
+                            Left(exception)
+                        }
+                    }
             }
         }
 
@@ -152,11 +171,26 @@ public class Request {
         executor.submit(callable)
     }
 
-    fun call(f: () -> Unit) {
+    fun callback(f: () -> Unit) {
         callbackExecutor.execute {
             f.invoke()
         }
     }
+
+    //byte array
+    public fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit): Unit = response(Request.byteArrayDeserializer(), handler)
+
+    public fun response(handler: Handler<ByteArray>): Unit = response(Request.byteArrayDeserializer(), handler)
+
+    //string
+    public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit): Unit = response(Request.stringDeserializer(), handler)
+
+    public fun responseString(handler: Handler<String>): Unit = response(Request.stringDeserializer(), handler)
+
+    //jsonObject
+    public fun responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit): Unit = response(Request.jsonDeserializer(), handler)
+
+    public fun responseJson(handler: Handler<JSONObject>): Unit = response(Request.jsonDeserializer(), handler)
 
     public fun cUrlString(): String {
         val elements = arrayListOf("$ curl -i")
@@ -215,7 +249,9 @@ public class Request {
                 //dispatch
                 dispatchCallback(response)
             } catch (error: FuelError) {
-                failureCallback?.invoke(error, error.response)
+                val response = Response()
+                response.url = request.url
+                failureCallback?.invoke(error, response)
             }
         }
 
@@ -225,9 +261,8 @@ public class Request {
                 successCallback?.invoke(response)
             } else {
                 val error = build(FuelError()) {
-                    this.exception = IllegalStateException("Validation failed")
-                    this.response = response
-                    this.errorData = response.data
+                    exception = HttpException(response.httpStatusCode, response.httpResponseMessage)
+                    errorData = response.data
                 }
                 failureCallback?.invoke(error, response)
             }
@@ -261,14 +296,16 @@ public class Request {
                 //dispatch
                 dispatchCallback(response)
             } catch(error: FuelError) {
-                failureCallback?.invoke(error, error.response)
+                val response = Response()
+                response.url = request.url
+                failureCallback?.invoke(error, response)
             } catch(ex: Exception) {
                 val error = build(FuelError()) {
-                    response = Response()
-                    response.url = request.url
                     exception = ex
                 }
-                failureCallback?.invoke(error, error.response)
+                val response = Response()
+                response.url = request.url
+                failureCallback?.invoke(error, response)
             } finally {
                 dataStream.close()
                 fileOutputStream.close()
@@ -325,14 +362,16 @@ public class Request {
                 //dispatch
                 dispatchCallback(response)
             } catch(error: FuelError) {
-                failureCallback?.invoke(error, error.response)
+                val response = Response()
+                response.url = request.url
+                failureCallback?.invoke(error, response)
             } catch(ex: Exception) {
                 val error = build(FuelError()) {
-                    response = Response()
-                    response.url = request.url
                     exception = ex
                 }
-                failureCallback?.invoke(error, error.response)
+                val response = Response()
+                response.url = request.url
+                failureCallback?.invoke(error, response)
             } finally {
                 dataStream.close()
                 fileInputStream.close()

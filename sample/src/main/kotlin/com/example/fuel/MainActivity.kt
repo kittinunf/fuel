@@ -19,12 +19,18 @@ public class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Manager.instance.basePath = "http://httpbin.org"
-        Manager.instance.baseHeaders = mapOf("Device" to "Android")
-        Manager.instance.baseParams = mapOf("key" to "value")
+//        Manager.instance.basePath = "http://httpbin.org"
+//        Manager.instance.baseHeaders = mapOf("Device" to "Android")
+//        Manager.instance.baseParams = mapOf("key" to "value")
 
         mainGoButton.setOnClickListener {
-            execute()
+//            execute()
+            "https://api.themoviedb.org/3/authentication/token/validate_with_login"
+                    .httpGet(mapOf("username" to "kittinun.f@gmail.com", "password" to "abcd1234"))
+                    .responseString { request, response, either ->
+                        Log.d(TAG, request.toString())
+                        updateUI(response, either)
+                    }
         }
 
         mainClearButton.setOnClickListener {
@@ -151,6 +157,7 @@ public class MainActivity : AppCompatActivity() {
         val (error, data) = either
         val text = mainResultText.getText().toString()
         if (error != null) {
+            Log.e(TAG, response.toString())
             Log.e(TAG, error.toString())
             mainResultText.setText(text + String(error.errorData))
         } else {

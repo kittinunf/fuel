@@ -3,6 +3,7 @@ package fuel
 import fuel.core.*
 import fuel.toolbox.HttpClient
 import fuel.util.build
+import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -110,6 +111,34 @@ class RequestTest : BaseTestCase() {
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
         assertTrue(data is String, "data should be String type")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    Test
+    fun httpGetRequestWithJsonObjectResponse() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/get").responseJson { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(data is JSONObject, "data should be JSONObject type")
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
