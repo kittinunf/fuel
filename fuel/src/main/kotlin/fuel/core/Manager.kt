@@ -16,7 +16,7 @@ import kotlin.properties.Delegates
 
 public class Manager {
 
-    public var client: Client by Delegates.notNull()
+    public var client: Client by Delegates.readWriteLazy { HttpClient() }
     public var basePath: String? = null
 
     public var baseHeaders: Map<String, String>? = null
@@ -39,9 +39,7 @@ public class Manager {
 
         //manager
         var instance by Delegates.readWriteLazy {
-            build(Manager()) {
-                this.client = HttpClient()
-            }
+            Manager()
         }
 
     }
@@ -51,7 +49,7 @@ public class Manager {
             httpMethod = method
             baseUrlString = basePath
             urlString = path
-            parameters = if (param == null) baseParams else param + baseParams
+            parameters = if (param == null) baseParams else baseParams + param
         })
 
         request.executor = executor
@@ -64,7 +62,7 @@ public class Manager {
             httpMethod = method
             baseUrlString = basePath
             urlString = convertible.path
-            parameters = if (param == null) baseParams else param + baseParams
+            parameters = if (param == null) baseParams else baseParams + param
         })
 
         request.executor = executor
@@ -77,7 +75,7 @@ public class Manager {
             httpMethod = Method.GET
             baseUrlString = basePath
             urlString = path
-            parameters = if (param == null) baseParams else param + baseParams
+            parameters = if (param == null) baseParams else baseParams + param
             requestType = Request.Type.DOWNLOAD
         }.request
 
@@ -91,7 +89,7 @@ public class Manager {
             httpMethod = Method.GET
             baseUrlString = basePath
             urlString = convertible.path
-            parameters = if (param == null) baseParams else param + baseParams
+            parameters = if (param == null) baseParams else baseParams + param
             requestType = Request.Type.DOWNLOAD
         }.request
 
@@ -105,7 +103,7 @@ public class Manager {
             httpMethod = Method.POST
             baseUrlString = basePath
             urlString = path
-            parameters = if (param == null) baseParams else param + baseParams
+            parameters = if (param == null) baseParams else baseParams + param
             requestType = Request.Type.UPLOAD
         }.request
 
@@ -119,7 +117,7 @@ public class Manager {
             httpMethod = Method.POST
             baseUrlString = basePath
             urlString = convertible.path
-            parameters = if (param == null) baseParams else param + baseParams
+            parameters = if (param == null) baseParams else baseParams + param
             requestType = Request.Type.UPLOAD
         }.request
 

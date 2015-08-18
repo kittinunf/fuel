@@ -1,6 +1,7 @@
 package fuel
 
 import fuel.core.*
+import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -34,7 +35,7 @@ class RequestHandlerTest : BaseTestCase() {
     }
 
     Test
-    fun httpGetRequestWithSuccess() {
+    fun httpGetRequestValid() {
         var req: Request? = null
         var res: Response? = null
         var data: Any? = null
@@ -51,6 +52,7 @@ class RequestHandlerTest : BaseTestCase() {
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
+                println(error)
             }
 
         })
@@ -65,7 +67,7 @@ class RequestHandlerTest : BaseTestCase() {
     }
 
     Test
-    fun httpGetRequestWithFailure() {
+    fun httpGetRequestInvalid() {
         var req: Request? = null
         var res: Response? = null
         var data: Any? = null
@@ -74,7 +76,7 @@ class RequestHandlerTest : BaseTestCase() {
         "/g".httpGet().response(object : Handler<ByteArray> {
 
             override fun success(request: Request, response: Response, value: ByteArray) {
-
+                println(String(value))
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
@@ -96,6 +98,102 @@ class RequestHandlerTest : BaseTestCase() {
         assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_NOT_FOUND, "http status code (${res?.httpStatusCode}) should be ${HttpURLConnection.HTTP_NOT_FOUND}")
     }
 
+    Test
+    fun httpPostRequestWithParameters() {
+        var req: Request? = null
+        var res: Response? = null
+        var data: Any? = null
+        var err: FuelError? = null
 
+        val paramKey = "foo"
+        val paramValue = "bar"
+
+        "/post".httpPost(mapOf(paramKey to paramValue)).responseString(object : Handler<String> {
+            override fun success(request: Request, response: Response, value: String) {
+                req = request
+                res = response
+                data = value
+
+                lock.countDown()
+            }
+
+            override fun failure(request: Request, response: Response, error: FuelError) {
+                println(error)
+            }
+        })
+
+        await()
+
+        val string = data as String
+
+        assertNotNull(req, "request should not be null")
+        assertNotNull(res, "response should not be null")
+        assertNull(err, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+
+        assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
+    }
+
+    Test
+    fun httpGetRequestJsonValid() {
+        var req: Request? = null
+        var res: Response? = null
+        var data: Any? = null
+        var err: FuelError? = null
+
+        Fuel.get("/user-agent").responseJson(object : Handler<JSONObject> {
+            override fun success(request: Request, response: Response, value: JSONObject) {
+                req = request
+                res = response
+                data = value
+
+                lock.countDown()
+            }
+
+            override fun failure(request: Request, response: Response, error: FuelError) {
+                println(error)
+            }
+        })
+
+        await()
+
+        assertNotNull(req, "request should not be null")
+        assertNotNull(res, "response should not be null")
+        assertNull(err, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(data is JSONObject, "data should be JSONObject type")
+        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    Test
+    fun httpGetRequestJsonInvalid() {
+        var req: Request? = null
+        var res: Response? = null
+        var data: Any? = null
+        var err: FuelError? = null
+
+        Fuel.get("/html").responseJson(object : Handler<JSONObject> {
+            override fun success(request: Request, response: Response, value: JSONObject) {
+            }
+
+            override fun failure(request: Request, response: Response, error: FuelError) {
+                req = request
+                res = response
+                err = error
+
+                lock.countDown()
+                println(error)
+            }
+        })
+
+        await()
+
+        assertNotNull(req, "request should not be null")
+        assertNotNull(res, "response should not be null")
+        assertNotNull(err, "error should not be null")
+        assertNull(data, "data should be null")
+        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code (${res?.httpStatusCode}) should be ${HttpURLConnection.HTTP_OK}")
+    }
 
 }

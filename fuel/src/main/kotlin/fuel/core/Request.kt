@@ -57,6 +57,37 @@ public class Request {
     var executor: ExecutorService by Delegates.notNull()
     var callbackExecutor: Executor by Delegates.notNull()
 
+    companion object {
+
+        public fun byteArrayDeserializer(): ResponseDeserializable<ByteArray> {
+            return object : ResponseDeserializable<ByteArray> {
+                override val deserializer: (Request, Response) -> ByteArray
+                    get() = { request, response ->
+                        response.data
+                    }
+            }
+        }
+
+        public fun stringDeserializer(): ResponseDeserializable<String> {
+            return object : ResponseDeserializable<String> {
+                override val deserializer: (Request, Response) -> String
+                    get() = { request, response ->
+                        String(response.data)
+                    }
+            }
+        }
+
+        public fun jsonDeserializer(): ResponseDeserializable<JSONObject> {
+            return object : ResponseDeserializable<JSONObject> {
+                override val deserializer: (Request, Response) -> JSONObject
+                    get() = { request, response ->
+                        JSONObject(String(response.data))
+                    }
+            }
+        }
+
+    }
+
     //interfaces
     public fun header(pair: Pair<String, Any>?): Request {
         if (pair != null) {
@@ -132,41 +163,6 @@ public class Request {
         return this
     }
 
-    companion object {
-
-        public fun byteArrayDeserializer(): ResponseDeserializable<ByteArray> {
-            return object : ResponseDeserializable<ByteArray> {
-                override val deserializer: (Request, Response) -> Either<Exception, ByteArray>
-                    get() = { request, response ->
-                        Right(response.data)
-                    }
-            }
-        }
-
-        public fun stringDeserializer(): ResponseDeserializable<String> {
-            return object : ResponseDeserializable<String> {
-                override val deserializer: (Request, Response) -> Either<Exception, String>
-                    get() = { request, response ->
-                        Right(String(response.data))
-                    }
-            }
-        }
-
-        public fun jsonDeserializer(): ResponseDeserializable<JSONObject> {
-            return object : ResponseDeserializable<JSONObject> {
-                override val deserializer: (Request, Response) -> Either<Exception, JSONObject>
-                    get() = { request, response ->
-                        try {
-                            Right(JSONObject(String(response.data)))
-                        } catch(exception: Exception) {
-                            Left(exception)
-                        }
-                    }
-            }
-        }
-
-    }
-
     fun submit(callable: Callable<Unit>) {
         executor.submit(callable)
     }
@@ -191,6 +187,23 @@ public class Request {
     public fun responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit): Unit = response(Request.jsonDeserializer(), handler)
 
     public fun responseJson(handler: Handler<JSONObject>): Unit = response(Request.jsonDeserializer(), handler)
+
+    //object
+    public fun <T, U : ResponseDeserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Either<FuelError, T>) -> Unit) {
+        response(deserializable, { request, response, value ->
+            handler(this@response, response, Right(value))
+        }, { request, response, error ->
+            handler(this@response, response, Left(error))
+        })
+    }
+
+    public fun <T, U : ResponseDeserializable<T>> Request.response(deserializable: U, handler: Handler<T>) {
+        response(deserializable, { request, response, value ->
+            handler.success(request, response, value)
+        }, { request, response, error ->
+            handler.failure(request, response, error)
+        })
+    }
 
     public fun cUrlString(): String {
         val elements = arrayListOf("$ curl -i")

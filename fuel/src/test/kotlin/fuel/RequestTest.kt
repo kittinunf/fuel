@@ -22,7 +22,6 @@ class RequestTest : BaseTestCase() {
 
     val manager: Manager by Delegates.lazy {
         build(Manager()) {
-            client = HttpClient()
             callbackExecutor = object : Executor {
                 override fun execute(command: Runnable) {
                     command.run()
@@ -186,7 +185,7 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(Method.POST, "http://httpbin.org/post", mapOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.GET, "http://httpbin.org/get", mapOf(paramKey to paramValue)).responseString { req, res, either ->
             request = req
             response = res
 
@@ -368,6 +367,43 @@ class RequestTest : BaseTestCase() {
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    Test
+    fun httpGetRequestWithRequestConvertibleAndOverriddenParameters() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val paramKey = "foo"
+        val paramValue = "xxx"
+
+        manager.request(Method.POST, "http://httpbin.org/post", mapOf(paramKey to paramValue)).responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        val string = data as String
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+
+        assertTrue(string.contains(paramKey) &&
+                string.contains(paramValue) &&
+                !string.contains("bar"),
+                "url query param should be sent along with url and present in response of httpbin.org and overrides the base one")
     }
 
 }

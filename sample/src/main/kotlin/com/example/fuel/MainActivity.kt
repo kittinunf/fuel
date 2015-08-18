@@ -19,18 +19,12 @@ public class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        Manager.instance.basePath = "http://httpbin.org"
-//        Manager.instance.baseHeaders = mapOf("Device" to "Android")
-//        Manager.instance.baseParams = mapOf("key" to "value")
+        Manager.instance.basePath = "http://httpbin.org"
+        Manager.instance.baseHeaders = mapOf("Device" to "Android")
+        Manager.instance.baseParams = mapOf("key" to "value")
 
         mainGoButton.setOnClickListener {
-//            execute()
-            "https://api.themoviedb.org/3/authentication/token/validate_with_login"
-                    .httpGet(mapOf("username" to "kittinun.f@gmail.com", "password" to "abcd1234"))
-                    .responseString { request, response, either ->
-                        Log.d(TAG, request.toString())
-                        updateUI(response, either)
-                    }
+            execute()
         }
 
         mainClearButton.setOnClickListener {
@@ -136,23 +130,6 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun updateUI(response: Response, either: Either<FuelError, String>) {
-        //when checking
-        val e: FuelError? = when (either) {
-            is Left -> either.get()
-            else -> null
-        }
-        var d: String? = when (either) {
-            is Right -> either.get()
-            else -> null
-        }
-
-        //folding
-        either.fold({ e ->
-            //left
-        }, { d ->
-            //right
-        })
-
         //multi-declaration
         val (error, data) = either
         val text = mainResultText.getText().toString()

@@ -29,7 +29,6 @@ class RequestAuthenticationTest : BaseTestCase() {
 
     val manager: Manager by Delegates.lazy {
         build(Manager()) {
-            client = HttpClient()
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
                 override fun execute(command: Runnable) {
