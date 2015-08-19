@@ -12,22 +12,27 @@ import java.io.Reader
 
 private interface Deserializable<out T> {
 
-    fun deserialize(response: Response): T?
+    fun deserialize(response: Response): T
 
 }
 
 public interface ResponseDeserializable<out T> : Deserializable<T> {
 
-    override fun deserialize(response: Response): T? {
+    override fun deserialize(response: Response): T {
         return deserialize(response.data) ?:
                 deserialize(ByteArrayInputStream(response.data)) ?:
                 deserialize(InputStreamReader(ByteArrayInputStream(response.data))) ?:
-                deserialize(String(response.data))
+                deserialize(String(response.data)) ?:
+                throw IllegalStateException("One of deserialize(ByteArray) or deserialize(InputStream) or deserialize(Reader) or deserialize(String) must be implemented")
     }
 
+    //One of these methods must be implemented
     public fun deserialize(bytes: ByteArray): T? = null
+
     public fun deserialize(inputStream: InputStream): T? = null
+
     public fun deserialize(reader: Reader): T? = null
+
     public fun deserialize(content: String): T? = null
 
 }
@@ -53,11 +58,10 @@ private fun <T, U : Deserializable<T>> Request.response(deserializable: U,
                                                         failure: (Request, Response, FuelError) -> Unit) {
     build(taskRequest) {
         successCallback = { response ->
-            //deserialization
+
             val deliverable: Either<Exception, T> =
                     try {
-                        val value = (deserializable.deserialize(response))
-                        if (value == null) Left(IllegalStateException()) else Right(value)
+                        Right(deserializable.deserialize(response))
                     } catch(exception: Exception) {
                         Left(exception)
                     }
