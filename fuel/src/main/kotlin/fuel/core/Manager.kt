@@ -38,9 +38,7 @@ public class Manager {
     companion object Singleton {
 
         //manager
-        var instance by Delegates.readWriteLazy {
-            Manager()
-        }
+        var instance by Delegates.readWriteLazy { Manager() }
 
     }
 

@@ -19,7 +19,6 @@ private interface Deserializable<T> {
 public interface ResponseDeserializable<T> : Deserializable<T> {
 
     override fun deserialize(response: Response): T? {
-
         return deserialize(response.data) ?:
                 deserialize(ByteArrayInputStream(response.data)) ?:
                 deserialize(InputStreamReader(ByteArrayInputStream(response.data))) ?:
@@ -54,11 +53,11 @@ private fun <T, U : Deserializable<T>> Request.response(deserializable: U,
                                                         failure: (Request, Response, FuelError) -> Unit) {
     build(taskRequest) {
         successCallback = { response ->
-
+            //deserialization
             val deliverable: Either<Exception, T> =
                     try {
                         val value = (deserializable.deserialize(response))
-                        if (value == null) Left(Exception()) else Right(value)
+                        if (value == null) Left(IllegalStateException()) else Right(value)
                     } catch(exception: Exception) {
                         Left(exception)
                     }

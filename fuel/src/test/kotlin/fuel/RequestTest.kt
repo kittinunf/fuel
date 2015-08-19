@@ -10,6 +10,7 @@ import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -394,16 +395,16 @@ class RequestTest : BaseTestCase() {
 
         val string = data as String
 
+        println(string)
+
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
         assertNull(error, "error should be null")
         assertNotNull(data, "data should not be null")
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
 
-        assertTrue(string.contains(paramKey) &&
-                string.contains(paramValue) &&
-                !string.contains("bar"),
-                "url query param should be sent along with url and present in response of httpbin.org and overrides the base one")
+        assertTrue(string.contains(paramKey), "url query param should be sent along with url, $paramKey")
+        assertTrue(string.contains(paramValue), "url query param should be sent along with url, $paramValue")
     }
 
 }

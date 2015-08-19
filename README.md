@@ -7,10 +7,11 @@ The easiest HTTP networking library in Kotlin for Android.
 ## Features
 
 - [x] Support basic HTTP GET/POST/PUT/DELETE in a fluent style interface
-- [x] Download File
-- [x] Upload File (multipart/form-data)
+- [x] Download file
+- [x] Upload file (multipart/form-data)
 - [x] Configuration manager
 - [x] Debug log / cUrl log
+- [x] Support response deserialization into plain old object (both Kotlin & Java)
 - [x] Automatically invoke handler on Android Main Thread
 
 ## Installation
@@ -95,24 +96,33 @@ Fuel.get("http://httpbin.org/get").response { request, response, either ->
 
 * [Either](http://www.ibm.com/developerworks/java/library/j-ft13/index.html) is a functional style data structure that represents data that contains either *left* or *right* but not both. It represents result of action that can be error or success (with result). The common functional convention is the *left* of an Either class contains an exception (if any), and the *right* contains the result.
 
-* Work with either is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Either.kt#L13) it, [*muliple declare*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/fuel/RequestAuthenticationTest.kt#L44) it because it is just a [data class](http://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *left* or *right*.
+* Work with either is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Either.kt#L13), [*muliple declare*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/fuel/RequestAuthenticationTest.kt#L44) as because it is just a [data class](http://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *left* or *right*.
 
 ### Response
-``` response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit) ```
+``` Kotlin
+fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit)
+```
 
 ### Response in String
-``` responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) ```
+``` Kotlin
+fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit)
+```
+
+### Response in [JSONObject](http://www.json.org/javadoc/org/json/JSONObject.html)
+``` Kotlin
+fun responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit)
+```
+
+
 
 ### POST
 
 ``` Kotlin
 Fuel.post("http://httpbin.org/post").response { request, response, either ->
-    
 }
 
 //if you have body to post manually
 Fuel.post("http://httpbin.org/post").body("{ \"foo\" : \"bar\" }").response { request, response, either -> 
-
 }
 ```
 
@@ -120,7 +130,6 @@ Fuel.post("http://httpbin.org/post").body("{ \"foo\" : \"bar\" }").response { re
 
 ``` Kotlin
 Fuel.put("http://httpbin.org/put").response { request, response, either ->
-
 }
 ```
 
@@ -128,7 +137,6 @@ Fuel.put("http://httpbin.org/put").response { request, response, either ->
 
 ``` Kotlin
 Fuel.delete("http://httpbin.org/delete").response { request, response, either ->
-
 }
 ```
 

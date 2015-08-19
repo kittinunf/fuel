@@ -29,6 +29,29 @@ class RequestHandlerTest : BaseTestCase() {
         }
     }
 
+    //Model
+    data class HttpBinHeadersModel(var headers: MutableMap<String, String> = hashMapOf())
+
+    //Deserializer
+    class HttpBinHeadersDeserializer : ResponseDeserializable<HttpBinHeadersModel> {
+
+        override fun deserialize(content: String): HttpBinHeadersModel? {
+            val results = hashMapOf<String, String>()
+
+            val jsonHeaders = JSONObject(content).getJSONObject("headers")
+            jsonHeaders.keys().asSequence().fold(results) { results, key ->
+                results.put(key, jsonHeaders.getString(key))
+                results
+            }
+
+            val model = HttpBinHeadersModel()
+            model.headers = results
+
+            return model
+        }
+
+    }
+
     Before
     fun setUp() {
         lock = CountDownLatch(1)
@@ -194,6 +217,38 @@ class RequestHandlerTest : BaseTestCase() {
         assertNotNull(err, "error should not be null")
         assertNull(data, "data should be null")
         assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code (${res?.httpStatusCode}) should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    Test
+    fun httpGetRequestObject() {
+        var req: Request? = null
+        var res: Response? = null
+        var data: Any? = null
+        var err: FuelError? = null
+
+        Fuel.get("/headers").responseObject(HttpBinHeadersDeserializer(), object : Handler<HttpBinHeadersModel> {
+
+            override fun success(request: Request, response: Response, value: HttpBinHeadersModel) {
+                req = request
+                res = response
+                data = value
+
+                lock.countDown()
+            }
+
+            override fun failure(request: Request, response: Response, error: FuelError) {
+            }
+
+        })
+
+        await()
+
+        assertNotNull(req, "request should not be null")
+        assertNotNull(res, "response should not be null")
+        assertNull(err, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(data is HttpBinHeadersModel, "data should be HttpBinHeadersModel type")
+        assertTrue((data as HttpBinHeadersModel).headers.isNotEmpty(), "model must properly be serialized")
     }
 
 }
