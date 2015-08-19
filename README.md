@@ -113,8 +113,6 @@ fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Un
 fun responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit)
 ```
 
-
-
 ### POST
 
 ``` Kotlin
@@ -251,7 +249,50 @@ Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request,
 
 ## Advanced Configuration
 
+### Response Deserialization
+
+* Fuel provides built-in support for response deserialization. Here is how one might want to use Fuel together with [Gson](https://github.com/google/gson)
+
+``` Kotlin
+
+//model
+data class User(var firstName: String = "", var lastName: String = "")
+
+//Deserializer
+class UserDeserializer : ResponseDeserializable<User> {
+
+    override fun deserialize(content: String): User {
+        return Gson().fromJson(content, javaClass<User>())
+    }
+
+}
+
+Fuel.get("http://www.example.com/user/1").responseObject(UserDeserializer()) { req, res, either
+    //either is type of Either<Exception, User>
+    val (err, user) = either
+
+    println(user.firstName)
+    println(user.lastName)
+}
+
+```
+
+* There are 4 of methods to support your deserialization depending on your needs (also depending on JSON parsing lib of your choice), you are required to implement just only one of them.
+
+``` Kotlin
+public fun deserialize(bytes: ByteArray): T?
+
+public fun deserialize(inputStream: InputStream): T?
+
+public fun deserialize(reader: Reader): T?
+
+public fun deserialize(content: String): T?
+```
+
+### Configuration
+
 * Use singleton ```Manager.sharedInstance``` to manager global configuration.
+
 * ```basePath``` is to manage common root path. Great usage is for your static API endpoint.
 
 ``` Kotlin

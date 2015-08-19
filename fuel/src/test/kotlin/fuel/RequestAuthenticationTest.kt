@@ -1,7 +1,6 @@
 package fuel
 
 import fuel.core.*
-import fuel.toolbox.HttpClient
 import fuel.util.build
 import org.junit.Before
 import org.junit.Test

@@ -35,7 +35,7 @@ class RequestHandlerTest : BaseTestCase() {
     //Deserializer
     class HttpBinHeadersDeserializer : ResponseDeserializable<HttpBinHeadersModel> {
 
-        override fun deserialize(content: String): HttpBinHeadersModel? {
+        override fun deserialize(content: String): HttpBinHeadersModel {
             val results = hashMapOf<String, String>()
 
             val jsonHeaders = JSONObject(content).getJSONObject("headers")

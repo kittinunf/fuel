@@ -32,7 +32,7 @@ class RequestObjectTest : BaseTestCase() {
     //Deserializer
     class HttpBinUserAgentModelDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
 
-        override fun deserialize(content: String): HttpBinUserAgentModel? {
+        override fun deserialize(content: String): HttpBinUserAgentModel {
             return HttpBinUserAgentModel(content)
         }
 
@@ -40,7 +40,7 @@ class RequestObjectTest : BaseTestCase() {
 
     class HttpBinMalformedDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
 
-        override fun deserialize(reader: Reader): HttpBinUserAgentModel? {
+        override fun deserialize(reader: Reader): HttpBinUserAgentModel {
             throw JSONException("Test malformed data")
         }
 

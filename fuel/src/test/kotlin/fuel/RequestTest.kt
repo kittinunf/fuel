@@ -1,7 +1,6 @@
 package fuel
 
 import fuel.core.*
-import fuel.toolbox.HttpClient
 import fuel.util.build
 import org.json.JSONObject
 import org.junit.Before
@@ -10,7 +9,6 @@ import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
