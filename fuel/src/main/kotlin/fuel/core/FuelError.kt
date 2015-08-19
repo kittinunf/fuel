@@ -9,15 +9,13 @@ import kotlin.properties.Delegates
 public class FuelError : Exception() {
 
     var exception: Exception by Delegates.notNull()
-    var response: Response by Delegates.notNull()
 
     //data
     var errorData = ByteArray(0)
 
     override fun toString(): String {
-        val elements = arrayListOf(response.toString())
+        val elements = arrayListOf("Exception : ${exception.getMessage()}")
         //exception
-        elements.add("Exception : ${exception.getMessage()}")
         return elements.join("\n").toString()
     }
 

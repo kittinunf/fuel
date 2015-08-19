@@ -20,6 +20,7 @@ import kotlin.test.assertTrue
 class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
     init {
+        Manager.instance.basePath = "https://httpbin.org"
         Manager.instance.callbackExecutor = object : Executor {
             override fun execute(command: Runnable) {
                 command.run()
@@ -33,7 +34,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         PUT("put"),
         DELETE("delete");
 
-        override val path = "https://httpbin.org/$relativePath"
+        override val path = "/$relativePath"
     }
 
     Before

@@ -5,11 +5,11 @@ import fuel.util.build
 import fuel.util.copyTo
 import fuel.util.readWriteLazy
 import fuel.util.toHexString
+import org.json.JSONObject
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
 import java.nio.charset.Charset
-import java.util.HashMap
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
@@ -37,7 +37,7 @@ public class Request {
 
     var httpHeaders by Delegates.readWriteLazy {
         val additionalHeaders = Manager.instance.baseHeaders
-        val headers = HashMap<String, String>()
+        val headers = hashMapOf<String, String>()
         if (additionalHeaders != null) {
             headers.putAll(additionalHeaders)
         }
@@ -56,6 +56,34 @@ public class Request {
     //callers
     var executor: ExecutorService by Delegates.notNull()
     var callbackExecutor: Executor by Delegates.notNull()
+
+    companion object {
+
+        public fun byteArrayDeserializer(): Deserializable<ByteArray> {
+            return object : Deserializable<ByteArray> {
+                override fun deserialize(response: Response): ByteArray {
+                    return response.data
+                }
+            }
+        }
+
+        public fun stringDeserializer(): Deserializable<String> {
+            return object : Deserializable<String> {
+                override fun deserialize(response: Response): String {
+                    return String(response.data)
+                }
+            }
+        }
+
+        public fun jsonDeserializer(): Deserializable<JSONObject> {
+            return object : Deserializable<JSONObject> {
+                override fun deserialize(response: Response): JSONObject {
+                    return JSONObject(String(response.data))
+                }
+            }
+        }
+
+    }
 
     //interfaces
     public fun header(pair: Pair<String, Any>?): Request {
@@ -132,93 +160,80 @@ public class Request {
         return this
     }
 
-    public fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit) {
-        build(taskRequest) {
-            successCallback = { response ->
-                callback {
-                    handler(this@Request, response, Right(response.data))
-                }
-            }
-
-            failureCallback = { error, response ->
-                callback {
-                    handler(this@Request, response, Left(error))
-                }
-            }
-        }
-
-        submit(taskRequest)
-    }
-
-    public fun response(handler: Handler<ByteArray>) {
-        build(taskRequest) {
-            successCallback = { response ->
-                callback {
-                    handler.success(this@Request, response, response.data)
-                }
-            }
-
-            failureCallback = { error, response ->
-                callback {
-                    handler.failure(this@Request, response, error)
-                }
-            }
-        }
-
-        submit(taskRequest)
-    }
-
-    public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) {
-        build(taskRequest) {
-            successCallback = { response ->
-                val data = String(response.data)
-                callback {
-                    handler(this@Request, response, Right(data))
-                }
-            }
-
-            failureCallback = { error, response ->
-                callback {
-                    handler(this@Request, response, Left(error))
-                }
-            }
-        }
-
-        submit(taskRequest)
-    }
-
-    public fun responseString(handler: Handler<String>) {
-        build(taskRequest) {
-            successCallback = { response ->
-                val data = String(response.data)
-                callback {
-                    handler.success(this@Request, response, data)
-                }
-            }
-
-            failureCallback = { error, response ->
-                callback {
-                    handler.failure(this@Request, response, error)
-                }
-            }
-        }
-
-        submit(taskRequest)
-    }
-
-
-    public fun submit(callable: Callable<Unit>) {
+    fun submit(callable: Callable<Unit>) {
         executor.submit(callable)
     }
 
-
-    //privates
-    private fun callback(f: () -> Unit) {
+    fun callback(f: () -> Unit) {
         callbackExecutor.execute {
             f.invoke()
         }
     }
 
+    //byte array
+    public fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit): Unit =
+            response(Request.byteArrayDeserializer(), handler)
+
+    public fun response(handler: Handler<ByteArray>): Unit = response(Request.byteArrayDeserializer(), handler)
+
+    //string
+    public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit): Unit =
+            response(Request.stringDeserializer(), handler)
+
+    public fun responseString(handler: Handler<String>): Unit = response(Request.stringDeserializer(), handler)
+
+    //jsonObject
+    public fun responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit): Unit =
+            response(Request.jsonDeserializer(), handler)
+
+    public fun responseJson(handler: Handler<JSONObject>): Unit = response(Request.jsonDeserializer(), handler)
+
+    //object
+    public fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit): Unit = response(deserializer, handler)
+
+    public fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): Unit = response(deserializer, handler)
+
+    public fun cUrlString(): String {
+        val elements = arrayListOf("$ curl -i")
+
+        //method
+        if (!httpMethod.equals(Method.GET)) {
+            elements.add("-X $httpMethod")
+        }
+
+        //body
+        val escapedBody = String(httpBody).replace("\"", "\\\"")
+        if (escapedBody.isNotEmpty()) {
+            elements.add("-d \"$escapedBody\"")
+        }
+
+        //headers
+        for ((key, value) in httpHeaders) {
+            elements.add("-H \"$key:$value\"")
+        }
+
+        //url
+        elements.add("\"${url.toString()}\"")
+
+        return elements.join(" ").toString()
+    }
+
+    override fun toString(): String {
+        val elements = arrayListOf("--> $httpMethod (${url.toString()})")
+
+        //body
+        elements.add("Body : ${ if (httpBody.size() != 0) String(httpBody) else "(empty)"}")
+
+        //headers
+        elements.add("Headers : (${httpHeaders.size()})")
+        for ((key, value) in httpHeaders) {
+            elements.add("$key : $value")
+        }
+
+        return elements.join("\n").toString()
+    }
+
+    //underlying requests
     open class TaskRequest(open val request: Request) : Callable<Unit> {
 
         var successCallback: ((Response) -> Unit)? = null
@@ -235,7 +250,9 @@ public class Request {
                 //dispatch
                 dispatchCallback(response)
             } catch (error: FuelError) {
-                failureCallback?.invoke(error, error.response)
+                val response = Response()
+                response.url = request.url
+                failureCallback?.invoke(error, response)
             }
         }
 
@@ -245,9 +262,8 @@ public class Request {
                 successCallback?.invoke(response)
             } else {
                 val error = build(FuelError()) {
-                    this.exception = IllegalStateException("Validation failed")
-                    this.response = response
-                    this.errorData = response.data
+                    exception = HttpException(response.httpStatusCode, response.httpResponseMessage)
+                    errorData = response.data
                 }
                 failureCallback?.invoke(error, response)
             }
@@ -281,14 +297,16 @@ public class Request {
                 //dispatch
                 dispatchCallback(response)
             } catch(error: FuelError) {
-                failureCallback?.invoke(error, error.response)
+                val response = Response()
+                response.url = request.url
+                failureCallback?.invoke(error, response)
             } catch(ex: Exception) {
                 val error = build(FuelError()) {
-                    response = Response()
-                    response.url = request.url
                     exception = ex
                 }
-                failureCallback?.invoke(error, error.response)
+                val response = Response()
+                response.url = request.url
+                failureCallback?.invoke(error, response)
             } finally {
                 dataStream.close()
                 fileOutputStream.close()
@@ -345,60 +363,22 @@ public class Request {
                 //dispatch
                 dispatchCallback(response)
             } catch(error: FuelError) {
-                failureCallback?.invoke(error, error.response)
+                val response = Response()
+                response.url = request.url
+                failureCallback?.invoke(error, response)
             } catch(ex: Exception) {
                 val error = build(FuelError()) {
-                    response = Response()
-                    response.url = request.url
                     exception = ex
                 }
-                failureCallback?.invoke(error, error.response)
+                val response = Response()
+                response.url = request.url
+                failureCallback?.invoke(error, response)
             } finally {
                 dataStream.close()
                 fileInputStream.close()
             }
         }
 
-    }
-
-    public fun cUrlString(): String {
-        val elements = arrayListOf("$ curl -i")
-
-        //method
-        if (!httpMethod.equals(Method.GET)) {
-            elements.add("-X $httpMethod")
-        }
-
-        //body
-        val escapedBody = String(httpBody).replace("\"", "\\\"")
-        if (escapedBody.isNotEmpty()) {
-            elements.add("-d \"$escapedBody\"")
-        }
-
-        //headers
-        for ((key, value) in httpHeaders) {
-            elements.add("-H \"$key:$value\"")
-        }
-
-        //url
-        elements.add("\"${url.toString()}\"")
-
-        return elements.join(" ").toString()
-    }
-
-    override fun toString(): String {
-        val elements = arrayListOf("--> $httpMethod (${url.toString()})")
-
-        //body
-        elements.add("Body : ${ if (httpBody.size() != 0) String(httpBody) else "(empty)"}")
-
-        //headers
-        elements.add("Headers : (${httpHeaders.size()})")
-        for ((key, value) in httpHeaders) {
-            elements.add("$key : $value")
-        }
-
-        return elements.join("\n").toString()
     }
 
 }

@@ -4,7 +4,6 @@ import fuel.core.FuelError
 import fuel.core.Manager
 import fuel.core.Request
 import fuel.core.Response
-import fuel.toolbox.HttpClient
 import fuel.util.build
 import org.junit.Before
 import org.junit.Test
@@ -26,7 +25,6 @@ class RequestDownloadTest : BaseTestCase() {
 
     val manager: Manager by Delegates.lazy {
         build(Manager()) {
-            client = HttpClient()
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
                 override fun execute(command: Runnable) {

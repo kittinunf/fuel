@@ -1,7 +1,6 @@
 package fuel
 
 import fuel.core.*
-import fuel.toolbox.HttpClient
 import fuel.util.build
 import org.junit.Before
 import org.junit.Test
@@ -20,7 +19,6 @@ class RequestValidationTest : BaseTestCase() {
 
     val manager: Manager by Delegates.lazy {
         build(Manager()) {
-            client = HttpClient()
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
                 override fun execute(command: Runnable) {

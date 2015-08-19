@@ -7,10 +7,11 @@ The easiest HTTP networking library in Kotlin for Android.
 ## Features
 
 - [x] Support basic HTTP GET/POST/PUT/DELETE in a fluent style interface
-- [x] Download File
-- [x] Upload File (multipart/form-data)
+- [x] Download file
+- [x] Upload file (multipart/form-data)
 - [x] Configuration manager
 - [x] Debug log / cUrl log
+- [x] Support response deserialization into plain old object (both Kotlin & Java)
 - [x] Automatically invoke handler on Android Main Thread
 
 ## Installation
@@ -18,7 +19,6 @@ The easiest HTTP networking library in Kotlin for Android.
 ### Gradle
 
 ``` Groovy
-
 buildscript {
     repositories {
         jcenter()
@@ -26,7 +26,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'fuel:fuel:0.51'
+    compile 'fuel:fuel:0.52'
 }
 ```
 
@@ -39,13 +39,11 @@ dependencies {
 * Kotlin
 ``` Kotlin
 //an extension over string (support GET, PUT, POST, DELETE with httpGet(), httpPut(), httpPost(), httpDelete())
-
-"http://httpbin.org/get".httpGet().responseString { request, response, either ->	
+"http://httpbin.org/get".httpGet().responseString { request, response, either ->
 	//do something with response
 }
 
 //if we set baseURL beforehand, simply use relativePath
-
 Manager.sharedInstance.basePath = "http://httpbin.org"
 "/get".httpGet().responseString { request, response, either ->    
     //make a GET to http://httpbin.org/get and do something with response
@@ -95,24 +93,36 @@ Fuel.get("http://httpbin.org/get").response { request, response, either ->
 
 * [Either](http://www.ibm.com/developerworks/java/library/j-ft13/index.html) is a functional style data structure that represents data that contains either *left* or *right* but not both. It represents result of action that can be error or success (with result). The common functional convention is the *left* of an Either class contains an exception (if any), and the *right* contains the result.
 
-* Work with either is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Either.kt#L13) it, [*muliple declare*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/fuel/RequestAuthenticationTest.kt#L44) it because it is just a [data class](http://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *left* or *right*.
+* Work with either is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/fuel/RequestTest.kt#L355), [*muliple declare*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/fuel/RequestAuthenticationTest.kt#L44) as because it is just a [data class](http://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *left* or *right*.
 
 ### Response
-``` response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit) ```
+``` Kotlin
+fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit)
+```
 
 ### Response in String
-``` responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit) ```
+``` Kotlin
+fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit)
+```
+
+### Response in [JSONObject](http://www.json.org/javadoc/org/json/JSONObject.html)
+``` Kotlin
+fun responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit)
+```
+
+### Response in T (object)
+``` Kotlin
+fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit)
+```
 
 ### POST
 
 ``` Kotlin
 Fuel.post("http://httpbin.org/post").response { request, response, either ->
-    
 }
 
 //if you have body to post manually
 Fuel.post("http://httpbin.org/post").body("{ \"foo\" : \"bar\" }").response { request, response, either -> 
-
 }
 ```
 
@@ -120,7 +130,6 @@ Fuel.post("http://httpbin.org/post").body("{ \"foo\" : \"bar\" }").response { re
 
 ``` Kotlin
 Fuel.put("http://httpbin.org/put").response { request, response, either ->
-
 }
 ```
 
@@ -128,7 +137,6 @@ Fuel.put("http://httpbin.org/put").response { request, response, either ->
 
 ``` Kotlin
 Fuel.delete("http://httpbin.org/delete").response { request, response, either ->
-
 }
 ```
 
@@ -192,13 +200,13 @@ Fuel.put("http://httpbin.org/put", mapOf("foo" to "foo", "bar" to "bar")).respon
 ### Download with or without progress handler
 ``` Kotlin
 Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
-    File.createTempFile("temp", ".tmp");
+    File.createTempFile("temp", ".tmp")
 }.response { req, res, either -> {
 
 }
 
 Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
-    File.createTempFile("temp", ".tmp");
+    File.createTempFile("temp", ".tmp")
 }.progress { readBytes, totalBytes ->
     val progress = readBytes.toFloat() / totalBytes.toFloat()
 }.response { req, res, either -> {
@@ -243,7 +251,50 @@ Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request,
 
 ## Advanced Configuration
 
+### Response Deserialization
+
+* Fuel provides built-in support for response deserialization. Here is how one might want to use Fuel together with [Gson](https://github.com/google/gson)
+
+``` Kotlin
+
+//User Model
+data class User(val firstName: String = "",
+                val lastName: String = "") {
+
+    //User Deserializer
+    class Deserializer : ResponseDeserializable<User> {
+        override fun deserialize(content: String) = Gson().fromJson(content, javaClass<User>())
+    }
+
+}
+
+//Use httpGet extension
+"http://www.example.com/user/1".httpGet().responseObject(User.Deserializer()) { req, res, either
+    //either is type of Either<Exception, User>
+    val (err, user) = either
+
+    println(user.firstName)
+    println(user.lastName)
+}
+
+```
+
+* There are 4 of methods to support response deserialization depending on your needs (also depending on JSON parsing library of your choice), you are required to implement just only one of them.
+
+``` Kotlin
+public fun deserialize(bytes: ByteArray): T?
+
+public fun deserialize(inputStream: InputStream): T?
+
+public fun deserialize(reader: Reader): T?
+
+public fun deserialize(content: String): T?
+```
+
+### Configuration
+
 * Use singleton ```Manager.sharedInstance``` to manager global configuration.
+
 * ```basePath``` is to manage common root path. Great usage is for your static API endpoint.
 
 ``` Kotlin

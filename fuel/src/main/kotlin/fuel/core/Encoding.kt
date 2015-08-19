@@ -1,5 +1,6 @@
 package fuel.core
 
+import android.net.Uri
 import fuel.Fuel
 import fuel.util.build
 import fuel.util.toHexString
@@ -52,15 +53,16 @@ public class Encoding : Fuel.RequestConvertible {
     override val request by Delegates.lazy { encoder(httpMethod, urlString, parameters) }
 
     private fun createUrl(path: String): URL {
-        if (baseUrlString != null) {
-            return URL(baseUrlString + if (!path.startsWith('/')) '/' + path else path)
-        } else {
-            return URL(path)
-        }
+        val pathUri = Uri.parse(path)
+        //give precedence to local path
+        if (baseUrlString == null || pathUri.getScheme() != null) return URL(path)
+
+        //use basePath
+        return URL(baseUrlString + if (path.startsWith('/')) path else '/' + path)
     }
 
     private fun encodeParameterInUrl(method: Method): Boolean {
-        when(method) {
+        when (method) {
             Method.GET, Method.DELETE -> return true
             else -> return false
         }

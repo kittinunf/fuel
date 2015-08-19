@@ -49,7 +49,7 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
 
             return build(response) {
 
-                httpResponseHeaders = connection.getHeaderFields()
+                httpResponseHeaders = connection.getHeaderFields() ?: emptyMap()
                 httpContentLength = connection.getContentLength().toLong()
 
                 val contentEncoding = connection.getContentEncoding() ?: ""
@@ -75,14 +75,14 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
                 } catch(exception: IOException) {
                     throw build(FuelError()) {
                         this.exception = exception
-                        this.response = response
+                        this.errorData = response.data
                     }
                 }
             }
         } catch(exception: Exception) {
             throw build(FuelError()) {
                 this.exception = exception
-                this.response = response
+                this.errorData = response.data
             }
         } finally {
             connection.disconnect()
