@@ -1,15 +1,16 @@
 package com.example.fuel
 
 import android.os.Bundle
-import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.google.gson.Gson
 import fuel.*
 import fuel.core.*
 import kotlinx.android.synthetic.activity_main.mainClearButton
 import kotlinx.android.synthetic.activity_main.mainGoButton
 import kotlinx.android.synthetic.activity_main.mainResultText
 import java.io.File
+import java.io.Reader
 
 public class MainActivity : AppCompatActivity() {
 
@@ -33,6 +34,7 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun execute() {
+
         httpGet()
         httpPut()
         httpPost()
@@ -40,6 +42,15 @@ public class MainActivity : AppCompatActivity() {
         httpDownload()
         httpUpload()
         httpBasicAuthentication()
+
+        httpResponseObject()
+    }
+
+    fun httpResponseObject() {
+        "http://jsonplaceholder.typicode.com/photos/1".httpGet().responseObject(Photo.Deserializer()) { request, response, either ->
+            Log.d(TAG, request.toString())
+            updateUI(response, either)
+        }
     }
 
     fun httpGet() {
@@ -129,7 +140,7 @@ public class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateUI(response: Response, either: Either<FuelError, String>) {
+    fun <T> updateUI(response: Response, either: Either<FuelError, T>) {
         //multi-declaration
         val (error, data) = either
         val text = mainResultText.getText().toString()
@@ -139,8 +150,23 @@ public class MainActivity : AppCompatActivity() {
             mainResultText.setText(text + String(error.errorData))
         } else {
             Log.d(TAG, response.toString())
-            mainResultText.setText(text + data)
+            mainResultText.setText(text + data.toString())
         }
     }
+
+    data class Photo(
+            val albumId: Int = 0,
+            val id: Int = 0,
+            val title: String = "",
+            val url: String = "",
+            val thumbnailUrl: String = ""
+    ) {
+
+        class Deserializer : ResponseDeserializable<Photo> {
+            override fun deserialize(reader: Reader) = Gson().fromJson(reader, javaClass<Photo>())
+        }
+
+    }
+
 
 }

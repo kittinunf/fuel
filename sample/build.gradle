@@ -35,6 +35,7 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:$android_support_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "com.google.code.gson:gson:$gson_version"
 
     compile project(':fuel')
 }
@@ -44,6 +45,7 @@ buildscript {
     ext {
         android_support_version = '23.0.0'
         kotlin_version = '0.12.1230'
+        gson_version = '2.3.1'
     }
 
     repositories {

@@ -19,7 +19,6 @@ The easiest HTTP networking library in Kotlin for Android.
 ### Gradle
 
 ``` Groovy
-
 buildscript {
     repositories {
         jcenter()
@@ -40,13 +39,11 @@ dependencies {
 * Kotlin
 ``` Kotlin
 //an extension over string (support GET, PUT, POST, DELETE with httpGet(), httpPut(), httpPost(), httpDelete())
-
-"http://httpbin.org/get".httpGet().responseString { request, response, either ->	
+"http://httpbin.org/get".httpGet().responseString { request, response, either ->
 	//do something with response
 }
 
 //if we set baseURL beforehand, simply use relativePath
-
 Manager.sharedInstance.basePath = "http://httpbin.org"
 "/get".httpGet().responseString { request, response, either ->    
     //make a GET to http://httpbin.org/get and do something with response
@@ -111,6 +108,11 @@ fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Un
 ### Response in [JSONObject](http://www.json.org/javadoc/org/json/JSONObject.html)
 ``` Kotlin
 fun responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit)
+```
+
+### Response in T (object)
+``` Kotlin
+fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit)
 ```
 
 ### POST
@@ -198,13 +200,13 @@ Fuel.put("http://httpbin.org/put", mapOf("foo" to "foo", "bar" to "bar")).respon
 ### Download with or without progress handler
 ``` Kotlin
 Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
-    File.createTempFile("temp", ".tmp");
+    File.createTempFile("temp", ".tmp")
 }.response { req, res, either -> {
 
 }
 
 Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
-    File.createTempFile("temp", ".tmp");
+    File.createTempFile("temp", ".tmp")
 }.progress { readBytes, totalBytes ->
     val progress = readBytes.toFloat() / totalBytes.toFloat()
 }.response { req, res, either -> {
@@ -255,19 +257,19 @@ Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request,
 
 ``` Kotlin
 
-//model
-data class User(var firstName: String = "", var lastName: String = "")
+//User Model
+data class User(val firstName: String = "",
+                val lastName: String = "") {
 
-//Deserializer
-class UserDeserializer : ResponseDeserializable<User> {
-
-    override fun deserialize(content: String): User {
-        return Gson().fromJson(content, javaClass<User>())
+    //User Deserializer
+    class Deserializer : ResponseDeserializable<User> {
+        override fun deserialize(content: String) = Gson().fromJson(content, javaClass<User>())
     }
 
 }
 
-Fuel.get("http://www.example.com/user/1").responseObject(UserDeserializer()) { req, res, either
+//Use httpGet extension
+"http://www.example.com/user/1".httpGet().responseObject(User.Deserializer()) { req, res, either
     //either is type of Either<Exception, User>
     val (err, user) = either
 
@@ -277,7 +279,7 @@ Fuel.get("http://www.example.com/user/1").responseObject(UserDeserializer()) { r
 
 ```
 
-* There are 4 of methods to support your deserialization depending on your needs (also depending on JSON parsing lib of your choice), you are required to implement just only one of them.
+* There are 4 of methods to support response deserialization depending on your needs (also depending on JSON parsing library of your choice), you are required to implement just only one of them.
 
 ``` Kotlin
 public fun deserialize(bytes: ByteArray): T?

@@ -393,8 +393,6 @@ class RequestTest : BaseTestCase() {
 
         val string = data as String
 
-        println(string)
-
         assertNotNull(request, "request should not be null")
         assertNotNull(response, "response should not be null")
         assertNull(error, "error should be null")
