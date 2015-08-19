@@ -59,30 +59,27 @@ public class Request {
 
     companion object {
 
-        public fun byteArrayDeserializer(): ResponseDeserializable<ByteArray> {
-            return object : ResponseDeserializable<ByteArray> {
-                override val deserializer: (Request, Response) -> ByteArray
-                    get() = { request, response ->
-                        response.data
-                    }
+        public fun byteArrayDeserializer(): Deserializable<ByteArray> {
+            return object : Deserializable<ByteArray> {
+                override fun deserialize(response: Response): ByteArray {
+                    return response.data
+                }
             }
         }
 
-        public fun stringDeserializer(): ResponseDeserializable<String> {
-            return object : ResponseDeserializable<String> {
-                override val deserializer: (Request, Response) -> String
-                    get() = { request, response ->
-                        String(response.data)
-                    }
+        public fun stringDeserializer(): Deserializable<String> {
+            return object : Deserializable<String> {
+                override fun deserialize(response: Response): String {
+                    return String(response.data)
+                }
             }
         }
 
-        public fun jsonDeserializer(): ResponseDeserializable<JSONObject> {
-            return object : ResponseDeserializable<JSONObject> {
-                override val deserializer: (Request, Response) -> JSONObject
-                    get() = { request, response ->
-                        JSONObject(String(response.data))
-                    }
+        public fun jsonDeserializer(): Deserializable<JSONObject> {
+            return object : Deserializable<JSONObject> {
+                override fun deserialize(response: Response): JSONObject {
+                    return JSONObject(String(response.data))
+                }
             }
         }
 
@@ -174,36 +171,27 @@ public class Request {
     }
 
     //byte array
-    public fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit): Unit = response(Request.byteArrayDeserializer(), handler)
+    public fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit): Unit =
+            response(Request.byteArrayDeserializer(), handler)
 
     public fun response(handler: Handler<ByteArray>): Unit = response(Request.byteArrayDeserializer(), handler)
 
     //string
-    public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit): Unit = response(Request.stringDeserializer(), handler)
+    public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit): Unit =
+            response(Request.stringDeserializer(), handler)
 
     public fun responseString(handler: Handler<String>): Unit = response(Request.stringDeserializer(), handler)
 
     //jsonObject
-    public fun responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit): Unit = response(Request.jsonDeserializer(), handler)
+    public fun responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit): Unit =
+            response(Request.jsonDeserializer(), handler)
 
     public fun responseJson(handler: Handler<JSONObject>): Unit = response(Request.jsonDeserializer(), handler)
 
     //object
-    public fun <T, U : ResponseDeserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Either<FuelError, T>) -> Unit) {
-        response(deserializable, { request, response, value ->
-            handler(this@response, response, Right(value))
-        }, { request, response, error ->
-            handler(this@response, response, Left(error))
-        })
-    }
+    public fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit): Unit = response(deserializer, handler)
 
-    public fun <T, U : ResponseDeserializable<T>> Request.response(deserializable: U, handler: Handler<T>) {
-        response(deserializable, { request, response, value ->
-            handler.success(request, response, value)
-        }, { request, response, error ->
-            handler.failure(request, response, error)
-        })
-    }
+    public fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): Unit = response(deserializer, handler)
 
     public fun cUrlString(): String {
         val elements = arrayListOf("$ curl -i")
