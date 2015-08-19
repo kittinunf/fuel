@@ -10,13 +10,13 @@ import java.io.Reader
  * Created by Kittinun Vantasin on 8/16/15.
  */
 
-private interface Deserializable<T> {
+private interface Deserializable<out T> {
 
     fun deserialize(response: Response): T?
 
 }
 
-public interface ResponseDeserializable<T> : Deserializable<T> {
+public interface ResponseDeserializable<out T> : Deserializable<T> {
 
     override fun deserialize(response: Response): T? {
         return deserialize(response.data) ?:
