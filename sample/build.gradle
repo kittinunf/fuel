@@ -44,7 +44,7 @@ buildscript {
 
     ext {
         android_support_version = '23.0.0'
-        kotlin_version = '0.12.1230'
+        kotlin_version = '0.13.1513'
         gson_version = '2.3.1'
     }
 

@@ -29,7 +29,7 @@ public class MainActivity : AppCompatActivity() {
         }
 
         mainClearButton.setOnClickListener {
-            mainResultText.setText("")
+            mainResultText.text = ""
         }
     }
 
@@ -106,7 +106,7 @@ public class MainActivity : AppCompatActivity() {
 
     fun httpDownload() {
         Fuel.download("/bytes/1048").destination { response, url ->
-            File(getFilesDir(), "test.tmp")
+            File(filesDir, "test.tmp")
         }.progress { readBytes, totalBytes ->
             Log.v(TAG, "Download: ${readBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->
@@ -117,7 +117,7 @@ public class MainActivity : AppCompatActivity() {
 
     fun httpUpload() {
         Fuel.upload("/post").source { request, url ->
-            File(getFilesDir(), "test.tmp")
+            File(filesDir, "test.tmp")
         }.progress { writtenBytes, totalBytes ->
             Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->
@@ -143,14 +143,14 @@ public class MainActivity : AppCompatActivity() {
     fun <T> updateUI(response: Response, either: Either<FuelError, T>) {
         //multi-declaration
         val (error, data) = either
-        val text = mainResultText.getText().toString()
+        val text = mainResultText.text.toString()
         if (error != null) {
             Log.e(TAG, response.toString())
             Log.e(TAG, error.toString())
-            mainResultText.setText(text + String(error.errorData))
+            mainResultText.text += String(error.errorData)
         } else {
             Log.d(TAG, response.toString())
-            mainResultText.setText(text + data.toString())
+            mainResultText.text += data.toString()
         }
     }
 
@@ -163,7 +163,7 @@ public class MainActivity : AppCompatActivity() {
     ) {
 
         class Deserializer : ResponseDeserializable<Photo> {
-            override fun deserialize(reader: Reader) = Gson().fromJson(reader, javaClass<Photo>())
+            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Photo::class.java)
         }
 
     }
