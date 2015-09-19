@@ -45,7 +45,7 @@ public class Request {
     }
 
     //underlying task request
-    val taskRequest: TaskRequest by Delegates.lazy {
+    val taskRequest: TaskRequest by lazy(LazyThreadSafetyMode.NONE) {
         when (type) {
             Type.DOWNLOAD -> DownloadTaskRequest(this)
             Type.UPLOAD -> UploadTaskRequest(this)
@@ -189,9 +189,9 @@ public class Request {
     public fun responseJson(handler: Handler<JSONObject>): Unit = response(Request.jsonDeserializer(), handler)
 
     //object
-    public fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit): Unit = response(deserializer, handler)
+    public fun <T: Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit): Unit = response(deserializer, handler)
 
-    public fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): Unit = response(deserializer, handler)
+    public fun <T: Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): Unit = response(deserializer, handler)
 
     public fun cUrlString(): String {
         val elements = arrayListOf("$ curl -i")
@@ -337,9 +337,9 @@ public class Request {
 
                 dataStream = build(ByteArrayOutputStream()) {
                     write(("--" + boundary + CRLF).toByteArray())
-                    write(("Content-Disposition: form-data; filename=\"" + file.getName() + "\"").toByteArray())
+                    write(("Content-Disposition: form-data; filename=\"" + file.name + "\"").toByteArray())
                     write(CRLF.toByteArray())
-                    write(("Content-Type: " + URLConnection.guessContentTypeFromName(file.getName())).toByteArray())
+                    write(("Content-Type: " + URLConnection.guessContentTypeFromName(file.name)).toByteArray())
                     write(CRLF.toByteArray())
                     write(CRLF.toByteArray())
                     flush()
@@ -351,7 +351,7 @@ public class Request {
 
                     write(CRLF.toByteArray())
                     flush()
-                    write(("--" + boundary + "--").toByteArray())
+                    write(("--$boundary--").toByteArray())
                     write(CRLF.toByteArray())
                     flush()
                 }

@@ -8,7 +8,6 @@ import org.junit.Test
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
-import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -19,7 +18,7 @@ import kotlin.test.assertTrue
 
 class RequestTest : BaseTestCase() {
 
-    val manager: Manager by Delegates.lazy {
+    val manager: Manager by lazy {
         build(Manager()) {
             callbackExecutor = object : Executor {
                 override fun execute(command: Runnable) {
@@ -38,7 +37,7 @@ class RequestTest : BaseTestCase() {
         override val path = "https://httpbin.org/$relativePath"
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
@@ -56,7 +55,7 @@ class RequestTest : BaseTestCase() {
         }
     }
 
-    Test
+    @Test
     fun httpGetRequestWithDataResponse() {
         var request: Request? = null
         var response: Response? = null
@@ -84,7 +83,7 @@ class RequestTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpGetRequestWithStringResponse() {
         var request: Request? = null
         var response: Response? = null
@@ -112,7 +111,7 @@ class RequestTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpGetRequestWithJsonObjectResponse() {
         var request: Request? = null
         var response: Response? = null
@@ -140,7 +139,7 @@ class RequestTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpGetRequestWithParameters() {
         var request: Request? = null
         var response: Response? = null
@@ -174,7 +173,7 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
     }
 
-    Test
+    @Test
     fun httpPostRequestWithParameters() {
         var request: Request? = null
         var response: Response? = null
@@ -208,7 +207,7 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
     }
 
-    Test
+    @Test
     fun httpPostRequestWithBody() {
         var request: Request? = null
         var response: Response? = null
@@ -241,7 +240,7 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains("foo") && string.contains("bar"), "body should be sent along with url and present in response of httpbin.org")
     }
 
-    Test
+    @Test
     fun httpPutRequestWithParameters() {
         var request: Request? = null
         var response: Response? = null
@@ -275,7 +274,7 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
     }
 
-    Test
+    @Test
     fun httpDeleteRequestWithParameters() {
         var request: Request? = null
         var response: Response? = null
@@ -309,7 +308,7 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
     }
 
-    Test
+    @Test
     fun httpGetRequestWithPathStringConvertible() {
         var request: Request? = null
         var response: Response? = null
@@ -339,7 +338,7 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains("user-agent"), "USER_AGENT endpoint must be resolved correctly, and user-agent should be present in this response")
     }
 
-    Test
+    @Test
     fun httpGetRequestWithRequestConvertible() {
         var request: Request? = null
         var response: Response? = null
@@ -368,7 +367,7 @@ class RequestTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpGetRequestWithRequestConvertibleAndOverriddenParameters() {
         var request: Request? = null
         var response: Response? = null

@@ -17,7 +17,7 @@ import kotlin.test.assertTrue
 
 class RequestValidationTest : BaseTestCase() {
 
-    val manager: Manager by Delegates.lazy {
+    val manager: Manager by lazy(LazyThreadSafetyMode.NONE) {
         build(Manager()) {
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
@@ -28,12 +28,12 @@ class RequestValidationTest : BaseTestCase() {
         }
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpValidationWithDefaultCase() {
         val preDefinedStatusCode = 418
 
@@ -64,7 +64,7 @@ class RequestValidationTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode")
     }
 
-    Test
+    @Test
     fun httpValidationWithCustomValidCase() {
         val preDefinedStatusCode = 203
 
@@ -94,7 +94,7 @@ class RequestValidationTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == preDefinedStatusCode, "http status code should be $preDefinedStatusCode")
     }
 
-    Test
+    @Test
     fun httpValidationWithCustomInvalidCase() {
         val preDefineStatusCode = 418
 

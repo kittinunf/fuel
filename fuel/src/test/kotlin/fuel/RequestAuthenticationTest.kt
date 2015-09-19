@@ -26,7 +26,7 @@ class RequestAuthenticationTest : BaseTestCase() {
         password = "password"
     }
 
-    val manager: Manager by Delegates.lazy {
+    val manager: Manager by lazy(LazyThreadSafetyMode.NONE) {
         build(Manager()) {
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
@@ -37,12 +37,12 @@ class RequestAuthenticationTest : BaseTestCase() {
         }
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpBasicAuthenticationWithInvalidCase() {
         var request: Request? = null
         var response: Response? = null
@@ -70,7 +70,7 @@ class RequestAuthenticationTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode")
     }
 
-    Test
+    @Test
     fun httpBasicAuthenticationWithValidCase() {
         var request: Request? = null
         var response: Response? = null

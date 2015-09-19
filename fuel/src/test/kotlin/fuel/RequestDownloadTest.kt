@@ -12,7 +12,6 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
-import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -23,7 +22,7 @@ import kotlin.test.assertTrue
 
 class RequestDownloadTest : BaseTestCase() {
 
-    val manager: Manager by Delegates.lazy {
+    val manager: Manager by lazy {
         build(Manager()) {
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
@@ -34,12 +33,12 @@ class RequestDownloadTest : BaseTestCase() {
         }
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpDownloadCase() {
         var request: Request? = null
         var response: Response? = null
@@ -50,7 +49,7 @@ class RequestDownloadTest : BaseTestCase() {
 
         manager.download("/bytes/$numberOfBytes").destination { response, url ->
             val f = File.createTempFile(numberOfBytes.toString(), null)
-            println(f.getAbsolutePath())
+            println(f.absolutePath)
             f
         }.responseString { req, res, either ->
             request = req
@@ -72,7 +71,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    Test
+    @Test
     fun httpDownloadWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null
@@ -85,7 +84,7 @@ class RequestDownloadTest : BaseTestCase() {
         val numberOfBytes = 1048576L
         manager.download("/bytes/$numberOfBytes").destination { response, url ->
             val f = File.createTempFile(numberOfBytes.toString(), null)
-            println(f.getAbsolutePath())
+            println(f.absolutePath)
             f
         }.progress { readBytes, totalBytes ->
             read = readBytes
@@ -113,7 +112,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    Test
+    @Test
     fun httpDownloadWithProgressInvalidEndPointCase() {
         var request: Request? = null
         var response: Response? = null
@@ -123,7 +122,7 @@ class RequestDownloadTest : BaseTestCase() {
         val numberOfBytes = 131072
         manager.download("/byte/$numberOfBytes").destination { response, url ->
             val f = File.createTempFile(numberOfBytes.toString(), null)
-            println(f.getAbsolutePath())
+            println(f.absolutePath)
             f
         }.progress { readBytes, totalBytes ->
 
@@ -148,7 +147,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    Test
+    @Test
     fun httpDownloadWithProgressInvalidFileCase() {
         var request: Request? = null
         var response: Response? = null

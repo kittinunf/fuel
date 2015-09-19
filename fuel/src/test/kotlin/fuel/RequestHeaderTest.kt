@@ -18,7 +18,7 @@ import kotlin.test.assertTrue
 
 class RequestHeaderTest : BaseTestCase() {
 
-    val manager: Manager by Delegates.lazy {
+    val manager: Manager by lazy {
         build(Manager()) {
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
@@ -29,12 +29,12 @@ class RequestHeaderTest : BaseTestCase() {
         }
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpRequestHeader() {
         var request: Request? = null
         var response: Response? = null

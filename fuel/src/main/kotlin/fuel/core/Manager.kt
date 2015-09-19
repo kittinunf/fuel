@@ -26,7 +26,7 @@ public class Manager {
     public var executor: ExecutorService by Delegates.readWriteLazy {
         Executors.newCachedThreadPool { command ->
             Thread {
-                Thread.currentThread().setPriority(Thread.NORM_PRIORITY)
+                Thread.currentThread().priority = Thread.NORM_PRIORITY
                 command.run()
             }
         }
