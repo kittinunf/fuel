@@ -10,8 +10,8 @@ import kotlin.properties.Delegates
  * Created by Kittinun Vantasin on 5/21/15.
  */
 
-RunWith(CustomRobolectricGradleTestRunner::class)
-Config(constants = BuildConfig::class, sdk = intArrayOf(21))
+@RunWith(CustomRobolectricGradleTestRunner::class)
+@Config(constants = BuildConfig::class, sdk = intArrayOf(21))
 abstract class BaseTestCase {
 
     val DEFAULT_TIMEOUT = 15L
@@ -19,7 +19,7 @@ abstract class BaseTestCase {
     var lock: CountDownLatch by Delegates.notNull()
 
     fun await(seconds: Long = DEFAULT_TIMEOUT) {
-        lock.await(seconds, TimeUnit.SECONDS);
+        lock.await(seconds, TimeUnit.SECONDS)
     }
 
 }

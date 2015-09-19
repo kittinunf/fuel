@@ -39,7 +39,8 @@ class RequestHandlerTest : BaseTestCase() {
             val results = hashMapOf<String, String>()
 
             val jsonHeaders = JSONObject(content).getJSONObject("headers")
-            jsonHeaders.keys().asSequence().fold(results) { results, key ->
+            @Suppress("UNCHECKED_CAST")
+            (jsonHeaders.keys().asSequence() as Sequence<String>).fold(results) { results, key ->
                 results.put(key, jsonHeaders.getString(key))
                 results
             }
@@ -52,12 +53,12 @@ class RequestHandlerTest : BaseTestCase() {
 
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpGetRequestValid() {
         var req: Request? = null
         var res: Response? = null
@@ -89,7 +90,7 @@ class RequestHandlerTest : BaseTestCase() {
         assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpGetRequestInvalid() {
         var req: Request? = null
         var res: Response? = null
@@ -121,7 +122,7 @@ class RequestHandlerTest : BaseTestCase() {
         assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_NOT_FOUND, "http status code (${res?.httpStatusCode}) should be ${HttpURLConnection.HTTP_NOT_FOUND}")
     }
 
-    Test
+    @Test
     fun httpPostRequestWithParameters() {
         var req: Request? = null
         var res: Response? = null
@@ -158,7 +159,7 @@ class RequestHandlerTest : BaseTestCase() {
         assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
     }
 
-    Test
+    @Test
     fun httpGetRequestJsonValid() {
         var req: Request? = null
         var res: Response? = null
@@ -189,7 +190,7 @@ class RequestHandlerTest : BaseTestCase() {
         assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpGetRequestJsonInvalid() {
         var req: Request? = null
         var res: Response? = null
@@ -219,7 +220,7 @@ class RequestHandlerTest : BaseTestCase() {
         assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code (${res?.httpStatusCode}) should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpGetRequestObject() {
         var req: Request? = null
         var res: Response? = null

@@ -20,9 +20,9 @@ import javax.net.ssl.X509TrustManager
 class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()) : Client {
 
     override fun executeRequest(request: Request): Response {
-        val connection = if (request.url.getProtocol().equals("https")) {
+        val connection = if (request.url.protocol.equals("https")) {
             val conn = request.url.openConnection() as HttpsURLConnection
-            conn.setSSLSocketFactory(sslSocketFactory)
+            conn.sslSocketFactory = sslSocketFactory
             conn.setHostnameVerifier { s, SSLSession -> true }
             conn
         } else {
@@ -35,11 +35,11 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
         try {
             build(connection) {
                 val timeout = request.timeoutInMillisecond
-                setConnectTimeout(timeout)
-                setReadTimeout(timeout)
-                setDoInput(true)
-                setUseCaches(false)
-                setRequestMethod(request.httpMethod.value)
+                connectTimeout = timeout
+                readTimeout = timeout
+                doInput = true
+                useCaches = false
+                requestMethod = request.httpMethod.value
                 setDoOutput(connection, request.httpMethod)
                 for ((key, value) in request.httpHeaders) {
                     setRequestProperty(key, value)
@@ -49,15 +49,16 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
 
             return build(response) {
 
-                httpResponseHeaders = connection.getHeaderFields() ?: emptyMap()
-                httpContentLength = connection.getContentLength().toLong()
+                httpResponseHeaders = connection.headerFields ?: emptyMap()
+                httpContentLength = connection.contentLength.toLong()
 
-                val contentEncoding = connection.getContentEncoding() ?: ""
+                val contentEncoding = connection.contentEncoding ?: ""
 
-                val dataStream = if (connection.getErrorStream() != null) {
-                    connection.getErrorStream()
+                val dataStream = if (connection.errorStream != null) {
+                    connection.errorStream
                 } else {
-                    try { connection.getInputStream() } catch(exception: IOException) { null }
+                    try { connection.inputStream
+                    } catch(exception: IOException) { null }
                 }
 
                 if (dataStream != null) {
@@ -70,8 +71,8 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
 
                 //try - catch just in case both methods throw
                 try {
-                    httpStatusCode = connection.getResponseCode()
-                    httpResponseMessage = connection.getResponseMessage()
+                    httpStatusCode = connection.responseCode
+                    httpResponseMessage = connection.responseMessage
                 } catch(exception: IOException) {
                     throw build(FuelError()) {
                         this.exception = exception
@@ -92,15 +93,15 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
     private fun setBodyIfAny(connection: HttpURLConnection, bytes: ByteArray) {
         if (bytes.size() == 0) return
 
-        val outStream = BufferedOutputStream(connection.getOutputStream());
+        val outStream = BufferedOutputStream(connection.outputStream);
         outStream.write(bytes);
         outStream.close();
     }
 
     private fun setDoOutput(connection: HttpURLConnection, method: Method) {
         when (method) {
-            Method.GET, Method.DELETE -> connection.setDoOutput(false)
-            Method.POST, Method.PUT -> connection.setDoOutput(true)
+            Method.GET, Method.DELETE -> connection.doOutput = false
+            Method.POST, Method.PUT, Method.PATCH -> connection.doOutput = true
         }
     }
 
@@ -124,5 +125,5 @@ fun defaultSocketFactory(): SSLSocketFactory {
     val sslContext = SSLContext.getInstance("SSL")
     sslContext.init(null, trustAllCerts, SecureRandom())
 
-    return sslContext.getSocketFactory()
+    return sslContext.socketFactory
 }

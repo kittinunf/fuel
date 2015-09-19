@@ -13,15 +13,15 @@ private class ReadWriteLazyVal<T>(private val initializer: () -> T) : ReadWriteP
 
     private var value: Any? = null
 
-    public override fun get(thisRef: Any?, desc: PropertyMetadata): T {
+    public override fun get(thisRef: Any?, property: PropertyMetadata): T {
         if (value == null) {
-            value = (initializer()) ?: throw IllegalStateException("Initializer block of property ${desc.name} return null")
+            value = (initializer()) ?: throw IllegalStateException("Initializer block of property ${property.name} return null")
         }
-        @suppress("UNCHECKED_CAST")
+        @Suppress("UNCHECKED_CAST")
         return value as T
     }
 
-    override fun set(thisRef: Any?, desc: PropertyMetadata, value: T) {
+    override fun set(thisRef: Any?, property: PropertyMetadata, value: T) {
         this.value = value
     }
 

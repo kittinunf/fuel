@@ -23,7 +23,7 @@ import kotlin.test.assertTrue
 
 class RequestUploadTest : BaseTestCase() {
 
-    val manager: Manager by Delegates.lazy {
+    val manager: Manager by lazy {
         build(Manager()) {
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
@@ -34,17 +34,17 @@ class RequestUploadTest : BaseTestCase() {
         }
     }
 
-    val currentDir: File by Delegates.lazy {
+    val currentDir: File by lazy {
         val dir = System.getProperty("user.dir")
         File(dir, "src/test/assets")
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpUploadCase() {
         var request: Request? = null
         var response: Response? = null
@@ -73,7 +73,7 @@ class RequestUploadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    Test
+    @Test
     fun httpUploadWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null
@@ -111,7 +111,7 @@ class RequestUploadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    Test
+    @Test
     fun httpUploadWithProgressInvalidEndPointCase() {
         var request: Request? = null
         var response: Response? = null
@@ -143,7 +143,7 @@ class RequestUploadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    Test
+    @Test
     fun httpUploadWithProgressInvalidFileCase() {
         var request: Request? = null
         var response: Response? = null
