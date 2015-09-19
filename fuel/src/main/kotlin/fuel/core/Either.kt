@@ -5,7 +5,7 @@ package fuel.core
  */
 
 suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
-abstract public class Either<out L, out R> {
+sealed public class Either<out L, out R> {
 
     public abstract fun component1(): L?
     public abstract fun component2(): R?
@@ -35,18 +35,22 @@ abstract public class Either<out L, out R> {
         }
     }
 
+    public class Left<L, R>(val left: L) : Either<L, R>() {
+
+        public override fun component1() = left
+        public override fun component2() = null
+
+    }
+
+    public class Right<L, R>(val right: R) : Either<L, R>() {
+
+        public override fun component1() = null
+        public override fun component2() = right
+
+    }
+
 }
 
-public class Left<L, R>(val left: L) : Either<L, R>() {
 
-    public override fun component1() = left
-    public override fun component2() = null
 
-}
 
-public class Right<L, R>(val right: R) : Either<L, R>() {
-
-    public override fun component1() = null
-    public override fun component2() = right
-
-}
