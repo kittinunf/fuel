@@ -3,12 +3,10 @@ package fuel.core
 import fuel.Fuel
 import fuel.toolbox.HttpClient
 import fuel.util.AndroidMainThreadExecutor
-import fuel.util.build
 import fuel.util.readWriteLazy
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.properties.Delegates
 
 /**
  * Created by Kittinun Vantasin on 5/14/15.
@@ -16,34 +14,34 @@ import kotlin.properties.Delegates
 
 public class Manager {
 
-    public var client: Client by Delegates.readWriteLazy { HttpClient() }
+    public var client: Client by readWriteLazy { HttpClient() }
     public var basePath: String? = null
 
     public var baseHeaders: Map<String, String>? = null
     public var baseParams: Map<String, Any?> = mapOf()
 
     //background executor
-    public var executor: ExecutorService by Delegates.readWriteLazy {
+    public var executor: ExecutorService by readWriteLazy {
         Executors.newCachedThreadPool { command ->
             Thread {
-                Thread.currentThread().setPriority(Thread.NORM_PRIORITY)
+                Thread.currentThread().priority = Thread.NORM_PRIORITY
                 command.run()
             }
         }
     }
 
     //callback executor
-    public var callbackExecutor: Executor by Delegates.readWriteLazy { AndroidMainThreadExecutor() }
+    public var callbackExecutor: Executor by readWriteLazy { AndroidMainThreadExecutor() }
 
     companion object Singleton {
 
         //manager
-        var instance by Delegates.readWriteLazy { Manager() }
+        var instance by readWriteLazy { Manager() }
 
     }
 
     fun request(method: Method, path: String, param: Map<String, Any?>? = null): Request {
-        val request = request(build(Encoding()) {
+        val request = request(Encoding().apply {
             httpMethod = method
             baseUrlString = basePath
             urlString = path
@@ -56,7 +54,7 @@ public class Manager {
     }
 
     fun request(method: Method, convertible: Fuel.PathStringConvertible, param: Map<String, Any?>? = null): Request {
-        val request = request(build(Encoding()) {
+        val request = request(Encoding().apply {
             httpMethod = method
             baseUrlString = basePath
             urlString = convertible.path
@@ -69,7 +67,7 @@ public class Manager {
     }
 
     fun download(path: String, param: Map<String, Any?>? = null): Request {
-        val request = build(Encoding()) {
+        val request = Encoding().apply {
             httpMethod = Method.GET
             baseUrlString = basePath
             urlString = path
@@ -83,7 +81,7 @@ public class Manager {
     }
 
     fun download(convertible: Fuel.PathStringConvertible, param: Map<String, Any?>? = null): Request {
-        val request = build(Encoding()) {
+        val request = Encoding().apply {
             httpMethod = Method.GET
             baseUrlString = basePath
             urlString = convertible.path
@@ -97,7 +95,7 @@ public class Manager {
     }
 
     fun upload(path: String, param: Map<String, Any?>? = null): Request {
-        val request = build(Encoding()) {
+        val request = Encoding().apply {
             httpMethod = Method.POST
             baseUrlString = basePath
             urlString = path
@@ -111,7 +109,7 @@ public class Manager {
     }
 
     fun upload(convertible: Fuel.PathStringConvertible, param: Map<String, Any?>? = null): Request {
-        val request = build(Encoding()) {
+        val request = Encoding().apply {
             httpMethod = Method.POST
             baseUrlString = basePath
             urlString = convertible.path

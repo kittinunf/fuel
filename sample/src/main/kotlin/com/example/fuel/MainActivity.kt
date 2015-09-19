@@ -1,7 +1,6 @@
 package com.example.fuel
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.gson.Gson
 import fuel.*

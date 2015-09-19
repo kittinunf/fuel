@@ -4,7 +4,6 @@ import fuel.core.FuelError
 import fuel.core.Manager
 import fuel.core.Request
 import fuel.core.Response
-import fuel.util.build
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -12,7 +11,6 @@ import java.io.FileNotFoundException
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
-import kotlin.properties.Delegates
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -23,8 +21,8 @@ import kotlin.test.assertTrue
 
 class RequestUploadTest : BaseTestCase() {
 
-    val manager: Manager by Delegates.lazy {
-        build(Manager()) {
+    val manager: Manager by lazy(LazyThreadSafetyMode.NONE) {
+        Manager().apply {
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
                 override fun execute(command: Runnable) {
@@ -34,17 +32,17 @@ class RequestUploadTest : BaseTestCase() {
         }
     }
 
-    val currentDir: File by Delegates.lazy {
+    val currentDir: File by lazy(LazyThreadSafetyMode.NONE) {
         val dir = System.getProperty("user.dir")
         File(dir, "src/test/assets")
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpUploadCase() {
         var request: Request? = null
         var response: Response? = null
@@ -73,7 +71,7 @@ class RequestUploadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    Test
+    @Test
     fun httpUploadWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null
@@ -111,7 +109,7 @@ class RequestUploadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    Test
+    @Test
     fun httpUploadWithProgressInvalidEndPointCase() {
         var request: Request? = null
         var response: Response? = null
@@ -143,7 +141,7 @@ class RequestUploadTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
-    Test
+    @Test
     fun httpUploadWithProgressInvalidFileCase() {
         var request: Request? = null
         var response: Response? = null
