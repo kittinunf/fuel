@@ -9,13 +9,13 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 23
         versionCode 1
-        versionName "0.52"
+        versionName "0.53"
     }
 
     sourceSets {
@@ -47,7 +47,7 @@ dependencies {
 buildscript {
     ext {
         //dependencies version
-        kotlin_version = '0.12.1230'
+        kotlin_version = '0.13.1513'
         junit_version = '4.12'
         robolectric_version = '3.0'
     }

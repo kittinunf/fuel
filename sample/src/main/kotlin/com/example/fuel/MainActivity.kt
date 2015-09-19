@@ -1,7 +1,6 @@
 package com.example.fuel
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.gson.Gson
 import fuel.*
@@ -106,7 +105,7 @@ public class MainActivity : AppCompatActivity() {
 
     fun httpDownload() {
         Fuel.download("/bytes/1048").destination { response, url ->
-            File(getFilesDir(), "test.tmp")
+            File(filesDir, "test.tmp")
         }.progress { readBytes, totalBytes ->
             Log.v(TAG, "Download: ${readBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->
@@ -117,7 +116,7 @@ public class MainActivity : AppCompatActivity() {
 
     fun httpUpload() {
         Fuel.upload("/post").source { request, url ->
-            File(getFilesDir(), "test.tmp")
+            File(filesDir, "test.tmp")
         }.progress { writtenBytes, totalBytes ->
             Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, response, either ->
@@ -163,7 +162,7 @@ public class MainActivity : AppCompatActivity() {
     ) {
 
         class Deserializer : ResponseDeserializable<Photo> {
-            override fun deserialize(reader: Reader) = Gson().fromJson(reader, javaClass<Photo>())
+            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Photo::class.java)
         }
 
     }

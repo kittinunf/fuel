@@ -13,15 +13,15 @@ public class CustomRobolectricGradleTestRunner(clazz: Class<*>) : RobolectricGra
 
     override fun getAppManifest(config: Config): AndroidManifest {
         val appManifest = super.getAppManifest(config)
-        var androidManifestFile = appManifest.getAndroidManifestFile()
+        var androidManifestFile = appManifest.androidManifestFile
 
         if (androidManifestFile.exists()) {
             return appManifest
         } else {
             val moduleRoot = getModuleRootPath(config)
-            androidManifestFile = FileFsFile.from(moduleRoot, appManifest.getAndroidManifestFile().getPath())
-            val resDirectory = FileFsFile.from(moduleRoot, appManifest.getAndroidManifestFile().getPath().replace("AndroidManifest.xml", "res"))
-            val assetsDirectory = FileFsFile.from(moduleRoot, appManifest.getAndroidManifestFile().getPath().replace("AndroidManifest.xml", "assets"))
+            androidManifestFile = FileFsFile.from(moduleRoot, appManifest.androidManifestFile.path)
+            val resDirectory = FileFsFile.from(moduleRoot, appManifest.androidManifestFile.path.replace("AndroidManifest.xml", "res"))
+            val assetsDirectory = FileFsFile.from(moduleRoot, appManifest.androidManifestFile.path.replace("AndroidManifest.xml", "assets"))
             return AndroidManifest(androidManifestFile, resDirectory, assetsDirectory)
         }
     }
