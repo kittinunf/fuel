@@ -37,12 +37,12 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         override val path = "/$relativePath"
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpGetRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -69,7 +69,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpPostRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -100,7 +100,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    Test
+    @Test
     fun httpPutRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -131,7 +131,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    Test
+    @Test
     fun httpDeleteRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null

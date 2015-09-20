@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         applicationId "com.example.kotlin.fuel"
@@ -43,8 +43,8 @@ dependencies {
 buildscript {
 
     ext {
-        android_support_version = '23.0.0'
-        kotlin_version = '0.12.1230'
+        android_support_version = '23.0.1'
+        kotlin_version = '0.13.1513'
         gson_version = '2.3.1'
     }
 

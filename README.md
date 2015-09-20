@@ -14,6 +14,10 @@ The easiest HTTP networking library in Kotlin for Android.
 - [x] Support response deserialization into plain old object (both Kotlin & Java)
 - [x] Automatically invoke handler on Android Main Thread
 
+## Dependencies
+
+* [Kotlin](http://kotlinlang.org/) M13 (0.13.1513)
+
 ## Installation
 
 ### Gradle
@@ -44,7 +48,7 @@ dependencies {
 }
 
 //if we set baseURL beforehand, simply use relativePath
-Manager.sharedInstance.basePath = "http://httpbin.org"
+Manager.instance.basePath = "http://httpbin.org"
 "/get".httpGet().responseString { request, response, either ->    
     //make a GET to http://httpbin.org/get and do something with response
 }
@@ -293,24 +297,24 @@ public fun deserialize(content: String): T?
 
 ### Configuration
 
-* Use singleton ```Manager.sharedInstance``` to manager global configuration.
+* Use singleton `Manager.instance` to manager global configuration.
 
-* ```basePath``` is to manage common root path. Great usage is for your static API endpoint.
+* `basePath` is to manage common root path. Great usage is for your static API endpoint.
 
 ``` Kotlin
-Manager.sharedInstance.basePath = "https://httpbin.org
+Manager.instance.basePath = "https://httpbin.org
 ```
 
 ``` Kotlin
 Fuel.get("/get").response { request, response, either ->
-    //make request to https://httpbin.org/get because Fuel.{get|post|put|delete} use Manager.sharedInstance to make HTTP request
+    //make request to https://httpbin.org/get because Fuel.{get|post|put|delete} use Manager.instance to make HTTP request
 }
 ```
 
-* ```baseHeaders``` is to manage common HTTP header pairs in format of ``` mapOf<String, String>```.
+* `baseHeaders` is to manage common HTTP header pairs in format of `mapOf<String, String>`.
 
 ``` Kotlin
-Manager.sharedInstance.baseHeaders = mapOf("Device" to "Android")
+Manager.instance.baseHeaders = mapOf("Device" to "Android")
 ```
 
 ``` Kotlin
@@ -319,10 +323,10 @@ Fuel.get("/get").response { request, response, either ->
 }
 ```
 
-* ```baseParams``` is to manage common `key=value` query param which will be automatically included in all of your subsequent requests in format of ``` mapOf<String, Any>``` (`Any` is converted to `String` by `toString()` method)
+* `baseParams` is to manage common `key=value` query param which will be automatically included in all of your subsequent requests in format of ` mapOf<String, Any>` (`Any` is converted to `String` by `toString()` method)
 
 ``` Kotlin
-Manager.sharedInstance.baseParams = mapOf("api_key" to "1234567890")
+Manager.instance.baseParams = mapOf("api_key" to "1234567890")
 ```
 
 ``` Kotlin
@@ -331,11 +335,11 @@ Fuel.get("/get").response { request, response, either ->
 }
 ```
 
-* ```client``` is a raw HTTP client driver. Generally, it is responsible to make [```Request```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [```Response```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [```HttpClient```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [```java.net.HttpUrlConnnection```](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [```client```](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Client.kt) protocol, and set back to ```Manager.sharedInstance``` to kick off the effect.
+* `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Client.kt) protocol, and set back to `Manager.instance` to kick off the effect.
 
 ## Credits
 
-Fuel is brought to you by [contributors](https://github.com/kittinunf/Fuel/wiki/Contributors).
+Fuel is brought to you by [contributors](https://github.com/kittinunf/Fuel/graphs/contributors).
 
 ## License
 

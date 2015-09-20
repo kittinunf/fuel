@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         applicationId "com.example.java.fuel"
@@ -30,7 +30,7 @@ dependencies {
 buildscript {
 
     ext {
-        android_support_version = '23.0.0'
+        android_support_version = '23.0.1'
     }
 
 }
