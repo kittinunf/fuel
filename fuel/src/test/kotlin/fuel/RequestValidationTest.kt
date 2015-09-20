@@ -106,10 +106,10 @@ class RequestValidationTest : BaseTestCase() {
             response = res
 
             when (either) {
-                is Left -> {
+                is Either.Left -> {
                     error = either.get()
                 }
-                is Right -> {
+                is Either.Right -> {
                     data = either.get()
                 }
             }

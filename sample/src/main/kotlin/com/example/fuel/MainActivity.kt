@@ -1,6 +1,7 @@
 package com.example.fuel
 
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.gson.Gson
 import fuel.*
@@ -142,14 +143,13 @@ public class MainActivity : AppCompatActivity() {
     fun <T> updateUI(response: Response, either: Either<FuelError, T>) {
         //multi-declaration
         val (error, data) = either
-        val text = mainResultText.text.toString()
         if (error != null) {
             Log.e(TAG, response.toString())
             Log.e(TAG, error.toString())
-            mainResultText.text += String(error.errorData)
+            mainResultText.text = mainResultText.text.toString() + String(error.errorData)
         } else {
             Log.d(TAG, response.toString())
-            mainResultText.text += data.toString()
+            mainResultText.text = mainResultText.text.toString() + data.toString()
         }
     }
 

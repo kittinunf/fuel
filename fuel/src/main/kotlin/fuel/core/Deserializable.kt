@@ -38,9 +38,9 @@ public interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 
 internal fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Either<FuelError, T>) -> Unit) {
     response(deserializable, { request, response, value ->
-        handler(this@response, response, Right(value))
+        handler(this@response, response, Either.Right(value))
     }, { request, response, error ->
-        handler(this@response, response, Left(error))
+        handler(this@response, response, Either.Left(error))
     })
 }
 
@@ -60,9 +60,9 @@ internal fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U,
 
             val deliverable: Either<Exception, T> =
                     try {
-                        Right(deserializable.deserialize(response))
+                        Either.Right(deserializable.deserialize(response))
                     } catch(exception: Exception) {
-                        Left(exception)
+                        Either.Left(exception)
                     }
 
             callback {
