@@ -46,12 +46,12 @@ class RequestObjectTest : BaseTestCase() {
 
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpRequestObjectUserAgentValidTest() {
         var request: Request? = null
         var response: Response? = null
@@ -79,7 +79,7 @@ class RequestObjectTest : BaseTestCase() {
         assertTrue((data as HttpBinUserAgentModel).userAgent.isNotBlank(), "model must properly be serialized")
     }
 
-    Test
+    @Test
     fun httpRequestObjectUserAgentInvalidTest() {
         var request: Request? = null
         var response: Response? = null

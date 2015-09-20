@@ -1,7 +1,6 @@
 package fuel.core
 
 import android.util.Base64
-import fuel.util.build
 import fuel.util.copyTo
 import fuel.util.readWriteLazy
 import fuel.util.toHexString
@@ -35,7 +34,7 @@ public class Request {
     var url: URL by Delegates.notNull()
     var httpBody: ByteArray = ByteArray(0)
 
-    var httpHeaders by Delegates.readWriteLazy {
+    var httpHeaders by readWriteLazy {
         val additionalHeaders = Manager.instance.baseHeaders
         val headers = hashMapOf<String, String>()
         if (additionalHeaders != null) {
@@ -45,7 +44,7 @@ public class Request {
     }
 
     //underlying task request
-    val taskRequest: TaskRequest by Delegates.lazy {
+    val taskRequest: TaskRequest by lazy(LazyThreadSafetyMode.NONE) {
         when (type) {
             Type.DOWNLOAD -> DownloadTaskRequest(this)
             Type.UPLOAD -> UploadTaskRequest(this)
@@ -116,7 +115,7 @@ public class Request {
     }
 
     public fun validate(statusCodeRange: IntRange): Request {
-        build(taskRequest) {
+        taskRequest.apply {
             validator = { response ->
                 statusCodeRange.contains(response.httpStatusCode)
             }
@@ -127,12 +126,12 @@ public class Request {
     public fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
         if (taskRequest as? DownloadTaskRequest != null) {
             val download = taskRequest as DownloadTaskRequest
-            build(download) {
+            download.apply {
                 progressCallback = handler
             }
         } else if (taskRequest as? UploadTaskRequest != null) {
             val upload = taskRequest as UploadTaskRequest
-            build(upload) {
+            upload.apply {
                 progressCallback = handler
             }
         } else {
@@ -145,7 +144,7 @@ public class Request {
     public fun source(source: (Request, URL) -> File): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
 
-        build(uploadTaskRequest) {
+        uploadTaskRequest.apply {
             sourceCallback = source
         }
         return this
@@ -154,7 +153,7 @@ public class Request {
     public fun destination(destination: (Response, URL) -> File): Request {
         val downloadTaskRequest = taskRequest as? DownloadTaskRequest ?: throw IllegalStateException("destination is only used with RequestType.DOWNLOAD")
 
-        build(downloadTaskRequest) {
+        downloadTaskRequest.apply {
             destinationCallback = destination
         }
         return this
@@ -189,9 +188,9 @@ public class Request {
     public fun responseJson(handler: Handler<JSONObject>): Unit = response(Request.jsonDeserializer(), handler)
 
     //object
-    public fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit): Unit = response(deserializer, handler)
+    public fun <T: Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit): Unit = response(deserializer, handler)
 
-    public fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): Unit = response(deserializer, handler)
+    public fun <T: Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): Unit = response(deserializer, handler)
 
     public fun cUrlString(): String {
         val elements = arrayListOf("$ curl -i")
@@ -261,7 +260,7 @@ public class Request {
             if (validator.invoke(response)) {
                 successCallback?.invoke(response)
             } else {
-                val error = build(FuelError()) {
+                val error = FuelError().apply {
                     exception = HttpException(response.httpStatusCode, response.httpResponseMessage)
                     errorData = response.data
                 }
@@ -301,7 +300,7 @@ public class Request {
                 response.url = request.url
                 failureCallback?.invoke(error, response)
             } catch(ex: Exception) {
-                val error = build(FuelError()) {
+                val error = FuelError().apply {
                     exception = ex
                 }
                 val response = Response()
@@ -335,11 +334,11 @@ public class Request {
                 //file input
                 fileInputStream = FileInputStream(file)
 
-                dataStream = build(ByteArrayOutputStream()) {
+                dataStream = ByteArrayOutputStream().apply {
                     write(("--" + boundary + CRLF).toByteArray())
-                    write(("Content-Disposition: form-data; filename=\"" + file.getName() + "\"").toByteArray())
+                    write(("Content-Disposition: form-data; filename=\"" + file.name + "\"").toByteArray())
                     write(CRLF.toByteArray())
-                    write(("Content-Type: " + URLConnection.guessContentTypeFromName(file.getName())).toByteArray())
+                    write(("Content-Type: " + URLConnection.guessContentTypeFromName(file.name)).toByteArray())
                     write(CRLF.toByteArray())
                     write(CRLF.toByteArray())
                     flush()
@@ -351,7 +350,7 @@ public class Request {
 
                     write(CRLF.toByteArray())
                     flush()
-                    write(("--" + boundary + "--").toByteArray())
+                    write(("--$boundary--").toByteArray())
                     write(CRLF.toByteArray())
                     flush()
                 }
@@ -367,7 +366,7 @@ public class Request {
                 response.url = request.url
                 failureCallback?.invoke(error, response)
             } catch(ex: Exception) {
-                val error = build(FuelError()) {
+                val error = FuelError().apply {
                     exception = ex
                 }
                 val response = Response()

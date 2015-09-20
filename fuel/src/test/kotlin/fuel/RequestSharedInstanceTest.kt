@@ -1,7 +1,6 @@
 package fuel
 
 import fuel.core.*
-import fuel.util.build
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -41,7 +40,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         override val request = createRequest()
 
         fun createRequest(): Request {
-            val encoder = build(Encoding()) {
+            val encoder = Encoding().apply {
                 httpMethod = method
                 urlString = "https://httpbin.org$relativePath"
                 parameters = mapOf("foo" to "bar")
@@ -50,12 +49,12 @@ class RequestSharedInstanceTest : BaseTestCase() {
         }
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpGetRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -87,7 +86,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    Test
+    @Test
     fun httpPostRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -120,7 +119,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    Test
+    @Test
     fun httpPutRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -153,7 +152,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    Test
+    @Test
     fun httpDeleteRequestWithSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -186,7 +185,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    Test
+    @Test
     fun httpGetRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -217,7 +216,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("origin"), "response should contain \"origin\" ")
     }
 
-    Test
+    @Test
     fun httpPostRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -248,7 +247,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    Test
+    @Test
     fun httpPutRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -279,7 +278,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    Test
+    @Test
     fun httpDeleteRequestWithPathStringConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -310,7 +309,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
     }
 
-    Test
+    @Test
     fun httpGetRequestWithRequestConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -337,7 +336,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpPostRequestWithRequestConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -364,7 +363,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpPutRequestWithRequestConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -391,7 +390,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpDeleteRequestWithRequestConvertibleAndSharedInstance() {
         var request: Request? = null
         var response: Response? = null
@@ -418,7 +417,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
-    Test
+    @Test
     fun httpUploadWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null
@@ -458,7 +457,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     }
 
 
-    Test
+    @Test
     fun httpDownloadWithProgressValidCase() {
         var request: Request? = null
         var response: Response? = null

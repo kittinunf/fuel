@@ -31,12 +31,12 @@ class RequestStringExtensionTest : BaseTestCase() {
         }
     }
 
-    Before
+    @Before
     fun setUp() {
         lock = CountDownLatch(1)
     }
 
-    Test
+    @Test
     fun httpGet() {
         var request: Request? = null
         var response: Response? = null
@@ -64,7 +64,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
     }
 
-    Test
+    @Test
     fun httpPost() {
         var request: Request? = null
         var response: Response? = null
@@ -92,7 +92,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
     }
 
-    Test
+    @Test
     fun httpPut() {
         var request: Request? = null
         var response: Response? = null
@@ -120,7 +120,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
     }
 
-    Test
+    @Test
     fun httpDelete() {
         var request: Request? = null
         var response: Response? = null
