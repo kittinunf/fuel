@@ -14,6 +14,10 @@ The easiest HTTP networking library in Kotlin for Android.
 - [x] Support response deserialization into plain old object (both Kotlin & Java)
 - [x] Automatically invoke handler on Android Main Thread
 
+## Dependencies
+
+* [Kotlin](http://kotlinlang.org/) M13 (0.13.1513)
+
 ## Installation
 
 ### Gradle
