@@ -30,7 +30,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'fuel:fuel:0.52'
+    compile 'fuel:fuel:0.53'
 }
 ```
 
