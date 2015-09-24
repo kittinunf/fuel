@@ -28,8 +28,14 @@ public class Encoding : Fuel.RequestConvertible {
         var headerPairs: MutableMap<String, Any> = hashMapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
 
         if (encodeParameterInUrl(method)) {
-            val query = if (path.last().equals("?")) "" else "?"
-            modifiedPath += query + queryFromParameters(parameters)
+            var querySign = ""
+            val queryParamString = queryFromParameters(parameters)
+            if (queryParamString.isNotEmpty()) {
+                if (path.count() > 0) {
+                    querySign = if (path.last() == '?') "" else "?"
+                }
+            }
+            modifiedPath += (querySign + queryParamString)
         } else if (requestType.equals(Request.Type.UPLOAD)) {
             val boundary = System.currentTimeMillis().toHexString()
             headerPairs.plusAssign("Content-Type" to "multipart/form-data; boundary=" + boundary)
@@ -56,8 +62,7 @@ public class Encoding : Fuel.RequestConvertible {
         //give precedence to local path
         if (baseUrlString == null || pathUri.scheme != null) return URL(path)
 
-        //use basePath
-        return URL(baseUrlString + if (path.startsWith('/')) path else '/' + path)
+        return URL(baseUrlString + if (path.startsWith('/') or path.isEmpty()) path else '/' + path)
     }
 
     private fun encodeParameterInUrl(method: Method): Boolean {
