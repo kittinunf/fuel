@@ -55,7 +55,7 @@ public class Encoding : Fuel.RequestConvertible {
 
     }
 
-    override val request by lazy(LazyThreadSafetyMode.NONE) { encoder(httpMethod, urlString, parameters) }
+    override val request by lazy { encoder(httpMethod, urlString, parameters) }
 
     private fun createUrl(path: String): URL {
         val pathUri = Uri.parse(path)

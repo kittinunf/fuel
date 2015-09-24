@@ -17,7 +17,7 @@ import kotlin.test.assertTrue
 
 class RequestTest : BaseTestCase() {
 
-    val manager: Manager by lazy(LazyThreadSafetyMode.NONE) {
+    val manager: Manager by lazy {
         Manager().apply {
             callbackExecutor = object : Executor {
                 override fun execute(command: Runnable) {

@@ -24,7 +24,7 @@ class RequestAuthenticationTest : BaseTestCase() {
         password = "password"
     }
 
-    val manager: Manager by lazy(LazyThreadSafetyMode.NONE) {
+    val manager: Manager by lazy {
         Manager().apply {
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
