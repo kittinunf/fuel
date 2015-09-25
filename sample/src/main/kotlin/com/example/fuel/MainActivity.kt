@@ -22,7 +22,7 @@ public class MainActivity : AppCompatActivity() {
 
         Manager.instance.basePath = "http://httpbin.org"
         Manager.instance.baseHeaders = mapOf("Device" to "Android")
-        Manager.instance.baseParams = mapOf("key" to "value")
+        Manager.instance.baseParams = listOf("key" to "value")
 
         mainGoButton.setOnClickListener {
             execute()
@@ -54,7 +54,7 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun httpGet() {
-        Fuel.get("/get", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        Fuel.get("/get", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             Log.d(TAG, request.cUrlString())
             updateUI(response, either)
         }
@@ -66,12 +66,12 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun httpPut() {
-        Fuel.put("/put", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        Fuel.put("/put", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             Log.d(TAG, request.cUrlString())
             updateUI(response, either)
         }
 
-        "/put".httpPut(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        "/put".httpPut(listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             Log.d(TAG, request.toString())
             updateUI(response, either)
         }
@@ -79,12 +79,12 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun httpPost() {
-        Fuel.post("/post", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        Fuel.post("/post", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             Log.d(TAG, request.cUrlString())
             updateUI(response, either)
         }
 
-        "/post".httpPost(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        "/post".httpPost(listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             Log.d(TAG, request.toString())
             updateUI(response, either)
         }
@@ -92,12 +92,12 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun httpDelete() {
-        Fuel.delete("/delete", mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        Fuel.delete("/delete", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             Log.d(TAG, request.cUrlString())
             updateUI(response, either)
         }
 
-        "/delete".httpDelete(mapOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        "/delete".httpDelete(listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
             Log.d(TAG, request.toString())
             updateUI(response, either)
         }

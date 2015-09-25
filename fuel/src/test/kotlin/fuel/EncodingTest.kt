@@ -24,7 +24,7 @@ public class EncodingTest : BaseTestCase() {
             httpMethod = Method.GET
             baseUrlString = "http://www.example.com"
             urlString = "test"
-            parameters = hashMapOf("a" to "b")
+            parameters = listOf("a" to "b")
         }.request
 
         assertTrue { "http://www.example.com/test?a=b" ==  request.url.toString() }

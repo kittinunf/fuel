@@ -19,9 +19,9 @@ public class Encoding : Fuel.RequestConvertible {
     var httpMethod: Method by Delegates.notNull()
     var baseUrlString: String? = null
     var urlString: String by Delegates.notNull()
-    var parameters: Map<String, Any?>? = null
+    var parameters: List<Pair<String, Any?>>? = null
 
-    var encoder: (Method, String, Map<String, Any?>?) -> Request = { method, path, parameters ->
+    var encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
 
         var modifiedPath = path
         var data: ByteArray? = null
@@ -72,15 +72,17 @@ public class Encoding : Fuel.RequestConvertible {
         }
     }
 
-    private fun queryFromParameters(params: Map<String, Any?>?): String {
+    private fun queryFromParameters(params: List<Pair<String, Any?>>?): String {
         if (params == null) return ""
 
-        val list = arrayListOf<String>()
-        for ((key, value) in parameters) {
+        val list = params.fold(arrayListOf<String>()) { container, item ->
+            val (key, value) = item
             if (value != null) {
-                list.add("${URLEncoder.encode(key, ENCODING)}=${URLEncoder.encode(value.toString(), ENCODING)}")
+                container.add("${URLEncoder.encode(key, ENCODING)}=${URLEncoder.encode(value.toString(), ENCODING)}")
             }
+            container
         }
+
         return list.join("&")
     }
 

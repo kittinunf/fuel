@@ -20,7 +20,7 @@ class RequestHandlerTest : BaseTestCase() {
     init {
         Manager.instance.basePath = "https://httpbin.org"
         Manager.instance.baseHeaders = mapOf("foo" to "bar")
-        Manager.instance.baseParams = mapOf("key" to "value")
+        Manager.instance.baseParams = listOf("key" to "value")
 
         Manager.instance.callbackExecutor = object : Executor {
             override fun execute(command: Runnable) {
@@ -131,7 +131,7 @@ class RequestHandlerTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        "/post".httpPost(mapOf(paramKey to paramValue)).responseString(object : Handler<String> {
+        "/post".httpPost(listOf(paramKey to paramValue)).responseString(object : Handler<String> {
             override fun success(request: Request, response: Response, value: String) {
                 req = request
                 res = response
