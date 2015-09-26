@@ -1,8 +1,8 @@
 # Fuel
 
-The easiest HTTP networking library in Kotlin for Android.
+[ ![Kotlin](https://img.shields.io/badge/Kotlin-M13%200.13.1513-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel/_latestVersion)
 
-[ ![Download](https://api.bintray.com/packages/kittinunf/maven/Fuel/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel/_latestVersion)
+The easiest HTTP networking library in Kotlin for Android.
 
 ## Features
 
@@ -13,10 +13,6 @@ The easiest HTTP networking library in Kotlin for Android.
 - [x] Debug log / cUrl log
 - [x] Support response deserialization into plain old object (both Kotlin & Java)
 - [x] Automatically invoke handler on Android Main Thread
-
-## Dependencies
-
-* [Kotlin](http://kotlinlang.org/) M13 (0.13.1513)
 
 ## Installation
 
