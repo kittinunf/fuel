@@ -12,23 +12,24 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import fuel.Fuel;
 import fuel.core.FuelError;
 import fuel.core.Handler;
 import fuel.core.Request;
 import fuel.core.Response;
+import kotlin.Pair;
 import kotlin.jvm.functions.Function2;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main";
 
-    private Map<String, String> params = new HashMap<String, String>() {{
-        put("foo1", "bar1");
-        put("foo2", "bar2");
+    private List<Pair<String, String>> params = new ArrayList<Pair<String, String>>() {{
+        add(new Pair<>("foo1", "bar1"));
+        add(new Pair<>("foo2", "bar2"));
     }};
 
     private TextView resultText;

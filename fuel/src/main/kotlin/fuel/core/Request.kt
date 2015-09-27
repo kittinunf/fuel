@@ -44,7 +44,7 @@ public class Request {
     }
 
     //underlying task request
-    val taskRequest: TaskRequest by lazy(LazyThreadSafetyMode.NONE) {
+    val taskRequest: TaskRequest by lazy {
         when (type) {
             Type.DOWNLOAD -> DownloadTaskRequest(this)
             Type.UPLOAD -> UploadTaskRequest(this)

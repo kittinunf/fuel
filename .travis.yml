@@ -1,0 +1,20 @@
+language: android
+
+android:
+  components:
+    - build-tools-23.0.1
+    - android-23
+    - extra-android-support
+    - extra-android-m2repository
+  licenses:
+    - android-sdk-license-.+
+
+jdk:
+  - oraclejdk8
+
+cache:
+  directories:
+    - $HOME/.gradle
+
+script:
+  - ./gradlew test

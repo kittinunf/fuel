@@ -19,17 +19,23 @@ public class Encoding : Fuel.RequestConvertible {
     var httpMethod: Method by Delegates.notNull()
     var baseUrlString: String? = null
     var urlString: String by Delegates.notNull()
-    var parameters: Map<String, Any?>? = null
+    var parameters: List<Pair<String, Any?>>? = null
 
-    var encoder: (Method, String, Map<String, Any?>?) -> Request = { method, path, parameters ->
+    var encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
 
         var modifiedPath = path
         var data: ByteArray? = null
         var headerPairs: MutableMap<String, Any> = hashMapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
 
         if (encodeParameterInUrl(method)) {
-            val query = if (path.last().equals("?")) "" else "?"
-            modifiedPath += query + queryFromParameters(parameters)
+            var querySign = ""
+            val queryParamString = queryFromParameters(parameters)
+            if (queryParamString.isNotEmpty()) {
+                if (path.count() > 0) {
+                    querySign = if (path.last() == '?') "" else "?"
+                }
+            }
+            modifiedPath += (querySign + queryParamString)
         } else if (requestType.equals(Request.Type.UPLOAD)) {
             val boundary = System.currentTimeMillis().toHexString()
             headerPairs.plusAssign("Content-Type" to "multipart/form-data; boundary=" + boundary)
@@ -49,15 +55,14 @@ public class Encoding : Fuel.RequestConvertible {
 
     }
 
-    override val request by lazy(LazyThreadSafetyMode.NONE) { encoder(httpMethod, urlString, parameters) }
+    override val request by lazy { encoder(httpMethod, urlString, parameters) }
 
     private fun createUrl(path: String): URL {
         val pathUri = Uri.parse(path)
         //give precedence to local path
         if (baseUrlString == null || pathUri.scheme != null) return URL(path)
 
-        //use basePath
-        return URL(baseUrlString + if (path.startsWith('/')) path else '/' + path)
+        return URL(baseUrlString + if (path.startsWith('/') or path.isEmpty()) path else '/' + path)
     }
 
     private fun encodeParameterInUrl(method: Method): Boolean {
@@ -67,15 +72,17 @@ public class Encoding : Fuel.RequestConvertible {
         }
     }
 
-    private fun queryFromParameters(params: Map<String, Any?>?): String {
+    private fun queryFromParameters(params: List<Pair<String, Any?>>?): String {
         if (params == null) return ""
 
-        val list = arrayListOf<String>()
-        for ((key, value) in parameters) {
+        val list = params.fold(arrayListOf<String>()) { container, item ->
+            val (key, value) = item
             if (value != null) {
-                list.add("${URLEncoder.encode(key, ENCODING)}=${URLEncoder.encode(value.toString(), ENCODING)}")
+                container.add("${URLEncoder.encode(key, ENCODING)}=${URLEncoder.encode(value.toString(), ENCODING)}")
             }
+            container
         }
+
         return list.join("&")
     }
 

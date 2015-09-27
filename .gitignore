@@ -21,10 +21,13 @@ local.properties
 .classpath
 .project
 
+# Bintray
+install.gradle
+bintray.gradle
+
 # Android Studio
 .idea/
 .gradle
-gradle  
 /*/local.properties
 /*/out
 /*/*/build

@@ -17,7 +17,7 @@ import kotlin.test.assertTrue
 
 class RequestTest : BaseTestCase() {
 
-    val manager: Manager by lazy(LazyThreadSafetyMode.NONE) {
+    val manager: Manager by lazy {
         Manager().apply {
             callbackExecutor = object : Executor {
                 override fun execute(command: Runnable) {
@@ -48,7 +48,7 @@ class RequestTest : BaseTestCase() {
             val encoder = Encoding().apply {
                 httpMethod = method
                 urlString = "http://httpbin.org/$relativePath"
-                parameters = mapOf("foo" to "bar")
+                parameters = listOf("foo" to "bar")
             }
             return encoder.request
         }
@@ -148,7 +148,7 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(Method.GET, "http://httpbin.org/get", mapOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.GET, "http://httpbin.org/get", listOf(paramKey to paramValue)).responseString { req, res, either ->
             request = req
             response = res
 
@@ -182,7 +182,7 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(Method.GET, "http://httpbin.org/get", mapOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.GET, "http://httpbin.org/get", listOf(paramKey to paramValue)).responseString { req, res, either ->
             request = req
             response = res
 
@@ -249,7 +249,7 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(Method.PUT, "http://httpbin.org/put", mapOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.PUT, "http://httpbin.org/put", listOf(paramKey to paramValue)).responseString { req, res, either ->
             request = req
             response = res
 
@@ -283,7 +283,7 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(Method.DELETE, "http://httpbin.org/delete", mapOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.DELETE, "http://httpbin.org/delete", listOf(paramKey to paramValue)).responseString { req, res, either ->
             request = req
             response = res
 
@@ -376,7 +376,7 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "xxx"
 
-        manager.request(Method.POST, "http://httpbin.org/post", mapOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.POST, "http://httpbin.org/post", listOf(paramKey to paramValue)).responseString { req, res, either ->
             request = req
             response = res
 

@@ -15,7 +15,7 @@ import kotlin.test.assertTrue
 
 class RequestValidationTest : BaseTestCase() {
 
-    val manager: Manager by lazy(LazyThreadSafetyMode.NONE) {
+    val manager: Manager by lazy {
         Manager().apply {
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {

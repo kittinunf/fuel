@@ -20,7 +20,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
     init {
         Manager.instance.basePath = "https://httpbin.org"
         Manager.instance.baseHeaders = mapOf("foo" to "bar")
-        Manager.instance.baseParams = mapOf("key" to "value")
+        Manager.instance.baseParams = listOf("key" to "value")
 
         Manager.instance.callbackExecutor = object : Executor {
             override fun execute(command: Runnable) {
@@ -43,7 +43,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val encoder = Encoding().apply {
                 httpMethod = method
                 urlString = "https://httpbin.org$relativePath"
-                parameters = mapOf("foo" to "bar")
+                parameters = listOf("foo" to "bar")
             }
             return encoder.request
         }

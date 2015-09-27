@@ -21,7 +21,7 @@ import kotlin.test.assertTrue
 
 class RequestUploadTest : BaseTestCase() {
 
-    val manager: Manager by lazy(LazyThreadSafetyMode.NONE) {
+    val manager: Manager by lazy {
         Manager().apply {
             basePath = "http://httpbin.org"
             callbackExecutor = object : Executor {
@@ -32,7 +32,7 @@ class RequestUploadTest : BaseTestCase() {
         }
     }
 
-    val currentDir: File by lazy(LazyThreadSafetyMode.NONE) {
+    val currentDir: File by lazy {
         val dir = System.getProperty("user.dir")
         File(dir, "src/test/assets")
     }
