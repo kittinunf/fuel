@@ -39,7 +39,7 @@ public class EncodingTest : BaseTestCase() {
             parameters = null
         }.request
 
-        assertTrue { "http://www.example.com/test" ==  request.url.toString() }
+        assertTrue { "http://www.example.com/test?" ==  request.url.toString() }
     }
 
     @Test
