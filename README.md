@@ -41,18 +41,28 @@ dependencies {
 //an extension over string (support GET, PUT, POST, DELETE with httpGet(), httpPut(), httpPost(), httpDelete())
 "http://httpbin.org/get".httpGet().responseString { request, response, either ->
 	//do something with response
+	when (either) {
+	    is Left -> // left means failure
+	    is Right -> // right means success
+	}
 }
 
 //if we set baseURL beforehand, simply use relativePath
 Manager.instance.basePath = "http://httpbin.org"
 "/get".httpGet().responseString { request, response, either ->    
     //make a GET to http://httpbin.org/get and do something with response
+    val (error, data) = either
 }
 
 //if you prefer this a little longer way, you can always do
 //get
 Fuel.get("http://httpbin.org/get").responseString { request, response, either ->
 	//do something with response
+	either.fold({ error ->
+	    //do something with error
+	}, { data ->
+	    //do something with data
+	})
 }
 
 ```
@@ -176,11 +186,11 @@ curl -i -X POST -d "foo=foo&bar=bar&key=value" -H "Accept-Encoding:compress;q=0.
 * URL encoded style for GET & DELETE request
 
 ``` Kotlin
-Fuel.get("http://httpbin.org/get", mapOf("foo" to "foo", "bar" to "bar")).response { request, response, either -> {
+Fuel.get("http://httpbin.org/get", listOf("foo" to "foo", "bar" to "bar")).response { request, response, either -> {
     //resolve to http://httpbin.org/get?foo=foo&bar=bar
 }
 
-Fuel.delete("http://httpbin.org/delete", mapOf("foo" to "foo", "bar" to "bar")).response { request, response, either ->
+Fuel.delete("http://httpbin.org/delete", listOf("foo" to "foo", "bar" to "bar")).response { request, response, either ->
     //resolve to http://httpbin.org/get?foo=foo&bar=bar
 }
 ```
@@ -188,11 +198,11 @@ Fuel.delete("http://httpbin.org/delete", mapOf("foo" to "foo", "bar" to "bar")).
 * Support x-www-form-urlencoded for PUT & POST
 
 ``` Kotlin
-Fuel.post("http://httpbin.org/post", mapOf("foo" to "foo", "bar" to "bar")).response { request, response, either ->
+Fuel.post("http://httpbin.org/post", listOf("foo" to "foo", "bar" to "bar")).response { request, response, either ->
     //http body includes foo=foo&bar=bar
 }
 
-Fuel.put("http://httpbin.org/put", mapOf("foo" to "foo", "bar" to "bar")).response { request, response, either ->
+Fuel.put("http://httpbin.org/put", listOf("foo" to "foo", "bar" to "bar")).response { request, response, either ->
     //http body includes foo=foo&bar=bar
 }
 ```
@@ -307,7 +317,7 @@ Fuel.get("/get").response { request, response, either ->
 }
 ```
 
-* `baseHeaders` is to manage common HTTP header pairs in format of `mapOf<String, String>`.
+* `baseHeaders` is to manage common HTTP header pairs in format of `Map<String, String>>`.
 
 ``` Kotlin
 Manager.instance.baseHeaders = mapOf("Device" to "Android")
@@ -319,10 +329,10 @@ Fuel.get("/get").response { request, response, either ->
 }
 ```
 
-* `baseParams` is to manage common `key=value` query param which will be automatically included in all of your subsequent requests in format of ` mapOf<String, Any>` (`Any` is converted to `String` by `toString()` method)
+* `baseParams` is to manage common `key=value` query param which will be automatically included in all of your subsequent requests in format of ` List<Pair<String, Any?>>` (`Any` is converted to `String` by `toString()` method)
 
 ``` Kotlin
-Manager.instance.baseParams = mapOf("api_key" to "1234567890")
+Manager.instance.baseParams = listOf("api_key" to "1234567890")
 ```
 
 ``` Kotlin
