@@ -1,6 +1,6 @@
 # Fuel
 
-[ ![Kotlin](https://img.shields.io/badge/Kotlin-M13%200.13.1513-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel/_latestVersion)
+[ ![Kotlin](https://img.shields.io/badge/Kotlin-M14%20%40%200.14.449-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel/_latestVersion)
 
 The easiest HTTP networking library in Kotlin for Android.
 
@@ -26,7 +26,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'fuel:fuel:0.54'
+    compile 'fuel:fuel:0.55'
 }
 ```
 
@@ -99,7 +99,7 @@ Fuel.get("http://httpbin.org/get").response { request, response, either ->
 ```
 
 ### Response Handling
-### Either 
+### Either
 
 * [Either](http://www.ibm.com/developerworks/java/library/j-ft13/index.html) is a functional style data structure that represents data that contains either *left* or *right* but not both. It represents result of action that can be error or success (with result). The common functional convention is the *left* of an Either class contains an exception (if any), and the *right* contains the result.
 
@@ -132,7 +132,7 @@ Fuel.post("http://httpbin.org/post").response { request, response, either ->
 }
 
 //if you have body to post manually
-Fuel.post("http://httpbin.org/post").body("{ \"foo\" : \"bar\" }").response { request, response, either -> 
+Fuel.post("http://httpbin.org/post").body("{ \"foo\" : \"bar\" }").response { request, response, either ->
 }
 ```
 
@@ -157,7 +157,7 @@ Fuel.delete("http://httpbin.org/delete").response { request, response, either ->
 Log.d("log", request.toString())
 ```
 
-``` 
+```
 //print and header detail
 //request
 --> GET (http://httpbin.org/get?key=value)
@@ -240,7 +240,7 @@ Fuel.upload("/post").source { request, url ->
 val username = "username"
 val password = "abcd1234"
 
-Fuel.get("http://httpbin.org/basic-auth/$user/$password").authenticate(username, password).response { request, response, either -> 
+Fuel.get("http://httpbin.org/basic-auth/$user/$password").authenticate(username, password).response { request, response, either ->
 }
 ```
 
@@ -248,13 +248,13 @@ Fuel.get("http://httpbin.org/basic-auth/$user/$password").authenticate(username,
 
 * By default, (200..299) status code will be valid range for HTTP status code. However, it can be configurable
 ``` Kotlin
-Fuel.get("http://httpbin.org/status/418").response { request, response, either -> 
+Fuel.get("http://httpbin.org/status/418").response { request, response, either ->
     //either contains Error
-    
+
 }
 
 //418 will pass validator
-Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request, response, either -> 
+Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request, response, either ->
     //either contains data
 }
 ```
@@ -301,6 +301,16 @@ public fun deserialize(reader: Reader): T?
 public fun deserialize(content: String): T?
 ```
 
+* Another example may be parsing a website that is not UTF-8. Since Fuel by default serialize text as UTF-8, we need to define our deserializer:
+
+```kotlin
+object Windows1255StringDeserializer : ResponseDeserializable<String> {
+        override fun deserialize(bytes: ByteArray): String {
+            return String(bytes, "windows-1255")
+        }
+    }
+```
+
 ### Configuration
 
 * Use singleton `Manager.instance` to manager global configuration.
@@ -337,7 +347,7 @@ Manager.instance.baseParams = listOf("api_key" to "1234567890")
 
 ``` Kotlin
 Fuel.get("/get").response { request, response, either ->
-    //make request to https://httpbin.org/get?api_key=1234567890 
+    //make request to https://httpbin.org/get?api_key=1234567890
 }
 ```
 
