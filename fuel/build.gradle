@@ -47,7 +47,7 @@ dependencies {
 buildscript {
     ext {
         //dependencies version
-        kotlin_version = '0.13.1513'
+        kotlin_version = '0.14.449'
         junit_version = '4.12'
         robolectric_version = '3.0'
     }
