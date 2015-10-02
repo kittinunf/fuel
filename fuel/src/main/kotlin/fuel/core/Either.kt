@@ -7,8 +7,8 @@ package fuel.core
 @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
 sealed public class Either<out L, out R> {
 
-    public abstract fun component1(): L?
-    public abstract fun component2(): R?
+    public operator abstract fun component1(): L?
+    public operator abstract fun component2(): R?
 
     public fun fold(fl: (L) -> Unit, fr: (R) -> Unit) {
         return when (this) {
