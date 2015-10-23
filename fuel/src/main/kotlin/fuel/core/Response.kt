@@ -28,16 +28,16 @@ public class Response {
         elements.add("Length : $httpContentLength")
 
         //body
-        elements.add("Body : ${ if (data.size() != 0) String(data) else "(empty)"}")
+        elements.add("Body : ${ if (data.size != 0) String(data) else "(empty)"}")
 
         //headers
         //headers
-        elements.add("Headers : (${httpResponseHeaders.size()})")
+        elements.add("Headers : (${httpResponseHeaders.size})")
         for ((key, value) in httpResponseHeaders) {
             elements.add("$key : $value")
         }
 
-        return elements.join("\n").toString()
+        return elements.joinToString("\n").toString()
     }
 
 }

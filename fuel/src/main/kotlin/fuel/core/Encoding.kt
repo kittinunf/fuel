@@ -83,7 +83,7 @@ public class Encoding : Fuel.RequestConvertible {
             container
         }
 
-        return list.join("&")
+        return list.joinToString("&")
     }
 
 }
