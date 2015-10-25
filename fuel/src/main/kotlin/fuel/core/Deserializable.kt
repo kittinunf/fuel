@@ -9,7 +9,7 @@ import java.io.Reader
  * Created by Kittinun Vantasin on 8/16/15.
  */
 
-internal interface Deserializable<out T: Any> {
+public interface Deserializable<out T: Any> {
 
     fun deserialize(response: Response): T
 

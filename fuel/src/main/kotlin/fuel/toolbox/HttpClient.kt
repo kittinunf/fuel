@@ -90,7 +90,7 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
     }
 
     private fun setBodyIfAny(connection: HttpURLConnection, bytes: ByteArray) {
-        if (bytes.size() == 0) return
+        if (bytes.size == 0) return
 
         val outStream = BufferedOutputStream(connection.outputStream);
         outStream.write(bytes);

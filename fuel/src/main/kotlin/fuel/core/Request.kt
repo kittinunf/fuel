@@ -214,22 +214,22 @@ public class Request {
         //url
         elements.add("\"${url.toString()}\"")
 
-        return elements.join(" ").toString()
+        return elements.joinToString(" ").toString()
     }
 
     override fun toString(): String {
         val elements = arrayListOf("--> $httpMethod (${url.toString()})")
 
         //body
-        elements.add("Body : ${ if (httpBody.size() != 0) String(httpBody) else "(empty)"}")
+        elements.add("Body : ${ if (httpBody.size != 0) String(httpBody) else "(empty)"}")
 
         //headers
-        elements.add("Headers : (${httpHeaders.size()})")
+        elements.add("Headers : (${httpHeaders.size})")
         for ((key, value) in httpHeaders) {
             elements.add("$key : $value")
         }
 
-        return elements.join("\n").toString()
+        return elements.joinToString("\n").toString()
     }
 
     //underlying requests
