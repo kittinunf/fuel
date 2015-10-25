@@ -1,6 +1,6 @@
 # Fuel
 
-[ ![Kotlin](https://img.shields.io/badge/Kotlin-M14%20%40%200.14.449-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
+[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.0.0--beta--1038-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
 
 The easiest HTTP networking library in Kotlin for Android.
 
@@ -26,7 +26,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'fuel:fuel:0.55'
+    compile 'fuel:fuel:0.56'
 }
 ```
 
@@ -52,6 +52,11 @@ Manager.instance.basePath = "http://httpbin.org"
 "/get".httpGet().responseString { request, response, either ->    
     //make a GET to http://httpbin.org/get and do something with response
     val (error, data) = either
+    if (error != null) {
+        //do something when success
+    } else {
+        //error handling
+    }
 }
 
 //if you prefer this a little longer way, you can always do
@@ -273,7 +278,7 @@ data class User(val firstName: String = "",
 
     //User Deserializer
     class Deserializer : ResponseDeserializable<User> {
-        override fun deserialize(content: String) = Gson().fromJson(content, javaClass<User>())
+        override fun deserialize(content: String) = Gson().fromJson(content, User::class.java)
     }
 
 }
