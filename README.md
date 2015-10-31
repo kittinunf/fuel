@@ -106,9 +106,9 @@ Fuel.get("http://httpbin.org/get").response { request, response, either ->
 ### Response Handling
 ### Either
 
-* [Either](http://www.ibm.com/developerworks/java/library/j-ft13/index.html) is a functional style data structure that represents data that contains either *left* or *right* but not both. It represents result of action that can be error or success (with result). The common functional convention is the *left* of an Either class contains an exception (if any), and the *right* contains the result.
+* [Either](http://www.ibm.com/developerworks/java/library/j-ft13/index.html) is a functional style data structure that represents data that contains either *left* or *right* but not both. It represents the result of an action that can be error or success (with result). The common functional convention is that the *left* of an Either class contains an exception (if any), and the *right* contains the result.
 
-* Work with either is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/fuel/RequestTest.kt#L355), [*muliple declare*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/fuel/RequestAuthenticationTest.kt#L44) as because it is just a [data class](http://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *left* or *right*.
+* Working with either is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/fuel/RequestTest.kt#L355), [*muliple declare*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/fuel/RequestAuthenticationTest.kt#L44) as because it is just a [data class](http://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *left* or *right*.
 
 ### Response
 ``` Kotlin
@@ -136,7 +136,7 @@ fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Reques
 Fuel.post("http://httpbin.org/post").response { request, response, either ->
 }
 
-//if you have body to post manually
+//if you have body to post it manually
 Fuel.post("http://httpbin.org/post").body("{ \"foo\" : \"bar\" }").response { request, response, either ->
 }
 ```
@@ -251,14 +251,14 @@ Fuel.get("http://httpbin.org/basic-auth/$user/$password").authenticate(username,
 
 ### Validation
 
-* By default, (200..299) status code will be valid range for HTTP status code. However, it can be configurable
+* By default, the valid range for HTTP status code will be (200..299). However, it can be configurable
 ``` Kotlin
 Fuel.get("http://httpbin.org/status/418").response { request, response, either ->
     //either contains Error
 
 }
 
-//418 will pass validator
+//418 will pass the validator
 Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request, response, either ->
     //either contains data
 }
@@ -285,7 +285,7 @@ data class User(val firstName: String = "",
 
 //Use httpGet extension
 "http://www.example.com/user/1".httpGet().responseObject(User.Deserializer()) { req, res, either
-    //either is type of Either<Exception, User>
+    //either is of type Either<Exception, User>
     val (err, user) = either
 
     println(user.firstName)
@@ -294,7 +294,7 @@ data class User(val firstName: String = "",
 
 ```
 
-* There are 4 of methods to support response deserialization depending on your needs (also depending on JSON parsing library of your choice), you are required to implement just only one of them.
+* There are 4 methods to support response deserialization depending on your needs (also depending on JSON parsing library of your choice), and you are required to implement only one of them.
 
 ``` Kotlin
 public fun deserialize(bytes: ByteArray): T?
@@ -320,7 +320,7 @@ object Windows1255StringDeserializer : ResponseDeserializable<String> {
 
 * Use singleton `Manager.instance` to manager global configuration.
 
-* `basePath` is to manage common root path. Great usage is for your static API endpoint.
+* `basePath` is used to manage common root path. Great usage is for your static API endpoint.
 
 ``` Kotlin
 Manager.instance.basePath = "https://httpbin.org
@@ -344,7 +344,7 @@ Fuel.get("/get").response { request, response, either ->
 }
 ```
 
-* `baseParams` is to manage common `key=value` query param which will be automatically included in all of your subsequent requests in format of ` List<Pair<String, Any?>>` (`Any` is converted to `String` by `toString()` method)
+* `baseParams` is used to manage common `key=value` query param, which will be automatically included in all of your subsequent requests in format of ` List<Pair<String, Any?>>` (`Any` is converted to `String` by `toString()` method)
 
 ``` Kotlin
 Manager.instance.baseParams = listOf("api_key" to "1234567890")
