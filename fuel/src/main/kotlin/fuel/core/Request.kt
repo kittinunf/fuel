@@ -1,10 +1,9 @@
 package fuel.core
 
-import android.util.Base64
+import fuel.util.Base64Coder
 import fuel.util.copyTo
 import fuel.util.readWriteLazy
 import fuel.util.toHexString
-import org.json.JSONObject
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
@@ -73,15 +72,6 @@ public class Request {
                 }
             }
         }
-
-        public fun jsonDeserializer(): Deserializable<JSONObject> {
-            return object : Deserializable<JSONObject> {
-                override fun deserialize(response: Response): JSONObject {
-                    return JSONObject(String(response.data))
-                }
-            }
-        }
-
     }
 
     //interfaces
@@ -110,8 +100,8 @@ public class Request {
 
     public fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
-        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
-        return header("Authorization" to "Basic " + String(encodedAuth))
+        val encodedAuth = Base64Coder.encode(auth.toByteArray())
+        return header("Authorization" to "Basic " + encodedAuth)
     }
 
     public fun validate(statusCodeRange: IntRange): Request {
@@ -181,16 +171,10 @@ public class Request {
 
     public fun responseString(handler: Handler<String>): Unit = response(Request.stringDeserializer(), handler)
 
-    //jsonObject
-    public fun responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit): Unit =
-            response(Request.jsonDeserializer(), handler)
-
-    public fun responseJson(handler: Handler<JSONObject>): Unit = response(Request.jsonDeserializer(), handler)
-
     //object
-    public fun <T: Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit): Unit = response(deserializer, handler)
+    public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit): Unit = response(deserializer, handler)
 
-    public fun <T: Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): Unit = response(deserializer, handler)
+    public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): Unit = response(deserializer, handler)
 
     public fun cUrlString(): String {
         val elements = arrayListOf("$ curl -i")

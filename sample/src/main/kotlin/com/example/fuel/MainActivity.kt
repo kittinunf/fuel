@@ -11,6 +11,7 @@ import kotlinx.android.synthetic.activity_main.mainGoButton
 import kotlinx.android.synthetic.activity_main.mainResultText
 import java.io.File
 import java.io.Reader
+import java.net.URLEncoder
 
 public class MainActivity : AppCompatActivity() {
 
@@ -19,7 +20,6 @@ public class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         Manager.instance.basePath = "http://httpbin.org"
         Manager.instance.baseHeaders = mapOf("Device" to "Android")
         Manager.instance.baseParams = listOf("key" to "value")
@@ -127,8 +127,8 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun httpBasicAuthentication() {
-        val username = "username"
-        val password = "P@s\$vv0|2|)"
+        val username = URLEncoder.encode("username", "UTF-8")
+        val password = URLEncoder.encode("P@s\$vv0|2|)", "UTF-8")
         Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, either ->
             Log.d(TAG, request.toString())
             updateUI(response, either)
@@ -141,15 +141,17 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun <T> updateUI(response: Response, either: Either<FuelError, T>) {
-        //multi-declaration
-        val (error, data) = either
-        if (error != null) {
-            Log.e(TAG, response.toString())
-            Log.e(TAG, error.toString())
-            mainResultText.text = mainResultText.text.toString() + String(error.errorData)
-        } else {
-            Log.d(TAG, response.toString())
-            mainResultText.text = mainResultText.text.toString() + data.toString()
+        runOnUiThread {
+            //multi-declaration
+            val (error, data) = either
+            if (error != null) {
+                Log.e(TAG, response.toString())
+                Log.e(TAG, error.toString())
+                mainResultText.text = mainResultText.text.toString() + String(error.errorData)
+            } else {
+                Log.d(TAG, response.toString())
+                mainResultText.text = mainResultText.text.toString() + data.toString()
+            }
         }
     }
 

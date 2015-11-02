@@ -1,47 +1,16 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+apply plugin: 'kotlin'
 
 repositories {
-
     jcenter()
-
-}
-
-android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
-
-    defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 23
-        versionCode 1
-        versionName "0.57"
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-    }
-
-    lintOptions {
-        abortOnError false
-    }
-
 }
 
 dependencies {
-
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     testCompile "junit:junit:$junit_version"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     testCompile "org.robolectric:robolectric:$robolectric_version"
+    testCompile "com.google.android:android:4.1.1.4"
 }
 
 buildscript {
