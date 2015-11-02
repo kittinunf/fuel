@@ -36,7 +36,7 @@ public interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 
 }
 
-/*internal*/ fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Either<FuelError, T>) -> Unit) {
+fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Either<FuelError, T>) -> Unit) {
     response(deserializable, { request, response, value ->
         handler(this@response, response, Either.Right(value))
     }, { request, response, error ->
@@ -44,7 +44,7 @@ public interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     })
 }
 
-/*internal*/ fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>) {
+fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>) {
     response(deserializable, { request, response, value ->
         handler.success(request, response, value)
     }, { request, response, error ->
@@ -52,7 +52,7 @@ public interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     })
 }
 
-/*internal*/ fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U,
+private fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U,
                                                         success: (Request, Response, T) -> Unit,
                                                         failure: (Request, Response, FuelError) -> Unit) {
     taskRequest.apply {
