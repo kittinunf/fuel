@@ -1,9 +1,6 @@
 package fuel.core
 
-import fuel.util.Base64Coder
-import fuel.util.copyTo
-import fuel.util.readWriteLazy
-import fuel.util.toHexString
+import fuel.util.*
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
@@ -100,8 +97,8 @@ public class Request {
 
     public fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
-        val encodedAuth = Base64Coder.encode(auth.toByteArray())
-        return header("Authorization" to "Basic " + encodedAuth)
+        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
+        return header("Authorization" to "Basic " + String(encodedAuth))
     }
 
     public fun validate(statusCodeRange: IntRange): Request {

@@ -30,5 +30,10 @@ buildscript {
     }
 }
 
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    test.java.srcDirs += 'src/test/kotlin'
+}
+
 //apply from: '../gradle/install.gradle'
 //apply from: '../gradle/bintray.gradle'
