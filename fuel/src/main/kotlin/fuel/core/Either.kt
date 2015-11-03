@@ -10,12 +10,20 @@ sealed public class Either<out L, out R> {
     public operator abstract fun component1(): L?
     public operator abstract fun component2(): R?
 
-    public fun fold(fl: (L) -> Unit, fr: (R) -> Unit) {
+    public inline fun fold(fl: (L) -> Unit, fr: (R) -> Unit) {
         return when (this) {
             is Left<L, R> -> fl(this.left)
             is Right<L, R> -> fr(this.right)
             else -> throw UnsupportedOperationException()
         }
+    }
+
+    public inline fun left(fl: (L) -> Unit) {
+        if (this is Left<L, R>) fl(this.left)
+    }
+
+    public inline fun right(fr: (R) -> Unit) {
+        if (this is Right<L, R>) fr(this.right)
     }
 
     public fun swap(): Either<R, L> {

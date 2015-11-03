@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button clearButton = (Button) findViewById(R.id.main_clear_button);
-        clearButton.setOnClickListener(new View.OnClickListener(){
+        clearButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -167,13 +167,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUI(FuelError error, String result) {
-        if (error == null) {
-            resultText.setText(resultText.getText() + result);
-        } else {
-            Log.e(TAG, "error: " + error.getException().getMessage());
-            resultText.setText(resultText.getText() + error.getException().getMessage());
-        }
+    private void updateUI(final FuelError error, final String result) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (error == null) {
+                    resultText.setText(resultText.getText() + result);
+                } else {
+                    Log.e(TAG, "error: " + error.getException().getMessage());
+                    resultText.setText(resultText.getText() + error.getException().getMessage());
+                }
+            }
+        });
     }
-
 }

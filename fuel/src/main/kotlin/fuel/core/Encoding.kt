@@ -1,8 +1,8 @@
 package fuel.core
 
-import android.net.Uri
 import fuel.Fuel
 import fuel.util.toHexString
+import java.net.URI
 import java.net.URL
 import java.net.URLEncoder
 import kotlin.properties.Delegates
@@ -58,7 +58,7 @@ public class Encoding : Fuel.RequestConvertible {
     override val request by lazy { encoder(httpMethod, urlString, parameters) }
 
     private fun createUrl(path: String): URL {
-        val pathUri = Uri.parse(path)
+        val pathUri = URI(path)
         //give precedence to local path
         if (baseUrlString == null || pathUri.scheme != null) return URL(path)
 

@@ -16,7 +16,6 @@ import kotlin.test.assertTrue
  */
 
 class RequestHandlerTest : BaseTestCase() {
-
     init {
         Manager.instance.basePath = "https://httpbin.org"
         Manager.instance.baseHeaders = mapOf("foo" to "bar")
@@ -40,7 +39,7 @@ class RequestHandlerTest : BaseTestCase() {
 
             val jsonHeaders = JSONObject(content).getJSONObject("headers")
             jsonHeaders.keys().asSequence().fold(results) { results, key ->
-                results.put(key, jsonHeaders.getString(key))
+                results.put(key as String, jsonHeaders.getString(key))
                 results
             }
 
@@ -250,5 +249,20 @@ class RequestHandlerTest : BaseTestCase() {
         assertTrue(data is HttpBinHeadersModel, "data should be HttpBinHeadersModel type")
         assertTrue((data as HttpBinHeadersModel).headers.isNotEmpty(), "model must properly be serialized")
     }
+
+    //jsonObject
+    public fun Request.responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit): Unit =
+            response(jsonDeserializer(), handler)
+
+    public fun Request.responseJson(handler: Handler<JSONObject>): Unit = response(jsonDeserializer(), handler)
+
+    public fun jsonDeserializer(): Deserializable<JSONObject> {
+        return object : Deserializable<JSONObject> {
+            override fun deserialize(response: Response): JSONObject {
+                return JSONObject(String(response.data))
+            }
+        }
+    }
+
 
 }
