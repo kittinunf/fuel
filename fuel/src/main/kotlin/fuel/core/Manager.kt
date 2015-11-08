@@ -31,7 +31,14 @@ public class Manager {
     }
 
     //callback executor
-    public var callbackExecutor: Executor by readWriteLazy { DefaultExecutor() }
+    public var callbackExecutor: Executor by readWriteLazy {
+        try {
+            val clazz = Class.forName("util.AndroidMainThreadExecutor")
+            return@readWriteLazy clazz.newInstance() as Executor
+        } catch(exception: ClassNotFoundException) {
+            return@readWriteLazy DefaultExecutor()
+        }
+    }
 
     companion object {
 

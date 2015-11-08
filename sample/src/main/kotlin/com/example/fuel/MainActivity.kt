@@ -128,7 +128,7 @@ public class MainActivity : AppCompatActivity() {
 
     fun httpBasicAuthentication() {
         val username = URLEncoder.encode("username", "UTF-8")
-        val password = URLEncoder.encode("P@s\$vv0|2|)", "UTF-8")
+        val password = URLEncoder.encode("1234567890", "UTF-8")
         Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, either ->
             Log.d(TAG, request.toString())
             updateUI(response, either)
@@ -141,17 +141,15 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun <T> updateUI(response: Response, either: Either<FuelError, T>) {
-        runOnUiThread {
-            //multi-declaration
-            val (error, data) = either
-            if (error != null) {
-                Log.e(TAG, response.toString())
-                Log.e(TAG, error.toString())
-                mainResultText.text = mainResultText.text.toString() + String(error.errorData)
-            } else {
-                Log.d(TAG, response.toString())
-                mainResultText.text = mainResultText.text.toString() + data.toString()
-            }
+        //multi-declaration
+        val (error, data) = either
+        if (error != null) {
+            Log.e(TAG, response.toString())
+            Log.e(TAG, error.toString())
+            mainResultText.text = mainResultText.text.toString() + String(error.errorData)
+        } else {
+            Log.d(TAG, response.toString())
+            mainResultText.text = mainResultText.text.toString() + data.toString()
         }
     }
 
