@@ -21,12 +21,6 @@ class RequestSharedInstanceTest : BaseTestCase() {
         Manager.instance.basePath = "https://httpbin.org"
         Manager.instance.baseHeaders = mapOf("foo" to "bar")
         Manager.instance.baseParams = listOf("key" to "value")
-
-        Manager.instance.callbackExecutor = object : Executor {
-            override fun execute(command: Runnable) {
-                command.run()
-            }
-        }
     }
 
     enum class HttpsBin(override val path: String) : Fuel.PathStringConvertible {

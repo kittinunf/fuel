@@ -1,7 +1,5 @@
 package fuel
 
-import org.junit.runner.RunWith
-import org.junit.runners.Suite
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.properties.Delegates

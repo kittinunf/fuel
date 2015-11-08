@@ -1,9 +1,6 @@
 package fuel
 
-import fuel.core.FuelError
-import fuel.core.Manager
-import fuel.core.Request
-import fuel.core.Response
+import fuel.core.*
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -24,11 +21,6 @@ class RequestUploadTest : BaseTestCase() {
     val manager: Manager by lazy {
         Manager().apply {
             basePath = "http://httpbin.org"
-            callbackExecutor = object : Executor {
-                override fun execute(command: Runnable) {
-                    command.run()
-                }
-            }
         }
     }
 

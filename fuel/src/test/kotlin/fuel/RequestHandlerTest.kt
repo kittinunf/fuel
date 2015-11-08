@@ -1,7 +1,6 @@
 package fuel
 
 import fuel.core.*
-import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -16,40 +15,35 @@ import kotlin.test.assertTrue
  */
 
 class RequestHandlerTest : BaseTestCase() {
+
     init {
         Manager.instance.basePath = "https://httpbin.org"
         Manager.instance.baseHeaders = mapOf("foo" to "bar")
         Manager.instance.baseParams = listOf("key" to "value")
-
-        Manager.instance.callbackExecutor = object : Executor {
-            override fun execute(command: Runnable) {
-                command.run()
-            }
-        }
     }
 
     //Model
     data class HttpBinHeadersModel(var headers: MutableMap<String, String> = hashMapOf())
 
     //Deserializer
-    class HttpBinHeadersDeserializer : ResponseDeserializable<HttpBinHeadersModel> {
-
-        override fun deserialize(content: String): HttpBinHeadersModel {
-            val results = hashMapOf<String, String>()
-
-            val jsonHeaders = JSONObject(content).getJSONObject("headers")
-            jsonHeaders.keys().asSequence().fold(results) { results, key ->
-                results.put(key as String, jsonHeaders.getString(key))
-                results
-            }
-
-            val model = HttpBinHeadersModel()
-            model.headers = results
-
-            return model
-        }
-
-    }
+//    class HttpBinHeadersDeserializer : ResponseDeserializable<HttpBinHeadersModel> {
+//
+//        override fun deserialize(content: String): HttpBinHeadersModel {
+//            val results = hashMapOf<String, String>()
+//
+//            val jsonHeaders = JSONObject(content).getJSONObject("headers")
+//            jsonHeaders.keys().asSequence().fold(results) { results, key ->
+//                results.put(key as String, jsonHeaders.getString(key))
+//                results
+//            }
+//
+//            val model = HttpBinHeadersModel()
+//            model.headers = results
+//
+//            return model
+//        }
+//
+//    }
 
     @Before
     fun setUp() {
@@ -157,112 +151,111 @@ class RequestHandlerTest : BaseTestCase() {
         assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
     }
 
-    @Test
-    fun httpGetRequestJsonValid() {
-        var req: Request? = null
-        var res: Response? = null
-        var data: Any? = null
-        var err: FuelError? = null
+//    @Test
+//    fun httpGetRequestJsonValid() {
+//        var req: Request? = null
+//        var res: Response? = null
+//        var data: Any? = null
+//        var err: FuelError? = null
+//
+//        Fuel.get("/user-agent").responseJson(object : Handler<JSONObject> {
+//            override fun success(request: Request, response: Response, value: JSONObject) {
+//                req = request
+//                res = response
+//                data = value
+//
+//                lock.countDown()
+//            }
+//
+//            override fun failure(request: Request, response: Response, error: FuelError) {
+//                println(error)
+//            }
+//        })
+//
+//        await()
+//
+//        assertNotNull(req, "request should not be null")
+//        assertNotNull(res, "response should not be null")
+//        assertNull(err, "error should be null")
+//        assertNotNull(data, "data should not be null")
+//        assertTrue(data is JSONObject, "data should be JSONObject type")
+//        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+//    }
 
-        Fuel.get("/user-agent").responseJson(object : Handler<JSONObject> {
-            override fun success(request: Request, response: Response, value: JSONObject) {
-                req = request
-                res = response
-                data = value
+//    @Test
+//    fun httpGetRequestJsonInvalid() {
+//        var req: Request? = null
+//        var res: Response? = null
+//        var data: Any? = null
+//        var err: FuelError? = null
+//
+//        Fuel.get("/html").responseJson(object : Handler<JSONObject> {
+//            override fun success(request: Request, response: Response, value: JSONObject) {
+//            }
+//
+//            override fun failure(request: Request, response: Response, error: FuelError) {
+//                req = request
+//                res = response
+//                err = error
+//
+//                lock.countDown()
+//                println(error)
+//            }
+//        })
+//
+//        await()
+//
+//        assertNotNull(req, "request should not be null")
+//        assertNotNull(res, "response should not be null")
+//        assertNotNull(err, "error should not be null")
+//        assertNull(data, "data should be null")
+//        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code (${res?.httpStatusCode}) should be ${HttpURLConnection.HTTP_OK}")
+//    }
 
-                lock.countDown()
-            }
-
-            override fun failure(request: Request, response: Response, error: FuelError) {
-                println(error)
-            }
-        })
-
-        await()
-
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNull(err, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(data is JSONObject, "data should be JSONObject type")
-        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
-    }
-
-    @Test
-    fun httpGetRequestJsonInvalid() {
-        var req: Request? = null
-        var res: Response? = null
-        var data: Any? = null
-        var err: FuelError? = null
-
-        Fuel.get("/html").responseJson(object : Handler<JSONObject> {
-            override fun success(request: Request, response: Response, value: JSONObject) {
-            }
-
-            override fun failure(request: Request, response: Response, error: FuelError) {
-                req = request
-                res = response
-                err = error
-
-                lock.countDown()
-                println(error)
-            }
-        })
-
-        await()
-
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNotNull(err, "error should not be null")
-        assertNull(data, "data should be null")
-        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code (${res?.httpStatusCode}) should be ${HttpURLConnection.HTTP_OK}")
-    }
-
-    @Test
-    fun httpGetRequestObject() {
-        var req: Request? = null
-        var res: Response? = null
-        var data: Any? = null
-        var err: FuelError? = null
-
-        Fuel.get("/headers").responseObject(HttpBinHeadersDeserializer(), object : Handler<HttpBinHeadersModel> {
-
-            override fun success(request: Request, response: Response, value: HttpBinHeadersModel) {
-                req = request
-                res = response
-                data = value
-
-                lock.countDown()
-            }
-
-            override fun failure(request: Request, response: Response, error: FuelError) {
-            }
-
-        })
-
-        await()
-
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNull(err, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(data is HttpBinHeadersModel, "data should be HttpBinHeadersModel type")
-        assertTrue((data as HttpBinHeadersModel).headers.isNotEmpty(), "model must properly be serialized")
-    }
+//    @Test
+//    fun httpGetRequestObject() {
+//        var req: Request? = null
+//        var res: Response? = null
+//        var data: Any? = null
+//        var err: FuelError? = null
+//
+//        Fuel.get("/headers").responseObject(HttpBinHeadersDeserializer(), object : Handler<HttpBinHeadersModel> {
+//
+//            override fun success(request: Request, response: Response, value: HttpBinHeadersModel) {
+//                req = request
+//                res = response
+//                data = value
+//
+//                lock.countDown()
+//            }
+//
+//            override fun failure(request: Request, response: Response, error: FuelError) {
+//            }
+//
+//        })
+//
+//        await()
+//
+//        assertNotNull(req, "request should not be null")
+//        assertNotNull(res, "response should not be null")
+//        assertNull(err, "error should be null")
+//        assertNotNull(data, "data should not be null")
+//        assertTrue(data is HttpBinHeadersModel, "data should be HttpBinHeadersModel type")
+//        assertTrue((data as HttpBinHeadersModel).headers.isNotEmpty(), "model must properly be serialized")
+//    }
 
     //jsonObject
-    public fun Request.responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit): Unit =
-            response(jsonDeserializer(), handler)
-
-    public fun Request.responseJson(handler: Handler<JSONObject>): Unit = response(jsonDeserializer(), handler)
-
-    public fun jsonDeserializer(): Deserializable<JSONObject> {
-        return object : Deserializable<JSONObject> {
-            override fun deserialize(response: Response): JSONObject {
-                return JSONObject(String(response.data))
-            }
-        }
-    }
-
+//    public fun Request.responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit): Unit =
+//            response(jsonDeserializer(), handler)
+//
+//    public fun Request.responseJson(handler: Handler<JSONObject>): Unit = response(jsonDeserializer(), handler)
+//
+//    public fun jsonDeserializer(): Deserializable<JSONObject> {
+//        return object : Deserializable<JSONObject> {
+//            override fun deserialize(response: Response): JSONObject {
+//                return JSONObject(String(response.data))
+//            }
+//        }
+//    }
 
 }

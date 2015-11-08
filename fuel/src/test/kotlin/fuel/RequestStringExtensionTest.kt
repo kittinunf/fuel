@@ -1,9 +1,6 @@
 package fuel
 
-import fuel.core.FuelError
-import fuel.core.Manager
-import fuel.core.Request
-import fuel.core.Response
+import fuel.core.*
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -23,12 +20,6 @@ class RequestStringExtensionTest : BaseTestCase() {
         Manager.instance.basePath = "https://httpbin.org"
         Manager.instance.baseHeaders = mapOf("foo" to "bar")
         Manager.instance.baseParams = listOf("key" to "value")
-
-        Manager.instance.callbackExecutor = object : Executor {
-            override fun execute(command: Runnable) {
-                command.run()
-            }
-        }
     }
 
     @Before

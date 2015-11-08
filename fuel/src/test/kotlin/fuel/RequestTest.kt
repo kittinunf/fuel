@@ -16,15 +16,7 @@ import kotlin.test.assertTrue
 
 class RequestTest : BaseTestCase() {
 
-    val manager: Manager by lazy {
-        Manager().apply {
-            callbackExecutor = object : Executor {
-                override fun execute(command: Runnable) {
-                    command.run()
-                }
-            }
-        }
-    }
+    val manager: Manager by lazy { Manager() }
 
     enum class HttpsBin(val relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),

@@ -1,7 +1,6 @@
 package fuel
 
 import fuel.core.*
-import org.json.JSONException
 import org.junit.Before
 import org.junit.Test
 import java.io.Reader
@@ -19,11 +18,6 @@ class RequestObjectTest : BaseTestCase() {
 
     init {
         Manager.instance.basePath = "http://httpbin.org"
-        Manager.instance.callbackExecutor = object : Executor {
-            override fun execute(command: Runnable) {
-                command.run()
-            }
-        }
     }
 
     //Model
@@ -41,7 +35,7 @@ class RequestObjectTest : BaseTestCase() {
     class HttpBinMalformedDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
 
         override fun deserialize(reader: Reader): HttpBinUserAgentModel {
-            throw JSONException("Test malformed data")
+            throw IllegalStateException("Malformed data")
         }
 
     }
@@ -103,7 +97,7 @@ class RequestObjectTest : BaseTestCase() {
         assertNotNull(response, "response should not be null")
         assertNotNull(error, "error should not be null")
         assertNull(data, "data should be null")
-        assertTrue(error?.exception is JSONException, "exception is JSONException so that user can react with exception")
+        assertTrue(error?.exception is IllegalStateException, "exception is JSONException so that user can react with exception")
     }
 
 }
