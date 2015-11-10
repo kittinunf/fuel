@@ -193,7 +193,7 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
         assertNull(err, "error should be null")
         assertNotNull(data, "data should not be null")
         assertTrue(data is HttpBinHeadersModel, "data should be HttpBinHeadersModel type")
-        assertFalse((data as HttpBinHeadersModel).headers.isNotEmpty(), "model must properly be serialized")
+        assertFalse((data as HttpBinHeadersModel).headers.isEmpty(), "model must properly be serialized")
     }
 
     @Test
@@ -225,7 +225,7 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
         assertNull(err, "error should be null")
         assertNotNull(data, "data should not be null")
         assertTrue(data is HttpBinHeadersModel, "data should be HttpBinHeadersModel type")
-        assertFalse((data as HttpBinHeadersModel).headers.isNotEmpty(), "model must properly be serialized")
+        assertFalse((data as HttpBinHeadersModel).headers.isEmpty(), "model must properly be serialized")
     }
 
 }

@@ -49,6 +49,7 @@ dependencies {
     compile project(':fuel')
 
     testCompile "junit:junit:$junit_version"
+    testCompile "org.robolectric:robolectric:$robolectric_version"
 }
 
 buildscript {
@@ -58,6 +59,7 @@ buildscript {
 
         //test dependencies version
         junit_version = '4.12'
+        robolectric_version = '3.0'
     }
 
     repositories {
