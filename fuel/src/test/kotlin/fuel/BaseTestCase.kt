@@ -2,7 +2,6 @@ package fuel
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import kotlin.properties.Delegates
 
 /**
  * Created by Kittinun Vantasin on 5/21/15.

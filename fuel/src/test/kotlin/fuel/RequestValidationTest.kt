@@ -4,7 +4,6 @@ import fuel.core.*
 import org.junit.Before
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executor
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue

@@ -1,13 +1,15 @@
 package fuel
 
-import fuel.core.*
+import fuel.core.FuelError
+import fuel.core.Manager
+import fuel.core.Request
+import fuel.core.Response
 import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executor
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue

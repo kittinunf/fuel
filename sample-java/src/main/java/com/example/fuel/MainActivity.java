@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main";
 
-    private List<Pair<String, String>> params = new ArrayList<Pair<String, String>>() {{
+    private final List<Pair<String, String>> params = new ArrayList<Pair<String, String>>() {{
         add(new Pair<>("foo1", "bar1"));
         add(new Pair<>("foo2", "bar2"));
     }};
