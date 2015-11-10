@@ -78,13 +78,13 @@ public class Fuel {
 
         //upload
         @JvmStatic @JvmOverloads
-        public fun upload(path: String, parameters: List<Pair<String, Any?>>? = null): Request {
-            return Manager.instance.upload(path, parameters)
+        public fun upload(path: String, method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request {
+            return Manager.instance.upload(path, method, parameters)
         }
 
         @JvmStatic @JvmOverloads
-        public fun upload(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request {
-            return Manager.instance.upload(convertible, parameters)
+        public fun upload(convertible: PathStringConvertible, method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request {
+            return Manager.instance.upload(convertible, method, parameters)
         }
 
         //request
@@ -156,11 +156,11 @@ public fun Fuel.PathStringConvertible.httpDownload(parameter: List<Pair<String, 
 }
 
 @JvmOverloads
-public fun String.httpUpload(parameter: List<Pair<String, Any?>>? = null): Request {
-    return Fuel.upload(this, parameter)
+public fun String.httpUpload(method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request {
+    return Fuel.upload(this, method, parameters)
 }
 
 @JvmOverloads
-public fun Fuel.PathStringConvertible.httpUpload(parameter: List<Pair<String, Any?>>? = null): Request {
-    return Fuel.upload(this, parameter)
+public fun Fuel.PathStringConvertible.httpUpload(method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request {
+    return Fuel.upload(this, method, parameters)
 }

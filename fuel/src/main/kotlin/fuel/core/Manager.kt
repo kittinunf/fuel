@@ -93,9 +93,9 @@ public class Manager {
         return request
     }
 
-    fun upload(path: String, param: List<Pair<String, Any?>>? = null): Request {
+    fun upload(path: String, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
         val request = Encoding().apply {
-            httpMethod = Method.POST
+            httpMethod = method
             baseUrlString = basePath
             urlString = path
             parameters = if (param == null) baseParams else baseParams + param
@@ -107,9 +107,9 @@ public class Manager {
         return request
     }
 
-    fun upload(convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request {
+    fun upload(convertible: Fuel.PathStringConvertible, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
         val request = Encoding().apply {
-            httpMethod = Method.POST
+            httpMethod = method
             baseUrlString = basePath
             urlString = convertible.path
             parameters = if (param == null) baseParams else baseParams + param

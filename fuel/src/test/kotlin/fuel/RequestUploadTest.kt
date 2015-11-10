@@ -1,9 +1,6 @@
 package fuel
 
-import fuel.core.FuelError
-import fuel.core.Manager
-import fuel.core.Request
-import fuel.core.Response
+import fuel.core.*
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -37,7 +34,7 @@ class RequestUploadTest : BaseTestCase() {
     }
 
     @Test
-    fun httpUploadCase() {
+    fun httpUploadWithPostCase() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -45,6 +42,35 @@ class RequestUploadTest : BaseTestCase() {
 
         manager.upload("/post").source { request, url ->
             File(currentDir, "lorem_ipsum_short.tmp")
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
+    }
+
+    @Test
+    fun httpUploadWithPutCase() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.upload("/put", Method.PUT).source { request, url ->
+            File(currentDir, "lorem_ipsum_long.tmp")
         }.responseString { req, res, either ->
             request = req
             response = res

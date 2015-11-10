@@ -1,11 +1,9 @@
 package fuel
 
-import fuel.core.FuelError
-import fuel.core.Manager
-import fuel.core.Request
-import fuel.core.Response
+import fuel.core.*
 import org.junit.Before
 import org.junit.Test
+import java.io.File
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import kotlin.test.assertNotNull
@@ -139,6 +137,101 @@ class RequestStringExtensionTest : BaseTestCase() {
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
+    }
+
+    @Test
+    fun httpDownload() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val numberOfBytes = 32768L
+
+        "/bytes/$numberOfBytes".httpDownload().destination { response, url ->
+            val f = File.createTempFile(numberOfBytes.toString(), null)
+            println(f.absolutePath)
+            f
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
+    }
+
+    @Test
+    fun httpUploadWithPut() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        "/put".httpUpload(Method.PUT).source { request, url ->
+            val dir = System.getProperty("user.dir")
+            val currentDir = File(dir, "src/test/assets")
+            File(currentDir, "lorem_ipsum_long.tmp")
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
+    }
+
+    @Test
+    fun httpUploadWithPost() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        "/post".httpUpload().source { request, url ->
+            val dir = System.getProperty("user.dir")
+            val currentDir = File(dir, "src/test/assets")
+            File(currentDir, "lorem_ipsum_long.tmp")
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode")
     }
 
 }

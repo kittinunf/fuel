@@ -6,6 +6,7 @@ import fuel.core.Request
 import fuel.core.Response
 import org.junit.Before
 import org.junit.Test
+import java.io.File
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import kotlin.test.assertNotNull
@@ -26,7 +27,9 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         COOKIES("cookies"),
         POST("post"),
         PUT("put"),
-        DELETE("delete");
+        DELETE("delete"),
+        DOWNLOAD("bytes/123456"),
+        UPLOAD("post");
 
         override val path = "/$relativePath"
     }
@@ -154,6 +157,66 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
 
         assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+    }
+
+    @Test
+    fun httpUploadRequestWithSharedInstance() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        HttpsBin.UPLOAD.httpUpload().source { request, url ->
+            val dir = System.getProperty("user.dir")
+            val currentDir = File(dir, "src/test/assets")
+            File(currentDir, "lorem_ipsum_long.tmp")
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+    }
+
+    @Test
+    fun httpDownloadRequestWithSharedInstance() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        HttpsBin.DOWNLOAD.httpDownload().destination { response, url ->
+            File.createTempFile(123456.toString(), null)
+        }.responseString { req, res, either ->
+            request = req
+            response = res
+
+            val (err, d) = either
+            data = d
+            error = err
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertNotNull(request, "request should not be null")
+        assertNotNull(response, "response should not be null")
+        assertNull(error, "error should be null")
+        assertNotNull(data, "data should not be null")
+        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
     }
 
 }
