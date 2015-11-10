@@ -2,7 +2,6 @@ package fuel.core
 
 import fuel.Fuel
 import fuel.toolbox.HttpClient
-import fuel.util.DefaultExecutor
 import fuel.util.readWriteLazy
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
@@ -31,14 +30,7 @@ public class Manager {
     }
 
     //callback executor
-    public var callbackExecutor: Executor by readWriteLazy {
-        try {
-            val clazz = Class.forName("util.AndroidMainThreadExecutor")
-            return@readWriteLazy clazz.newInstance() as Executor
-        } catch(exception: ClassNotFoundException) {
-            return@readWriteLazy DefaultExecutor()
-        }
-    }
+    public var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
     companion object {
 

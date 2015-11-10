@@ -1,11 +1,10 @@
-package fuel
+package fuel.android
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import kotlin.properties.Delegates
 
 /**
- * Created by Kittinun Vantasin on 5/21/15.
+ * Created by Kittinun Vantasin on 11/9/15.
  */
 
 abstract class BaseTestCase {

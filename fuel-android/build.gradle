@@ -36,6 +36,11 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
 }
 
 dependencies {
@@ -50,6 +55,8 @@ buildscript {
     ext {
         //dependencies version
         kotlin_version = '1.0.0-beta-1038'
+
+        //test dependencies version
         junit_version = '4.12'
     }
 
