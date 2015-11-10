@@ -1,6 +1,9 @@
 package fuel.core
 
-import fuel.util.*
+import fuel.util.Base64
+import fuel.util.copyTo
+import fuel.util.readWriteLazy
+import fuel.util.toHexString
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
