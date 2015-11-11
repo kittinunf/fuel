@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.util.toHexString
+import java.net.MalformedURLException
 import java.net.URI
 import java.net.URL
 import java.net.URLEncoder
@@ -58,11 +59,14 @@ public class Encoding : Fuel.RequestConvertible {
     override val request by lazy { encoder(httpMethod, urlString, parameters) }
 
     private fun createUrl(path: String): URL {
-        val pathUri = URI(path)
-        //give precedence to local path
-        if (baseUrlString == null || pathUri.scheme != null) return URL(path)
-
-        return URL(baseUrlString + if (path.startsWith('/') or path.isEmpty()) path else '/' + path)
+        val url = try {
+            //give precedence to local path
+            URL(path)
+        } catch (e: MalformedURLException) {
+            URL(baseUrlString + if (path.startsWith('/') or path.isEmpty()) path else '/' + path)
+        }
+        val uri = URI(url.protocol, url.userInfo, url.host, url.port, url.path, url.query, url.ref)
+        return uri.toURL()
     }
 
     private fun encodeParameterInUrl(method: Method): Boolean {
