@@ -26,7 +26,8 @@ buildscript {
 }
 
 dependencies {
-    compile 'fuel:fuel:0.6'
+    compile 'com.github.kittinunf.fuel:fuel:0.6' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:0.6' //for Android
 }
 ```
 
