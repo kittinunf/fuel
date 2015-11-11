@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+apply plugin: 'com.novoda.bintray-release'
+
 repositories {
     jcenter()
 }
@@ -13,7 +15,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 23
         versionCode 1
-        versionName "0.57"
+        versionName "0.6"
     }
 
     sourceSets {
@@ -71,3 +73,11 @@ buildscript {
     }
 }
 
+publish {
+    groupId = ''
+    artifactId = ''
+    uploadName = ''
+    version = android.defaultConfig.versionName
+    desc = ''
+    website = 'https://github.com/kittinunf/Fuel'
+}

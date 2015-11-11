@@ -15,11 +15,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import fuel.Fuel;
-import fuel.core.FuelError;
-import fuel.core.Handler;
-import fuel.core.Request;
-import fuel.core.Response;
+import com.github.kittinunf.fuel.Fuel;
+import com.github.kittinunf.fuel.core.FuelError;
+import com.github.kittinunf.fuel.core.Handler;
+import com.github.kittinunf.fuel.core.Request;
+import com.github.kittinunf.fuel.core.Response;
 import kotlin.Pair;
 import kotlin.jvm.functions.Function2;
 

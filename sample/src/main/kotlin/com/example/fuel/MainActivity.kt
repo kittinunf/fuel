@@ -3,9 +3,9 @@ package com.example.fuel
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.github.kittinunf.fuel.*
+import com.github.kittinunf.fuel.core.*
 import com.google.gson.Gson
-import fuel.*
-import fuel.core.*
 import kotlinx.android.synthetic.activity_main.mainClearButton
 import kotlinx.android.synthetic.activity_main.mainGoButton
 import kotlinx.android.synthetic.activity_main.mainResultText

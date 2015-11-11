@@ -24,6 +24,7 @@ local.properties
 # Bintray
 install.gradle
 bintray.gradle
+bintray_push
 
 # Android Studio
 .idea/

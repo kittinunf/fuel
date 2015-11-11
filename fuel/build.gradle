@@ -1,5 +1,7 @@
 apply plugin: 'kotlin'
 
+apply plugin: 'com.novoda.bintray-release'
+
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
     test.java.srcDirs += 'src/test/kotlin'
@@ -33,5 +35,11 @@ buildscript {
     }
 }
 
-//apply from: '../gradle/install.gradle'
-//apply from: '../gradle/bintray.gradle'
+publish {
+    groupId = ''
+    artifactId = ''
+    uploadName = ''
+    version = '0.6'
+    desc = ''
+    website = 'https://github.com/kittinunf/Fuel'
+}
