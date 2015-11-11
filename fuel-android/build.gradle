@@ -74,10 +74,11 @@ buildscript {
 }
 
 publish {
-    groupId = ''
-    artifactId = ''
-    uploadName = ''
-    version = android.defaultConfig.versionName
-    desc = ''
+    artifactId = 'fuel-android'
+    autoPublish = false
+    desc = 'The easiest HTTP networking library for Android'
+    groupId = 'com.github.kittinunf.fuel'
+    publishVersion = android.defaultConfig.versionName
+    uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }

@@ -36,10 +36,11 @@ buildscript {
 }
 
 publish {
-    groupId = ''
-    artifactId = ''
-    uploadName = ''
-    version = '0.6'
-    desc = ''
+    artifactId = 'fuel'
+    autoPublish = false
+    desc = 'The easiest HTTP networking library for Kotlin'
+    groupId = 'com.github.kittinunf.fuel'
+    publishVersion = '0.6'
+    uploadName = 'Fuel'
     website = 'https://github.com/kittinunf/Fuel'
 }
