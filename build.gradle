@@ -16,6 +16,10 @@ buildscript {
 }
 
 allprojects {
+    ext {
+        publishVersion = '0.6'
+    }
+
     repositories {
         jcenter()
     }

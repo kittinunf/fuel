@@ -1,4 +1,4 @@
-package com.github.kittinunf.fuel.util
+package com.github.kittinunf.fuel.android.util
 
 import android.os.Handler
 import android.os.Looper

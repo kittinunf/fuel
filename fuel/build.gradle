@@ -38,9 +38,9 @@ buildscript {
 publish {
     artifactId = 'fuel'
     autoPublish = false
-    desc = 'The easiest HTTP networking library for Kotlin'
+    desc = 'The easiest HTTP networking library in Kotlin'
     groupId = 'com.github.kittinunf.fuel'
-    publishVersion = '0.6'
+    publishVersion = parent.ext.publishVersion
     uploadName = 'Fuel'
     website = 'https://github.com/kittinunf/Fuel'
 }

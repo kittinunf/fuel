@@ -1,4 +1,4 @@
-package fuel.android
+package com.github.kittinunf.fuel.android
 
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner

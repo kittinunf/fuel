@@ -1,4 +1,4 @@
-<manifest package="fuel.android">
+<manifest package="com.github.kittinunf.fuel.android">
 
     <!-- Libraries have no manifest -->
 

@@ -1,13 +1,8 @@
-package fuel.android
+package com.github.kittinunf.fuel.android
 
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Handler
-import com.github.kittinunf.fuel.core.Manager
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.extension.responseJson
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.android.extension.responseJson
+import com.github.kittinunf.fuel.core.*
 import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test

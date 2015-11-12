@@ -15,7 +15,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 23
         versionCode 1
-        versionName "0.6"
+        versionName parent.ext.publishVersion
     }
 
     sourceSets {
@@ -76,9 +76,9 @@ buildscript {
 publish {
     artifactId = 'fuel-android'
     autoPublish = false
-    desc = 'The easiest HTTP networking library for Android'
+    desc = 'The easiest HTTP networking library in Kotlin for Android'
     groupId = 'com.github.kittinunf.fuel'
-    publishVersion = android.defaultConfig.versionName
-    uploadName = 'Fuel-Android'
+    publishVersion = parent.ext.publishVersion
+    uploadName = 'Fuel'
     website = 'https://github.com/kittinunf/Fuel'
 }
