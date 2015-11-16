@@ -80,6 +80,6 @@ publish {
     groupId = 'com.github.kittinunf.fuel'
     licences = ['MIT']
     publishVersion = parent.ext.publishVersion
-    uploadName = 'fuel'
+    uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }
