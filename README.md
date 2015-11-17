@@ -1,6 +1,6 @@
 # Fuel
 
-[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.0.0--beta--1038-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
+[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.0.0--beta--1103-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
 
 The easiest HTTP networking library in Kotlin for Android.
 
@@ -26,7 +26,8 @@ buildscript {
 }
 
 dependencies {
-    compile 'fuel:fuel:0.57'
+    compile 'com.github.kittinunf.fuel:fuel:0.6' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:0.6' //for Android
 }
 ```
 
@@ -234,6 +235,14 @@ Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
 Fuel.upload("/post").source { request, url ->
     File.createTempFile("temp", ".tmp");
 }.responseString { request, response, either ->
+
+}
+
+//by default upload use Method.POST, unless it is specified as something else
+Fuel.upload("/put", Method.PUT).source { request, url ->
+    File.createTempFile("temp", ".tmp");
+}.responseString { request, response, either ->
+    // calls to http://example.com/api/put with PUT
 
 }
 ```

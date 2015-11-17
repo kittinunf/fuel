@@ -13,6 +13,10 @@ android {
         versionName "1.0"
     }
 
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -25,8 +29,9 @@ android {
         exclude 'META-INF/NOTICE.txt'
     }
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 
@@ -37,14 +42,13 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.google.code.gson:gson:$gson_version"
 
-    compile project(':fuel')
+    compile project(':fuel-android')
 }
 
 buildscript {
-
     ext {
         android_support_version = '23.1.0'
-        kotlin_version = '1.0.0-beta-1038'
+        kotlin_version = '1.0.0-beta-1103'
         gson_version = '2.3.1'
     }
 

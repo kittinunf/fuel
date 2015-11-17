@@ -1,0 +1,85 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+apply plugin: 'com.novoda.bintray-release'
+
+repositories {
+    jcenter()
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 23
+        versionCode 1
+        versionName parent.ext.publishVersion
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    compile project(':fuel')
+
+    testCompile "junit:junit:$junit_version"
+    testCompile "org.robolectric:robolectric:$robolectric_version"
+}
+
+buildscript {
+    ext {
+        //dependencies version
+        kotlin_version = '1.0.0-beta-1103'
+
+        //test dependencies version
+        junit_version = '4.12'
+        robolectric_version = '3.0'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+publish {
+    artifactId = 'fuel-android'
+    autoPublish = true
+    desc = 'The easiest HTTP networking library in Kotlin/Android'
+    groupId = 'com.github.kittinunf.fuel'
+    licences = ['MIT']
+    publishVersion = parent.ext.publishVersion
+    uploadName = 'Fuel-Android'
+    website = 'https://github.com/kittinunf/Fuel'
+}

@@ -16,6 +16,7 @@ gen/
 
 # Local configuration file (sdk path, etc)
 local.properties
+gradle.properties
 
 # Eclipse project files
 .classpath
@@ -24,6 +25,7 @@ local.properties
 # Bintray
 install.gradle
 bintray.gradle
+bintray_push
 
 # Android Studio
 .idea/

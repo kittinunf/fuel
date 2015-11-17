@@ -11,11 +11,17 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 
@@ -24,14 +30,12 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:$android_support_version"
 
-    compile project(':fuel')
+    compile project(':fuel-android')
 }
 
 buildscript {
-
     ext {
         android_support_version = '23.1.0'
     }
-
 }
 
