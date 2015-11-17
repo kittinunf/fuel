@@ -14,7 +14,7 @@ interface Environment {
 
 public fun createEnvironment(): Environment {
     try {
-        return Class.forName("com.github.kittinunf.fuel.util.AndroidEnvironment").newInstance() as Environment
+        return Class.forName("com.github.kittinunf.fuel.android.util.AndroidEnvironment").newInstance() as Environment
     } catch(exception: ClassNotFoundException) {
         return DefaultEnvironment()
     }
