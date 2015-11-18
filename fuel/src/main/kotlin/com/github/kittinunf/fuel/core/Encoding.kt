@@ -5,7 +5,6 @@ import com.github.kittinunf.fuel.util.toHexString
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URL
-import java.net.URLEncoder
 import kotlin.properties.Delegates
 
 /**
@@ -13,8 +12,6 @@ import kotlin.properties.Delegates
  */
 
 public class Encoding : Fuel.RequestConvertible {
-
-    val ENCODING = "UTF-8"
 
     var requestType: Request.Type = Request.Type.REQUEST
     var httpMethod: Method by Delegates.notNull()
@@ -77,17 +74,11 @@ public class Encoding : Fuel.RequestConvertible {
     }
 
     private fun queryFromParameters(params: List<Pair<String, Any?>>?): String {
-        if (params == null) return ""
-
-        val list = params.fold(arrayListOf<String>()) { container, item ->
-            val (key, value) = item
-            if (value != null) {
-                container.add("${URLEncoder.encode(key, ENCODING)}=${URLEncoder.encode(value.toString(), ENCODING)}")
-            }
-            container
-        }
-
-        return list.joinToString("&")
+        return params?.let {
+            params.filterNot { it.second == null }
+                    .mapTo(arrayListOf<String>()) { "${it.first}=${it.second}" }
+                    .joinToString("&")
+        } ?: ""
     }
 
 }
