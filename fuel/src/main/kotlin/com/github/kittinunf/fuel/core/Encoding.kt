@@ -5,7 +5,6 @@ import com.github.kittinunf.fuel.util.toHexString
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URL
-import java.net.URLEncoder
 import kotlin.properties.Delegates
 
 /**
