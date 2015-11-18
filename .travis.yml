@@ -17,4 +17,4 @@ cache:
     - $HOME/.gradle
 
 script:
-  - ./gradlew test
+  - ./gradlew test --info
