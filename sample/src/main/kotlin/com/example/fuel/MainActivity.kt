@@ -33,7 +33,6 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun execute() {
-
         httpGet()
         httpPut()
         httpPost()
@@ -41,7 +40,6 @@ public class MainActivity : AppCompatActivity() {
         httpDownload()
         httpUpload()
         httpBasicAuthentication()
-
         httpResponseObject()
     }
 
@@ -126,8 +124,8 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun httpBasicAuthentication() {
-        val username = "username"
-        val password = "P@s\$vv0R|)"
+        val username = "U$3|2|\\|@me"
+        val password = "P@$\$vv0|2|)"
         Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, either ->
             Log.d(TAG, request.toString())
             updateUI(response, either)
