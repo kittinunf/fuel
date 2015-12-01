@@ -1,5 +1,8 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.get
+import com.github.kittinunf.result.getAs
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -36,11 +39,11 @@ public interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 
 }
 
-public fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Either<FuelError, T>) -> Unit) {
+public fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit) {
     response(deserializable, { request, response, value ->
-        handler(this@response, response, Either.Right(value))
+        handler(this@response, response, Result.Success(value))
     }, { request, response, error ->
-        handler(this@response, response, Either.Left(error))
+        handler(this@response, response, Result.Failure(error))
     })
 }
 
@@ -58,21 +61,18 @@ private fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U,
     taskRequest.apply {
         successCallback = { response ->
 
-            val deliverable: Either<Exception, T> =
+            val deliverable: Result<T, Exception> =
                     try {
-                        Either.Right(deserializable.deserialize(response))
+                        Result.of(deserializable.deserialize(response))
                     } catch(exception: Exception) {
-                        Either.Left(exception)
+                        Result.of(exception)
                     }
 
             callback {
                 deliverable.fold({
-                    val error = FuelError().apply {
-                        exception = deliverable.get()
-                    }
-                    failure(this@response, response, error)
-                }, {
                     success(this@response, response, it)
+                }, {
+                    failure(this@response, response, FuelError().apply { exception = it })
                 })
             }
         }

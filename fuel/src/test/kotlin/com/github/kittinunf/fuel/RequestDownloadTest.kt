@@ -44,10 +44,10 @@ class RequestDownloadTest : BaseTestCase() {
             val f = File.createTempFile(numberOfBytes.toString(), null)
             println(f.absolutePath)
             f
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -83,10 +83,10 @@ class RequestDownloadTest : BaseTestCase() {
             read = readBytes
             total = totalBytes
             println("read: $read, total: $total")
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -119,10 +119,10 @@ class RequestDownloadTest : BaseTestCase() {
             f
         }.progress { readBytes, totalBytes ->
 
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -153,10 +153,10 @@ class RequestDownloadTest : BaseTestCase() {
             File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
         }.progress { readBytes, totalBytes ->
 
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 

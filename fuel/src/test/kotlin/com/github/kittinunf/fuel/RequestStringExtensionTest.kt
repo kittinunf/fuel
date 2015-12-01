@@ -34,10 +34,10 @@ class RequestStringExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        "/get".httpGet().responseString { req, res, either ->
+        "/get".httpGet().responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -62,10 +62,10 @@ class RequestStringExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        "/post".httpPost().responseString { req, res, either ->
+        "/post".httpPost().responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -90,10 +90,10 @@ class RequestStringExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        "/put".httpPut().responseString { req, res, either ->
+        "/put".httpPut().responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -118,10 +118,10 @@ class RequestStringExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        "/delete".httpDelete().responseString { req, res, either ->
+        "/delete".httpDelete().responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -152,10 +152,10 @@ class RequestStringExtensionTest : BaseTestCase() {
             val f = File.createTempFile(numberOfBytes.toString(), null)
             println(f.absolutePath)
             f
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -183,10 +183,10 @@ class RequestStringExtensionTest : BaseTestCase() {
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -214,10 +214,10 @@ class RequestStringExtensionTest : BaseTestCase() {
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 

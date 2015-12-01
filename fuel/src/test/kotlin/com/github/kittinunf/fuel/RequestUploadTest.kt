@@ -42,10 +42,10 @@ class RequestUploadTest : BaseTestCase() {
 
         manager.upload("/post").source { request, url ->
             File(currentDir, "lorem_ipsum_short.tmp")
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -71,10 +71,10 @@ class RequestUploadTest : BaseTestCase() {
 
         manager.upload("/put", Method.PUT).source { request, url ->
             File(currentDir, "lorem_ipsum_long.tmp")
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -107,10 +107,10 @@ class RequestUploadTest : BaseTestCase() {
             read = readBytes
             total = totalBytes
             println("read: $read, total: $total")
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -140,10 +140,10 @@ class RequestUploadTest : BaseTestCase() {
             File(currentDir, "lorem_ipsum_short.tmp")
         }.progress { readBytes, totalBytes ->
 
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -172,10 +172,10 @@ class RequestUploadTest : BaseTestCase() {
             File(currentDir, "not_found_file.tmp")
         }.progress { readBytes, totalBytes ->
 
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 

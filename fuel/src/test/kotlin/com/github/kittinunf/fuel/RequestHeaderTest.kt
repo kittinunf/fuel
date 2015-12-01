@@ -36,11 +36,11 @@ class RequestHeaderTest : BaseTestCase() {
         val headerKey = "Custom"
         val headerValue = "foobar"
 
-        manager.request(Method.GET, "/get").header(headerKey to headerValue).response { req, res, either ->
+        manager.request(Method.GET, "/get").header(headerKey to headerValue).response { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 

@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.kittinunf.fuel.*
 import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import kotlinx.android.synthetic.activity_main.mainClearButton
 import kotlinx.android.synthetic.activity_main.mainGoButton
@@ -44,59 +45,59 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun httpResponseObject() {
-        "http://jsonplaceholder.typicode.com/photos/1".httpGet().responseObject(Photo.Deserializer()) { request, response, either ->
+        "http://jsonplaceholder.typicode.com/photos/1".httpGet().responseObject(Photo.Deserializer()) { request, response, result ->
             Log.d(TAG, request.toString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
     }
 
     fun httpGet() {
-        Fuel.get("/get", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        Fuel.get("/get", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, result ->
             Log.d(TAG, request.cUrlString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
 
-        "/get".httpGet().responseString { request, response, either ->
+        "/get".httpGet().responseString { request, response, result ->
             Log.d(TAG, request.toString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
     }
 
     fun httpPut() {
-        Fuel.put("/put", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        Fuel.put("/put", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, result ->
             Log.d(TAG, request.cUrlString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
 
-        "/put".httpPut(listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        "/put".httpPut(listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, result ->
             Log.d(TAG, request.toString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
 
     }
 
     fun httpPost() {
-        Fuel.post("/post", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        Fuel.post("/post", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, result ->
             Log.d(TAG, request.cUrlString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
 
-        "/post".httpPost(listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        "/post".httpPost(listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, result ->
             Log.d(TAG, request.toString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
 
     }
 
     fun httpDelete() {
-        Fuel.delete("/delete", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        Fuel.delete("/delete", listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, result ->
             Log.d(TAG, request.cUrlString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
 
-        "/delete".httpDelete(listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, either ->
+        "/delete".httpDelete(listOf("foo" to "foo", "bar" to "bar")).responseString { request, response, result ->
             Log.d(TAG, request.toString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
 
     }
@@ -106,9 +107,9 @@ public class MainActivity : AppCompatActivity() {
             File(filesDir, "test.tmp")
         }.progress { readBytes, totalBytes ->
             Log.v(TAG, "Download: ${readBytes.toFloat() / totalBytes.toFloat()}")
-        }.responseString { request, response, either ->
+        }.responseString { request, response, result ->
             Log.d(TAG, request.toString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
     }
 
@@ -117,29 +118,29 @@ public class MainActivity : AppCompatActivity() {
             File(filesDir, "test.tmp")
         }.progress { writtenBytes, totalBytes ->
             Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
-        }.responseString { request, response, either ->
+        }.responseString { request, response, result ->
             Log.d(TAG, request.toString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
     }
 
     fun httpBasicAuthentication() {
         val username = "U$3|2|\\|@me"
         val password = "P@$\$vv0|2|)"
-        Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, either ->
+        Fuel.get("/basic-auth/$username/$password").authenticate(username, password).responseString { request, response, result ->
             Log.d(TAG, request.toString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
 
-        "/basic-auth/$username/$password".httpGet().authenticate(username, password).responseString { request, response, either ->
+        "/basic-auth/$username/$password".httpGet().authenticate(username, password).responseString { request, response, result ->
             Log.d(TAG, request.toString())
-            updateUI(response, either)
+            updateUI(response, result)
         }
     }
 
-    fun <T> updateUI(response: Response, either: Either<FuelError, T>) {
+    fun <T : Any> updateUI(response: Response, result: Result<T, FuelError>) {
         //multi-declaration
-        val (error, data) = either
+        val (data, error) = result
         if (error != null) {
             Log.e(TAG, response.toString())
             Log.e(TAG, error.toString())

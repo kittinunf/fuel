@@ -1,6 +1,9 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.get
+import com.github.kittinunf.result.getAs
 import org.junit.Before
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
@@ -35,11 +38,11 @@ class RequestValidationTest : BaseTestCase() {
         var error: FuelError? = null
 
         //this validate (200..299) which should fail with 418
-        manager.request(Method.GET, "/status/$preDefinedStatusCode").response { req, res, either ->
+        manager.request(Method.GET, "/status/$preDefinedStatusCode").response { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -66,11 +69,11 @@ class RequestValidationTest : BaseTestCase() {
         var error: FuelError? = null
 
         //this validate (200..299) which should fail with 418
-        manager.request(Method.GET, "/status/$preDefinedStatusCode").validate(200..202).responseString { req, res, either ->
+        manager.request(Method.GET, "/status/$preDefinedStatusCode").validate(200..202).responseString { req, res, result ->
             request = req
             response = res
 
-            val (d, err) = either.swap()
+            val (d, err) = result
             data = d
             error = err
 
@@ -95,16 +98,16 @@ class RequestValidationTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.request(Method.GET, "/status/$preDefineStatusCode").validate(400..419).response { req, res, either ->
+        manager.request(Method.GET, "/status/$preDefineStatusCode").validate(400..419).response { req, res, result ->
             request = req
             response = res
 
-            when (either) {
-                is Either.Left -> {
-                    error = either.get()
+            when (result) {
+                is Result.Failure -> {
+                    error = result.getAs()
                 }
-                is Either.Right -> {
-                    data = either.get()
+                is Result.Success -> {
+                    data = result.getAs()
                 }
             }
 

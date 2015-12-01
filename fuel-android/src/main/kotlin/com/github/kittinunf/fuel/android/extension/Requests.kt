@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel.android.extension
 
 import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.result.Result
 import org.json.JSONObject
 
 /**
@@ -8,7 +9,7 @@ import org.json.JSONObject
  */
 
 //jsonObject
-public fun Request.responseJson(handler: (Request, Response, Either<FuelError, JSONObject>) -> Unit): Unit =
+public fun Request.responseJson(handler: (Request, Response, Result<JSONObject, FuelError>) -> Unit): Unit =
         response(jsonDeserializer(), handler)
 
 public fun Request.responseJson(handler: Handler<JSONObject>): Unit = response(jsonDeserializer(), handler)

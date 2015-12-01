@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.util.Base64
 import com.github.kittinunf.fuel.util.copyTo
 import com.github.kittinunf.fuel.util.readWriteLazy
 import com.github.kittinunf.fuel.util.toHexString
+import com.github.kittinunf.result.Result
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
@@ -160,19 +161,19 @@ public class Request {
     }
 
     //byte array
-    public fun response(handler: (Request, Response, Either<FuelError, ByteArray>) -> Unit): Unit =
+    public fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit): Unit =
             response(byteArrayDeserializer(), handler)
 
     public fun response(handler: Handler<ByteArray>): Unit = response(byteArrayDeserializer(), handler)
 
     //string
-    public fun responseString(handler: (Request, Response, Either<FuelError, String>) -> Unit): Unit =
+    public fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit): Unit =
             response(stringDeserializer(), handler)
 
     public fun responseString(handler: Handler<String>): Unit = response(stringDeserializer(), handler)
 
     //object
-    public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Either<FuelError, T>) -> Unit): Unit = response(deserializer, handler)
+    public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit): Unit = response(deserializer, handler)
 
     public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): Unit = response(deserializer, handler)
 
