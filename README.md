@@ -19,10 +19,8 @@ The easiest HTTP networking library in Kotlin for Android.
 ### Gradle
 
 ``` Groovy
-buildscript {
-    repositories {
-        jcenter()
-    }
+repositories {
+    jcenter()
 }
 
 dependencies {
