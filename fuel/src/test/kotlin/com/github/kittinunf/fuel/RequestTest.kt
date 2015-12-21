@@ -370,7 +370,7 @@ class RequestTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/2097152").responseString { req, res, result ->
+        val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString { req, res, result ->
             response = res
 
             val (d, err) = result
@@ -378,7 +378,7 @@ class RequestTest : BaseTestCase() {
             error = err
         }
 
-        Thread.sleep(1000)
+        Thread.sleep(500)
         request.cancel()
 
         println(request.cUrlString())
