@@ -27,8 +27,8 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.kittinunf.fuel:fuel:0.62' //for JVM
-    compile 'com.github.kittinunf.fuel:fuel-android:0.62' //for Android
+    compile 'com.github.kittinunf.fuel:fuel:0.65' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:0.65' //for Android
 }
 ```
 
@@ -283,6 +283,7 @@ Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request,
 * If one wants to cancel on-going request, one could call `cancel` on the request object
 ``` Kotlin
 val request = Fuel.get("http://httpbin.org/get").response { request, response, result ->
+    // if request is cancelled successfully, response callback will not be called. Interrupt callback (if provided) will be called instead
 }
 
 //later
@@ -294,7 +295,10 @@ request.cancel() //this will cancel on-going request
 val request = Fuel.get("http://httpbin.org/get").interrupt { request -> 
     println("${request.url} was interrupted and cancelled")
 }.response { request, response, result ->
+    // if request is cancelled successfully, response callback will not be called. Interrupt callback (if provided) will be called instead
 }
+
+request.cancel()
 ```
 
 ## Advanced Configuration
