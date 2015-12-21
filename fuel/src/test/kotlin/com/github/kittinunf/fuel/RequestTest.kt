@@ -366,35 +366,26 @@ class RequestTest : BaseTestCase() {
 
     @Test
     fun httpGetRequestCancel() {
-
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
-        val request = manager.request(Method.GET, "http://httpbin.org/delay/100").responseString { req, res, result ->
+        val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/2097152").responseString { req, res, result ->
             response = res
 
             val (d, err) = result
             data = d
             error = err
-
         }
 
-        var i = 0
-        while(++i > 0) {
-            if (i == 100) {
-                request.cancel()
-                break
-            }
-        }
+        Thread.sleep(1000)
+        request.cancel()
 
         println(request.cUrlString())
         assertNotNull(request, "request should not be null")
         assertNull(response, "response should be null")
         assertNull(data, "data should be null")
-
-        assertTrue { true }
-
+        assertNull(error, "error should be null")
     }
 
 }

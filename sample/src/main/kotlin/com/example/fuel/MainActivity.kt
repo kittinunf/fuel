@@ -36,14 +36,14 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun execute() {
-        //        httpGet()
-        //        httpPut()
-        //        httpPost()
-        //        httpDelete()
-        //        httpDownload()
-        //        httpUpload()
-        //        httpBasicAuthentication()
-        //        httpResponseObject()
+        httpGet()
+        httpPut()
+        httpPost()
+        httpDelete()
+        httpDownload()
+        httpUpload()
+        httpBasicAuthentication()
+        httpResponseObject()
         httpCancel()
     }
 
