@@ -9,10 +9,10 @@ import org.json.JSONObject
  */
 
 //jsonObject
-public fun Request.responseJson(handler: (Request, Response, Result<JSONObject, FuelError>) -> Unit): Unit =
+public fun Request.responseJson(handler: (Request, Response, Result<JSONObject, FuelError>) -> Unit) =
         response(jsonDeserializer(), handler)
 
-public fun Request.responseJson(handler: Handler<JSONObject>): Unit = response(jsonDeserializer(), handler)
+public fun Request.responseJson(handler: Handler<JSONObject>) = response(jsonDeserializer(), handler)
 
 public fun jsonDeserializer(): Deserializable<JSONObject> {
     return object : Deserializable<JSONObject> {

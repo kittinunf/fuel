@@ -6,7 +6,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.example.kotlin.fuel"
+        applicationId "com.example.fuel"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
@@ -48,7 +48,7 @@ dependencies {
 buildscript {
     ext {
         android_support_version = '23.1.1'
-        kotlin_version = '1.0.0-beta-2423'
+        kotlin_version = '1.0.0-beta-3595'
         gson_version = '2.3.1'
     }
 

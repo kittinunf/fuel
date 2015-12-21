@@ -9,7 +9,8 @@ import kotlin.properties.Delegates
 
 public class Response {
 
-    var url: URL by Delegates.notNull()
+    lateinit var url: URL
+
     var httpStatusCode = -1
     var httpResponseMessage = ""
     var httpResponseHeaders = emptyMap<String, List<String>>()

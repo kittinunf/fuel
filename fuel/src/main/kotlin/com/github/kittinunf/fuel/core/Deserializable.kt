@@ -1,8 +1,6 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.get
-import com.github.kittinunf.result.getAs
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -39,25 +37,27 @@ public interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 
 }
 
-public fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit) {
+public fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit): Request {
     response(deserializable, { request, response, value ->
         handler(this@response, response, Result.Success(value))
     }, { request, response, error ->
         handler(this@response, response, Result.Failure(error))
     })
+    return this
 }
 
-public fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>) {
+public fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>): Request {
     response(deserializable, { request, response, value ->
         handler.success(request, response, value)
     }, { request, response, error ->
         handler.failure(request, response, error)
     })
+    return this
 }
 
 private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
                                                               success: (Request, Response, T) -> Unit,
-                                                              failure: (Request, Response, FuelError) -> Unit) {
+                                                              failure: (Request, Response, FuelError) -> Unit): Request {
     taskRequest.apply {
         successCallback = { response ->
 
@@ -80,4 +80,6 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     }
 
     submit(taskRequest)
+
+    return this
 }

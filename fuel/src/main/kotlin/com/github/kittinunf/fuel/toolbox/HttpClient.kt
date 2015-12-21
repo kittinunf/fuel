@@ -3,7 +3,9 @@ package com.github.kittinunf.fuel.toolbox
 import com.github.kittinunf.fuel.core.*
 import java.io.BufferedOutputStream
 import java.io.IOException
+import java.io.InterruptedIOException
 import java.net.HttpURLConnection
+import java.net.URLConnection
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.zip.GZIPInputStream
@@ -13,23 +15,13 @@ import javax.net.ssl.*
  * Created by Kittinun Vantasin on 5/15/15.
  */
 
-class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()) : Client {
+class HttpClient(val socketFactory: SSLSocketFactory = defaultSocketFactory()) : Client {
 
     override fun executeRequest(request: Request): Response {
-        val connection = if (request.url.protocol.equals("https")) {
-            val conn = request.url.openConnection() as HttpsURLConnection
-            conn.apply {
-                this.sslSocketFactory = sslSocketFactory
-                hostnameVerifier = object : HostnameVerifier {
-                    override fun verify(hostname: String?, session: SSLSession?) = true
-                }
-            }
-        } else {
-            request.url.openConnection() as HttpURLConnection
-        }
-
         val response = Response()
         response.url = request.url
+
+        val connection = establishConnection(request) as HttpURLConnection
 
         try {
             connection.apply {
@@ -56,8 +48,11 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
                 val dataStream = if (connection.errorStream != null) {
                     connection.errorStream
                 } else {
-                    try { connection.inputStream
-                    } catch(exception: IOException) { null }
+                    try {
+                        connection.inputStream
+                    } catch(exception: IOException) {
+                        null
+                    }
                 }
 
                 if (dataStream != null) {
@@ -73,10 +68,7 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
                     httpStatusCode = connection.responseCode
                     httpResponseMessage = connection.responseMessage
                 } catch(exception: IOException) {
-                    throw FuelError().apply {
-                        this.exception = exception
-                        this.errorData = response.data
-                    }
+                    throw exception
                 }
             }
         } catch(exception: Exception) {
@@ -86,6 +78,18 @@ class HttpClient(val sslSocketFactory: SSLSocketFactory = defaultSocketFactory()
             }
         } finally {
             connection.disconnect()
+        }
+    }
+
+    private fun establishConnection(request: Request): URLConnection {
+        return if (request.url.protocol.equals("https")) {
+            val conn = request.url.openConnection() as HttpsURLConnection
+            conn.apply {
+                sslSocketFactory = socketFactory
+                hostnameVerifier = HostnameVerifier { hostname, session -> true }
+            }
+        } else {
+            request.url.openConnection() as HttpURLConnection
         }
     }
 

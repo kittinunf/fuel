@@ -1,15 +1,17 @@
 package com.example.fuel
 
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.kittinunf.fuel.*
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
-import kotlinx.android.synthetic.activity_main.mainClearButton
-import kotlinx.android.synthetic.activity_main.mainGoButton
-import kotlinx.android.synthetic.activity_main.mainResultText
+import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.Reader
 
@@ -34,14 +36,27 @@ public class MainActivity : AppCompatActivity() {
     }
 
     fun execute() {
-        httpGet()
-        httpPut()
-        httpPost()
-        httpDelete()
-        httpDownload()
-        httpUpload()
-        httpBasicAuthentication()
-        httpResponseObject()
+        //        httpGet()
+        //        httpPut()
+        //        httpPost()
+        //        httpDelete()
+        //        httpDownload()
+        //        httpUpload()
+        //        httpBasicAuthentication()
+        //        httpResponseObject()
+        httpCancel()
+    }
+
+    fun httpCancel() {
+        val request = Fuel.get("/delay/10").interrupt {
+            Log.d(TAG, it.url.toString() + " is interrupted")
+        }.responseString { request, response, result ->
+            updateUI(response, result)
+        }
+
+        Handler().postDelayed({
+            request.cancel()
+        }, 1000)
     }
 
     fun httpResponseObject() {

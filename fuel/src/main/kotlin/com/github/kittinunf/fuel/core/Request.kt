@@ -12,7 +12,7 @@ import java.nio.charset.Charset
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
-import kotlin.properties.Delegates
+import java.util.concurrent.Future
 
 /**
  * Created by Kittinun Vantasin on 5/13/15.
@@ -29,9 +29,9 @@ public class Request {
     val timeoutInMillisecond = 15000
 
     var type: Type = Type.REQUEST
-    var httpMethod: Method by Delegates.notNull()
-    var path: String by Delegates.notNull()
-    var url: URL by Delegates.notNull()
+    lateinit var httpMethod: Method
+    lateinit var path: String
+    lateinit var url: URL
     var httpBody: ByteArray = ByteArray(0)
 
     var httpHeaders by readWriteLazy {
@@ -52,9 +52,11 @@ public class Request {
         }
     }
 
+    private var taskFuture: Future<Unit>? = null
+
     //callers
-    var executor: ExecutorService by Delegates.notNull()
-    var callbackExecutor: Executor by Delegates.notNull()
+    lateinit var executor: ExecutorService
+    lateinit var callbackExecutor: Executor
 
     companion object {
 
@@ -150,8 +152,15 @@ public class Request {
         return this
     }
 
+    public fun interrupt(interrupt: (Request) -> Unit): Request {
+        taskRequest.apply {
+            interruptCallback = interrupt
+        }
+        return this
+    }
+
     fun submit(callable: Callable<Unit>) {
-        executor.submit(callable)
+        taskFuture = executor.submit(callable)
     }
 
     fun callback(f: () -> Unit) {
@@ -160,22 +169,26 @@ public class Request {
         }
     }
 
+    public fun cancel() {
+        taskFuture?.cancel(true)
+    }
+
     //byte array
-    public fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit): Unit =
+    public fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit) =
             response(byteArrayDeserializer(), handler)
 
-    public fun response(handler: Handler<ByteArray>): Unit = response(byteArrayDeserializer(), handler)
+    public fun response(handler: Handler<ByteArray>) = response(byteArrayDeserializer(), handler)
 
     //string
-    public fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit): Unit =
+    public fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit) =
             response(stringDeserializer(), handler)
 
-    public fun responseString(handler: Handler<String>): Unit = response(stringDeserializer(), handler)
+    public fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
 
     //object
-    public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit): Unit = response(deserializer, handler)
+    public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit) = response(deserializer, handler)
 
-    public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): Unit = response(deserializer, handler)
+    public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) = response(deserializer, handler)
 
     public fun cUrlString(): String {
         val elements = arrayListOf("$ curl -i")
@@ -222,6 +235,7 @@ public class Request {
 
         var successCallback: ((Response) -> Unit)? = null
         var failureCallback: ((FuelError, Response) -> Unit)? = null
+        var interruptCallback: ((Request) -> Unit)? = null
 
         var validator: (Response) -> Boolean = { response ->
             (200..299).contains(response.httpStatusCode)
@@ -233,10 +247,14 @@ public class Request {
 
                 //dispatch
                 dispatchCallback(response)
-            } catch (error: FuelError) {
-                val response = Response()
-                response.url = request.url
-                failureCallback?.invoke(error, response)
+            } catch(error: FuelError) {
+                if (error.exception as? InterruptedIOException != null) {
+                    interruptCallback?.invoke(request)
+                } else {
+                    val response = Response()
+                    response.url = request.url
+                    failureCallback?.invoke(error, response)
+                }
             }
         }
 
@@ -260,15 +278,16 @@ public class Request {
         val BUFFER_SIZE = 1024
 
         var progressCallback: ((Long, Long) -> Unit)? = null
-        var destinationCallback: ((Response, URL) -> File)? = null
+        lateinit var destinationCallback: ((Response, URL) -> File)
 
-        var dataStream: InputStream by Delegates.notNull()
-        var fileOutputStream: FileOutputStream by Delegates.notNull()
+        lateinit var dataStream: InputStream
+        lateinit var fileOutputStream: FileOutputStream
 
         override fun call() {
             try {
                 val response = Manager.instance.client.executeRequest(request)
-                val file = destinationCallback?.invoke(response, request.url)!!
+
+                val file = destinationCallback.invoke(response, request.url)
 
                 //file output
                 fileOutputStream = FileOutputStream(file)
@@ -281,9 +300,13 @@ public class Request {
                 //dispatch
                 dispatchCallback(response)
             } catch(error: FuelError) {
-                val response = Response()
-                response.url = request.url
-                failureCallback?.invoke(error, response)
+                if (error.exception as? InterruptedIOException != null) {
+                    interruptCallback?.invoke(request)
+                } else {
+                    val response = Response()
+                    response.url = request.url
+                    failureCallback?.invoke(error, response)
+                }
             } catch(ex: Exception) {
                 val error = FuelError().apply {
                     exception = ex
@@ -307,10 +330,10 @@ public class Request {
         val boundary = System.currentTimeMillis().toHexString()
 
         var progressCallback: ((Long, Long) -> Unit)? = null
-        var sourceCallback: ((Request, URL) -> File) by Delegates.notNull()
+        lateinit var sourceCallback: ((Request, URL) -> File)
 
-        var dataStream: ByteArrayOutputStream by Delegates.notNull()
-        var fileInputStream: FileInputStream by Delegates.notNull()
+        lateinit var dataStream: ByteArrayOutputStream
+        lateinit var fileInputStream: FileInputStream
 
         override fun call() {
             try {
@@ -347,9 +370,13 @@ public class Request {
                 //dispatch
                 dispatchCallback(response)
             } catch(error: FuelError) {
-                val response = Response()
-                response.url = request.url
-                failureCallback?.invoke(error, response)
+                if (error.exception as? InterruptedIOException != null) {
+                    interruptCallback?.invoke(request)
+                } else {
+                    val response = Response()
+                    response.url = request.url
+                    failureCallback?.invoke(error, response)
+                }
             } catch(ex: Exception) {
                 val error = FuelError().apply {
                     exception = ex

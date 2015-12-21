@@ -364,4 +364,37 @@ class RequestTest : BaseTestCase() {
         assertTrue(string.contains(paramValue), "url query param should be sent along with url, $paramValue")
     }
 
+    @Test
+    fun httpGetRequestCancel() {
+
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val request = manager.request(Method.GET, "http://httpbin.org/delay/100").responseString { req, res, result ->
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+
+        }
+
+        var i = 0
+        while(++i > 0) {
+            if (i == 100) {
+                request.cancel()
+                break
+            }
+        }
+
+        println(request.cUrlString())
+        assertNotNull(request, "request should not be null")
+        assertNull(response, "response should be null")
+        assertNull(data, "data should be null")
+
+        assertTrue { true }
+
+    }
+
 }
