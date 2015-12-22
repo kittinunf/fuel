@@ -27,8 +27,8 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.github.kittinunf.fuel:fuel:0.65' //for JVM
-    compile 'com.github.kittinunf.fuel:fuel-android:0.65' //for Android
+    compile 'com.github.kittinunf.fuel:fuel:0.66' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:0.66' //for Android
 }
 ```
 
@@ -292,7 +292,7 @@ request.cancel() //this will cancel on-going request
 
 * Also, interrupt request can be further processed with interrupt callback
 ``` Kotlin
-val request = Fuel.get("http://httpbin.org/get").interrupt { request -> 
+val request = Fuel.get("http://httpbin.org/get").interrupt { request ->
     println("${request.url} was interrupted and cancelled")
 }.response { request, response, result ->
     // if request is cancelled successfully, response callback will not be called. Interrupt callback (if provided) will be called instead
@@ -395,7 +395,7 @@ Fuel.get("/get").response { request, response, result ->
 
 * `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Client.kt) protocol, and set back to `Manager.instance` to kick off the effect.
 
-* `keyStore` is configurable by user. By default it is `null`. 
+* `keyStore` is configurable by user. By default it is `null`.
 
 * `socketFactory` can be supplied by user. If `keyStore` is not null, `socketFactory` will be derived from it.
 
