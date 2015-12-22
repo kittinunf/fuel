@@ -1,7 +1,6 @@
 package com.github.kittinunf.fuel.core
 
 import java.net.URL
-import kotlin.properties.Delegates
 
 /**
  * Created by Kittinun Vantasin on 5/13/15.

@@ -378,7 +378,6 @@ class RequestTest : BaseTestCase() {
             error = err
         }
 
-        Thread.sleep(500)
         request.cancel()
 
         println(request.cUrlString())

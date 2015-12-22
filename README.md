@@ -395,8 +395,14 @@ Fuel.get("/get").response { request, response, result ->
 
 * `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Client.kt) protocol, and set back to `Manager.instance` to kick off the effect.
 
+* `keyStore` is configurable by user. By default it is `null`. 
+
+* `socketFactory` can be supplied by user. If `keyStore` is not null, `socketFactory` will be derived from it.
+
+* `hostnameVerifier` is configurable by user. By default, it is just ignore it by returning `true` to all hostnames. If this is not what you want, please consider provide it.
+
 ## Other libraries
-If you like Fuel, you might also like other libraries by the following;
+If you like Fuel, you might also like other libraries;
 * [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
 * [Kovenant](https://github.com/mplatvoet/kovenant) - Kovenant. Promises for Kotlin.
 

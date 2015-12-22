@@ -3,19 +3,16 @@ package com.github.kittinunf.fuel.toolbox
 import com.github.kittinunf.fuel.core.*
 import java.io.BufferedOutputStream
 import java.io.IOException
-import java.io.InterruptedIOException
 import java.net.HttpURLConnection
 import java.net.URLConnection
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
 import java.util.zip.GZIPInputStream
-import javax.net.ssl.*
+import javax.net.ssl.HttpsURLConnection
 
 /**
  * Created by Kittinun Vantasin on 5/15/15.
  */
 
-class HttpClient(val socketFactory: SSLSocketFactory = defaultSocketFactory()) : Client {
+class HttpClient : Client {
 
     override fun executeRequest(request: Request): Response {
         val response = Response()
@@ -85,8 +82,8 @@ class HttpClient(val socketFactory: SSLSocketFactory = defaultSocketFactory()) :
         return if (request.url.protocol.equals("https")) {
             val conn = request.url.openConnection() as HttpsURLConnection
             conn.apply {
-                sslSocketFactory = socketFactory
-                hostnameVerifier = HostnameVerifier { hostname, session -> true }
+                sslSocketFactory = request.socketFactory
+                hostnameVerifier = request.hostnameVerifier
             }
         } else {
             request.url.openConnection() as HttpURLConnection
@@ -110,23 +107,4 @@ class HttpClient(val socketFactory: SSLSocketFactory = defaultSocketFactory()) :
 
 }
 
-fun defaultSocketFactory(): SSLSocketFactory {
-    val trustAllCerts = arrayOf(object : X509TrustManager {
 
-        override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String) {
-        }
-
-        override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String) {
-        }
-
-        override fun getAcceptedIssuers(): Array<out X509Certificate>? {
-            return null
-        }
-
-    })
-
-    val sslContext = SSLContext.getInstance("SSL")
-    sslContext.init(null, trustAllCerts, SecureRandom())
-
-    return sslContext.socketFactory
-}

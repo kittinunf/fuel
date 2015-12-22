@@ -13,6 +13,8 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.SSLSocketFactory
 
 /**
  * Created by Kittinun Vantasin on 5/13/15.
@@ -53,6 +55,10 @@ public class Request {
     }
 
     private var taskFuture: Future<Unit>? = null
+
+    //configuration
+    var socketFactory: SSLSocketFactory? = null
+    var hostnameVerifier: HostnameVerifier? = null
 
     //callers
     lateinit var executor: ExecutorService
