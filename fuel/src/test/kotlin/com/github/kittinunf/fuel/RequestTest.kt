@@ -51,11 +51,11 @@ class RequestTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.request(Method.GET, "http://httpbin.org/get").response { req, res, either ->
+        manager.request(Method.GET, "http://httpbin.org/get").response { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -79,11 +79,11 @@ class RequestTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.request(Method.GET, "http://httpbin.org/get").responseString { req, res, either ->
+        manager.request(Method.GET, "http://httpbin.org/get").responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -111,11 +111,11 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(Method.GET, "http://httpbin.org/get", listOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.GET, "http://httpbin.org/get", listOf(paramKey to paramValue)).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -145,11 +145,11 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(Method.GET, "http://httpbin.org/get", listOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.GET, "http://httpbin.org/get", listOf(paramKey to paramValue)).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -178,11 +178,11 @@ class RequestTest : BaseTestCase() {
 
         val body = "{ \"foo\" : \"bar\" }"
 
-        manager.request(Method.POST, "http://httpbin.org/post").body(body).responseString { req, res, either ->
+        manager.request(Method.POST, "http://httpbin.org/post").body(body).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -212,11 +212,11 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(Method.PUT, "http://httpbin.org/put", listOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.PUT, "http://httpbin.org/put", listOf(paramKey to paramValue)).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -246,11 +246,11 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(Method.DELETE, "http://httpbin.org/delete", listOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.DELETE, "http://httpbin.org/delete", listOf(paramKey to paramValue)).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -277,11 +277,11 @@ class RequestTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.request(Method.GET, HttpsBin.USER_AGENT).responseString { req, res, either ->
+        manager.request(Method.GET, HttpsBin.USER_AGENT).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -307,14 +307,14 @@ class RequestTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.request(HttpBinConvertible(Method.GET, "get")).responseString { req, res, either ->
+        manager.request(HttpBinConvertible(Method.GET, "get")).responseString { req, res, result ->
             request = req
             response = res
 
-            either.fold({ err ->
-                error = err
-            }, { d ->
-                data = d
+            result.fold({
+                data = it
+            }, {
+                error = it
             })
 
             lock.countDown()
@@ -339,11 +339,11 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "xxx"
 
-        manager.request(Method.POST, "http://httpbin.org/post", listOf(paramKey to paramValue)).responseString { req, res, either ->
+        manager.request(Method.POST, "http://httpbin.org/post", listOf(paramKey to paramValue)).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -362,6 +362,29 @@ class RequestTest : BaseTestCase() {
 
         assertTrue(string.contains(paramKey), "url query param should be sent along with url, $paramKey")
         assertTrue(string.contains(paramValue), "url query param should be sent along with url, $paramValue")
+    }
+
+    @Test
+    fun httpGetRequestCancel() {
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString { req, res, result ->
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        request.cancel()
+
+        println(request.cUrlString())
+        assertNotNull(request, "request should not be null")
+        assertNull(response, "response should be null")
+        assertNull(data, "data should be null")
+        assertNull(error, "error should be null")
     }
 
 }

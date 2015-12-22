@@ -3,9 +3,13 @@ package com.github.kittinunf.fuel.core
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.toolbox.HttpClient
 import com.github.kittinunf.fuel.util.readWriteLazy
+import java.security.KeyStore
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import javax.net.ssl.*
 
 /**
  * Created by Kittinun Vantasin on 5/14/15.
@@ -18,6 +22,21 @@ public class Manager {
 
     public var baseHeaders: Map<String, String>? = null
     public var baseParams: List<Pair<String, Any?>> = emptyList()
+
+    public var keystore: KeyStore? = null
+    public var socketFactory: SSLSocketFactory by readWriteLazy {
+        keystore?.let {
+            val trustFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+            trustFactory.init(it)
+            val sslContext = SSLContext.getInstance("SSL")
+            sslContext.init(null, trustFactory.trustManagers, null)
+            sslContext.socketFactory
+        } ?: unsecuredSocketFactory()
+    }
+
+    public var hostnameVerifier: HostnameVerifier by readWriteLazy {
+        unsecuredHostnameVerifier()
+    }
 
     //background executor
     public var executor: ExecutorService by readWriteLazy {
@@ -47,6 +66,8 @@ public class Manager {
             parameters = if (param == null) baseParams else baseParams + param
         })
 
+        request.socketFactory = socketFactory
+        request.hostnameVerifier = hostnameVerifier
         request.executor = executor
         request.callbackExecutor = callbackExecutor
         return request
@@ -60,6 +81,8 @@ public class Manager {
             parameters = if (param == null) baseParams else baseParams + param
         })
 
+        request.socketFactory = socketFactory
+        request.hostnameVerifier = hostnameVerifier
         request.executor = executor
         request.callbackExecutor = callbackExecutor
         return request
@@ -74,6 +97,8 @@ public class Manager {
             requestType = Request.Type.DOWNLOAD
         }.request
 
+        request.socketFactory = socketFactory
+        request.hostnameVerifier = hostnameVerifier
         request.executor = executor
         request.callbackExecutor = callbackExecutor
         return request
@@ -88,6 +113,8 @@ public class Manager {
             requestType = Request.Type.DOWNLOAD
         }.request
 
+        request.socketFactory = socketFactory
+        request.hostnameVerifier = hostnameVerifier
         request.executor = executor
         request.callbackExecutor = callbackExecutor
         return request
@@ -102,6 +129,8 @@ public class Manager {
             requestType = Request.Type.UPLOAD
         }.request
 
+        request.socketFactory = socketFactory
+        request.hostnameVerifier = hostnameVerifier
         request.executor = executor
         request.callbackExecutor = callbackExecutor
         return request
@@ -116,6 +145,8 @@ public class Manager {
             requestType = Request.Type.UPLOAD
         }.request
 
+        request.socketFactory = socketFactory
+        request.hostnameVerifier = hostnameVerifier
         request.executor = executor
         request.callbackExecutor = callbackExecutor
         return request
@@ -123,10 +154,35 @@ public class Manager {
 
     fun request(convertible: Fuel.RequestConvertible): Request {
         val request = convertible.request
-
+        request.socketFactory = socketFactory
+        request.hostnameVerifier = hostnameVerifier
         request.executor = executor
         request.callbackExecutor = callbackExecutor
         return request
+    }
+
+    private fun unsecuredSocketFactory(): SSLSocketFactory {
+        val trustAllCerts = arrayOf(object : X509TrustManager {
+
+            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String) {
+            }
+
+            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String) {
+            }
+
+            override fun getAcceptedIssuers(): Array<out X509Certificate>? {
+                return null
+            }
+
+        })
+
+        val sslContext = SSLContext.getInstance("SSL")
+        sslContext.init(null, trustAllCerts, SecureRandom())
+        return sslContext.socketFactory
+    }
+
+    private fun unsecuredHostnameVerifier(): HostnameVerifier {
+        return HostnameVerifier { hostname, session -> true }
     }
 
 }

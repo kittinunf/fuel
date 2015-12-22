@@ -54,11 +54,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.get("/get").responseString { req, res, either ->
+        Fuel.get("/get").responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -86,11 +86,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.post("/post").responseString { req, res, either ->
+        Fuel.post("/post").responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -119,11 +119,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.put("/put").responseString { req, res, either ->
+        Fuel.put("/put").responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -152,11 +152,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.delete("/delete").responseString { req, res, either ->
+        Fuel.delete("/delete").responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -185,11 +185,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.get(HttpsBin.IP).responseString { req, res, either ->
+        Fuel.get(HttpsBin.IP).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -216,11 +216,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.post(HttpsBin.POST).responseString { req, res, either ->
+        Fuel.post(HttpsBin.POST).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -247,11 +247,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.put(HttpsBin.PUT).responseString { req, res, either ->
+        Fuel.put(HttpsBin.PUT).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -278,11 +278,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.delete(HttpsBin.DELETE).responseString { req, res, either ->
+        Fuel.delete(HttpsBin.DELETE).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -309,11 +309,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.request(HttpBinConvertible(Method.GET, "/get")).responseString { req, res, either ->
+        Fuel.request(HttpBinConvertible(Method.GET, "/get")).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -336,11 +336,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.request(HttpBinConvertible(Method.POST, "/post")).responseString { req, res, either ->
+        Fuel.request(HttpBinConvertible(Method.POST, "/post")).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -363,11 +363,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.request(HttpBinConvertible(Method.PUT, "/put")).responseString { req, res, either ->
+        Fuel.request(HttpBinConvertible(Method.PUT, "/put")).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -390,11 +390,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.request(HttpBinConvertible(Method.DELETE, "/delete")).responseString { req, res, either ->
+        Fuel.request(HttpBinConvertible(Method.DELETE, "/delete")).responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -427,10 +427,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
             read = readBytes
             total = totalBytes
             println("read: $read, total: $total")
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -466,10 +466,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
         }.progress { readBytes, totalBytes ->
             read = readBytes
             total = totalBytes
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 

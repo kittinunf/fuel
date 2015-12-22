@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.result.Result
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -9,7 +10,7 @@ import java.io.Reader
  * Created by Kittinun Vantasin on 8/16/15.
  */
 
-public interface Deserializable<out T: Any> {
+public interface Deserializable<out T : Any> {
 
     fun deserialize(response: Response): T
 
@@ -36,43 +37,37 @@ public interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 
 }
 
-public fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Either<FuelError, T>) -> Unit) {
+public fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit): Request {
     response(deserializable, { request, response, value ->
-        handler(this@response, response, Either.Right(value))
+        handler(this@response, response, Result.Success(value))
     }, { request, response, error ->
-        handler(this@response, response, Either.Left(error))
+        handler(this@response, response, Result.Failure(error))
     })
+    return this
 }
 
-public fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>) {
+public fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>): Request {
     response(deserializable, { request, response, value ->
         handler.success(request, response, value)
     }, { request, response, error ->
         handler.failure(request, response, error)
     })
+    return this
 }
 
-private fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U,
-                                                        success: (Request, Response, T) -> Unit,
-                                                        failure: (Request, Response, FuelError) -> Unit) {
+private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
+                                                              success: (Request, Response, T) -> Unit,
+                                                              failure: (Request, Response, FuelError) -> Unit): Request {
     taskRequest.apply {
         successCallback = { response ->
 
-            val deliverable: Either<Exception, T> =
-                    try {
-                        Either.Right(deserializable.deserialize(response))
-                    } catch(exception: Exception) {
-                        Either.Left(exception)
-                    }
+            val deliverable = Result.of { deserializable.deserialize(response) }
 
             callback {
                 deliverable.fold({
-                    val error = FuelError().apply {
-                        exception = deliverable.get()
-                    }
-                    failure(this@response, response, error)
-                }, {
                     success(this@response, response, it)
+                }, {
+                    failure(this@response, response, FuelError().apply { exception = it })
                 })
             }
         }
@@ -85,4 +80,6 @@ private fun <T: Any, U : Deserializable<T>> Request.response(deserializable: U,
     }
 
     submit(taskRequest)
+
+    return this
 }

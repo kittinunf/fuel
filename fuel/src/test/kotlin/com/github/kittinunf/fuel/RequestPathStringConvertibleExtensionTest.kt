@@ -46,11 +46,11 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        HttpsBin.COOKIES.httpGet().responseString { req, res, either ->
+        HttpsBin.COOKIES.httpGet().responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -73,11 +73,11 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        HttpsBin.POST.httpPost().responseString { req, res, either ->
+        HttpsBin.POST.httpPost().responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -104,11 +104,11 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        HttpsBin.PUT.httpPut().responseString { req, res, either ->
+        HttpsBin.PUT.httpPut().responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -135,11 +135,11 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        HttpsBin.DELETE.httpDelete().responseString { req, res, either ->
+        HttpsBin.DELETE.httpDelete().responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -170,11 +170,11 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -199,11 +199,11 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
         HttpsBin.DOWNLOAD.httpDownload().destination { response, url ->
             File.createTempFile(123456.toString(), null)
-        }.responseString { req, res, either ->
+        }.responseString { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 

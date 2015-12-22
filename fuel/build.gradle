@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "com.github.kittinunf.result:result:$result_version"
 
     testCompile "junit:junit:$junit_version"
 }
@@ -20,7 +21,8 @@ dependencies {
 buildscript {
     ext {
         //dependencies version
-        kotlin_version = '1.0.0-beta-2423'
+        kotlin_version = '1.0.0-beta-3595'
+        result_version = '0.31'
 
         //test dependencies version
         junit_version = '4.12'

@@ -51,11 +51,11 @@ class RequestObjectTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.get("user-agent").responseObject(HttpBinUserAgentModelDeserializer()) { req, res, either ->
+        Fuel.get("user-agent").responseObject(HttpBinUserAgentModelDeserializer()) { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -79,11 +79,11 @@ class RequestObjectTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.get("user-agent").responseObject(HttpBinMalformedDeserializer()) { req, res, either ->
+        Fuel.get("user-agent").responseObject(HttpBinMalformedDeserializer()) { req, res, result ->
             request = req
             response = res
 
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 

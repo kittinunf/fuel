@@ -1,7 +1,6 @@
 package com.github.kittinunf.fuel.core
 
 import java.net.URL
-import kotlin.properties.Delegates
 
 /**
  * Created by Kittinun Vantasin on 5/13/15.
@@ -9,7 +8,8 @@ import kotlin.properties.Delegates
 
 public class Response {
 
-    var url: URL by Delegates.notNull()
+    lateinit var url: URL
+
     var httpStatusCode = -1
     var httpResponseMessage = ""
     var httpResponseHeaders = emptyMap<String, List<String>>()

@@ -25,11 +25,7 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
         Manager.instance.baseHeaders = mapOf("foo" to "bar")
         Manager.instance.baseParams = listOf("key" to "value")
 
-        Manager.instance.callbackExecutor = object : Executor {
-            override fun execute(command: Runnable) {
-                command.run()
-            }
-        }
+        Manager.instance.callbackExecutor = Executor { command -> command.run() }
 
     }
 
@@ -62,8 +58,8 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
         var data: Any? = null
         var err: FuelError? = null
 
-        Fuel.get("/user-agent").responseJson { request, response, either ->
-            val (e, d) = either
+        Fuel.get("/user-agent").responseJson { request, response, result ->
+            val (d, e) = result
             data = d
             err = e
 
@@ -120,8 +116,8 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
         var data: Any? = null
         var err: FuelError? = null
 
-        Fuel.get("/404").responseJson { request, response, either ->
-            val (e, d) = either
+        Fuel.get("/404").responseJson { request, response, result ->
+            val (d, e) = result
             data = d
             err = e
 
@@ -176,8 +172,8 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
         var data: Any? = null
         var err: FuelError? = null
 
-        Fuel.get("/headers").responseObject(HttpBinHeadersDeserializer()) { request, response, either ->
-            val (e, d) = either
+        Fuel.get("/headers").responseObject(HttpBinHeadersDeserializer()) { request, response, result ->
+            val (d, e) = result
             req = request
             res = response
             data = d

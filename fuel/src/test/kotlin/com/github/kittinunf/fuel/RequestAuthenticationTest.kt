@@ -41,10 +41,10 @@ class RequestAuthenticationTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.request(Method.GET, "/basic-auth/$user/$password").authenticate("invalid", "authentication").response { req, res, either ->
+        manager.request(Method.GET, "/basic-auth/$user/$password").authenticate("invalid", "authentication").response { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
@@ -69,10 +69,10 @@ class RequestAuthenticationTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.request(Method.GET, "/basic-auth/$user/$password").authenticate(user, password).response { req, res, either ->
+        manager.request(Method.GET, "/basic-auth/$user/$password").authenticate(user, password).response { req, res, result ->
             request = req
             response = res
-            val (err, d) = either
+            val (d, err) = result
             data = d
             error = err
 
