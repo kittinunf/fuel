@@ -398,7 +398,6 @@ class RequestTest : BaseTestCase() {
         // When
         val request = manager.request(Method.GET, "http://${expectedHost}/get").sync().responseString { req, res, result ->
             received = Received(res, result.value, result.error)
-            println("Received data")
         }
 
         // Then
