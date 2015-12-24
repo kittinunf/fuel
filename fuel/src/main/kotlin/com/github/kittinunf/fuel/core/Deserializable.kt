@@ -82,9 +82,7 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
 
     submit(taskRequest)
 
-    if (this.syncMode) {
-        this.taskFuture?.get(this.timeoutInMillisecond.toLong(), MILLISECONDS)
-    }
+    if (syncMode) taskFuture?.get(timeoutInMillisecond.toLong(), MILLISECONDS)
 
     return this
 }
