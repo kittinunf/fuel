@@ -402,8 +402,6 @@ class RequestTest : BaseTestCase() {
         }
 
         // Then
-        println(request.cUrlString())
-        assertNotNull(request, "request should not be null")
         assertThat(received, notNullValue())
         assertThat(received?.response, notNullValue())
         assertThat(received?.response?.httpStatusCode, `is`(200))
