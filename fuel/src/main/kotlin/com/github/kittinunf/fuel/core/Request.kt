@@ -29,6 +29,7 @@ public class Request {
     }
 
     val timeoutInMillisecond = 15000
+    var syncMode = false
 
     var type: Type = Type.REQUEST
     lateinit var httpMethod: Method
@@ -54,7 +55,7 @@ public class Request {
         }
     }
 
-    private var taskFuture: Future<Unit>? = null
+    public var taskFuture: Future<Unit>? = null
 
     //configuration
     var socketFactory: SSLSocketFactory? = null
@@ -81,6 +82,11 @@ public class Request {
                 }
             }
         }
+    }
+
+    public fun sync(): Request {
+        syncMode = true
+        return this
     }
 
     //interfaces
