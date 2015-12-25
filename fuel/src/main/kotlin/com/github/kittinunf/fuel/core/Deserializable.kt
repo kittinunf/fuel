@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
  * Created by Kittinun Vantasin on 8/16/15.
@@ -80,6 +81,8 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     }
 
     submit(taskRequest)
+
+    if (syncMode) taskFuture?.get(timeoutInMillisecond.toLong(), MILLISECONDS)
 
     return this
 }

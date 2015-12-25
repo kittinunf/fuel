@@ -1,6 +1,8 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
+import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -387,4 +389,24 @@ class RequestTest : BaseTestCase() {
         assertNull(error, "error should be null")
     }
 
+    @Test
+    fun httpGetSyncRequest() {
+        // Given
+        var expectedHost = "httpbin.org"
+        var received:Received? = null
+
+        // When
+        val request = manager.request(Method.GET, "http://${expectedHost}/get").sync().responseString { req, res, result ->
+            received = Received(res, result.value, result.error)
+        }
+
+        // Then
+        assertThat(received, notNullValue())
+        assertThat(received?.response, notNullValue())
+        assertThat(received?.response?.httpStatusCode, `is`(200))
+        assertThat(received?.data as String, containsString(expectedHost))
+        assertThat(received?.error, nullValue())
+    }
 }
+
+data class Received(val response:Response? = null, val data: Any? = null, val error:FuelError? = null)
