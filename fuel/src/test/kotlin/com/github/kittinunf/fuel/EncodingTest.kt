@@ -4,8 +4,9 @@ import com.github.kittinunf.fuel.core.Encoding
 import com.github.kittinunf.fuel.core.Method
 import org.junit.Before
 import org.junit.Test
+import org.hamcrest.CoreMatchers.`is` as isEqualTo
+import org.junit.Assert.assertThat
 import java.util.concurrent.CountDownLatch
-import kotlin.test.assertTrue
 
 /**
  * Created by Kittinun Vantasin on 9/24/15.
@@ -27,7 +28,7 @@ public class EncodingTest : BaseTestCase() {
             parameters = listOf("a" to "b")
         }.request
 
-        assertTrue { "http://www.example.com/test?a=b" == request.url.toString() }
+        assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?a=b"))
     }
 
     @Test
@@ -39,7 +40,7 @@ public class EncodingTest : BaseTestCase() {
             parameters = null
         }.request
 
-        assertTrue { "http://www.example.com/test" == request.url.toString() }
+        assertThat(request.url.toString(), isEqualTo("http://www.example.com/test"))
     }
 
     @Test
@@ -51,7 +52,7 @@ public class EncodingTest : BaseTestCase() {
             parameters = listOf("foo" to 1)
         }.request
 
-        assertTrue { "http://www.example.com/test?foo=1" == request.url.toString() }
+        assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?foo=1"))
     }
 
     @Test
@@ -63,7 +64,7 @@ public class EncodingTest : BaseTestCase() {
             parameters = listOf("foo" to 1.1)
         }.request
 
-        assertTrue { "http://www.example.com/test?foo=1.1" == request.url.toString() }
+        assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?foo=1.1"))
     }
 
     @Test
@@ -75,7 +76,7 @@ public class EncodingTest : BaseTestCase() {
             parameters = listOf("foo" to true)
         }.request
 
-        assertTrue { "http://www.example.com/test?foo=true" == request.url.toString() }
+        assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?foo=true"))
     }
 
     @Test
@@ -87,7 +88,7 @@ public class EncodingTest : BaseTestCase() {
             parameters = null
         }.request
 
-        assertTrue { "http://www.example.com/test" == request.url.toString() }
+        assertThat(request.url.toString(), isEqualTo("http://www.example.com/test"))
     }
 
     @Test
@@ -99,7 +100,7 @@ public class EncodingTest : BaseTestCase() {
             parameters = null
         }.request
 
-        assertTrue { "http://www.example.com/test?a=b" == request.url.toString() }
+        assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?a=b"))
     }
 
     @Test
@@ -111,8 +112,7 @@ public class EncodingTest : BaseTestCase() {
             parameters = null
         }.request
 
-        assertTrue("http://www.example.com/U$3%7C2%7C%5C%7C@me/P@$\$vv0%7C2%7C)" == request.url.toString(), "Found ${request.url.toString()}")
-
+        assertThat(request.url.toString(), isEqualTo("http://www.example.com/U$3%7C2%7C%5C%7C@me/P@$\$vv0%7C2%7C)"))
     }
 
 }

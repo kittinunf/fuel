@@ -5,9 +5,9 @@ import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertThat
+import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**
  * Created by Kittinun Vantasin on 5/21/15.
@@ -49,16 +49,19 @@ class RequestHeaderTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of valid request: $statusCode")
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
 
         val string = String(data as ByteArray)
-        assertTrue(string.contains(headerKey) && string.contains(headerValue), "header should be sent along with request header and present in response of httpbin.org")
+        assertThat("url query paramKey should be sent along with url and present in response of httpbin.org",
+                string, containsString(headerKey))
+        assertThat("url query paramValue should be sent along with url and present in response of httpbin.org",
+                string, containsString(headerValue))
     }
 
 }

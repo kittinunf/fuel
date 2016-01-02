@@ -5,9 +5,9 @@ import org.junit.Before
 import org.junit.Test
 import java.io.Reader
 import java.util.concurrent.CountDownLatch
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertThat
+import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**
  * Created by Kittinun Vantasin on 8/19/15.
@@ -64,12 +64,13 @@ class RequestObjectTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(data is HttpBinUserAgentModel, "data should be HttpBinUserAgentModel type")
-        assertTrue((data as HttpBinUserAgentModel).userAgent.isNotBlank(), "model must properly be serialized")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(data as HttpBinUserAgentModel, isA(HttpBinUserAgentModel::class.java))
+        assertThat((data as HttpBinUserAgentModel).userAgent, isEqualTo(not("")))
     }
 
     @Test
@@ -92,11 +93,12 @@ class RequestObjectTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNotNull(error, "error should not be null")
-        assertNull(data, "data should be null")
-        assertTrue(error?.exception is IllegalStateException, "exception is JSONException so that user can react with exception")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, notNullValue())
+        assertThat(data, nullValue())
+
+        assertThat(error?.exception as IllegalStateException, isA(IllegalStateException::class.java))
     }
 
 }

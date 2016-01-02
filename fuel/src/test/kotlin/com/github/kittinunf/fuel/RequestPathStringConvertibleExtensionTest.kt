@@ -9,9 +9,9 @@ import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertThat
+import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**
  * Created by Kittinun Vantasin on 8/10/15.
@@ -59,11 +59,13 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -88,13 +90,15 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString("https"))
     }
 
     @Test
@@ -119,13 +123,15 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString("https"))
     }
 
     @Test
@@ -150,13 +156,15 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString("https"))
     }
 
     @Test
@@ -183,11 +191,13 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -212,11 +222,13 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
 }

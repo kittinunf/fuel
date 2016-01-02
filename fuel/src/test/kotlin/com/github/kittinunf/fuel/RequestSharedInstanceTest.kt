@@ -6,9 +6,9 @@ import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertThat
+import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**
  * Created by Kittinun Vantasin on 5/22/15.
@@ -67,16 +67,22 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
 
         val string = data as String
-        assertTrue(string.toLowerCase().contains("foo") && string.toLowerCase().contains("bar"), "additional header must be sent along with request and present in response")
-        assertTrue(string.toLowerCase().contains("key") && string.toLowerCase().contains("value"), "additional param must be sent along with request and present in response")
-        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+
+        assertThat(string.toLowerCase(), containsString("foo"))
+        assertThat(string.toLowerCase(), containsString("bar"))
+        assertThat(string.toLowerCase(), containsString("key"))
+        assertThat(string.toLowerCase(), containsString("value"))
+
+        assertThat(string, containsString("https"))
     }
 
     @Test
@@ -101,15 +107,20 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.toLowerCase().contains("foo") && string.toLowerCase().contains("bar"), "additional header must be sent along with request and present in response")
-        assertTrue(string.toLowerCase().contains("key") && string.toLowerCase().contains("value"), "additional param must be sent along with request and present in response")
-        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string.toLowerCase(), containsString("foo"))
+        assertThat(string.toLowerCase(), containsString("bar"))
+        assertThat(string.toLowerCase(), containsString("key"))
+        assertThat(string.toLowerCase(), containsString("value"))
+
+        assertThat(string, containsString("https"))
     }
 
     @Test
@@ -134,15 +145,20 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.toLowerCase().contains("foo") && string.toLowerCase().contains("bar"), "additional header must be sent along with request and present in response")
-        assertTrue(string.toLowerCase().contains("key") && string.toLowerCase().contains("value"), "additional param must be sent along with request and present in response")
-        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string.toLowerCase(), containsString("foo"))
+        assertThat(string.toLowerCase(), containsString("bar"))
+        assertThat(string.toLowerCase(), containsString("key"))
+        assertThat(string.toLowerCase(), containsString("value"))
+
+        assertThat(string, containsString("https"))
     }
 
     @Test
@@ -167,15 +183,20 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.toLowerCase().contains("foo") && string.toLowerCase().contains("bar"), "additional header must be sent along with request and present in response")
-        assertTrue(string.toLowerCase().contains("key") && string.toLowerCase().contains("value"), "additional param must be sent along with request and present in response")
-        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string.toLowerCase(), containsString("foo"))
+        assertThat(string.toLowerCase(), containsString("bar"))
+        assertThat(string.toLowerCase(), containsString("key"))
+        assertThat(string.toLowerCase(), containsString("value"))
+
+        assertThat(string, containsString("https"))
     }
 
     @Test
@@ -200,13 +221,15 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains("origin"), "response should contain \"origin\" ")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString("origin"))
     }
 
     @Test
@@ -231,13 +254,15 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString("https"))
     }
 
     @Test
@@ -262,13 +287,15 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString("https"))
     }
 
     @Test
@@ -293,13 +320,15 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains("https"), "url should contain https to indicate usage of shared instance")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString("https"))
     }
 
     @Test
@@ -322,11 +351,13 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -349,11 +380,13 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -376,11 +409,13 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -403,11 +438,13 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -439,16 +476,16 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(read == total && read != -1L && total != -1L, "read bytes and total bytes should be equal")
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code should be $statusCode" )
-    }
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
 
+        assertThat(read == total && read != -1L && total != -1L, isEqualTo(true))
+    }
 
     @Test
     fun httpDownloadWithProgressValidCase() {
@@ -478,13 +515,15 @@ class RequestSharedInstanceTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(read == total, "read bytes and total bytes should be equal")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(read, isEqualTo(total))
     }
 
 }

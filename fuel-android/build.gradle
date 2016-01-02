@@ -57,7 +57,7 @@ dependencies {
 buildscript {
     ext {
         //dependencies version
-        kotlin_version = '1.0.0-beta-3595'
+        kotlin_version = '1.0.0-beta-4583'
 
         //test dependencies version
         junit_version = '4.12'
