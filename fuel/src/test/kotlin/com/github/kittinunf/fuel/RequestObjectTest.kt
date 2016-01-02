@@ -1,12 +1,12 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
+import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.io.Reader
 import java.util.concurrent.CountDownLatch
-import org.hamcrest.CoreMatchers.*
-import org.junit.Assert.assertThat
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**

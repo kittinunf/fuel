@@ -2,13 +2,13 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
-import org.junit.Assert.assertThat
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**
@@ -158,7 +158,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, notNullValue())
-        assertThat(error, nullValue())
+        assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
         assertThat(response?.httpStatusCode, isEqualTo(statusCode))
@@ -190,7 +190,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, notNullValue())
-        assertThat(error, nullValue())
+        assertThat(data, nullValue())
 
         assertThat(error?.exception as FileNotFoundException, isA(FileNotFoundException::class.java))
 

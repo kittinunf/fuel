@@ -2,11 +2,11 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Encoding
 import com.github.kittinunf.fuel.core.Method
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.hamcrest.CoreMatchers.`is` as isEqualTo
-import org.junit.Assert.assertThat
 import java.util.concurrent.CountDownLatch
+import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**
  * Created by Kittinun Vantasin on 9/24/15.

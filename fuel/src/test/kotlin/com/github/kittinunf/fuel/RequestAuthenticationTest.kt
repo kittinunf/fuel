@@ -1,12 +1,13 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
-import org.hamcrest.CoreMatchers.*
-import org.junit.Assert.assertThat
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**
@@ -55,11 +56,11 @@ class RequestAuthenticationTest : BaseTestCase() {
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
-        assertThat(error, nullValue())
+        assertThat(error, notNullValue())
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_UNAUTHORIZED
-        assertThat("http status code of invalid credential should be $statusCode", response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -87,7 +88,7 @@ class RequestAuthenticationTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat("http status code of valid credential should be $statusCode", response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
 }
