@@ -421,7 +421,7 @@ class RequestTest : BaseTestCase() {
 
         assertThat(received, notNullValue())
         assertThat(received.response, notNullValue())
-        assertThat(received.response?.httpStatusCode, `is`(200))
+        assertThat(received.response?.httpStatusCode, isEqualTo(200))
         assertThat(received.data as String, containsString("httpbin.org"))
         assertThat(received.error, nullValue())
     }
