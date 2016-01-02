@@ -9,10 +9,9 @@ import org.junit.Test
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import org.hamcrest.CoreMatchers.`is` as isEqualTo
+import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertThat
 
 /**
  * Created by Kittinun Vantasin on 11/8/15.
@@ -53,30 +52,32 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
 
     @Test
     fun httpGetRequestJsonValid() {
-        var req: Request? = null
-        var res: Response? = null
+        var request: Request? = null
+        var response: Response? = null
         var data: Any? = null
-        var err: FuelError? = null
+        var error: FuelError? = null
 
-        Fuel.get("/user-agent").responseJson { request, response, result ->
+        Fuel.get("/user-agent").responseJson { req, res, result ->
             val (d, e) = result
             data = d
-            err = e
+            error = e
 
-            req = request
-            res = response
+            request = req
+            response = res
 
             lock.countDown()
         }
 
         await()
 
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNull(err, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(data is JSONObject, "data should be JSONObject type")
-        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+        assertThat(data as JSONObject, isA(JSONObject::class.java))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -101,39 +102,43 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNull(err, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(data is JSONObject, "data should be JSONObject type")
-        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(req, notNullValue())
+        assertThat(res, notNullValue())
+        assertThat(err, nullValue())
+        assertThat(data, notNullValue())
+        assertThat(data as JSONObject, isA(JSONObject::class.java))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpGetRequestJsonInvalid() {
-        var req: Request? = null
-        var res: Response? = null
+        var request: Request? = null
+        var response: Response? = null
         var data: Any? = null
-        var err: FuelError? = null
+        var error: FuelError? = null
 
-        Fuel.get("/404").responseJson { request, response, result ->
+        Fuel.get("/404").responseJson { req, res, result ->
             val (d, e) = result
             data = d
-            err = e
+            error = e
 
-            req = request
-            res = response
+            request = req
+            response = res
 
             lock.countDown()
         }
 
         await()
 
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNotNull(err, "error should not be null")
-        assertNull(data, "data should be null")
-        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_NOT_FOUND, "http status code (${res?.httpStatusCode}) should be ${HttpURLConnection.HTTP_NOT_FOUND}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, notNullValue())
+        assertThat(data, nullValue())
+
+        val statusCode = HttpURLConnection.HTTP_NOT_FOUND
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -158,38 +163,43 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNotNull(err, "error should not be null")
-        assertNull(data, "data should be null")
-        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_NOT_FOUND, "http status code (${res?.httpStatusCode}) should be ${HttpURLConnection.HTTP_NOT_FOUND}")
+        assertThat(req, notNullValue())
+        assertThat(res, notNullValue())
+        assertThat(err, notNullValue())
+        assertThat(data, nullValue())
+
+        val statusCode = HttpURLConnection.HTTP_NOT_FOUND
+        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpGetRequestObject() {
-        var req: Request? = null
-        var res: Response? = null
+        var request: Request? = null
+        var response: Response? = null
         var data: Any? = null
-        var err: FuelError? = null
+        var error: FuelError? = null
 
-        Fuel.get("/headers").responseObject(HttpBinHeadersDeserializer()) { request, response, result ->
+        Fuel.get("/headers").responseObject(HttpBinHeadersDeserializer()) { req, res, result ->
             val (d, e) = result
-            req = request
-            res = response
+            request = req
+            response = res
             data = d
-            err = e
+            error = e
 
             lock.countDown()
         }
 
         await()
 
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNull(err, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(data is HttpBinHeadersModel, "data should be HttpBinHeadersModel type")
-        assertFalse((data as HttpBinHeadersModel).headers.isEmpty(), "model must properly be serialized")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+        assertThat(data as HttpBinHeadersModel, isA(HttpBinHeadersModel::class.java))
+        assertThat((data as HttpBinHeadersModel).headers.isNotEmpty(), isEqualTo(true))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -216,12 +226,15 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNull(err, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(data is HttpBinHeadersModel, "data should be HttpBinHeadersModel type")
-        assertFalse((data as HttpBinHeadersModel).headers.isEmpty(), "model must properly be serialized")
+        assertThat(req, notNullValue())
+        assertThat(res, notNullValue())
+        assertThat(err, nullValue())
+        assertThat(data, notNullValue())
+        assertThat(data as HttpBinHeadersModel, isA(HttpBinHeadersModel::class.java))
+        assertThat((data as HttpBinHeadersModel).headers.isNotEmpty(), isEqualTo(true))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
     }
 
 }

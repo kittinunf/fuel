@@ -1,13 +1,13 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
+import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**
  * Created by Kittinun Vantasin on 8/18/15.
@@ -51,11 +51,13 @@ class RequestHandlerTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNull(err, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(req, notNullValue())
+        assertThat(res, notNullValue())
+        assertThat(err, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -83,11 +85,13 @@ class RequestHandlerTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNotNull(err, "error should not be null")
-        assertNull(data, "data should be null")
-        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_NOT_FOUND, "http status code (${res?.httpStatusCode}) should be ${HttpURLConnection.HTTP_NOT_FOUND}")
+        assertThat(req, notNullValue())
+        assertThat(res, notNullValue())
+        assertThat(err, notNullValue())
+        assertThat(data, nullValue())
+
+        val statusCode = HttpURLConnection.HTTP_NOT_FOUND
+        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -118,15 +122,16 @@ class RequestHandlerTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(req, "request should not be null")
-        assertNotNull(res, "response should not be null")
-        assertNull(err, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(res?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(req, notNullValue())
+        assertThat(res, notNullValue())
+        assertThat(err, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString(paramKey))
+        assertThat(string, containsString(paramValue))
     }
-
-
 
 }

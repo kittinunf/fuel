@@ -1,13 +1,14 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**
  * Created by Kittinun Vantasin on 5/21/15.
@@ -53,13 +54,13 @@ class RequestAuthenticationTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNotNull(error, "error should not be null")
-        assertNull(data, "data should be null")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, notNullValue())
+        assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_UNAUTHORIZED
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of invalid credential should be $statusCode")
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -81,13 +82,13 @@ class RequestAuthenticationTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertTrue(response?.httpStatusCode == statusCode, "http status code of valid credential should be $statusCode")
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
 }

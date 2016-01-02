@@ -7,9 +7,7 @@ import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 /**
  * Created by Kittinun Vantasin on 5/22/15.
@@ -66,12 +64,13 @@ class RequestTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(data is ByteArray, "data should be ByteArray type")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -94,14 +93,14 @@ class RequestTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(data is String, "data should be String type")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
-    }
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+    }
 
     @Test
     fun httpGetRequestWithParameters() {
@@ -128,13 +127,16 @@ class RequestTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString(paramKey))
+        assertThat(string, containsString(paramValue))
     }
 
     @Test
@@ -162,13 +164,16 @@ class RequestTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString(paramKey))
+        assertThat(string, containsString(paramValue))
     }
 
     @Test
@@ -178,7 +183,9 @@ class RequestTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        val body = "{ \"foo\" : \"bar\" }"
+        val foo = "foo"
+        val bar = "bar"
+        val body = "{ $foo : $bar }"
 
         manager.request(Method.POST, "http://httpbin.org/post").body(body).responseString { req, res, result ->
             request = req
@@ -195,13 +202,16 @@ class RequestTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains("foo") && string.contains("bar"), "body should be sent along with url and present in response of httpbin.org")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString(foo))
+        assertThat(string, containsString(bar))
     }
 
     @Test
@@ -229,13 +239,16 @@ class RequestTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString(paramKey))
+        assertThat(string, containsString(paramValue))
     }
 
     @Test
@@ -263,13 +276,16 @@ class RequestTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains(paramKey) && string.contains(paramValue), "url query param should be sent along with url and present in response of httpbin.org")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString(paramKey))
+        assertThat(string, containsString(paramValue))
     }
 
     @Test
@@ -294,12 +310,15 @@ class RequestTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
-        assertTrue(string.contains("user-agent"), "USER_AGENT endpoint must be resolved correctly, and user-agent should be present in this response")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString("user-agent"))
     }
 
     @Test
@@ -324,11 +343,13 @@ class RequestTest : BaseTestCase() {
 
         await()
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -356,14 +377,16 @@ class RequestTest : BaseTestCase() {
 
         val string = data as String
 
-        assertNotNull(request, "request should not be null")
-        assertNotNull(response, "response should not be null")
-        assertNull(error, "error should be null")
-        assertNotNull(data, "data should not be null")
-        assertTrue(response?.httpStatusCode == HttpURLConnection.HTTP_OK, "http status code should be ${HttpURLConnection.HTTP_OK}")
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
 
-        assertTrue(string.contains(paramKey), "url query param should be sent along with url, $paramKey")
-        assertTrue(string.contains(paramValue), "url query param should be sent along with url, $paramValue")
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString(paramKey))
+        assertThat(string, containsString(paramValue))
     }
 
     @Test
@@ -383,30 +406,26 @@ class RequestTest : BaseTestCase() {
         request.cancel()
 
         println(request.cUrlString())
-        assertNotNull(request, "request should not be null")
-        assertNull(response, "response should be null")
-        assertNull(data, "data should be null")
-        assertNull(error, "error should be null")
+        assertThat(request, notNullValue())
+        assertThat(response, nullValue())
+        assertThat(data, nullValue())
+        assertThat(error, nullValue())
     }
 
     @Test
     fun httpGetSyncRequest() {
-        // Given
-        var expectedHost = "httpbin.org"
-        var received:Received? = null
-
-        // When
-        val request = manager.request(Method.GET, "http://${expectedHost}/get").sync().responseString { req, res, result ->
+        var received: Received = Received()
+        manager.request(Method.GET, "http://httpbin.org/get").sync().responseString { req, res, result ->
             received = Received(res, result.value, result.error)
         }
 
-        // Then
         assertThat(received, notNullValue())
-        assertThat(received?.response, notNullValue())
-        assertThat(received?.response?.httpStatusCode, `is`(200))
-        assertThat(received?.data as String, containsString(expectedHost))
-        assertThat(received?.error, nullValue())
+        assertThat(received.response, notNullValue())
+        assertThat(received.response?.httpStatusCode, isEqualTo(200))
+        assertThat(received.data as String, containsString("httpbin.org"))
+        assertThat(received.error, nullValue())
     }
+
+    data class Received(val response: Response? = null, val data: Any? = null, val error: FuelError? = null)
 }
 
-data class Received(val response:Response? = null, val data: Any? = null, val error:FuelError? = null)
