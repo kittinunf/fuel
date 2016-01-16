@@ -15,16 +15,15 @@ import javax.net.ssl.*
  * Created by Kittinun Vantasin on 5/14/15.
  */
 
-public class Manager {
+class Manager {
+    var client: Client by readWriteLazy { HttpClient() }
+    var basePath: String? = null
 
-    public var client: Client by readWriteLazy { HttpClient() }
-    public var basePath: String? = null
+    var baseHeaders: Map<String, String>? = null
+    var baseParams: List<Pair<String, Any?>> = emptyList()
 
-    public var baseHeaders: Map<String, String>? = null
-    public var baseParams: List<Pair<String, Any?>> = emptyList()
-
-    public var keystore: KeyStore? = null
-    public var socketFactory: SSLSocketFactory by readWriteLazy {
+    var keystore: KeyStore? = null
+    var socketFactory: SSLSocketFactory by readWriteLazy {
         keystore?.let {
             val trustFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
             trustFactory.init(it)
@@ -34,12 +33,12 @@ public class Manager {
         } ?: unsecuredSocketFactory()
     }
 
-    public var hostnameVerifier: HostnameVerifier by readWriteLazy {
+    var hostnameVerifier: HostnameVerifier by readWriteLazy {
         unsecuredHostnameVerifier()
     }
 
     //background executor
-    public var executor: ExecutorService by readWriteLazy {
+    var executor: ExecutorService by readWriteLazy {
         Executors.newCachedThreadPool { command ->
             Thread {
                 Thread.currentThread().priority = Thread.NORM_PRIORITY
@@ -49,14 +48,7 @@ public class Manager {
     }
 
     //callback executor
-    public var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
-
-    companion object {
-
-        //manager
-        var instance by readWriteLazy { Manager() }
-
-    }
+    var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
     fun request(method: Method, path: String, param: List<Pair<String, Any?>>? = null): Request {
         val request = request(Encoding().apply {
@@ -183,6 +175,12 @@ public class Manager {
 
     private fun unsecuredHostnameVerifier(): HostnameVerifier {
         return HostnameVerifier { hostname, session -> true }
+    }
+
+    companion object {
+        //manager
+        var instance by readWriteLazy { Manager() }
+
     }
 
 }

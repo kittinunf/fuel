@@ -11,8 +11,7 @@ import kotlin.properties.Delegates
  * Created by Kittinun Vantasin on 5/19/15.
  */
 
-public class Encoding : Fuel.RequestConvertible {
-
+class Encoding : Fuel.RequestConvertible {
     var requestType: Request.Type = Request.Type.REQUEST
     var httpMethod: Method by Delegates.notNull()
     var baseUrlString: String? = null
@@ -20,11 +19,9 @@ public class Encoding : Fuel.RequestConvertible {
     var parameters: List<Pair<String, Any?>>? = null
 
     var encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
-
         var modifiedPath = path
         var data: ByteArray? = null
         var headerPairs: MutableMap<String, Any> = hashMapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
-
         if (encodeParameterInUrl(method)) {
             var querySign = ""
             val queryParamString = queryFromParameters(parameters)
@@ -41,7 +38,6 @@ public class Encoding : Fuel.RequestConvertible {
             headerPairs.plusAssign("Content-Type" to "application/x-www-form-urlencoded")
             data = queryFromParameters(parameters).toByteArray()
         }
-
         Request().apply {
             httpMethod = method
             this.path = modifiedPath
@@ -80,5 +76,4 @@ public class Encoding : Fuel.RequestConvertible {
                     .joinToString("&")
         } ?: ""
     }
-
 }

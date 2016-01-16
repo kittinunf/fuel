@@ -13,7 +13,6 @@ import javax.net.ssl.HttpsURLConnection
  */
 
 class HttpClient : Client {
-
     override fun executeRequest(request: Request): Response {
         val response = Response()
         response.url = request.url

@@ -7,28 +7,20 @@ import java.util.concurrent.Executor
  */
 
 interface Environment {
-
     var callbackExecutor: Executor
-
 }
 
 public fun createEnvironment(): Environment {
     try {
-        return Class.forName("com.github.kittinunf.fuel.android.util.AndroidEnvironment").newInstance() as Environment
+        return Class.forName(AndroidEnvironmentClass).newInstance() as Environment
     } catch(exception: ClassNotFoundException) {
         return DefaultEnvironment()
     }
 }
 
 public class DefaultEnvironment : Environment {
-
-    override var callbackExecutor: Executor = object : Executor {
-
-        override fun execute(command: Runnable?) {
-            command?.run()
-        }
-
-    }
-
+    override var callbackExecutor: Executor = Executor { command -> command?.run() }
 }
+
+const val AndroidEnvironmentClass = "com.github.kittinunf.fuel.android.util.AndroidEnvironment"
 

@@ -11,13 +11,13 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
  * Created by Kittinun Vantasin on 8/16/15.
  */
 
-public interface Deserializable<out T : Any> {
+interface Deserializable<out T : Any> {
 
     fun deserialize(response: Response): T
 
 }
 
-public interface ResponseDeserializable<out T : Any> : Deserializable<T> {
+interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 
     override fun deserialize(response: Response): T {
         return deserialize(response.data) ?:
@@ -38,7 +38,7 @@ public interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 
 }
 
-public fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit): Request {
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit): Request {
     response(deserializable, { request, response, value ->
         handler(this@response, response, Result.Success(value))
     }, { request, response, error ->
@@ -47,7 +47,7 @@ public fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, 
     return this
 }
 
-public fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>): Request {
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>): Request {
     response(deserializable, { request, response, value ->
         handler.success(request, response, value)
     }, { request, response, error ->
@@ -61,9 +61,7 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
                                                               failure: (Request, Response, FuelError) -> Unit): Request {
     taskRequest.apply {
         successCallback = { response ->
-
             val deliverable = Result.of { deserializable.deserialize(response) }
-
             callback {
                 deliverable.fold({
                     success(this@response, response, it)
@@ -81,8 +79,6 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     }
 
     submit(taskRequest)
-
     if (syncMode) taskFuture?.get(timeoutInMillisecond.toLong(), MILLISECONDS)
-
     return this
 }

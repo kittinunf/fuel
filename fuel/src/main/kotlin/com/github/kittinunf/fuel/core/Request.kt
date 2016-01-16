@@ -20,8 +20,7 @@ import javax.net.ssl.SSLSocketFactory
  * Created by Kittinun Vantasin on 5/13/15.
  */
 
-public class Request {
-
+class Request {
     enum class Type {
         REQUEST,
         DOWNLOAD,
@@ -55,7 +54,7 @@ public class Request {
         }
     }
 
-    public var taskFuture: Future<Unit>? = null
+    var taskFuture: Future<Unit>? = null
 
     //configuration
     var socketFactory: SSLSocketFactory? = null
@@ -65,39 +64,21 @@ public class Request {
     lateinit var executor: ExecutorService
     lateinit var callbackExecutor: Executor
 
-    companion object {
-
-        public fun byteArrayDeserializer(): Deserializable<ByteArray> {
-            return object : Deserializable<ByteArray> {
-                override fun deserialize(response: Response): ByteArray {
-                    return response.data
-                }
-            }
-        }
-
-        public fun stringDeserializer(): Deserializable<String> {
-            return object : Deserializable<String> {
-                override fun deserialize(response: Response): String {
-                    return String(response.data)
-                }
-            }
-        }
-    }
-
-    public fun sync(): Request {
+    fun sync(): Request {
         syncMode = true
         return this
     }
 
     //interfaces
-    public fun header(pair: Pair<String, Any>?): Request {
-        if (pair != null) {
-            httpHeaders.plusAssign(Pair(pair.first, pair.second.toString()))
+    fun header(vararg pairs: Pair<String, Any>?): Request {
+        pairs.forEach {
+            if (it != null)
+                httpHeaders.plusAssign(Pair(it.first, it.second.toString()))
         }
         return this
     }
 
-    public fun header(pairs: Map<String, Any>?): Request {
+    fun header(pairs: Map<String, Any>?): Request {
         if (pairs != null) {
             for ((key, value) in pairs) {
                 header(key to value)
@@ -106,20 +87,20 @@ public class Request {
         return this
     }
 
-    public fun body(body: ByteArray): Request {
+    fun body(body: ByteArray): Request {
         httpBody = body
         return this
     }
 
-    public fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
+    fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
 
-    public fun authenticate(username: String, password: String): Request {
+    fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
         val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
         return header("Authorization" to "Basic " + String(encodedAuth))
     }
 
-    public fun validate(statusCodeRange: IntRange): Request {
+    fun validate(statusCodeRange: IntRange): Request {
         taskRequest.apply {
             validator = { response ->
                 statusCodeRange.contains(response.httpStatusCode)
@@ -128,7 +109,7 @@ public class Request {
         return this
     }
 
-    public fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
+    fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
         if (taskRequest as? DownloadTaskRequest != null) {
             val download = taskRequest as DownloadTaskRequest
             download.apply {
@@ -146,7 +127,7 @@ public class Request {
         return this
     }
 
-    public fun source(source: (Request, URL) -> File): Request {
+    fun source(source: (Request, URL) -> File): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
 
         uploadTaskRequest.apply {
@@ -155,7 +136,7 @@ public class Request {
         return this
     }
 
-    public fun destination(destination: (Response, URL) -> File): Request {
+    fun destination(destination: (Response, URL) -> File): Request {
         val downloadTaskRequest = taskRequest as? DownloadTaskRequest ?: throw IllegalStateException("destination is only used with RequestType.DOWNLOAD")
 
         downloadTaskRequest.apply {
@@ -164,7 +145,7 @@ public class Request {
         return this
     }
 
-    public fun interrupt(interrupt: (Request) -> Unit): Request {
+    fun interrupt(interrupt: (Request) -> Unit): Request {
         taskRequest.apply {
             interruptCallback = interrupt
         }
@@ -181,28 +162,28 @@ public class Request {
         }
     }
 
-    public fun cancel() {
+    fun cancel() {
         taskFuture?.cancel(true)
     }
 
     //byte array
-    public fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit) =
+    fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit) =
             response(byteArrayDeserializer(), handler)
 
-    public fun response(handler: Handler<ByteArray>) = response(byteArrayDeserializer(), handler)
+    fun response(handler: Handler<ByteArray>) = response(byteArrayDeserializer(), handler)
 
     //string
-    public fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit) =
+    fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit) =
             response(stringDeserializer(), handler)
 
-    public fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
+    fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
 
     //object
-    public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit) = response(deserializer, handler)
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit) = response(deserializer, handler)
 
-    public fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) = response(deserializer, handler)
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) = response(deserializer, handler)
 
-    public fun cUrlString(): String {
+    fun cUrlString(): String {
         val elements = arrayListOf("$ curl -i")
 
         //method
@@ -402,6 +383,24 @@ public class Request {
             }
         }
 
+    }
+
+    companion object {
+        fun byteArrayDeserializer(): Deserializable<ByteArray> {
+            return object : Deserializable<ByteArray> {
+                override fun deserialize(response: Response): ByteArray {
+                    return response.data
+                }
+            }
+        }
+
+        fun stringDeserializer(): Deserializable<String> {
+            return object : Deserializable<String> {
+                override fun deserialize(response: Response): String {
+                    return String(response.data)
+                }
+            }
+        }
     }
 
 }

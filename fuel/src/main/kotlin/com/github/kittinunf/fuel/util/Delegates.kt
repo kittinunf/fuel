@@ -7,13 +7,13 @@ import kotlin.reflect.KProperty
  * Created by Kittinun Vantasin on 5/15/15.
  */
 
-public fun <T> readWriteLazy(initializer: () -> T): ReadWriteProperty<Any?, T> = ReadWriteLazyVal(initializer)
+fun <T> readWriteLazy(initializer: () -> T): ReadWriteProperty<Any?, T> = ReadWriteLazyVal(initializer)
 
 private class ReadWriteLazyVal<T>(private val initializer: () -> T) : ReadWriteProperty<Any?, T> {
 
     private var value: Any? = null
 
-    public operator override fun getValue(thisRef: Any?, property: KProperty<*>): T {
+    operator override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         if (value == null) {
             value = (initializer()) ?: throw IllegalStateException("Initializer block of property ${property.name} return null")
         }
