@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.core.requests.AsyncTaskRequest
 import com.github.kittinunf.result.Result
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -51,7 +52,8 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler
 private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
                                                               success: (Request, Response, T) -> Unit,
                                                               failure: (Request, Response, FuelError) -> Unit): Request {
-    taskRequest.apply {
+    val request = AsyncTaskRequest(taskRequest)
+    request.apply {
         successCallback = { response ->
             val deliverable = Result.of { deserializable.deserialize(response) }
             callback {
@@ -70,7 +72,11 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
         }
     }
 
-    submit(taskRequest)
+    submit(request)
     if (syncMode) taskFuture?.get(timeoutInMillisecond.toLong(), MILLISECONDS)
     return this
+}
+
+fun <T : Any, U: Deserializable<T>> Request.response(deserializable: U): T {
+   return deserializable.deserialize(taskRequest.call())
 }
