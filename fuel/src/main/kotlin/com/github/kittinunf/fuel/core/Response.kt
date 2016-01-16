@@ -2,12 +2,7 @@ package com.github.kittinunf.fuel.core
 
 import java.net.URL
 
-/**
- * Created by Kittinun Vantasin on 5/13/15.
- */
-
 public class Response {
-
     lateinit var url: URL
 
     var httpStatusCode = -1

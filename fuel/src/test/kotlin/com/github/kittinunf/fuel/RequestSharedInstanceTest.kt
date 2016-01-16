@@ -10,10 +10,6 @@ import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-/**
- * Created by Kittinun Vantasin on 5/22/15.
- */
-
 class RequestSharedInstanceTest : BaseTestCase() {
 
     init {

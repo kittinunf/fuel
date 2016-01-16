@@ -11,10 +11,6 @@ import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-/**
- * Created by Kittinun Vantasin on 5/21/15.
- */
-
 class RequestValidationTest : BaseTestCase() {
 
     val manager: Manager by lazy {

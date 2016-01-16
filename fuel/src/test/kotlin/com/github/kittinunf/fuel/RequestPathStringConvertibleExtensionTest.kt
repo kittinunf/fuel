@@ -13,10 +13,6 @@ import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-/**
- * Created by Kittinun Vantasin on 8/10/15.
- */
-
 class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
 
     init {

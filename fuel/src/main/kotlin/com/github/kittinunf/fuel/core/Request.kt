@@ -16,10 +16,6 @@ import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
-/**
- * Created by Kittinun Vantasin on 5/13/15.
- */
-
 class Request {
     enum class Type {
         REQUEST,

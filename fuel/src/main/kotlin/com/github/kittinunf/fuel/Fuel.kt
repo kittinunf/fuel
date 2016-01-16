@@ -4,10 +4,6 @@ import com.github.kittinunf.fuel.core.Manager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 
-/**
- * Created by Kittinun Vantasin on 5/13/15.
- */
-
 class Fuel {
     interface PathStringConvertible {
         val path: String

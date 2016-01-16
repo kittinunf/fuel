@@ -8,10 +8,6 @@ import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-/**
- * Created by Kittinun Vantasin on 9/24/15.
- */
-
 public class EncodingTest : BaseTestCase() {
 
     @Before
