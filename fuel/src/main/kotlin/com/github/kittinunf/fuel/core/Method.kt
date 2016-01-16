@@ -1,9 +1,5 @@
 package com.github.kittinunf.fuel.core
 
-/**
- * Created by Kittinun Vantasin on 5/13/15.
- */
-
 enum class Method(val value: String) {
     GET("GET"),
     POST("POST"),

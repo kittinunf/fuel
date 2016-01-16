@@ -2,15 +2,11 @@ package com.github.kittinunf.fuel.core
 
 import java.util.concurrent.Executor
 
-/**
- * Created by Kittinun Vantasin on 11/8/15.
- */
-
 interface Environment {
     var callbackExecutor: Executor
 }
 
-public fun createEnvironment(): Environment {
+fun createEnvironment(): Environment {
     try {
         return Class.forName(AndroidEnvironmentClass).newInstance() as Environment
     } catch(exception: ClassNotFoundException) {
@@ -18,7 +14,7 @@ public fun createEnvironment(): Environment {
     }
 }
 
-public class DefaultEnvironment : Environment {
+class DefaultEnvironment : Environment {
     override var callbackExecutor: Executor = Executor { command -> command?.run() }
 }
 

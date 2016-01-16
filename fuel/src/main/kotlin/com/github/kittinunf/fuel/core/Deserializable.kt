@@ -7,18 +7,11 @@ import java.io.InputStreamReader
 import java.io.Reader
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-/**
- * Created by Kittinun Vantasin on 8/16/15.
- */
-
 interface Deserializable<out T : Any> {
-
     fun deserialize(response: Response): T
-
 }
 
 interface ResponseDeserializable<out T : Any> : Deserializable<T> {
-
     override fun deserialize(response: Response): T {
         return deserialize(response.data) ?:
                 deserialize(ByteArrayInputStream(response.data)) ?:
@@ -35,7 +28,6 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     public fun deserialize(reader: Reader): T? = null
 
     public fun deserialize(content: String): T? = null
-
 }
 
 fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit): Request {

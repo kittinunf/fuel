@@ -7,10 +7,6 @@ import java.net.URI
 import java.net.URL
 import kotlin.properties.Delegates
 
-/**
- * Created by Kittinun Vantasin on 5/19/15.
- */
-
 class Encoding : Fuel.RequestConvertible {
     var requestType: Request.Type = Request.Type.REQUEST
     var httpMethod: Method by Delegates.notNull()

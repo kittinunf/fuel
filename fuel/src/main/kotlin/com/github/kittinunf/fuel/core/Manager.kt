@@ -11,10 +11,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.net.ssl.*
 
-/**
- * Created by Kittinun Vantasin on 5/14/15.
- */
-
 class Manager {
     var client: Client by readWriteLazy { HttpClient() }
     var basePath: String? = null

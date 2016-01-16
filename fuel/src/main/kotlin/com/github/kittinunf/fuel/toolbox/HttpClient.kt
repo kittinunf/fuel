@@ -8,10 +8,6 @@ import java.net.URLConnection
 import java.util.zip.GZIPInputStream
 import javax.net.ssl.HttpsURLConnection
 
-/**
- * Created by Kittinun Vantasin on 5/15/15.
- */
-
 class HttpClient : Client {
     override fun executeRequest(request: Request): Response {
         val response = Response()
@@ -90,11 +86,11 @@ class HttpClient : Client {
     }
 
     private fun setBodyIfAny(connection: HttpURLConnection, bytes: ByteArray) {
-        if (bytes.size == 0) return
-
-        val outStream = BufferedOutputStream(connection.outputStream);
-        outStream.write(bytes);
-        outStream.close();
+        if (bytes.size != 0) {
+            val outStream = BufferedOutputStream(connection.outputStream)
+            outStream.write(bytes)
+            outStream.close()
+        }
     }
 
     private fun setDoOutput(connection: HttpURLConnection, method: Method) {
