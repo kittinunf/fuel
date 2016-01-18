@@ -12,6 +12,7 @@ class AsyncTaskRequest(val task: TaskRequest) : TaskRequest(task.request) {
     override fun call(): Response {
         try {
             val response = task.call()
+            dispatchCallback(response)
             return response
         } catch(error: FuelError) {
             if (error.exception as? InterruptedIOException != null) {
@@ -22,6 +23,7 @@ class AsyncTaskRequest(val task: TaskRequest) : TaskRequest(task.request) {
                 failureCallback?.invoke(error, response)
             }
         } catch(ex: Exception) {
+            val temp = ex
             val error = FuelError().apply {
                 exception = ex
             }

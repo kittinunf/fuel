@@ -5,10 +5,7 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.kittinunf.fuel.*
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Manager
-import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*

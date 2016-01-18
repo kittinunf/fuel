@@ -23,8 +23,8 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
     var progressCallback: ((Long, Long) -> Unit)? = null
     lateinit var sourceCallback: ((Request, URL) -> File)
 
-    lateinit var dataStream: ByteArrayOutputStream
-    lateinit var fileInputStream: FileInputStream
+    var dataStream: ByteArrayOutputStream? = null
+    var fileInputStream: FileInputStream? = null
 
     override fun call(): Response {
         try {
@@ -41,7 +41,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 flush()
 
                 //input file data
-                fileInputStream.copyTo(this, BUFFER_SIZE) { writtenBytes ->
+                fileInputStream!!.copyTo(this, BUFFER_SIZE) { writtenBytes ->
                     progressCallback?.invoke(writtenBytes, file.length())
                 }
 
@@ -52,7 +52,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 flush()
             }
 
-            request.body(dataStream.toByteArray())
+            request.body(dataStream!!.toByteArray())
             return Manager.instance.client.executeRequest(request).apply { dispatchCallback(this) }
         } catch(error: FuelError) {
             if (error.exception as? InterruptedIOException != null) {
@@ -60,8 +60,8 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
             }
             throw error
         } finally {
-            dataStream.close()
-            fileInputStream.close()
+            dataStream?.close()
+            fileInputStream?.close()
         }
     }
 }
