@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.requests.TaskRequest
 import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
 import com.github.kittinunf.fuel.util.Base64
 import com.github.kittinunf.fuel.util.readWriteLazy
+import com.github.kittinunf.result.Result
 import java.io.File
 import java.net.URL
 import java.nio.charset.Charset
@@ -200,5 +201,47 @@ class Request {
         }
 
         return elements.joinToString("\n").toString()
+    }
+
+    //byte array
+    fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit) =
+            response(byteArrayDeserializer(), handler)
+
+    fun response(handler: Handler<ByteArray>) = response(byteArrayDeserializer(), handler)
+
+    fun response() = response(byteArrayDeserializer())
+
+    //string
+    fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit) =
+            response(stringDeserializer(), handler)
+
+    fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
+
+    fun responseString() = response(stringDeserializer())
+
+    //object
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit) = response(deserializer, handler)
+
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) = response(deserializer, handler)
+
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) = response(deserializer)
+
+    companion object {
+        fun byteArrayDeserializer(): Deserializable<ByteArray> {
+            return object : Deserializable<ByteArray> {
+                override fun deserialize(response: Response): ByteArray {
+                    return response.data
+                }
+            }
+        }
+
+        fun stringDeserializer(): Deserializable<String> {
+            return object : Deserializable<String> {
+                override fun deserialize(response: Response): String {
+                    return String(response.data)
+                }
+            }
+        }
+
     }
 }

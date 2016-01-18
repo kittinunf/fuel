@@ -13,10 +13,6 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 
-/**
- * Created by Kittinun Vantasin on 11/8/15.
- */
-
 public class RequestAndroidHandlerTest : BaseTestCase() {
 
     init {
@@ -37,7 +33,7 @@ public class RequestAndroidHandlerTest : BaseTestCase() {
         override fun deserialize(content: String): HttpBinHeadersModel {
             val json = JSONObject(content)
             val headers = json.getJSONObject("headers")
-            val results = headers.keys().asSequence().toMap({ it }, { headers.getString(it) })
+            val results = headers.keys().asSequence().toMapBy({ it }, { headers.getString(it) })
             val model = HttpBinHeadersModel()
             model.headers = results
             return model
