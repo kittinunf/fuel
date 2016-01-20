@@ -7,6 +7,7 @@ The easiest HTTP networking library for Kotlin/Android.
 ## Features
 
 - [x] Support basic HTTP GET/POST/PUT/DELETE in a fluent style interface
+- [X] Support both asynchronous and blocking requests
 - [x] Download file
 - [x] Upload file (multipart/form-data)
 - [x] Cancel in-flight request
@@ -35,6 +36,8 @@ dependencies {
 * There are two samples, one is in Kotlin and another one in Java.
 
 ### Quick Glance Usage
+
+#### Async mode
 
 * Kotlin
 ``` Kotlin
@@ -90,6 +93,29 @@ Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() 
     	//do something when it is successful
     }
 });
+```
+
+#### Blocking mode
+You can also wait for the response. It returns the same parameters as the async version, but it blocks the thread. It supports all the features of the async version.
+
+**Note:** Instead of returning `Result` object, it will throw the exception.
+
+* Kotlin
+``` Kotlin
+val (request, response, data) = "http://httpbin.org/get".httpGet().responseString()
+```
+
+* Java
+``` Java
+try {
+    Triple<Request, Response, String> data = Fuel.get("http://www.google.com").responseString();
+    Request request = data.getFirst();
+    Response response = data.getSecond();
+    String text = data.getThird();
+} catch (Exception networkError) {
+
+}
+
 ```
 
 ## Detail Usage

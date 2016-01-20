@@ -1,13 +1,13 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
+import com.github.kittinunf.fuel.core.requests.TaskRequest
+import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
 import com.github.kittinunf.fuel.util.Base64
-import com.github.kittinunf.fuel.util.copyTo
 import com.github.kittinunf.fuel.util.readWriteLazy
-import com.github.kittinunf.fuel.util.toHexString
 import com.github.kittinunf.result.Result
-import java.io.*
+import java.io.File
 import java.net.URL
-import java.net.URLConnection
 import java.nio.charset.Charset
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
@@ -50,7 +50,7 @@ class Request {
         }
     }
 
-    var taskFuture: Future<Unit>? = null
+    var taskFuture: Future<*>? = null
 
     //configuration
     var socketFactory: SSLSocketFactory? = null
@@ -148,7 +148,7 @@ class Request {
         return this
     }
 
-    fun submit(callable: Callable<Unit>) {
+    fun submit(callable: Callable<*>) {
         taskFuture = executor.submit(callable)
     }
 
@@ -162,22 +162,6 @@ class Request {
         taskFuture?.cancel(true)
     }
 
-    //byte array
-    fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit) =
-            response(byteArrayDeserializer(), handler)
-
-    fun response(handler: Handler<ByteArray>) = response(byteArrayDeserializer(), handler)
-
-    //string
-    fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit) =
-            response(stringDeserializer(), handler)
-
-    fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
-
-    //object
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit) = response(deserializer, handler)
-
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) = response(deserializer, handler)
 
     fun cUrlString(): String {
         val elements = arrayListOf("$ curl -i")
@@ -219,167 +203,28 @@ class Request {
         return elements.joinToString("\n").toString()
     }
 
-    //underlying requests
-    open class TaskRequest(open val request: Request) : Callable<Unit> {
+    //byte array
+    fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit) =
+            response(byteArrayDeserializer(), handler)
 
-        var successCallback: ((Response) -> Unit)? = null
-        var failureCallback: ((FuelError, Response) -> Unit)? = null
-        var interruptCallback: ((Request) -> Unit)? = null
+    fun response(handler: Handler<ByteArray>) = response(byteArrayDeserializer(), handler)
 
-        var validator: (Response) -> Boolean = { response ->
-            (200..299).contains(response.httpStatusCode)
-        }
+    fun response() = response(byteArrayDeserializer())
 
-        override fun call() {
-            try {
-                val response = Manager.instance.client.executeRequest(request)
+    //string
+    fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit) =
+            response(stringDeserializer(), handler)
 
-                //dispatch
-                dispatchCallback(response)
-            } catch(error: FuelError) {
-                if (error.exception as? InterruptedIOException != null) {
-                    interruptCallback?.invoke(request)
-                } else {
-                    val response = Response()
-                    response.url = request.url
-                    failureCallback?.invoke(error, response)
-                }
-            }
-        }
+    fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
 
-        fun dispatchCallback(response: Response) {
-            //validate
-            if (validator.invoke(response)) {
-                successCallback?.invoke(response)
-            } else {
-                val error = FuelError().apply {
-                    exception = HttpException(response.httpStatusCode, response.httpResponseMessage)
-                    errorData = response.data
-                }
-                failureCallback?.invoke(error, response)
-            }
-        }
+    fun responseString() = response(stringDeserializer())
 
-    }
+    //object
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit) = response(deserializer, handler)
 
-    class DownloadTaskRequest(override val request: Request) : TaskRequest(request) {
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) = response(deserializer, handler)
 
-        val BUFFER_SIZE = 1024
-
-        var progressCallback: ((Long, Long) -> Unit)? = null
-        lateinit var destinationCallback: ((Response, URL) -> File)
-
-        lateinit var dataStream: InputStream
-        lateinit var fileOutputStream: FileOutputStream
-
-        override fun call() {
-            try {
-                val response = Manager.instance.client.executeRequest(request)
-
-                val file = destinationCallback.invoke(response, request.url)
-
-                //file output
-                fileOutputStream = FileOutputStream(file)
-
-                dataStream = ByteArrayInputStream(response.data)
-                dataStream.copyTo(fileOutputStream, BUFFER_SIZE) { readBytes ->
-                    progressCallback?.invoke(readBytes, response.httpContentLength)
-                }
-
-                //dispatch
-                dispatchCallback(response)
-            } catch(error: FuelError) {
-                if (error.exception as? InterruptedIOException != null) {
-                    interruptCallback?.invoke(request)
-                } else {
-                    val response = Response()
-                    response.url = request.url
-                    failureCallback?.invoke(error, response)
-                }
-            } catch(ex: Exception) {
-                val error = FuelError().apply {
-                    exception = ex
-                }
-                val response = Response()
-                response.url = request.url
-                failureCallback?.invoke(error, response)
-            } finally {
-                dataStream.close()
-                fileOutputStream.close()
-            }
-        }
-
-    }
-
-    class UploadTaskRequest(override val request: Request) : TaskRequest(request) {
-
-        val BUFFER_SIZE = 1024
-
-        val CRLF = "\\r\\n"
-        val boundary = System.currentTimeMillis().toHexString()
-
-        var progressCallback: ((Long, Long) -> Unit)? = null
-        lateinit var sourceCallback: ((Request, URL) -> File)
-
-        lateinit var dataStream: ByteArrayOutputStream
-        lateinit var fileInputStream: FileInputStream
-
-        override fun call() {
-            try {
-                val file = sourceCallback.invoke(request, request.url)
-
-                //file input
-                fileInputStream = FileInputStream(file)
-
-                dataStream = ByteArrayOutputStream().apply {
-                    write(("--" + boundary + CRLF).toByteArray())
-                    write(("Content-Disposition: form-data; filename=\"" + file.name + "\"").toByteArray())
-                    write(CRLF.toByteArray())
-                    write(("Content-Type: " + URLConnection.guessContentTypeFromName(file.name)).toByteArray())
-                    write(CRLF.toByteArray())
-                    write(CRLF.toByteArray())
-                    flush()
-
-                    //input file data
-                    fileInputStream.copyTo(this, BUFFER_SIZE) { writtenBytes ->
-                        progressCallback?.invoke(writtenBytes, file.length())
-                    }
-
-                    write(CRLF.toByteArray())
-                    flush()
-                    write(("--$boundary--").toByteArray())
-                    write(CRLF.toByteArray())
-                    flush()
-                }
-
-                request.body(dataStream.toByteArray())
-
-                val response = Manager.instance.client.executeRequest(request)
-
-                //dispatch
-                dispatchCallback(response)
-            } catch(error: FuelError) {
-                if (error.exception as? InterruptedIOException != null) {
-                    interruptCallback?.invoke(request)
-                } else {
-                    val response = Response()
-                    response.url = request.url
-                    failureCallback?.invoke(error, response)
-                }
-            } catch(ex: Exception) {
-                val error = FuelError().apply {
-                    exception = ex
-                }
-                val response = Response()
-                response.url = request.url
-                failureCallback?.invoke(error, response)
-            } finally {
-                dataStream.close()
-                fileInputStream.close()
-            }
-        }
-
-    }
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) = response(deserializer)
 
     companion object {
         fun byteArrayDeserializer(): Deserializable<ByteArray> {
@@ -397,6 +242,6 @@ class Request {
                 }
             }
         }
-    }
 
+    }
 }
