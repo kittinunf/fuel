@@ -103,7 +103,6 @@ You can also wait for the response. It returns the same parameters as the async 
 * Kotlin
 ``` Kotlin
 val (request, response, data) = "http://httpbin.org/get".httpGet().responseString()
-}
 ```
 
 * Java
