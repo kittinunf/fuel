@@ -8,7 +8,9 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class BlockingRequestTest : BaseTestCase() {
+
     val manager: Manager by lazy { Manager() }
+
     enum class HttpsBin(val relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),
         POST("post"),
@@ -17,7 +19,6 @@ class BlockingRequestTest : BaseTestCase() {
 
         override val path = "https://httpbin.org/$relativePath"
     }
-
 
     class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
         override val request = createRequest()
@@ -188,5 +189,6 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data, containsString(paramKey))
         assertThat(data, containsString(paramValue))
     }
+
 }
 

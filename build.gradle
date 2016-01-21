@@ -17,7 +17,7 @@ buildscript {
 
 allprojects {
     ext {
-        publishVersion = '0.67'
+        publishVersion = '0.7'
     }
 
     repositories {
