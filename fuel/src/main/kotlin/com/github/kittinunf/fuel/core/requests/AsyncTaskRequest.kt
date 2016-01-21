@@ -23,7 +23,6 @@ class AsyncTaskRequest(val task: TaskRequest) : TaskRequest(task.request) {
                 failureCallback?.invoke(error, response)
             }
         } catch(ex: Exception) {
-            val temp = ex
             val error = FuelError().apply {
                 exception = ex
             }
