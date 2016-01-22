@@ -1,5 +1,7 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
+import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
 import com.github.kittinunf.fuel.core.requests.TaskRequest
 import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
@@ -212,12 +214,13 @@ class Request {
     fun response() = response(byteArrayDeserializer())
 
     //string
-    fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit) =
-            response(stringDeserializer(), handler)
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: (Request, Response, Result<String, FuelError>) -> Unit) =
+            response(stringDeserializer(charset), handler)
 
+    fun responseString(charset: Charset, handler: Handler<String>) = response(stringDeserializer(charset), handler)
     fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
 
-    fun responseString() = response(stringDeserializer())
+    fun responseString(charset: Charset = Charsets.UTF_8) = response(stringDeserializer(charset))
 
     //object
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit) = response(deserializer, handler)
@@ -227,21 +230,8 @@ class Request {
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) = response(deserializer)
 
     companion object {
-        fun byteArrayDeserializer(): Deserializable<ByteArray> {
-            return object : Deserializable<ByteArray> {
-                override fun deserialize(response: Response): ByteArray {
-                    return response.data
-                }
-            }
-        }
+        fun byteArrayDeserializer() = ByteArrayDeserializer
 
-        fun stringDeserializer(): Deserializable<String> {
-            return object : Deserializable<String> {
-                override fun deserialize(response: Response): String {
-                    return String(response.data)
-                }
-            }
-        }
-
+        fun stringDeserializer(charset: Charset = Charsets.UTF_8) = StringDeserializer(charset)
     }
 }
