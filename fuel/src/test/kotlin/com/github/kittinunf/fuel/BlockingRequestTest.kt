@@ -1,7 +1,11 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
-import org.hamcrest.CoreMatchers.*
+import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
