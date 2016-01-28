@@ -25,7 +25,7 @@ class Request {
         UPLOAD
     }
 
-    val timeoutInMillisecond = 15000
+    var timeoutInMillisecond = 15000
     var syncMode = false
 
     var type: Type = Type.REQUEST
@@ -64,6 +64,11 @@ class Request {
 
     fun sync(): Request {
         syncMode = true
+        return this
+    }
+
+    fun timeout(timeout: Int): Request {
+        timeoutInMillisecond = timeout
         return this
     }
 
