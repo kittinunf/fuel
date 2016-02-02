@@ -7,10 +7,11 @@ The easiest HTTP networking library for Kotlin/Android.
 ## Features
 
 - [x] Support basic HTTP GET/POST/PUT/DELETE in a fluent style interface
-- [X] Support both asynchronous and blocking requests
+- [x] Support both asynchronous and blocking requests
 - [x] Download file
 - [x] Upload file (multipart/form-data)
 - [x] Cancel in-flight request
+- [x] Request timeout
 - [x] Configuration manager
 - [x] Debug log / cUrl log
 - [x] Support response deserialization into plain old object (both Kotlin & Java)
@@ -240,6 +241,31 @@ Fuel.post("http://httpbin.org/post", listOf("foo" to "foo", "bar" to "bar")).res
 Fuel.put("http://httpbin.org/put", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
     //http body includes foo=foo&bar=bar
 }
+```
+
+### Set request's timeout
+Default timeout for a request is 15000 milliseconds.
+
+* Kotlin
+```kotlin
+val timeout = 5000 // 5000 milliseconds = 5 seconds.
+"http://httpbin.org/get".httpGet().timeout(timeout).responseString { request, response, result -> }
+```
+
+* Java
+``` Java
+int timeout = 5000 // 5000 milliseconds = 5 seconds.
+Fuel.get("http://httpbin.org/get", params).timeout(timeout).responseString(new Handler<String>() {
+    @Override
+    public void failure(Request request, Response response, FuelError error) {
+    	//do something when it is failure
+    }
+
+    @Override
+    public void success(Request request, Response response, String data) {
+    	//do something when it is successful
+    }
+});
 ```
 
 ### Download with or without progress handler
