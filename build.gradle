@@ -17,7 +17,15 @@ buildscript {
 
 allprojects {
     ext {
-        publishVersion = '0.71'
+        publish_version = '1.0.0-rc-1036'
+
+        //dependencies version
+        kotlin_version = '1.0.0-rc-1036'
+        result_version = '1.0.0-rc-1036'
+
+        //test dependencies version
+        junit_version = '4.12'
+        robolectric_version = '3.0'
     }
 
     repositories {

@@ -412,7 +412,8 @@ class RequestTest : BaseTestCase() {
     fun httpGetSyncRequest() {
         var received: Received = Received()
         manager.request(Method.GET, "http://httpbin.org/get").sync().responseString { req, res, result ->
-            received = Received(res, result.value, result.error)
+            val (value, error) = result
+            received = Received(res, value, error)
         }
 
         assertThat(received, notNullValue())

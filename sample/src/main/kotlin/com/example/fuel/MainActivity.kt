@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.Reader
 
-public class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     val TAG = "Main"
 
