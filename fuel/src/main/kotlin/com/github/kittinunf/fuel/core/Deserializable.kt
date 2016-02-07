@@ -22,13 +22,13 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     }
 
     //One of these methods must be implemented
-    public fun deserialize(bytes: ByteArray): T? = null
+    fun deserialize(bytes: ByteArray): T? = null
 
-    public fun deserialize(inputStream: InputStream): T? = null
+    fun deserialize(inputStream: InputStream): T? = null
 
-    public fun deserialize(reader: Reader): T? = null
+    fun deserialize(reader: Reader): T? = null
 
-    public fun deserialize(content: String): T? = null
+    fun deserialize(content: String): T? = null
 }
 
 fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit): Request {

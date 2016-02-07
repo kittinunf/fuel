@@ -6,7 +6,6 @@ import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
 import com.github.kittinunf.fuel.core.requests.TaskRequest
 import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
 import com.github.kittinunf.fuel.util.Base64
-import com.github.kittinunf.fuel.util.readWriteLazy
 import com.github.kittinunf.result.Result
 import java.io.File
 import java.net.URL
@@ -34,14 +33,7 @@ class Request {
     lateinit var url: URL
     var httpBody: ByteArray = ByteArray(0)
 
-    var httpHeaders by readWriteLazy {
-        val additionalHeaders = Manager.instance.baseHeaders
-        val headers = hashMapOf<String, String>()
-        if (additionalHeaders != null) {
-            headers.putAll(additionalHeaders)
-        }
-        return@readWriteLazy headers
-    }
+    var httpHeaders = hashMapOf<String, String>()
 
     //underlying task request
     val taskRequest: TaskRequest by lazy {
@@ -62,6 +54,7 @@ class Request {
     lateinit var executor: ExecutorService
     lateinit var callbackExecutor: Executor
 
+    //interfaces
     fun sync(): Request {
         syncMode = true
         return this
@@ -72,7 +65,6 @@ class Request {
         return this
     }
 
-    //interfaces
     fun header(vararg pairs: Pair<String, Any>?): Request {
         pairs.forEach {
             if (it != null)
@@ -81,10 +73,14 @@ class Request {
         return this
     }
 
-    fun header(pairs: Map<String, Any>?): Request {
-        if (pairs != null) {
-            for ((key, value) in pairs) {
-                header(key to value)
+    fun header(pairs: Map<String, Any>?): Request = header(pairs, true)
+
+    internal fun header(pairs: Map<String, Any>?, replace: Boolean): Request {
+        pairs?.forEach {
+            it.let {
+                if (!httpHeaders.containsKey(it.key) || replace) {
+                    httpHeaders.plusAssign(Pair(it.key, it.value.toString()))
+                }
             }
         }
         return this

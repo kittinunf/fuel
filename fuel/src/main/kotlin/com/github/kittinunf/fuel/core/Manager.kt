@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.util.readWriteLazy
 import java.security.KeyStore
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
+import java.util.*
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -54,6 +55,7 @@ class Manager {
             parameters = if (param == null) baseParams else baseParams + param
         })
 
+        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = executor
@@ -69,6 +71,7 @@ class Manager {
             parameters = if (param == null) baseParams else baseParams + param
         })
 
+        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = executor
@@ -85,6 +88,7 @@ class Manager {
             requestType = Request.Type.DOWNLOAD
         }.request
 
+        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = executor
@@ -101,6 +105,7 @@ class Manager {
             requestType = Request.Type.DOWNLOAD
         }.request
 
+        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = executor
@@ -117,6 +122,7 @@ class Manager {
             requestType = Request.Type.UPLOAD
         }.request
 
+        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = executor
@@ -133,6 +139,7 @@ class Manager {
             requestType = Request.Type.UPLOAD
         }.request
 
+        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = executor
@@ -142,6 +149,7 @@ class Manager {
 
     fun request(convertible: Fuel.RequestConvertible): Request {
         val request = convertible.request
+        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = executor

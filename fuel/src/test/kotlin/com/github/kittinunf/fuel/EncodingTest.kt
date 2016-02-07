@@ -8,7 +8,7 @@ import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-public class EncodingTest : BaseTestCase() {
+class EncodingTest : BaseTestCase() {
 
     @Before
     fun setUp() {
