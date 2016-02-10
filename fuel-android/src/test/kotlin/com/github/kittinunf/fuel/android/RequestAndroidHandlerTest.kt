@@ -13,7 +13,7 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 
-public class RequestAndroidHandlerTest : BaseTestCase() {
+class RequestAndroidHandlerTest : BaseTestCase() {
 
     init {
         Manager.instance.basePath = "https://httpbin.org"

@@ -2,7 +2,8 @@ package com.github.kittinunf.fuel.core
 
 import java.net.URL
 
-public class Response {
+class Response {
+
     lateinit var url: URL
 
     var httpStatusCode = -1

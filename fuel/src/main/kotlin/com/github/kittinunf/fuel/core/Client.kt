@@ -1,5 +1,5 @@
 package com.github.kittinunf.fuel.core
 
-public interface Client {
+interface Client {
     fun executeRequest(request: Request): Response
 }

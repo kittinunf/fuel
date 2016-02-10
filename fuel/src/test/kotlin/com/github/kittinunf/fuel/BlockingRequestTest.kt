@@ -181,7 +181,7 @@ class BlockingRequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "xxx"
 
-        val (request, response, data) =manager.request(Method.POST, "http://httpbin.org/post", listOf(paramKey to paramValue)).responseString()
+        val (request, response, data) = manager.request(Method.POST, "http://httpbin.org/post", listOf(paramKey to paramValue)).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -192,6 +192,24 @@ class BlockingRequestTest : BaseTestCase() {
 
         assertThat(data, containsString(paramKey))
         assertThat(data, containsString(paramValue))
+    }
+
+    @Test
+    fun httpGetRequestWithNotOverridenHeaders() {
+        val headerKey = "Content-Type"
+        val headerValue = "application/json"
+        manager.baseHeaders = mapOf(headerKey to headerValue)
+
+        val (request, response, data) = manager.request(Method.POST, HttpsBin.POST, listOf("email" to "foo@bar.com")).responseString()
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(request.httpHeaders[headerKey], isEqualTo(headerValue))
     }
 
 }
