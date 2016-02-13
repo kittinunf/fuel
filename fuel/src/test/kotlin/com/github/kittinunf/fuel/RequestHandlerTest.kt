@@ -3,10 +3,8 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestHandlerTest : BaseTestCase() {
@@ -15,11 +13,6 @@ class RequestHandlerTest : BaseTestCase() {
         Manager.instance.basePath = "https://httpbin.org"
         Manager.instance.baseHeaders = mapOf("foo" to "bar")
         Manager.instance.baseParams = listOf("key" to "value")
-    }
-
-    @Before
-    fun setUp() {
-        lock = CountDownLatch(1)
     }
 
     @Test
@@ -35,8 +28,6 @@ class RequestHandlerTest : BaseTestCase() {
                 req = request
                 res = response
                 data = value
-
-                lock.countDown()
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
@@ -44,8 +35,6 @@ class RequestHandlerTest : BaseTestCase() {
             }
 
         })
-
-        await()
 
         assertThat(req, notNullValue())
         assertThat(res, notNullValue())
@@ -73,13 +62,9 @@ class RequestHandlerTest : BaseTestCase() {
                 req = request
                 res = response
                 err = error
-
-                lock.countDown()
             }
 
         })
-
-        await()
 
         assertThat(req, notNullValue())
         assertThat(res, notNullValue())
@@ -105,16 +90,12 @@ class RequestHandlerTest : BaseTestCase() {
                 req = request
                 res = response
                 data = value
-
-                lock.countDown()
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
                 println(error)
             }
         })
-
-        await()
 
         val string = data as String
 

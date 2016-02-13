@@ -1,16 +1,24 @@
 package com.github.kittinunf.fuel
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-
 abstract class BaseTestCase {
+    init {
+        enableTestMode()
+    }
 
-    val DEFAULT_TIMEOUT = 15L
+    protected inline fun regularMode(runnable: () -> Unit) {
+        disableTestMode()
+        runnable()
+        enableTestMode()
+    }
 
-    lateinit var lock: CountDownLatch
+    protected fun enableTestMode() {
+        Fuel.testMode {
+            timeout = 15000
+        }
+    }
 
-    fun await(seconds: Long = DEFAULT_TIMEOUT) {
-        lock.await(seconds, TimeUnit.SECONDS);
+    protected fun disableTestMode() {
+        Fuel.regularMode()
     }
 
 }

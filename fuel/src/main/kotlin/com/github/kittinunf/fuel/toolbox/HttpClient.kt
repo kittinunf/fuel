@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.toolbox
 
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.*
 import java.io.BufferedOutputStream
 import java.io.IOException
@@ -17,7 +18,7 @@ class HttpClient : Client {
 
         try {
             connection.apply {
-                val timeout = request.timeoutInMillisecond
+                val timeout = Fuel.testConfiguration.timeout?.let { if (it == -1) Int.MAX_VALUE else it } ?: request.timeoutInMillisecond
                 connectTimeout = timeout
                 readTimeout = timeout
                 doInput = true

@@ -25,7 +25,6 @@ class Request {
     }
 
     var timeoutInMillisecond = 15000
-    var syncMode = false
 
     var type: Type = Type.REQUEST
     lateinit var httpMethod: Method
@@ -55,11 +54,6 @@ class Request {
     lateinit var callbackExecutor: Executor
 
     //interfaces
-    fun sync(): Request {
-        syncMode = true
-        return this
-    }
-
     fun timeout(timeout: Int): Request {
         timeoutInMillisecond = timeout
         return this

@@ -3,10 +3,8 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestTest : BaseTestCase() {
@@ -20,11 +18,6 @@ class RequestTest : BaseTestCase() {
         DELETE("delete");
 
         override val path = "https://httpbin.org/$relativePath"
-    }
-
-    @Before
-    fun setUp() {
-        lock = CountDownLatch(1)
     }
 
     class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
@@ -54,11 +47,7 @@ class RequestTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -83,11 +72,7 @@ class RequestTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -115,11 +100,7 @@ class RequestTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -152,11 +133,7 @@ class RequestTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -190,11 +167,7 @@ class RequestTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -227,11 +200,7 @@ class RequestTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -264,11 +233,7 @@ class RequestTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -298,11 +263,7 @@ class RequestTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -333,11 +294,7 @@ class RequestTest : BaseTestCase() {
             }, {
                 error = it
             })
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -365,12 +322,7 @@ class RequestTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
-
         val string = data as String
 
         assertThat(request, notNullValue())
@@ -387,42 +339,27 @@ class RequestTest : BaseTestCase() {
 
     @Test
     fun httpGetRequestCancel() {
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        regularMode {
+            var response: Response? = null
+            var data: Any? = null
+            var error: FuelError? = null
 
-        val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString { req, res, result ->
-            response = res
+            val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString { req, res, result ->
+                response = res
 
-            val (d, err) = result
-            data = d
-            error = err
+                val (d, err) = result
+                data = d
+                error = err
+            }
+
+            request.cancel()
+
+            println(request.cUrlString())
+            assertThat(request, notNullValue())
+            assertThat(response, nullValue())
+            assertThat(data, nullValue())
+            assertThat(error, nullValue())
         }
-
-        request.cancel()
-
-        println(request.cUrlString())
-        assertThat(request, notNullValue())
-        assertThat(response, nullValue())
-        assertThat(data, nullValue())
-        assertThat(error, nullValue())
     }
-
-    @Test
-    fun httpGetSyncRequest() {
-        var received: Received = Received()
-        manager.request(Method.GET, "http://httpbin.org/get").sync().responseString { req, res, result ->
-            val (value, error) = result
-            received = Received(res, value, error)
-        }
-
-        assertThat(received, notNullValue())
-        assertThat(received.response, notNullValue())
-        assertThat(received.response?.httpStatusCode, isEqualTo(200))
-        assertThat(received.data as String, containsString("httpbin.org"))
-        assertThat(received.error, nullValue())
-    }
-
-    data class Received(val response: Response? = null, val data: Any? = null, val error: FuelError? = null)
 }
 
