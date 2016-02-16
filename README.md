@@ -1,6 +1,6 @@
 # Fuel
 
-[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.0.0--rc--1036-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
+[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.0.0-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
 
 The easiest HTTP networking library for Kotlin/Android.
 
@@ -27,8 +27,8 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.kittinunf.fuel:fuel:1.0.0-rc-1036' //for JVM
-    compile 'com.github.kittinunf.fuel:fuel-android:1.0.0-rc-1036' //for Android
+    compile 'com.github.kittinunf.fuel:fuel:1.0.0' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:1.0.0' //for Android
 }
 ```
 
