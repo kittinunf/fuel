@@ -4,11 +4,9 @@ import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
-import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestStringExtensionTest : BaseTestCase() {
@@ -17,11 +15,6 @@ class RequestStringExtensionTest : BaseTestCase() {
         Manager.instance.basePath = "https://httpbin.org"
         Manager.instance.baseHeaders = mapOf("foo" to "bar")
         Manager.instance.baseParams = listOf("key" to "value")
-    }
-
-    @Before
-    fun setUp() {
-        lock = CountDownLatch(1)
     }
 
     @Test
@@ -37,11 +30,7 @@ class RequestStringExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -65,11 +54,7 @@ class RequestStringExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -93,11 +78,7 @@ class RequestStringExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -121,11 +102,7 @@ class RequestStringExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -155,11 +132,7 @@ class RequestStringExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -187,11 +160,7 @@ class RequestStringExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -219,11 +188,7 @@ class RequestStringExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())

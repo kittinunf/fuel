@@ -4,10 +4,8 @@ import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestAuthenticationTest : BaseTestCase() {
@@ -26,11 +24,6 @@ class RequestAuthenticationTest : BaseTestCase() {
         }
     }
 
-    @Before
-    fun setUp() {
-        lock = CountDownLatch(1)
-    }
-
     @Test
     fun httpBasicAuthenticationWithInvalidCase() {
         var request: Request? = null
@@ -44,11 +37,7 @@ class RequestAuthenticationTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -72,11 +61,7 @@ class RequestAuthenticationTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())

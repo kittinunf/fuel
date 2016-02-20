@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.toolbox.HttpClient
+import com.github.kittinunf.fuel.util.SameThreadExecutorService
 import com.github.kittinunf.fuel.util.readWriteLazy
 import java.security.KeyStore
 import java.security.SecureRandom
@@ -44,6 +45,10 @@ class Manager {
         }
     }
 
+    val testExecutor: ExecutorService by lazy { SameThreadExecutorService() }
+
+    fun createExecutor() = if (Fuel.testConfiguration.blocking) testExecutor else executor
+
     //callback executor
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
@@ -58,7 +63,7 @@ class Manager {
         request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
-        request.executor = executor
+        request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         return request
     }
@@ -74,7 +79,7 @@ class Manager {
         request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
-        request.executor = executor
+        request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         return request
     }
@@ -91,7 +96,7 @@ class Manager {
         request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
-        request.executor = executor
+        request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         return request
     }
@@ -108,7 +113,7 @@ class Manager {
         request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
-        request.executor = executor
+        request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         return request
     }
@@ -125,7 +130,7 @@ class Manager {
         request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
-        request.executor = executor
+        request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         return request
     }
@@ -142,7 +147,7 @@ class Manager {
         request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
-        request.executor = executor
+        request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         return request
     }
@@ -152,7 +157,7 @@ class Manager {
         request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
-        request.executor = executor
+        request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         return request
     }

@@ -3,12 +3,10 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.HttpURLConnection
-import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestUploadTest : BaseTestCase() {
@@ -22,11 +20,6 @@ class RequestUploadTest : BaseTestCase() {
     val currentDir: File by lazy {
         val dir = System.getProperty("user.dir")
         File(dir, "src/test/assets")
-    }
-
-    @Before
-    fun setUp() {
-        lock = CountDownLatch(1)
     }
 
     @Test
@@ -44,11 +37,7 @@ class RequestUploadTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -74,11 +63,7 @@ class RequestUploadTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -111,11 +96,7 @@ class RequestUploadTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -145,11 +126,7 @@ class RequestUploadTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -177,11 +154,7 @@ class RequestUploadTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())

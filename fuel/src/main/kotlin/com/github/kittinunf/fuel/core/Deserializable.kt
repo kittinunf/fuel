@@ -75,7 +75,6 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     }
 
     submit(request)
-    if (syncMode) taskFuture?.get(timeoutInMillisecond.toLong(), MILLISECONDS)
     return this
 }
 

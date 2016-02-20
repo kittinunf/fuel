@@ -16,6 +16,7 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Debug log / cUrl log
 - [x] Support response deserialization into plain old object (both Kotlin & Java)
 - [x] Automatically invoke handler on Android Main Thread
+- [x] Special test mode for easier testing
 
 ## Installation
 
@@ -463,6 +464,18 @@ Fuel.get("/get").response { request, response, result ->
 * `socketFactory` can be supplied by user. If `keyStore` is not null, `socketFactory` will be derived from it.
 
 * `hostnameVerifier` is configurable by user. By default, it is just ignore it by returning `true` to all hostnames. If this is not what you want, please consider provide it.
+
+### Test mode
+
+Testing asynchronized calls can be somehow hard without special care. That's why Fuel has a special test mode with make all the requests blocking, for tests.
+
+``` Kotlin
+Fuel.testMode {
+            timeout = 15000 // Optional feature, set all requests' timeout to this value.
+}
+```
+
+In order to disable test mode, just call `Fuel.regularMode()`
 
 ## Other libraries
 If you like Fuel, you might also like other libraries;

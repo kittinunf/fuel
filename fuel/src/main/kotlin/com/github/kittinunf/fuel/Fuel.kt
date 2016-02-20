@@ -3,6 +3,7 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.Manager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.util.TestConfiguration
 
 class Fuel {
     interface PathStringConvertible {
@@ -14,6 +15,15 @@ class Fuel {
     }
 
     companion object {
+        internal var testConfiguration = TestConfiguration(timeout = null, blocking = false)
+
+        @JvmStatic @JvmOverloads
+        fun testMode(configuration: TestConfiguration.() -> Unit = {}) {
+            testConfiguration = TestConfiguration().apply(configuration)
+        }
+
+        fun regularMode() = testMode { timeout = null; blocking = false }
+
         //convenience methods
         //get
         @JvmStatic @JvmOverloads

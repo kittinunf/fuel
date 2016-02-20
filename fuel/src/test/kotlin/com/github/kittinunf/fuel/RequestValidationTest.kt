@@ -6,9 +6,7 @@ import com.github.kittinunf.result.getAs
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestValidationTest : BaseTestCase() {
@@ -17,11 +15,6 @@ class RequestValidationTest : BaseTestCase() {
         Manager().apply {
             basePath = "http://httpbin.org"
         }
-    }
-
-    @Before
-    fun setUp() {
-        lock = CountDownLatch(1)
     }
 
     @Test
@@ -41,11 +34,7 @@ class RequestValidationTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -73,11 +62,7 @@ class RequestValidationTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -108,11 +93,7 @@ class RequestValidationTest : BaseTestCase() {
                     data = result.getAs()
                 }
             }
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())

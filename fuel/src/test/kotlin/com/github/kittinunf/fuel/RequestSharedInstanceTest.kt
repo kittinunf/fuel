@@ -3,11 +3,9 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
-import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestSharedInstanceTest : BaseTestCase() {
@@ -38,11 +36,6 @@ class RequestSharedInstanceTest : BaseTestCase() {
         }
     }
 
-    @Before
-    fun setUp() {
-        lock = CountDownLatch(1)
-    }
-
     @Test
     fun httpGetRequestWithSharedInstance() {
         var request: Request? = null
@@ -57,11 +50,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -95,11 +84,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -133,11 +118,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -171,11 +152,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -209,11 +186,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -242,11 +215,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -275,11 +244,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -308,11 +273,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -341,11 +302,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -370,11 +327,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -399,11 +352,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -428,11 +377,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -466,11 +411,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -505,11 +446,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())

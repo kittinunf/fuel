@@ -6,12 +6,10 @@ import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
-import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestDownloadTest : BaseTestCase() {
@@ -20,11 +18,6 @@ class RequestDownloadTest : BaseTestCase() {
         Manager().apply {
             basePath = "http://httpbin.org"
         }
-    }
-
-    @Before
-    fun setUp() {
-        lock = CountDownLatch(1)
     }
 
     @Test
@@ -46,11 +39,7 @@ class RequestDownloadTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -86,11 +75,7 @@ class RequestDownloadTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -122,11 +107,7 @@ class RequestDownloadTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -156,11 +137,7 @@ class RequestDownloadTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())

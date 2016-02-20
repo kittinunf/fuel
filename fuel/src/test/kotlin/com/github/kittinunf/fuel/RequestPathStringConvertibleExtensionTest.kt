@@ -6,11 +6,9 @@ import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
-import java.util.concurrent.CountDownLatch
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
@@ -30,11 +28,6 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         override val path = "/$relativePath"
     }
 
-    @Before
-    fun setUp() {
-        lock = CountDownLatch(1)
-    }
-
     @Test
     fun httpGetRequestWithSharedInstance() {
         var request: Request? = null
@@ -49,11 +42,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -78,11 +67,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -111,11 +96,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -144,11 +125,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         val string = data as String
 
@@ -181,11 +158,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -212,11 +185,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-
-            lock.countDown()
         }
-
-        await()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
