@@ -17,6 +17,7 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Support response deserialization into plain old object (both Kotlin & Java)
 - [x] Automatically invoke handler on Android Main Thread
 - [x] Special test mode for easier testing
+- [x] RxJava support out of the box
 
 ## Installation
 
@@ -30,6 +31,7 @@ repositories {
 dependencies {
     compile 'com.github.kittinunf.fuel:fuel:1.0.0' //for JVM
     compile 'com.github.kittinunf.fuel:fuel-android:1.0.0' //for Android
+    compile 'com.github.kittinunf.fuel:fuel-rxjava:1.0.0' //for RxJava support (optional)
 }
 ```
 
@@ -476,6 +478,28 @@ Fuel.testMode {
 ```
 
 In order to disable test mode, just call `Fuel.regularMode()`
+
+### RxJava Support
+
+* Fuel supports [RxJava](https://github.com/ReactiveX/RxJava) right off the box.
+
+``` Kotlin
+"http://www.example.com/photos/1".httpGet().rx_object(Photo.Deserializer()).subscribe {
+	//do something
+}
+```
+
+* There are 6 extensions over `Request` that provide RxJava `Observable<T>` as return type.
+
+``` Kotlin
+fun Request.rx_response(): Observable<Pair<Response, ByteArray>>
+fun Request.rx_responseString(charset: Charset): Observable<Pair<Response, String>>
+fun <T : Any> Request.rx_responseObject(deserializable: Deserializable<T>): Observable<Pair<Response, T>>
+
+fun Request.rx_data(): Observable<ByteArray>
+fun Request.rx_string(charset: Charset): Observable<String>
+fun <T : Any> Request.rx_object(deserializable: Deserializable<T>): Observable<T>
+```
 
 ## Other libraries
 If you like Fuel, you might also like other libraries;
