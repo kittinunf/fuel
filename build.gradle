@@ -22,6 +22,7 @@ allprojects {
         //dependencies version
         kotlin_version = '1.0.0'
         result_version = '1.0.0'
+        rxjava_version = '1.1.1'
 
         //test dependencies version
         junit_version = '4.12'
