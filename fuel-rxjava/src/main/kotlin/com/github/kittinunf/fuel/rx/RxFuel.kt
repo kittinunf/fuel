@@ -14,7 +14,7 @@ import java.nio.charset.Charset
 
 fun Request.rx_response() = rx_response(ByteArrayDeserializer)
 
-fun Request.rx_responseString(charset: Charset) = rx_response(StringDeserializer(charset))
+fun Request.rx_responseString(charset: Charset = Charsets.UTF_8) = rx_response(StringDeserializer(charset))
 
 fun <T : Any> Request.rx_responseObject(deserializable: Deserializable<T>) = rx_response(deserializable)
 
@@ -38,7 +38,7 @@ private fun <T : Any> Request.rx_response(deserializable: Deserializable<T>): Ob
 
 fun Request.rx_bytes() = rx_result(ByteArrayDeserializer)
 
-fun Request.rx_string(charset: Charset) = rx_result(StringDeserializer(charset))
+fun Request.rx_string(charset: Charset = Charsets.UTF_8) = rx_result(StringDeserializer(charset))
 
 fun <T : Any> Request.rx_object(deserializable: Deserializable<T>) = rx_result(deserializable)
 
