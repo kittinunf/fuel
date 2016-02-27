@@ -5,7 +5,11 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.kittinunf.fuel.*
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.rx.rx_object
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
@@ -42,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         httpBasicAuthentication()
         httpResponseObject()
         httpCancel()
+        httpRxSupport()
     }
 
     fun httpCancel() {
@@ -150,6 +155,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun httpRxSupport() {
+        "http://jsonplaceholder.typicode.com/photos/1".httpGet().rx_object(Photo.Deserializer()).subscribe {
+            Log.d(TAG, it.toString())
+        }
+    }
+
     fun <T : Any> updateUI(response: Response, result: Result<T, FuelError>) {
         //multi-declaration
         val (data, error) = result
@@ -176,6 +187,5 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-
 
 }

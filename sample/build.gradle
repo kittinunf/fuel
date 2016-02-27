@@ -43,6 +43,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
     compile "com.google.code.gson:gson:$gson_version"
 
+    compile project(':fuel-rxjava')
     compile project(':fuel-android')
 }
 
