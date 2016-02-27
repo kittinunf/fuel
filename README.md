@@ -473,7 +473,7 @@ Testing asynchronized calls can be somehow hard without special care. That's why
 
 ``` Kotlin
 Fuel.testMode {
-            timeout = 15000 // Optional feature, set all requests' timeout to this value.
+    timeout = 15000 // Optional feature, set all requests' timeout to this value.
 }
 ```
 
