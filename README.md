@@ -355,16 +355,10 @@ request.cancel()
 ```
 
 ### Synchronous Call 
-* Fuel supports synchronous call by calling `sync` before `response`. 
+* Fuel supports synchronous call by calling the `response()` methods without handler. 
 ``` Kotlin
-var data: String? = null
 //the call will block until the http call finished
-Fuel.get("http://httpbin.org/get").sync().responseString { req, res, result ->
-    val (d, e) = result
-    data = d
-}
-
-//do something with data
+var (req, res, result) = Fuel.get("http://httpbin.org/get").sync().responseString()
 ```
 
 ## Advanced Configuration
