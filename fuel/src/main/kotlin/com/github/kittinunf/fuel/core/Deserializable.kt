@@ -2,11 +2,11 @@ package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.core.requests.AsyncTaskRequest
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.mapError
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
-import java.util.concurrent.TimeUnit.MILLISECONDS
 
 interface Deserializable<out T : Any> {
     fun deserialize(response: Response): T
@@ -78,7 +78,12 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     return this
 }
 
-fun <T : Any, U: Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, T>  {
-    val response = taskRequest.call()
-    return Triple(this, response ,deserializable.deserialize(response))
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
+    val call = taskRequest.call()
+    when (call) {
+        is Result.Success ->
+            return Triple(this, call.get(), Result.of { deserializable.deserialize(call.get()) }.mapError { FuelError().apply { exception = exception } })
+        is Result.Failure ->
+            return Triple(this, Response().apply { url = this.url }, Result.Failure<T, FuelError>(call.error))
+    }
 }

@@ -102,11 +102,9 @@ Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() 
 #### Blocking mode
 You can also wait for the response. It returns the same parameters as the async version, but it blocks the thread. It supports all the features of the async version.
 
-**Note:** Instead of returning `Result` object, it will throw the exception.
-
 * Kotlin
 ``` Kotlin
-val (request, response, data) = "http://httpbin.org/get".httpGet().responseString()
+val (request, response, result) = "http://httpbin.org/get".httpGet().responseString() // result is Result<String, FuelError>
 ```
 
 * Java
@@ -115,7 +113,7 @@ try {
     Triple<Request, Response, String> data = Fuel.get("http://www.google.com").responseString();
     Request request = data.getFirst();
     Response response = data.getSecond();
-    String text = data.getThird();
+    Result<String,FuelError> text = data.getThird();
 } catch (Exception networkError) {
 
 }
@@ -352,19 +350,6 @@ val request = Fuel.get("http://httpbin.org/get").interrupt { request ->
 }
 
 request.cancel()
-```
-
-### Synchronous Call 
-* Fuel supports synchronous call by calling `sync` before `response`. 
-``` Kotlin
-var data: String? = null
-//the call will block until the http call finished
-Fuel.get("http://httpbin.org/get").sync().responseString { req, res, result ->
-    val (d, e) = result
-    data = d
-}
-
-//do something with data
 ```
 
 ## Advanced Configuration

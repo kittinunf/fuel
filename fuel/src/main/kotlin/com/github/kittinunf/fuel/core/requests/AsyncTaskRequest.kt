@@ -3,25 +3,31 @@ package com.github.kittinunf.fuel.core.requests
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.failure
+import com.github.kittinunf.result.success
 import java.io.InterruptedIOException
 
 class AsyncTaskRequest(val task: TaskRequest) : TaskRequest(task.request) {
     var successCallback: ((Response) -> Unit)? = null
     var failureCallback: ((FuelError, Response) -> Unit)? = null
 
-    override fun call(): Response {
+    override fun call(): Result<Response, FuelError> {
         try {
-            val response = task.call()
-            dispatchCallback(response)
-            return response
-        } catch(error: FuelError) {
-            if (error.exception as? InterruptedIOException != null) {
-                interruptCallback?.invoke(request)
-            } else {
-                val response = Response()
-                response.url = request.url
-                failureCallback?.invoke(error, response)
+            val call = task.call()
+            call.success {
+                dispatchCallback(it)
             }
+            call.failure { error ->
+                if (error.exception as? InterruptedIOException != null) {
+                    interruptCallback?.invoke(request)
+                } else {
+                    val response = Response()
+                    response.url = request.url
+                    failureCallback?.invoke(error, response)
+                }
+            }
+            return Result.Success(Response()) //FIXME
         } catch(ex: Exception) {
             val error = FuelError().apply {
                 exception = ex
@@ -29,9 +35,8 @@ class AsyncTaskRequest(val task: TaskRequest) : TaskRequest(task.request) {
             val response = Response()
             response.url = request.url
             failureCallback?.invoke(error, response)
+            return Result.error(error)
         }
-        // FIXME
-        return Response()
     }
 
     override fun dispatchCallback(response: Response) {

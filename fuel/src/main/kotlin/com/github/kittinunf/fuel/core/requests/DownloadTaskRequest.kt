@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.Manager
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.util.copyTo
+import com.github.kittinunf.result.Result
 import java.io.*
 import java.net.URL
 
@@ -17,7 +18,7 @@ class DownloadTaskRequest(request: Request) : TaskRequest(request) {
     lateinit var dataStream: InputStream
     lateinit var fileOutputStream: FileOutputStream
 
-    override fun call(): Response {
+    override fun call(): Result<Response, FuelError> {
         try {
             val response = Manager.instance.client.executeRequest(request)
             val file = destinationCallback.invoke(response, request.url)
@@ -27,12 +28,12 @@ class DownloadTaskRequest(request: Request) : TaskRequest(request) {
             dataStream.copyTo(fileOutputStream, BUFFER_SIZE) { readBytes ->
                 progressCallback?.invoke(readBytes, response.httpContentLength)
             }
-            return response.apply { dispatchCallback(this) }
+            return Result.Success(response.apply { dispatchCallback(this) })
         } catch(error: FuelError) {
             if (error.exception as? InterruptedIOException != null) {
                 interruptCallback?.invoke(request)
             }
-            throw error
+            return Result.error(error)
         }
     }
 }

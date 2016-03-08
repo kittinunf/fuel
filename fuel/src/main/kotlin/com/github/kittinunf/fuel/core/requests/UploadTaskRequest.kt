@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.util.copyTo
 import com.github.kittinunf.fuel.util.toHexString
+import com.github.kittinunf.result.Result
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -26,7 +27,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
     var dataStream: ByteArrayOutputStream? = null
     var fileInputStream: FileInputStream? = null
 
-    override fun call(): Response {
+    override fun call(): Result<Response, FuelError> {
         try {
             val file = sourceCallback.invoke(request, request.url)
             //file input
@@ -53,12 +54,12 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
             }
 
             request.body(dataStream!!.toByteArray())
-            return Manager.instance.client.executeRequest(request).apply { dispatchCallback(this) }
+            return Result.Success(Manager.instance.client.executeRequest(request).apply { dispatchCallback(this) })
         } catch(error: FuelError) {
             if (error.exception as? InterruptedIOException != null) {
                 interruptCallback?.invoke(request)
             }
-            throw error
+            return Result.error(error)
         } finally {
             dataStream?.close()
             fileInputStream?.close()

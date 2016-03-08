@@ -1,10 +1,11 @@
 package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.result.Result
 import java.io.InterruptedIOException
 import java.util.concurrent.Callable
 
-open class TaskRequest(val request: Request) : Callable<Response> {
+open class TaskRequest(val request: Request) : Callable<Result<Response, FuelError>> {
     var validator: (Response) -> Boolean = { response ->
         (200..299).contains(response.httpStatusCode)
     }
@@ -12,14 +13,14 @@ open class TaskRequest(val request: Request) : Callable<Response> {
 
     var validating = true
 
-    override fun call(): Response {
+    override fun call(): Result<Response, FuelError> {
         try {
-            return Manager.instance.client.executeRequest(request).apply { dispatchCallback(this) }
+            return Result.Success(Manager.instance.client.executeRequest(request).apply { dispatchCallback(this) })
         } catch(error: FuelError) {
             if (error.exception as? InterruptedIOException != null) {
                 interruptCallback?.invoke(request)
             }
-            throw error
+            return Result.error(error)
         }
     }
 
