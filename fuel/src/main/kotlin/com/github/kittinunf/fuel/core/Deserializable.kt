@@ -6,7 +6,6 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
-import java.util.concurrent.TimeUnit.MILLISECONDS
 
 interface Deserializable<out T : Any> {
     fun deserialize(response: Response): T
@@ -78,7 +77,11 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     return this
 }
 
-fun <T : Any, U: Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, T>  {
-    val response = taskRequest.call()
-    return Triple(this, response ,deserializable.deserialize(response))
+fun <T : Any, U: Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T,FuelError>>  {
+    try {
+        val response = taskRequest.call()
+        return Triple(this, response, Result.Success(deserializable.deserialize(response)))
+    } catch (error: FuelError) {
+        return Triple(this, Response().apply { url = this@response.url }, Result.error(error))
+    }
 }
