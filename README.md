@@ -354,13 +354,6 @@ val request = Fuel.get("http://httpbin.org/get").interrupt { request ->
 request.cancel()
 ```
 
-### Synchronous Call 
-* Fuel supports synchronous call by calling the `response()` methods without handler. 
-``` Kotlin
-//the call will block until the http call finished
-var (req, res, result) = Fuel.get("http://httpbin.org/get").sync().responseString()
-```
-
 ## Advanced Configuration
 
 ### Response Deserialization
