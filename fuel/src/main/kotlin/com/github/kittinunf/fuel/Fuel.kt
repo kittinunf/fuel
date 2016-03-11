@@ -22,6 +22,7 @@ class Fuel {
             testConfiguration = TestConfiguration().apply(configuration)
         }
 
+        @JvmStatic
         fun regularMode() = testMode { timeout = null; blocking = false }
 
         //convenience methods
