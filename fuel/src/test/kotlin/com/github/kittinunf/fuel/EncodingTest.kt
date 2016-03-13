@@ -104,4 +104,30 @@ class EncodingTest : BaseTestCase() {
         assertThat(request.url.toString(), isEqualTo("http://www.example.com/U$3%7C2%7C%5C%7C@me/P@$\$vv0%7C2%7C)"))
     }
 
+    @Test
+    fun testEncodingAlreadyEncodedUrl() {
+        val supposed = "https://www.example.com/files/%D7%98%D7%A7%D7%A1%D7%98%20%D7%91%D7%A2%D7%91%D7%A8%D7%99%D7%AA%201%203.txt"
+        val request = Encoding().apply {
+            httpMethod = Method.GET
+            urlString = supposed
+        }.request
+
+        assertThat(request.url.toString(), isEqualTo(supposed))
+    }
+
+    @Test
+    fun testEncodingNonAsciiString() {
+        val hebrewString = "טקסט בעברית 1 3.txt"
+        val path = "https://www.example.com/files/" + hebrewString
+
+        val request = Encoding().apply {
+            httpMethod = Method.GET
+            urlString = path
+            parameters = null
+        }.request
+
+        val supposed = "https://www.example.com/files/%D7%98%D7%A7%D7%A1%D7%98%20%D7%91%D7%A2%D7%91%D7%A8%D7%99%D7%AA%201%203.txt"
+        assertThat(request.url.toString(), isEqualTo(supposed))
+    }
+
 }

@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.util.toHexString
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URL
+import java.net.URISyntaxException
 import kotlin.properties.Delegates
 
 class Encoding : Fuel.RequestConvertible {
@@ -54,8 +55,12 @@ class Encoding : Fuel.RequestConvertible {
         } catch (e: MalformedURLException) {
             URL(baseUrlString + if (path.startsWith('/') or path.isEmpty()) path else '/' + path)
         }
-        val uri = URI(url.protocol, url.userInfo, url.host, url.port, url.path, url.query, url.ref)
-        return uri.toURL()
+        val uri = try {
+                    url.toURI()
+                } catch (e: URISyntaxException) {
+                    URI(url.protocol, url.userInfo, url.host, url.port, url.path, url.query, url.ref)
+                }
+        return URL(uri.toASCIIString())
     }
 
     private fun encodeParameterInUrl(method: Method): Boolean {
