@@ -17,11 +17,11 @@ buildscript {
 
 allprojects {
     ext {
-        publish_version = '1.1.1'
+        publish_version = '1.1.2'
 
         //dependencies version
-        kotlin_version = '1.0.0'
-        result_version = '1.0.0'
+        kotlin_version = '1.0.1'
+        result_version = '1.0.1'
         rxjava_version = '1.1.1'
 
         //test dependencies version
