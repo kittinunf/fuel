@@ -5,8 +5,6 @@ import com.github.kittinunf.fuel.toolbox.HttpClient
 import com.github.kittinunf.fuel.util.SameThreadExecutorService
 import com.github.kittinunf.fuel.util.readWriteLazy
 import java.security.KeyStore
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
 import java.util.*
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
@@ -28,11 +26,11 @@ class Manager {
             val sslContext = SSLContext.getInstance("SSL")
             sslContext.init(null, trustFactory.trustManagers, null)
             sslContext.socketFactory
-        } ?: unsecuredSocketFactory()
+        } ?: HttpsURLConnection.getDefaultSSLSocketFactory()
     }
 
     var hostnameVerifier: HostnameVerifier by readWriteLazy {
-        unsecuredHostnameVerifier()
+        HttpsURLConnection.getDefaultHostnameVerifier()
     }
 
     //background executor
@@ -45,9 +43,7 @@ class Manager {
         }
     }
 
-    val testExecutor: ExecutorService by lazy { SameThreadExecutorService() }
-
-    fun createExecutor() = if (Fuel.testConfiguration.blocking) testExecutor else executor
+    fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
 
     //callback executor
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
@@ -160,30 +156,6 @@ class Manager {
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         return request
-    }
-
-    private fun unsecuredSocketFactory(): SSLSocketFactory {
-        val trustAllCerts = arrayOf(object : X509TrustManager {
-
-            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String) {
-            }
-
-            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String) {
-            }
-
-            override fun getAcceptedIssuers(): Array<out X509Certificate>? {
-                return null
-            }
-
-        })
-
-        val sslContext = SSLContext.getInstance("SSL")
-        sslContext.init(null, trustAllCerts, SecureRandom())
-        return sslContext.socketFactory
-    }
-
-    private fun unsecuredHostnameVerifier(): HostnameVerifier {
-        return HostnameVerifier { hostname, session -> true }
     }
 
     companion object {

@@ -33,9 +33,9 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.kittinunf.fuel:fuel:1.1.2' //for JVM
-    compile 'com.github.kittinunf.fuel:fuel-android:1.1.2' //for Android
-    compile 'com.github.kittinunf.fuel:fuel-rxjava:1.1.2' //for RxJava support
+    compile 'com.github.kittinunf.fuel:fuel:1.1.3' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:1.1.3' //for Android
+    compile 'com.github.kittinunf.fuel:fuel-rxjava:1.1.3' //for RxJava support
 }
 ```
 
@@ -454,7 +454,7 @@ Fuel.get("/get").response { request, response, result ->
 
 * `socketFactory` can be supplied by user. If `keyStore` is not null, `socketFactory` will be derived from it.
 
-* `hostnameVerifier` is configurable by user. By default, it is just ignore it by returning `true` to all hostnames. If this is not what you want, please consider provide it.
+* `hostnameVerifier` is configurable by user. By default, it uses `HttpsURLConnection.getDefaultHostnameVerifier()`.
 
 ### Test mode
 

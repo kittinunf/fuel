@@ -15,7 +15,6 @@ import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
-import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLSocketFactory
 
 class Request {
@@ -47,8 +46,8 @@ class Request {
     var taskFuture: Future<*>? = null
 
     //configuration
-    var socketFactory: SSLSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory()
-    var hostnameVerifier: HostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier()
+    var socketFactory: SSLSocketFactory? = null
+    var hostnameVerifier: HostnameVerifier? = null
 
     //callers
     lateinit var executor: ExecutorService
