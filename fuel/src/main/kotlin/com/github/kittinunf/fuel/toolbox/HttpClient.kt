@@ -100,7 +100,6 @@ class HttpClient : Client {
             Method.POST, Method.PUT, Method.PATCH -> connection.doOutput = true
         }
     }
-
 }
 
 
