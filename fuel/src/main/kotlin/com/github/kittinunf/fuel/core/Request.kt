@@ -24,6 +24,16 @@ class Request {
         UPLOAD
     }
 
+    enum class ContentType(val string: String) {
+        Text(""),
+        TextPlain("text/plain"),
+        JSON("application/json"),
+        Javascript("application/javascript"),
+        XML("application/xml"),
+        XMLText("text/xml"),
+        HTML("text/html")
+    }
+
     var timeoutInMillisecond = 15000
 
     var type: Type = Type.REQUEST
@@ -86,6 +96,14 @@ class Request {
     }
 
     fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
+
+    fun body(body: String, contentType: ContentType = ContentType.Text): Request {
+        httpBody = body.toByteArray()
+        if (contentType != ContentType.Text) {
+            header("Content-Type" to contentType.string)
+        }
+        return this
+    }
 
     fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
