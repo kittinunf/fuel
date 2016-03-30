@@ -97,8 +97,8 @@ class Request {
 
     fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
 
-    fun body(body: String, contentType: ContentType = ContentType.Text): Request {
-        httpBody = body.toByteArray()
+    fun body(body: String, contentType: ContentType = ContentType.Text, charset: Charset = Charsets.UTF_8): Request {
+        httpBody = body.toByteArray(charset)
         if (contentType != ContentType.Text) {
             header("Content-Type" to contentType.string)
         }
