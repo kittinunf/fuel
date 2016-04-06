@@ -43,7 +43,7 @@ dependencies {
 
 * There are two samples, one is in Kotlin and another one in Java.
 
-### Quick Glance Usage
+## Quick Glance Usage
 
 #### Async mode
 
