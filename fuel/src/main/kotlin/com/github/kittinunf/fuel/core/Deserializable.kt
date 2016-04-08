@@ -80,6 +80,6 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple
         val response = taskRequest.call()
         return Triple(this, response, Result.Success(deserializable.deserialize(response)))
     } catch (error: FuelError) {
-        return Triple(this, Response().apply { url = this@response.url }, Result.error(error))
+        return Triple(this, error.response, Result.error(error))
     }
 }

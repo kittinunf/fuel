@@ -1,6 +1,8 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
+import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import com.github.kittinunf.fuel.toolbox.HttpClient
 import com.github.kittinunf.fuel.util.SameThreadExecutorService
 import com.github.kittinunf.fuel.util.readWriteLazy
@@ -12,6 +14,7 @@ import java.util.concurrent.Executors
 import javax.net.ssl.*
 
 class Manager {
+
     var client: Client by readWriteLazy { HttpClient() }
     var basePath: String? = null
 
@@ -43,6 +46,11 @@ class Manager {
         }
     }
 
+    private val requestInterceptors: MutableList<((Request) -> Request) -> ((Request) -> Request)> =
+            mutableListOf()
+    private val responseInterceptors: MutableList<((Request, Response) -> Response) -> ((Request, Response) -> Response)> =
+            mutableListOf(redirectResponseInterceptor(), validatorResponseInterceptor(200..299))
+
     fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
 
     //callback executor
@@ -61,6 +69,8 @@ class Manager {
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
+        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 
@@ -77,6 +87,8 @@ class Manager {
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
+        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 
@@ -94,6 +106,8 @@ class Manager {
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
+        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 
@@ -111,6 +125,8 @@ class Manager {
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
+        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 
@@ -128,6 +144,8 @@ class Manager {
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
+        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 
@@ -145,6 +163,8 @@ class Manager {
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
+        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 
@@ -155,7 +175,33 @@ class Manager {
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
+        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
+    }
+
+    fun addRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)) {
+        requestInterceptors += interceptor
+    }
+
+    fun addResponseInterceptor(interceptor: ((Request, Response) -> Response) -> ((Request, Response) -> Response)) {
+        responseInterceptors += interceptor
+    }
+
+    fun removeRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)) {
+        requestInterceptors -= interceptor
+    }
+
+    fun removeResponseInterceptor(interceptor: ((Request, Response) -> Response) -> ((Request, Response) -> Response)) {
+        responseInterceptors -= interceptor
+    }
+
+    fun removeAllRequestInterceptors() {
+        requestInterceptors.clear()
+    }
+
+    fun removeAllResponseInterceptors() {
+        responseInterceptors.clear()
     }
 
     companion object {
