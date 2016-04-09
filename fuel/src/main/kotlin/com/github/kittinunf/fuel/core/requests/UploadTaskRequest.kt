@@ -1,7 +1,5 @@
 package com.github.kittinunf.fuel.core.requests
 
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Manager
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.util.copyTo
@@ -9,7 +7,6 @@ import com.github.kittinunf.fuel.util.toHexString
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
-import java.io.InterruptedIOException
 import java.net.URL
 import java.net.URLConnection
 
@@ -53,13 +50,8 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
             }
 
             request.body(dataStream!!.toByteArray())
-            return Manager.instance.client.executeRequest(request).apply { dispatchCallback(this) }
-        } catch(error: FuelError) {
-            if (error.exception as? InterruptedIOException != null) {
-                interruptCallback?.invoke(request)
-            }
-            throw error
-        } finally {
+            return super.call()
+        }  finally {
             dataStream?.close()
             fileInputStream?.close()
         }

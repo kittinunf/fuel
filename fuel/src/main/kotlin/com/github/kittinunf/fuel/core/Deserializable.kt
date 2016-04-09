@@ -51,10 +51,8 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler
 private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
                                                               success: (Request, Response, T) -> Unit,
                                                               failure: (Request, Response, FuelError) -> Unit): Request {
-    taskRequest.validating = false
     val request = AsyncTaskRequest(taskRequest)
     request.apply {
-        validator = taskRequest.validator
         successCallback = { response ->
             val deliverable = Result.of { deserializable.deserialize(response) }
             callback {
@@ -77,7 +75,7 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     return this
 }
 
-fun <T : Any, U: Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T,FuelError>>  {
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
     try {
         val response = taskRequest.call()
         return Triple(this, response, Result.Success(deserializable.deserialize(response)))

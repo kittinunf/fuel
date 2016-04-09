@@ -12,7 +12,7 @@ import rx.Subscription
 import rx.subscriptions.BooleanSubscription
 import java.nio.charset.Charset
 
-fun Request.rx_response() = rx_response(ByteArrayDeserializer)
+fun Request.rx_response() = rx_response(ByteArrayDeserializer())
 
 fun Request.rx_responseString(charset: Charset = Charsets.UTF_8) = rx_response(StringDeserializer(charset))
 
@@ -36,7 +36,7 @@ private fun <T : Any> Request.rx_response(deserializable: Deserializable<T>): Ob
             subscriber.add(createRequestSubscription(this))
         }
 
-fun Request.rx_bytes() = rx_result(ByteArrayDeserializer)
+fun Request.rx_bytes() = rx_result(ByteArrayDeserializer())
 
 fun Request.rx_string(charset: Charset = Charsets.UTF_8) = rx_result(StringDeserializer(charset))
 
