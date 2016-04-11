@@ -225,7 +225,7 @@ class Request {
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) = response(deserializer)
 
     companion object {
-        fun byteArrayDeserializer() = ByteArrayDeserializer
+        fun byteArrayDeserializer() = ByteArrayDeserializer()
 
         fun stringDeserializer(charset: Charset = Charsets.UTF_8) = StringDeserializer(charset)
     }

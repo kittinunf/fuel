@@ -10,11 +10,9 @@ open class TaskRequest(val request: Request) : Callable<Response> {
     }
     var interruptCallback: ((Request) -> Unit)? = null
 
-    var validating = true
-
     override fun call(): Response {
         try {
-            return Manager.instance.client.executeRequest(request).apply { dispatchCallback(this) }
+            return Manager.instance.client.executeRequest(request).apply { validate(this) }
         } catch(error: FuelError) {
             if (error.exception as? InterruptedIOException != null) {
                 interruptCallback?.invoke(request)
@@ -23,16 +21,15 @@ open class TaskRequest(val request: Request) : Callable<Response> {
         }
     }
 
-    open fun dispatchCallback(response: Response) {
-        if (validating) {
-            //validate
-            if (!validator(response)) {
-                val error = FuelError().apply {
-                    exception = HttpException(response.httpStatusCode, response.httpResponseMessage)
-                    errorData = response.data
-                }
-                throw error
+    fun validate(response: Response) {
+        //validate
+        if (!validator(response)) {
+            val error = FuelError().apply {
+                exception = HttpException(response.httpStatusCode, response.httpResponseMessage)
+                errorData = response.data
+                this.response = response
             }
+            throw error
         }
     }
 }

@@ -68,6 +68,7 @@ class HttpClient : Client {
             throw FuelError().apply {
                 this.exception = exception
                 this.errorData = response.data
+                this.response = response
             }
         } finally {
             connection.disconnect()
