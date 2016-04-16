@@ -10,6 +10,8 @@ fun Request.responseJson(handler: (Request, Response, Result<JSONObject, FuelErr
 
 fun Request.responseJson(handler: Handler<JSONObject>) = response(jsonDeserializer(), handler)
 
+fun Request.responseJson() = response(jsonDeserializer())
+
 fun jsonDeserializer(): Deserializable<JSONObject> {
     return object : Deserializable<JSONObject> {
         override fun deserialize(response: Response): JSONObject {
