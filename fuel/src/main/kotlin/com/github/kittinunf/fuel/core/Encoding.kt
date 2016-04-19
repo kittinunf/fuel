@@ -19,7 +19,7 @@ class Encoding : Fuel.RequestConvertible {
     var encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
         var modifiedPath = path
         var data: ByteArray? = null
-        var headerPairs: MutableMap<String, Any> = hashMapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
+        val headerPairs: MutableMap<String, Any> = defaultHeaders()
         if (encodeParameterInUrl(method)) {
             var querySign = ""
             val queryParamString = queryFromParameters(parameters)
@@ -29,11 +29,11 @@ class Encoding : Fuel.RequestConvertible {
                 }
             }
             modifiedPath += (querySign + queryParamString)
-        } else if (requestType.equals(Request.Type.UPLOAD)) {
+        } else if (requestType == Request.Type.UPLOAD) {
             val boundary = System.currentTimeMillis().toHexString()
-            headerPairs.plusAssign("Content-Type" to "multipart/form-data; boundary=" + boundary)
+            headerPairs += "Content-Type" to "multipart/form-data; boundary=" + boundary
         } else {
-            headerPairs.plusAssign("Content-Type" to "application/x-www-form-urlencoded")
+            headerPairs += "Content-Type" to "application/x-www-form-urlencoded"
             data = queryFromParameters(parameters).toByteArray()
         }
         Request().apply {
@@ -77,6 +77,10 @@ class Encoding : Fuel.RequestConvertible {
                     .mapTo(arrayListOf<String>()) { "${it.first}=${it.second}" }
                     .joinToString("&")
         } ?: ""
+    }
+
+    companion object {
+        private fun defaultHeaders(): MutableMap<String, Any> = mutableMapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
     }
 
 }
