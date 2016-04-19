@@ -10,6 +10,7 @@ import java.io.InputStream
 import java.net.URL
 
 class DownloadTaskRequest(request: Request) : TaskRequest(request) {
+
     val BUFFER_SIZE = 1024
 
     var progressCallback: ((Long, Long) -> Unit)? = null
@@ -29,4 +30,5 @@ class DownloadTaskRequest(request: Request) : TaskRequest(request) {
         }
         return response
     }
+
 }

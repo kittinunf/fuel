@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
@@ -17,7 +18,8 @@ import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
-class Request {
+class Request : Fuel.RequestConvertible {
+
     enum class Type {
         REQUEST,
         DOWNLOAD,
@@ -52,6 +54,10 @@ class Request {
     //callers
     lateinit var executor: ExecutorService
     lateinit var callbackExecutor: Executor
+
+    //interceptor
+    var requestInterceptor: ((Request) -> Request)? = null
+    var responseInterceptor: ((Request, Response) -> Response)? = null
 
     //interfaces
     fun timeout(timeout: Int): Request {
@@ -91,15 +97,6 @@ class Request {
         val auth = "$username:$password"
         val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
         return header("Authorization" to "Basic " + String(encodedAuth))
-    }
-
-    fun validate(statusCodeRange: IntRange): Request {
-        taskRequest.apply {
-            validator = { response ->
-                statusCodeRange.contains(response.httpStatusCode)
-            }
-        }
-        return this
     }
 
     fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
@@ -159,6 +156,8 @@ class Request {
         taskFuture?.cancel(true)
     }
 
+    override val request: Request
+        get() = this
 
     fun cUrlString(): String {
         val elements = arrayListOf("$ curl -i")
@@ -213,6 +212,7 @@ class Request {
             response(stringDeserializer(charset), handler)
 
     fun responseString(charset: Charset, handler: Handler<String>) = response(stringDeserializer(charset), handler)
+
     fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
 
     fun responseString(charset: Charset = Charsets.UTF_8) = response(stringDeserializer(charset))
@@ -229,4 +229,5 @@ class Request {
 
         fun stringDeserializer(charset: Charset = Charsets.UTF_8) = StringDeserializer(charset)
     }
+
 }

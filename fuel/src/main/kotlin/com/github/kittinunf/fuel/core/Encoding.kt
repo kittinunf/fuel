@@ -4,11 +4,12 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.util.toHexString
 import java.net.MalformedURLException
 import java.net.URI
-import java.net.URL
 import java.net.URISyntaxException
+import java.net.URL
 import kotlin.properties.Delegates
 
 class Encoding : Fuel.RequestConvertible {
+
     var requestType: Request.Type = Request.Type.REQUEST
     var httpMethod: Method by Delegates.notNull()
     var baseUrlString: String? = null
@@ -77,4 +78,5 @@ class Encoding : Fuel.RequestConvertible {
                     .joinToString("&")
         } ?: ""
     }
+
 }

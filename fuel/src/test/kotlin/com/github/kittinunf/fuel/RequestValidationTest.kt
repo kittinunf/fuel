@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.getAs
 import org.hamcrest.CoreMatchers.notNullValue
@@ -54,8 +55,11 @@ class RequestValidationTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
+        manager.removeAllResponseInterceptors()
+        manager.addResponseInterceptor(validatorResponseInterceptor(200..202))
+
         //this validate (200..202) which should fail with 203
-        manager.request(Method.GET, "/status/$preDefinedStatusCode").validate(200..202).responseString { req, res, result ->
+        manager.request(Method.GET, "/status/$preDefinedStatusCode").responseString { req, res, result ->
             request = req
             response = res
 
@@ -81,7 +85,10 @@ class RequestValidationTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.request(Method.GET, "/status/$preDefinedStatusCode").validate(400..419).response { req, res, result ->
+        manager.removeAllResponseInterceptors()
+        manager.addResponseInterceptor(validatorResponseInterceptor(400..419))
+
+        manager.request(Method.GET, "/status/$preDefinedStatusCode").response { req, res, result ->
             request = req
             response = res
 
