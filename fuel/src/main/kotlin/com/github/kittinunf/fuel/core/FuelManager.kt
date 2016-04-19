@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.net.ssl.*
 
-class Manager {
+class FuelManager {
 
     var client: Client by readWriteLazy { HttpClient() }
     var basePath: String? = null
@@ -206,7 +206,7 @@ class Manager {
 
     companion object {
         //manager
-        var instance by readWriteLazy { Manager() }
+        var instance by readWriteLazy { FuelManager() }
 
     }
 

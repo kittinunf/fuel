@@ -1,6 +1,6 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingInterceptor
@@ -17,7 +17,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testWithNoInterceptor() {
-        val manager = Manager()
+        val manager = FuelManager()
         val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response()
         val (data, error) = result
 
@@ -31,7 +31,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testWithLoggingInterceptor() {
-        val manager = Manager()
+        val manager = FuelManager()
         manager.addRequestInterceptor(loggingInterceptor())
 
         val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response()
@@ -47,7 +47,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testWithMultipleInterceptors() {
-        val manager = Manager()
+        val manager = FuelManager()
 
         var interceptorCalled = false
 
@@ -78,7 +78,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testWithBreakingChainInterceptor() {
-        val manager = Manager()
+        val manager = FuelManager()
 
         var interceptorCalled = false
         fun <T> customLoggingBreakingInterceptor() = { next: (T) -> T ->
@@ -120,7 +120,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testWithRedirectInterceptor() {
-        val manager = Manager();
+        val manager = FuelManager();
 
         manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
@@ -142,7 +142,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testWithRedirectInterceptorRelative() {
-        val manager = Manager();
+        val manager = FuelManager();
 
         manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
@@ -163,7 +163,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testNestedRedirectWithRedirectInterceptor() {
-        val manager = Manager();
+        val manager = FuelManager();
 
         manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
@@ -185,7 +185,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testHttpExceptionWithValidatorInterceptor() {
-        val manager = Manager();
+        val manager = FuelManager();
         manager.addResponseInterceptor(validatorResponseInterceptor(200..299))
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
@@ -203,7 +203,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testHttpExceptionWithRemoveInterceptors() {
-        val manager = Manager();
+        val manager = FuelManager();
         manager.removeAllResponseInterceptors()
 
         val (request, response, result) = manager.request(Method.GET,

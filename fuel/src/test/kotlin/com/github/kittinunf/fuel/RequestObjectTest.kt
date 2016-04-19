@@ -10,7 +10,7 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 class RequestObjectTest : BaseTestCase() {
 
     init {
-        Manager.instance.basePath = "http://httpbin.org"
+        FuelManager.instance.basePath = "http://httpbin.org"
     }
 
     //Model
