@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel.android
 
 import com.github.kittinunf.fuel.android.extension.responseJson
-import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.httpGet
 import org.hamcrest.CoreMatchers.*
 import org.json.JSONObject
@@ -13,9 +13,9 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 class RequestAndroidSyncTest : BaseTestCase() {
 
     init {
-        Manager.instance.basePath = "https://httpbin.org"
-        Manager.instance.baseHeaders = mapOf("foo" to "bar")
-        Manager.instance.baseParams = listOf("key" to "value")
+        FuelManager.instance.basePath = "https://httpbin.org"
+        FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
+        FuelManager.instance.baseParams = listOf("key" to "value")
     }
 
     @Test

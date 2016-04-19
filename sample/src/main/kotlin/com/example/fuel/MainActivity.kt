@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.kittinunf.fuel.*
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.rx.rx_object
@@ -23,9 +23,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Manager.instance.basePath = "http://httpbin.org"
-        Manager.instance.baseHeaders = mapOf("Device" to "Android")
-        Manager.instance.baseParams = listOf("key" to "value")
+        FuelManager.instance.basePath = "http://httpbin.org"
+        FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
+        FuelManager.instance.baseParams = listOf("key" to "value")
 
         mainGoButton.setOnClickListener {
             execute()

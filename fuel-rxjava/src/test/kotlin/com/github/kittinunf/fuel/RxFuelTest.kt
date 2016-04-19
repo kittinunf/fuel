@@ -1,6 +1,6 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.rx.rx_response
@@ -16,7 +16,7 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 class RxFuelTest {
 
     init {
-        Manager.instance.basePath = "https://httpbin.org"
+        FuelManager.instance.basePath = "https://httpbin.org"
 
         Fuel.testMode {
             timeout = 15000

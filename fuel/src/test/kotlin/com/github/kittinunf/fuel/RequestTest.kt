@@ -9,7 +9,7 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestTest : BaseTestCase() {
 
-    val manager: Manager by lazy { Manager() }
+    val manager: FuelManager by lazy { FuelManager() }
 
     enum class HttpsBin(val relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),

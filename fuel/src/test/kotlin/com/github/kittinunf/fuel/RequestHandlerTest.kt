@@ -10,9 +10,9 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 class RequestHandlerTest : BaseTestCase() {
 
     init {
-        Manager.instance.basePath = "https://httpbin.org"
-        Manager.instance.baseHeaders = mapOf("foo" to "bar")
-        Manager.instance.baseParams = listOf("key" to "value")
+        FuelManager.instance.basePath = "https://httpbin.org"
+        FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
+        FuelManager.instance.baseParams = listOf("key" to "value")
     }
 
     @Test

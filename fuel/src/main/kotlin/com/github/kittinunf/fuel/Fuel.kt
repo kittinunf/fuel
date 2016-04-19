@@ -1,6 +1,6 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.util.TestConfiguration
@@ -73,37 +73,37 @@ class Fuel {
         //download
         @JvmStatic @JvmOverloads
         fun download(path: String, parameters: List<Pair<String, Any?>>? = null): Request {
-            return Manager.instance.download(path, parameters)
+            return FuelManager.instance.download(path, parameters)
         }
 
         @JvmStatic @JvmOverloads
         fun download(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request {
-            return Manager.instance.download(convertible, parameters)
+            return FuelManager.instance.download(convertible, parameters)
         }
 
         //upload
         @JvmStatic @JvmOverloads
         fun upload(path: String, method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request {
-            return Manager.instance.upload(path, method, parameters)
+            return FuelManager.instance.upload(path, method, parameters)
         }
 
         @JvmStatic @JvmOverloads
         fun upload(convertible: PathStringConvertible, method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request {
-            return Manager.instance.upload(convertible, method, parameters)
+            return FuelManager.instance.upload(convertible, method, parameters)
         }
 
         //request
         private fun request(method: Method, path: String, parameters: List<Pair<String, Any?>>? = null): Request {
-            return Manager.instance.request(method, path, parameters)
+            return FuelManager.instance.request(method, path, parameters)
         }
 
         private fun request(method: Method, convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request {
-            return Manager.instance.request(method, convertible, parameters)
+            return FuelManager.instance.request(method, convertible, parameters)
         }
 
         @JvmStatic
         fun request(convertible: RequestConvertible): Request {
-            return Manager.instance.request(convertible)
+            return FuelManager.instance.request(convertible)
         }
 
     }

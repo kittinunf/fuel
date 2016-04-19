@@ -18,8 +18,8 @@ class RequestAuthenticationTest : BaseTestCase() {
         password = "password"
     }
 
-    val manager: Manager by lazy {
-        Manager().apply {
+    val manager: FuelManager by lazy {
+        FuelManager().apply {
             basePath = "http://httpbin.org"
         }
     }

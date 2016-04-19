@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import java.io.InterruptedIOException
@@ -14,7 +14,7 @@ open class TaskRequest(val request: Request) : Callable<Response> {
     override fun call(): Response {
         try {
             val modifiedRequest = request.requestInterceptor?.invoke(request) ?: request
-            val response = Manager.instance.client.executeRequest(modifiedRequest)
+            val response = FuelManager.instance.client.executeRequest(modifiedRequest)
             val modifiedResponse = request.responseInterceptor?.invoke(modifiedRequest, response) ?: response
             return modifiedResponse
         } catch(error: FuelError) {

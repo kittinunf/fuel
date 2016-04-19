@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.*
@@ -14,8 +14,8 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestDownloadTest : BaseTestCase() {
 
-    val manager: Manager by lazy {
-        Manager().apply {
+    val manager: FuelManager by lazy {
+        FuelManager().apply {
             basePath = "http://httpbin.org"
         }
     }

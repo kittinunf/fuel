@@ -9,8 +9,8 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestHeaderTest : BaseTestCase() {
 
-    val manager: Manager by lazy {
-        Manager().apply {
+    val manager: FuelManager by lazy {
+        FuelManager().apply {
             basePath = "http://httpbin.org"
         }
     }

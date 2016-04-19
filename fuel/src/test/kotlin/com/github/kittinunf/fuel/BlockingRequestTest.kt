@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Encoding
-import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import org.hamcrest.CoreMatchers.containsString
@@ -13,7 +13,7 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class BlockingRequestTest : BaseTestCase() {
 
-    val manager: Manager by lazy { Manager() }
+    val manager: FuelManager by lazy { FuelManager() }
 
     enum class HttpsBin(val relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),
