@@ -6,6 +6,7 @@ import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
+import java.util.*
 import kotlin.properties.Delegates
 
 class Encoding : Fuel.RequestConvertible {
@@ -74,7 +75,7 @@ class Encoding : Fuel.RequestConvertible {
     private fun queryFromParameters(params: List<Pair<String, Any?>>?): String {
         return params?.let {
             params.filterNot { it.second == null }
-                    .mapTo(arrayListOf<String>()) { "${it.first}=${it.second}" }
+                    .mapTo(ArrayList()) { "${it.first}=${it.second}" }
                     .joinToString("&")
         } ?: ""
     }

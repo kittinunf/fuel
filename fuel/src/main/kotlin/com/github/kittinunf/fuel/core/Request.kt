@@ -34,7 +34,7 @@ class Request : Fuel.RequestConvertible {
     lateinit var url: URL
     var httpBody: ByteArray = ByteArray(0)
 
-    var httpHeaders = hashMapOf<String, String>()
+    val httpHeaders: MutableMap<String, String> = hashMapOf<String, String>()
 
     //underlying task request
     val taskRequest: TaskRequest by lazy {
