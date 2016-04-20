@@ -25,7 +25,7 @@ class RequestAndroidHandlerTest : BaseTestCase() {
     }
 
     //Model
-    data class HttpBinHeadersModel(var headers: Map<String, String> = hashMapOf())
+    data class HttpBinHeadersModel(var headers: Map<String, String> = mutableMapOf())
 
     //Deserializer
     class HttpBinHeadersDeserializer : ResponseDeserializable<HttpBinHeadersModel> {

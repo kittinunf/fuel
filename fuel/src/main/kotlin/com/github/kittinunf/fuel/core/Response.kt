@@ -15,7 +15,7 @@ class Response {
     var data = ByteArray(0)
 
     override fun toString(): String {
-        val elements = arrayListOf("<-- $httpStatusCode (${url.toString()})")
+        val elements = mutableListOf("<-- $httpStatusCode (${url.toString()})")
 
         //response message
         elements.add("Response : $httpResponseMessage")

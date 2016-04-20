@@ -64,7 +64,7 @@ class FuelManager {
             parameters = if (param == null) baseParams else baseParams + param
         })
 
-        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
+        request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -82,7 +82,7 @@ class FuelManager {
             parameters = if (param == null) baseParams else baseParams + param
         })
 
-        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
+        request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -101,7 +101,7 @@ class FuelManager {
             requestType = Request.Type.DOWNLOAD
         }.request
 
-        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
+        request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -120,7 +120,7 @@ class FuelManager {
             requestType = Request.Type.DOWNLOAD
         }.request
 
-        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
+        request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -139,7 +139,7 @@ class FuelManager {
             requestType = Request.Type.UPLOAD
         }.request
 
-        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
+        request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -158,7 +158,7 @@ class FuelManager {
             requestType = Request.Type.UPLOAD
         }.request
 
-        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
+        request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -170,7 +170,7 @@ class FuelManager {
 
     fun request(convertible: Fuel.RequestConvertible): Request {
         val request = convertible.request
-        request.httpHeaders = if (baseHeaders != null) HashMap(baseHeaders) else hashMapOf()
+        request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()

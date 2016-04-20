@@ -9,21 +9,22 @@ class AsyncTaskRequest(val task: TaskRequest) : TaskRequest(task.request) {
     var failureCallback: ((FuelError, Response) -> Unit)? = null
 
     override fun call(): Response {
-        try {
+        return try {
             val response = task.call()
-            return response.apply { successCallback?.invoke(this) }
+            response.apply { successCallback?.invoke(this) }
         } catch(error: FuelError) {
             failureCallback?.invoke(error, error.response)
+            return errorResponse()
         } catch(ex: Exception) {
             val error = FuelError().apply {
                 exception = ex
             }
-            val response = Response()
-            response.url = request.url
+            val response = errorResponse()
             failureCallback?.invoke(error, response)
+            return response
         }
-        // FIXME
-        return Response()
     }
+
+    private fun errorResponse() = Response().apply { url = request.url }
 
 }
