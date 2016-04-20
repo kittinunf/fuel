@@ -33,9 +33,9 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.kittinunf.fuel:fuel:1.1.3' //for JVM
-    compile 'com.github.kittinunf.fuel:fuel-android:1.1.3' //for Android
-    compile 'com.github.kittinunf.fuel:fuel-rxjava:1.1.3' //for RxJava support
+    compile 'com.github.kittinunf.fuel:fuel:1.2.0' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:1.2.0' //for Android
+    compile 'com.github.kittinunf.fuel:fuel-rxjava:1.2.0' //for RxJava support
 }
 ```
 
