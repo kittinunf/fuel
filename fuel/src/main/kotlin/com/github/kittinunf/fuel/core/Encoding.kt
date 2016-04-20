@@ -75,7 +75,7 @@ class Encoding : Fuel.RequestConvertible {
     private fun queryFromParameters(params: List<Pair<String, Any?>>?): String {
         return params?.let {
             params.filterNot { it.second == null }
-                    .mapTo(ArrayList()) { "${it.first}=${it.second}" }
+                    .mapTo(mutableListOf()) { "${it.first}=${it.second}" }
                     .joinToString("&")
         } ?: ""
     }

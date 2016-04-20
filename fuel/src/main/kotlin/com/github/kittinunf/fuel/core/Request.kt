@@ -34,7 +34,7 @@ class Request : Fuel.RequestConvertible {
     lateinit var url: URL
     var httpBody: ByteArray = ByteArray(0)
 
-    val httpHeaders: MutableMap<String, String> = hashMapOf<String, String>()
+    val httpHeaders = mutableMapOf<String, String>()
 
     //underlying task request
     val taskRequest: TaskRequest by lazy {
@@ -160,7 +160,7 @@ class Request : Fuel.RequestConvertible {
         get() = this
 
     fun cUrlString(): String {
-        val elements = arrayListOf("$ curl -i")
+        val elements = mutableListOf("$ curl -i")
 
         //method
         if (!httpMethod.equals(Method.GET)) {
@@ -185,7 +185,7 @@ class Request : Fuel.RequestConvertible {
     }
 
     override fun toString(): String {
-        val elements = arrayListOf("--> $httpMethod (${url.toString()})")
+        val elements = mutableListOf("--> $httpMethod (${url.toString()})")
 
         //body
         elements.add("Body : ${ if (httpBody.size != 0) String(httpBody) else "(empty)"}")
