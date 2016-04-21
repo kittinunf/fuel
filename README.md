@@ -474,7 +474,7 @@ val (request, response, result) = manager.request(Method.GET, "https://httpbin.o
 
 ``` Kotlin
 inline fun <reified T> DbResponseInterceptor<T>() =
-	{ next: (Request, Response) -> Response ->
+        { next: (Request, Response) -> Response ->
             { req: Request, res: Response ->
                 val db = DB.getInstance()
                 val instance = Parser.getInstance().parse(res.data, T::class)
