@@ -12,7 +12,7 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Upload file (multipart/form-data)
 - [x] Cancel in-flight request
 - [x] Request timeout
-- [x] Configuration manager
+- [x] Configuration manager by using `FuelManager`
 - [x] Debug log / cUrl log
 - [x] Support response deserialization into plain old object (both Kotlin & Java)
 - [x] Automatically invoke handler on Android Main Thread
@@ -63,7 +63,7 @@ dependencies {
 }
 
 //if we set baseURL beforehand, simply use relativePath
-Manager.instance.basePath = "http://httpbin.org"
+FuelManager.instance.basePath = "http://httpbin.org"
 "/get".httpGet().responseString { request, response, result ->    
     //make a GET to http://httpbin.org/get and do something with response
     val (data, error) = result
@@ -410,24 +410,24 @@ object Windows1255StringDeserializer : ResponseDeserializable<String> {
 
 ### Configuration
 
-* Use singleton `Manager.instance` to manager global configuration.
+* Use singleton `FuelManager.instance` to manage global configuration.
 
 * `basePath` is used to manage common root path. Great usage is for your static API endpoint.
 
 ``` Kotlin
-Manager.instance.basePath = "https://httpbin.org"
+FuelManager.instance.basePath = "https://httpbin.org"
 ```
 
 ``` Kotlin
 Fuel.get("/get").response { request, response, result ->
-    //make request to https://httpbin.org/get because Fuel.{get|post|put|delete} use Manager.instance to make HTTP request
+    //make request to https://httpbin.org/get because Fuel.{get|post|put|delete} use FuelManager.instance to make HTTP request
 }
 ```
 
 * `baseHeaders` is to manage common HTTP header pairs in format of `Map<String, String>>`.
 
 ``` Kotlin
-Manager.instance.baseHeaders = mapOf("Device" to "Android")
+FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
 ```
 
 ``` Kotlin
@@ -439,7 +439,7 @@ Fuel.get("/get").response { request, response, result ->
 * `baseParams` is used to manage common `key=value` query param, which will be automatically included in all of your subsequent requests in format of ` List<Pair<String, Any?>>` (`Any` is converted to `String` by `toString()` method)
 
 ``` Kotlin
-Manager.instance.baseParams = listOf("api_key" to "1234567890")
+FuelManager.instance.baseParams = listOf("api_key" to "1234567890")
 ```
 
 ``` Kotlin
@@ -448,7 +448,7 @@ Fuel.get("/get").response { request, response, result ->
 }
 ```
 
-* `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/core/Client.kt) protocol, and set back to `Manager.instance` to kick off the effect.
+* `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/core/Client.kt) protocol, and set back to `FuelManager.instance` to kick off the effect.
 
 * `keyStore` is configurable by user. By default it is `null`.
 
