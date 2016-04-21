@@ -481,7 +481,7 @@ inline fun <reified T> DbResponseInterceptor<T>() =
                 db.transaction {
                     it.copyToDB(instance)
                 }
-                next(req,res)
+                next(req, res)
             }
         }
         
