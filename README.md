@@ -15,15 +15,19 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Configuration manager by using `FuelManager`
 - [x] Debug log / cUrl log
 - [x] Support response deserialization into plain old object (both Kotlin & Java)
-- [x] Automatically invoke handler on Android Main Thread
+- [x] Automatically invoke handler on Android Main Thread when using Android Module
 - [x] Special test mode for easier testing
 - [x] RxJava support out of the box
 
 ## Installation
 
-### Dependency
+### Dependency - fuel
 
 * [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
+
+### Dependency - fuel-rxjava
+
+* [RxJava](https://github.com/ReactiveX/RxJava) - RxJava – Reactive Extensions for the JVM
 
 ### Gradle
 
@@ -410,7 +414,7 @@ object Windows1255StringDeserializer : ResponseDeserializable<String> {
 
 ### Configuration
 
-* Use singleton `FuelManager.instance` to manage global configuration.
+* Use singleton `FuelManager.instance` to manage global configurations.
 
 * `basePath` is used to manage common root path. Great usage is for your static API endpoint.
 
@@ -455,6 +459,35 @@ Fuel.get("/get").response { request, response, result ->
 * `socketFactory` can be supplied by user. If `keyStore` is not null, `socketFactory` will be derived from it.
 
 * `hostnameVerifier` is configurable by user. By default, it uses `HttpsURLConnection.getDefaultHostnameVerifier()`.
+
+* `requestInterceptors` `responseInterceptors` is a side-effect to add to `Request` and/or `Response` objects. For example, one might wanna print cUrlString style for every request that hits server in DEBUG mode.
+
+``` Kotlin
+val manager = FuelManager()
+if (BUILD_DEBUG) {
+    manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
+}
+val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response() //it will print curl -i -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" "https://httpbin.org/get"
+```
+
+* Another example is that you might wanna add data into your Database, you can achieve that with providing `responseInterceptors` such as
+
+``` Kotlin
+inline fun <reified T> DbResponseInterceptor<T>() =
+        { next: (Response) -> Response ->
+            { res: Response ->
+                val db = DB.getInstance()
+                val instance = Parser.getInstance().parse(response.data, T::class)
+                db.transaction {
+                    it.copyToDB(instance)
+                }
+                next(t)
+            }
+        }
+        
+manager.addResponseInterceptor(DBResponseInterceptor<Dog>)
+manager.request(Method.GET, "http://www.example.com/api/dog/1").response() // Db interceptor will be called to intercept data and save into Database of your choice
+```
 
 ### Test mode
 
