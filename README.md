@@ -324,18 +324,7 @@ Fuel.get("http://httpbin.org/basic-auth/$user/$password").authenticate(username,
 
 ### Validation
 
-* By default, the valid range for HTTP status code will be (200..299). However, it can be configurable
-``` Kotlin
-Fuel.get("http://httpbin.org/status/418").response { request, response, result ->
-    //result contains Error
-
-}
-
-//418 will pass the validator
-Fuel.get("http://httpbin.org/status/418").validate(400..499).response { request, response, result ->
-    //result contains data
-}
-```
+* By default, the valid range for HTTP status code will be (200..299).
 
 ### Cancel
 
