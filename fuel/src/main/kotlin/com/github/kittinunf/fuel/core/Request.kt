@@ -27,6 +27,7 @@ class Request : Fuel.RequestConvertible {
     }
 
     var timeoutInMillisecond = 15000
+    var timeoutReadInMillisecond = timeoutInMillisecond
 
     var type: Type = Type.REQUEST
     lateinit var httpMethod: Method
@@ -62,6 +63,11 @@ class Request : Fuel.RequestConvertible {
     //interfaces
     fun timeout(timeout: Int): Request {
         timeoutInMillisecond = timeout
+        return this
+    }
+
+    fun timeoutRead(timeout: Int): Request {
+        timeoutReadInMillisecond = timeout
         return this
     }
 
