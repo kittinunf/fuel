@@ -19,8 +19,9 @@ class HttpClient : Client {
         try {
             connection.apply {
                 val timeout = Fuel.testConfiguration.timeout?.let { if (it == -1) Int.MAX_VALUE else it } ?: request.timeoutInMillisecond
+                val timeoutRead = Fuel.testConfiguration.timeoutRead?.let { if (it == -1) Int.MAX_VALUE else it } ?: timeout
                 connectTimeout = timeout
-                readTimeout = timeout
+                readTimeout = timeoutRead
                 doInput = true
                 useCaches = false
                 requestMethod = request.httpMethod.value
