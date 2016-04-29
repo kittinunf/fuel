@@ -516,6 +516,7 @@ fun <T : Any> Request.rx_object(deserializable: Deserializable<T>): Observable<T
 If you like Fuel, you might also like other libraries;
 * [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
 * [Kovenant](https://github.com/mplatvoet/kovenant) - Kovenant. Promises for Kotlin.
+* [Fuse](https://github.com/kittinunf/Fuse) - A simple generic LRU memory/disk cache for Android written in Kotlin
 
 ## Credits
 
