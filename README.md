@@ -37,9 +37,9 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.kittinunf.fuel:fuel:1.2.0' //for JVM
-    compile 'com.github.kittinunf.fuel:fuel-android:1.2.0' //for Android
-    compile 'com.github.kittinunf.fuel:fuel-rxjava:1.2.0' //for RxJava support
+    compile 'com.github.kittinunf.fuel:fuel:1.2.1' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:1.2.1' //for Android
+    compile 'com.github.kittinunf.fuel:fuel-rxjava:1.2.1' //for RxJava support
 }
 ```
 
@@ -462,7 +462,7 @@ val (request, response, result) = manager.request(Method.GET, "https://httpbin.o
 * Another example is that you might wanna add data into your Database, you can achieve that with providing `responseInterceptors` such as
 
 ``` Kotlin
-inline fun <reified T> DbResponseInterceptor<T>() =
+inline fun <reified T> DbResponseInterceptor() =
         { next: (Request, Response) -> Response ->
             { req: Request, res: Response ->
                 val db = DB.getInstance()
