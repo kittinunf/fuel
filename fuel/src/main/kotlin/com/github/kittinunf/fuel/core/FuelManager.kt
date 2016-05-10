@@ -7,7 +7,6 @@ import com.github.kittinunf.fuel.toolbox.HttpClient
 import com.github.kittinunf.fuel.util.SameThreadExecutorService
 import com.github.kittinunf.fuel.util.readWriteLazy
 import java.security.KeyStore
-import java.util.*
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -74,24 +73,6 @@ class FuelManager {
         return request
     }
 
-    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request {
-        val request = request(Encoding().apply {
-            httpMethod = method
-            baseUrlString = basePath
-            urlString = convertible.path
-            parameters = if (param == null) baseParams else baseParams + param
-        })
-
-        request.httpHeaders += baseHeaders.orEmpty()
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
-    }
-
     fun download(path: String, param: List<Pair<String, Any?>>? = null): Request {
         val request = Encoding().apply {
             httpMethod = Method.GET
@@ -111,49 +92,11 @@ class FuelManager {
         return request
     }
 
-    fun download(convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request {
-        val request = Encoding().apply {
-            httpMethod = Method.GET
-            baseUrlString = basePath
-            urlString = convertible.path
-            parameters = if (param == null) baseParams else baseParams + param
-            requestType = Request.Type.DOWNLOAD
-        }.request
-
-        request.httpHeaders += baseHeaders.orEmpty()
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
-    }
-
     fun upload(path: String, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
         val request = Encoding().apply {
             httpMethod = method
             baseUrlString = basePath
             urlString = path
-            parameters = if (param == null) baseParams else baseParams + param
-            requestType = Request.Type.UPLOAD
-        }.request
-
-        request.httpHeaders += baseHeaders.orEmpty()
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
-    }
-
-    fun upload(convertible: Fuel.PathStringConvertible, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
-        val request = Encoding().apply {
-            httpMethod = method
-            baseUrlString = basePath
-            urlString = convertible.path
             parameters = if (param == null) baseParams else baseParams + param
             requestType = Request.Type.UPLOAD
         }.request

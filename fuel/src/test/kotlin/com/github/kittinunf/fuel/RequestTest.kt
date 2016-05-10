@@ -256,7 +256,7 @@ class RequestTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.request(Method.GET, HttpsBin.USER_AGENT).responseString { req, res, result ->
+        manager.request(Method.GET, HttpsBin.USER_AGENT.path).responseString { req, res, result ->
             request = req
             response = res
 
