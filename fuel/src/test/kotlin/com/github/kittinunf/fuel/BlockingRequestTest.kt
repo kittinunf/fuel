@@ -152,7 +152,7 @@ class BlockingRequestTest : BaseTestCase() {
 
     @Test
     fun httpGetRequestWithPathStringConvertible() {
-        val (request, response, data) = manager.request(Method.GET, HttpsBin.USER_AGENT.path).responseString()
+        val (request, response, data) = manager.request(Method.GET, HttpsBin.USER_AGENT).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -200,7 +200,7 @@ class BlockingRequestTest : BaseTestCase() {
         val headerValue = "application/json"
         manager.baseHeaders = mapOf(headerKey to headerValue)
 
-        val (request, response, data) = manager.request(Method.POST, HttpsBin.POST.path, listOf("email" to "foo@bar.com")).responseString()
+        val (request, response, data) = manager.request(Method.POST, HttpsBin.POST, listOf("email" to "foo@bar.com")).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())

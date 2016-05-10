@@ -73,6 +73,10 @@ class FuelManager {
         return request
     }
 
+    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request {
+        return request(method, convertible.path, param)
+    }
+
     fun download(path: String, param: List<Pair<String, Any?>>? = null): Request {
         val request = Encoding().apply {
             httpMethod = Method.GET
