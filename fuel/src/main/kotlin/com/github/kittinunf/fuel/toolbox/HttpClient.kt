@@ -98,7 +98,7 @@ class HttpClient : Client {
 
     private fun setDoOutput(connection: HttpURLConnection, method: Method) {
         when (method) {
-            Method.GET, Method.DELETE -> connection.doOutput = false
+            Method.GET, Method.DELETE, Method.HEAD -> connection.doOutput = false
             Method.POST, Method.PUT, Method.PATCH -> connection.doOutput = true
         }
     }
