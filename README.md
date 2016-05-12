@@ -263,6 +263,7 @@ val readTimeout = 60000 // 60000 milliseconds = 1 minute.
 "http://httpbin.org/get".httpGet().timeout(timeout).readTimeout(readTimeout).responseString { request, response, result -> }
 ```
 
+
 * Java
 ``` Java
 int timeout = 5000 // 5000 milliseconds = 5 seconds.
