@@ -67,7 +67,7 @@ class Encoding : Fuel.RequestConvertible {
 
     private fun encodeParameterInUrl(method: Method): Boolean {
         when (method) {
-            Method.GET, Method.DELETE -> return true
+            Method.GET, Method.DELETE, Method.HEAD -> return true
             else -> return false
         }
     }

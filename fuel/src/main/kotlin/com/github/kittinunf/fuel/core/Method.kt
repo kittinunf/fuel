@@ -5,6 +5,7 @@ enum class Method(val value: String) {
     POST("POST"),
     PUT("PUT"),
     DELETE("DELETE"),
-    PATCH("PATCH")
+    PATCH("PATCH"),
+    HEAD("HEAD")
 }
 

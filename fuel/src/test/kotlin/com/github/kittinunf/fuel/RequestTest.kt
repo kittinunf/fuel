@@ -250,6 +250,38 @@ class RequestTest : BaseTestCase() {
     }
 
     @Test
+    fun httpHeadRequest() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val paramKey = "foo"
+        val paramValue = "bar"
+
+        manager.request(Method.HEAD, "http://httpbin.org/get", listOf(paramKey to paramValue)).responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        val string = data as String
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, equalTo(""))
+    }
+
+    @Test
     fun httpGetRequestWithPathStringConvertible() {
         var request: Request? = null
         var response: Response? = null

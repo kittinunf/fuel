@@ -6,7 +6,7 @@ The easiest HTTP networking library for Kotlin/Android.
 
 ## Features
 
-- [x] Support basic HTTP GET/POST/PUT/DELETE in a fluent style interface
+- [x] Support basic HTTP GET/POST/PUT/DELETE/HEAD in a fluent style interface
 - [x] Support both asynchronous and blocking requests
 - [x] Download file
 - [x] Upload file (multipart/form-data)
@@ -192,6 +192,14 @@ Fuel.put("http://httpbin.org/put").response { request, response, result ->
 
 ``` Kotlin
 Fuel.delete("http://httpbin.org/delete").response { request, response, result ->
+}
+```
+
+### HEAD
+
+``` Kotlin
+Fuel.head("http://httpbin.org/get").response { request, response, result ->
+   // request body should be empty.
 }
 ```
 

@@ -92,6 +92,17 @@ class Fuel {
             return upload(convertible.path, method, parameters)
         }
 
+        //head
+        @JvmStatic @JvmOverloads
+        fun head(path: String, parameters: List<Pair<String, Any?>>? = null): Request {
+            return request(Method.HEAD, path, parameters)
+        }
+
+        @JvmStatic @JvmOverloads
+        fun head(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request {
+            return request(Method.HEAD, convertible, parameters)
+        }
+
         //request
         private fun request(method: Method, path: String, parameters: List<Pair<String, Any?>>? = null): Request {
             return FuelManager.instance.request(method, path, parameters)
@@ -168,4 +179,14 @@ fun String.httpUpload(method: Method = Method.POST, parameters: List<Pair<String
 @JvmOverloads
 fun Fuel.PathStringConvertible.httpUpload(method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request {
     return Fuel.upload(this, method, parameters)
+}
+
+@JvmOverloads
+fun Fuel.PathStringConvertible.httpHead(parameter: List<Pair<String, Any?>>? = null): Request {
+    return Fuel.head(this, parameter)
+}
+
+@JvmOverloads
+fun String.httpHead(parameters: List<Pair<String, Any?>>? = null): Request {
+    return Fuel.head(this, parameters)
 }
