@@ -252,19 +252,22 @@ Fuel.put("http://httpbin.org/put", listOf("foo" to "foo", "bar" to "bar")).respo
 }
 ```
 
-### Set request's timeout
+### Set request's timeout and specific read timeout
 Default timeout for a request is 15000 milliseconds.
+Default read timeout for a request is 15000 milliseconds.
 
 * Kotlin
 ```kotlin
 val timeout = 5000 // 5000 milliseconds = 5 seconds.
-"http://httpbin.org/get".httpGet().timeout(timeout).responseString { request, response, result -> }
+val readTimeout = 60000 // 60000 milliseconds = 1 minute.
+"http://httpbin.org/get".httpGet().timeout(timeout).readTimeout(readTimeout).responseString { request, response, result -> }
 ```
 
 * Java
 ``` Java
 int timeout = 5000 // 5000 milliseconds = 5 seconds.
-Fuel.get("http://httpbin.org/get", params).timeout(timeout).responseString(new Handler<String>() {
+int readTimeout = 60000 // 60000 milliseconds = 1 minute.
+Fuel.get("http://httpbin.org/get", params).timeout(timeout).readTimeout(readTimeout).responseString(new Handler<String>() {
     @Override
     public void failure(Request request, Response response, FuelError error) {
     	//do something when it is failure
