@@ -78,7 +78,7 @@ class Fuel {
 
         @JvmStatic @JvmOverloads
         fun download(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request {
-            return FuelManager.instance.download(convertible, parameters)
+            return download(convertible.path, parameters)
         }
 
         //upload
@@ -89,7 +89,7 @@ class Fuel {
 
         @JvmStatic @JvmOverloads
         fun upload(convertible: PathStringConvertible, method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request {
-            return FuelManager.instance.upload(convertible, method, parameters)
+            return upload(convertible.path, method, parameters)
         }
 
         //request
@@ -98,7 +98,7 @@ class Fuel {
         }
 
         private fun request(method: Method, convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request {
-            return FuelManager.instance.request(method, convertible, parameters)
+            return request(method, convertible.path, parameters)
         }
 
         @JvmStatic
