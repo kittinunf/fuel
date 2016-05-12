@@ -37,9 +37,9 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.kittinunf.fuel:fuel:1.2.1' //for JVM
-    compile 'com.github.kittinunf.fuel:fuel-android:1.2.1' //for Android
-    compile 'com.github.kittinunf.fuel:fuel-rxjava:1.2.1' //for RxJava support
+    compile 'com.github.kittinunf.fuel:fuel:1.3.0' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:1.3.0' //for Android
+    compile 'com.github.kittinunf.fuel:fuel-rxjava:1.3.0' //for RxJava support
 }
 ```
 
@@ -148,7 +148,7 @@ Fuel.get("http://httpbin.org/get").response { request, response, result ->
 
 * [Result](https://github.com/kittinunf/Result) is a functional style data structure that represents data that contains result of *Success* or *Failure* but not both. It represents the result of an action that can be success (with result) or error.
 
-* Working with result is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L314), [*muliple declare*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestAuthenticationTest.kt#L47) as because it is just a [data class](http://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *Success* or *Failure*.
+* Working with result is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L292), [*destructure*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L263) as because it is just a [data class](http://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *Success* or *Failure*.
 
 ### Response
 ``` Kotlin
@@ -260,19 +260,23 @@ Fuel.put("http://httpbin.org/put", listOf("foo" to "foo", "bar" to "bar")).respo
 }
 ```
 
-### Set request's timeout
+### Set request's timeout and read timeout
 Default timeout for a request is 15000 milliseconds.
+Default read timeout for a request is 15000 milliseconds.
 
 * Kotlin
 ```kotlin
 val timeout = 5000 // 5000 milliseconds = 5 seconds.
-"http://httpbin.org/get".httpGet().timeout(timeout).responseString { request, response, result -> }
+val readTimeout = 60000 // 60000 milliseconds = 1 minute.
+
+"http://httpbin.org/get".httpGet().timeout(timeout).readTimeout(readTimeout).responseString { request, response, result -> }
 ```
 
 * Java
 ``` Java
 int timeout = 5000 // 5000 milliseconds = 5 seconds.
-Fuel.get("http://httpbin.org/get", params).timeout(timeout).responseString(new Handler<String>() {
+int readTimeout = 60000 // 60000 milliseconds = 1 minute.
+Fuel.get("http://httpbin.org/get", params).timeout(timeout).readTimeout(readTimeout).responseString(new Handler<String>() {
     @Override
     public void failure(Request request, Response response, FuelError error) {
     	//do something when it is failure
