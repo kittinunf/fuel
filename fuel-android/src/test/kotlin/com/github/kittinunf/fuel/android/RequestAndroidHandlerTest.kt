@@ -1,17 +1,18 @@
 package com.github.kittinunf.fuel.android
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.android.core.Json
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.*
+import org.hamcrest.CoreMatchers.*
 import org.json.JSONObject
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
-import org.hamcrest.CoreMatchers.*
-import org.junit.Assert.assertThat
 
 class RequestAndroidHandlerTest : BaseTestCase() {
 
@@ -70,7 +71,8 @@ class RequestAndroidHandlerTest : BaseTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertThat(data as JSONObject, isA(JSONObject::class.java))
+        assertThat(data as Json, isA(Json::class.java))
+        assertThat((data as Json).obj(), isA(JSONObject::class.java))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.httpStatusCode, isEqualTo(statusCode))
@@ -83,8 +85,8 @@ class RequestAndroidHandlerTest : BaseTestCase() {
         var data: Any? = null
         var err: FuelError? = null
 
-        Fuel.get("/user-agent").responseJson(object : Handler<JSONObject> {
-            override fun success(request: Request, response: Response, value: JSONObject) {
+        Fuel.get("/user-agent").responseJson(object : Handler<Json> {
+            override fun success(request: Request, response: Response, value: Json) {
                 req = request
                 res = response
                 data = value
@@ -102,7 +104,8 @@ class RequestAndroidHandlerTest : BaseTestCase() {
         assertThat(res, notNullValue())
         assertThat(err, nullValue())
         assertThat(data, notNullValue())
-        assertThat(data as JSONObject, isA(JSONObject::class.java))
+        assertThat(data as Json, isA(Json::class.java))
+        assertThat((data as Json).obj(), isA(JSONObject::class.java))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(res?.httpStatusCode, isEqualTo(statusCode))
@@ -144,8 +147,8 @@ class RequestAndroidHandlerTest : BaseTestCase() {
         var data: Any? = null
         var err: FuelError? = null
 
-        Fuel.get("/404").responseJson(object : Handler<JSONObject> {
-            override fun success(request: Request, response: Response, value: JSONObject) {
+        Fuel.get("/404").responseJson(object : Handler<Json> {
+            override fun success(request: Request, response: Response, value: Json) {
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
