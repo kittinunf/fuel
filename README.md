@@ -160,9 +160,12 @@ fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit)
 fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit)
 ```
 
-### Response in [JSONObject](http://www.json.org/javadoc/org/json/JSONObject.html)
+### Response in Json
 ``` Kotlin
-fun responseJson(handler: (Request, Response, Result<JSONObject, FuelError>) -> Unit)
+fun responseJson(handler: (Request, Response, Result<Json, FuelError>) -> Unit)
+
+val jsonObject = json.obj() //JSONObject
+val jsonArray = json.array() //JSONArray
 ```
 
 ### Response in T (object)
@@ -485,7 +488,7 @@ inline fun <reified T> DbResponseInterceptor() =
                 next(req, res)
             }
         }
-        
+
 manager.addResponseInterceptor(DBResponseInterceptor<Dog>)
 manager.request(Method.GET, "http://www.example.com/api/dog/1").response() // Db interceptor will be called to intercept data and save into Database of your choice
 ```

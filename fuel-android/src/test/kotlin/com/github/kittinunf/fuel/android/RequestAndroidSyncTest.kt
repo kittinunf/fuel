@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.android
 
+import com.github.kittinunf.fuel.android.core.Json
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.httpGet
@@ -27,7 +28,8 @@ class RequestAndroidSyncTest : BaseTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertThat(data as JSONObject, isA(JSONObject::class.java))
+        assertThat(data as Json, isA(Json::class.java))
+        assertThat(data.obj(), isA(JSONObject::class.java))
 
         assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
