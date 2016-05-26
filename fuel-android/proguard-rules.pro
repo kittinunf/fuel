@@ -15,3 +15,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# Without specifically keeping this class, callbacks on android don't
+# function properly.
+-keep class com.github.kittinunf.fuel.android.util.AndroidEnvironment
