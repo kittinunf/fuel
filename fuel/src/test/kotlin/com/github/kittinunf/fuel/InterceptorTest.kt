@@ -4,7 +4,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingInterceptor
-import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
+import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
@@ -120,14 +120,13 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testWithRedirectInterceptor() {
-        val manager = FuelManager();
+        val manager = FuelManager()
 
-        manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
         val (request, response, result) = manager.request(Method.GET,
                 "https://httpbin.org/redirect-to",
-                listOf("url" to "http://jsonplaceholder.typicode.com/users"))
+                listOf("url" to "http://www.example.com"))
                 .header(mapOf("User-Agent" to "Fuel"))
                 .response()
 
@@ -142,9 +141,8 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testWithRedirectInterceptorRelative() {
-        val manager = FuelManager();
+        val manager = FuelManager()
 
-        manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
         val (request, response, result) = manager.request(Method.GET,
@@ -163,14 +161,13 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testNestedRedirectWithRedirectInterceptor() {
-        val manager = FuelManager();
+        val manager = FuelManager()
 
-        manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
         val (request, response, result) = manager.request(Method.GET,
                 "https://httpbin.org/redirect-to",
-                listOf("url" to "https://httpbin.org/redirect-to?url=http://jsonplaceholder.typicode.com/users"))
+                listOf("url" to "https://httpbin.org/redirect-to?url=http://www.example.com"))
                 .header(mapOf("User-Agent" to "Fuel"))
                 .response()
 
@@ -185,7 +182,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testHttpExceptionWithValidatorInterceptor() {
-        val manager = FuelManager();
+        val manager = FuelManager()
         manager.addResponseInterceptor(validatorResponseInterceptor(200..299))
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
@@ -203,7 +200,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testHttpExceptionWithRemoveInterceptors() {
-        val manager = FuelManager();
+        val manager = FuelManager()
         manager.removeAllResponseInterceptors()
 
         val (request, response, result) = manager.request(Method.GET,
@@ -212,10 +209,21 @@ class InterceptorTest : BaseTestCase() {
         val (data, error) = result
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
+        assertThat(error, notNullValue())
+        assertThat(data, nullValue())
 
         assertThat(response.httpStatusCode, isEqualTo(418))
+    }
+
+    @Test
+    fun testHttpFailWithInterceptors() {
+        val manager = FuelManager()
+
+        manager.addResponseInterceptor(loggingResponseInterceptor())
+
+        val (request, response, result) = manager.request(Method.GET, "http://httpbin.org/status").response()
+
+        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_NOT_FOUND))
     }
 
 }
