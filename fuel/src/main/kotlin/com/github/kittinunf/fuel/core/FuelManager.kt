@@ -48,7 +48,7 @@ class FuelManager {
     private val requestInterceptors: MutableList<((Request) -> Request) -> ((Request) -> Request)> =
             mutableListOf()
     private val responseInterceptors: MutableList<((Request, Response) -> Response) -> ((Request, Response) -> Response)> =
-            mutableListOf(redirectResponseInterceptor(), validatorResponseInterceptor(200..299))
+            mutableListOf()
 
     fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
 
@@ -56,63 +56,19 @@ class FuelManager {
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
     fun request(method: Method, path: String, param: List<Pair<String, Any?>>? = null): Request {
-        val request = request(Encoding().apply {
-            httpMethod = method
-            baseUrlString = basePath
-            urlString = path
-            parameters = if (param == null) baseParams else baseParams + param
-        })
-
-        request.httpHeaders += baseHeaders.orEmpty()
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
+        return request(Request.Type.REQUEST, method, path, param)
     }
 
     fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request {
-        return request(method, convertible.path, param)
+        return request(Request.Type.REQUEST, method, convertible.path, param)
     }
 
     fun download(path: String, param: List<Pair<String, Any?>>? = null): Request {
-        val request = Encoding().apply {
-            httpMethod = Method.GET
-            baseUrlString = basePath
-            urlString = path
-            parameters = if (param == null) baseParams else baseParams + param
-            requestType = Request.Type.DOWNLOAD
-        }.request
-
-        request.httpHeaders += baseHeaders.orEmpty()
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
+        return request(Request.Type.DOWNLOAD, Method.GET, path, param)
     }
 
     fun upload(path: String, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
-        val request = Encoding().apply {
-            httpMethod = method
-            baseUrlString = basePath
-            urlString = path
-            parameters = if (param == null) baseParams else baseParams + param
-            requestType = Request.Type.UPLOAD
-        }.request
-
-        request.httpHeaders += baseHeaders.orEmpty()
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
+        return request(Request.Type.UPLOAD, method, path, param)
     }
 
     fun request(convertible: Fuel.RequestConvertible): Request {
@@ -122,9 +78,24 @@ class FuelManager {
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
+
+        //add default responseInterceptors
+        responseInterceptors.add(0, redirectResponseInterceptor())
+        responseInterceptors.add(validatorResponseInterceptor(200..299))
+
         request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
         request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
+    }
+
+    private fun request(type: Request.Type, method: Method, path: String, param: List<Pair<String, Any?>>? = null): Request {
+        return request(Encoding().apply {
+            httpMethod = method
+            baseUrlString = basePath
+            urlString = path
+            parameters = if (param == null) baseParams else baseParams + param
+            requestType = type
+        })
     }
 
     fun addRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)) {
