@@ -141,6 +141,26 @@ class InterceptorTest : BaseTestCase() {
     }
 
     @Test
+    fun testWithoutDefaultRedirectionInterceptor(){
+        val manager = FuelManager()
+        manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
+        manager.removeAllResponseInterceptors()
+
+        val (request, response, result) = manager.request(Method.GET,
+                "https://httpbin.org/relative-redirect/3")
+                .header(mapOf("User-Agent" to "Fuel"))
+                .response()
+
+        val (data, error) = result
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_MOVED_TEMP))
+    }
+
+    @Test
     fun testWithRedirectInterceptorRelative() {
         val manager = FuelManager();
 
