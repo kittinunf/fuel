@@ -5,6 +5,8 @@ import com.github.kittinunf.fuel.core.Encoding
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import java.net.MalformedURLException
+import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
 class RedirectException() : Exception("Redirection fail, not found URL to redirect to")
@@ -18,7 +20,13 @@ fun redirectResponseInterceptor() =
                     if (redirectedUrl != null && !redirectedUrl.isEmpty()) {
                         val encoding = Encoding().apply {
                             httpMethod = request.httpMethod
-                            urlString = redirectedUrl[0]
+                            urlString = try {
+                                URL(redirectedUrl[0]).toString()
+                            } catch (e: MalformedURLException){
+                                // Maybe its a relative url
+                                val serverPart = request.url.protocol + "://" + request.url.authority
+                                URL(serverPart + redirectedUrl[0]).toString()
+                            }
                         }
                         Fuel.request(encoding).response().second
                     } else {
