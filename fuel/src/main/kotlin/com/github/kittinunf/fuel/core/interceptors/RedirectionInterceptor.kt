@@ -20,12 +20,12 @@ fun redirectResponseInterceptor() =
                     if (redirectedUrl != null && !redirectedUrl.isEmpty()) {
                         val encoding = Encoding().apply {
                             httpMethod = request.httpMethod
-                            urlString = try {
+                            urlString =
+                            try {
                                 URL(redirectedUrl[0]).toString()
                             } catch (e: MalformedURLException){
-                                // Maybe its a relative url
-                                val serverPart = request.url.protocol + "://" + request.url.authority
-                                URL(serverPart + redirectedUrl[0]).toString()
+                                // Maybe its a relative url. Use the original for context.
+                                URL(request.url, redirectedUrl[0]).toString()
                             }
                         }
                         Fuel.request(encoding).response().second
