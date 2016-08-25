@@ -1,17 +1,13 @@
 package com.github.kittinunf.fuel.core.interceptors
 
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.Encoding
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.*
 import java.net.MalformedURLException
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
 class RedirectException() : Exception("Redirection fail, not found URL to redirect to")
 
-fun redirectResponseInterceptor() =
+fun redirectResponseInterceptor(manager: FuelManager) =
         { next: (Request, Response) -> Response ->
             { request: Request, response: Response ->
                 if (response.httpStatusCode == HttpsURLConnection.HTTP_MOVED_PERM ||
@@ -28,7 +24,7 @@ fun redirectResponseInterceptor() =
                                 URL(request.url, redirectedUrl[0]).toString()
                             }
                         }
-                        Fuel.request(encoding).response().second
+                        manager.request(encoding).response().second
                     } else {
                         //error
                         val error = FuelError().apply {

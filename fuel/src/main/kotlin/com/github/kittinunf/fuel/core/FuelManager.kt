@@ -48,7 +48,7 @@ class FuelManager {
     private val requestInterceptors: MutableList<((Request) -> Request) -> ((Request) -> Request)> =
             mutableListOf()
     private val responseInterceptors: MutableList<((Request, Response) -> Response) -> ((Request, Response) -> Response)> =
-            mutableListOf(redirectResponseInterceptor(), validatorResponseInterceptor(200..299))
+            mutableListOf(redirectResponseInterceptor(this), validatorResponseInterceptor(200..299))
 
     fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
 
