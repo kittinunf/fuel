@@ -4,7 +4,6 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingInterceptor
-import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
@@ -122,7 +121,6 @@ class InterceptorTest : BaseTestCase() {
     fun testWithRedirectInterceptor() {
         val manager = FuelManager();
 
-        manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
         val (request, response, result) = manager.request(Method.GET,
@@ -164,7 +162,6 @@ class InterceptorTest : BaseTestCase() {
     fun testWithRedirectInterceptorRelative() {
         val manager = FuelManager();
 
-        manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
         val (request, response, result) = manager.request(Method.GET,
@@ -185,7 +182,6 @@ class InterceptorTest : BaseTestCase() {
     fun testNestedRedirectWithRedirectInterceptor() {
         val manager = FuelManager();
 
-        manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
         val (request, response, result) = manager.request(Method.GET,
