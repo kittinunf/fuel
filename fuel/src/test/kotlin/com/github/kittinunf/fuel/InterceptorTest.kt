@@ -4,10 +4,8 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingInterceptor
-import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
-import org.hamcrest.CoreMatchers.notNullValue
-import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -122,7 +120,6 @@ class InterceptorTest : BaseTestCase() {
     fun testWithRedirectInterceptor() {
         val manager = FuelManager();
 
-        manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
         val (request, response, result) = manager.request(Method.GET,
@@ -141,10 +138,29 @@ class InterceptorTest : BaseTestCase() {
     }
 
     @Test
+    fun testWithoutDefaultRedirectionInterceptor(){
+        val manager = FuelManager()
+        manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
+        manager.removeAllResponseInterceptors()
+
+        val (request, response, result) = manager.request(Method.GET,
+                "https://httpbin.org/relative-redirect/3")
+                .header(mapOf("User-Agent" to "Fuel"))
+                .response()
+
+        val (data, error) = result
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_MOVED_TEMP))
+    }
+
+    @Test
     fun testWithRedirectInterceptorRelative() {
         val manager = FuelManager();
 
-        manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
         val (request, response, result) = manager.request(Method.GET,
@@ -162,10 +178,28 @@ class InterceptorTest : BaseTestCase() {
     }
 
     @Test
+    fun testWithRedirectInterceptorPreservesBaseHeaders() {
+        val manager = FuelManager()
+        manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
+
+        manager.baseHeaders = mapOf("User-Agent" to "Fuel")
+        val (request, response, result) = manager.request(Method.GET,
+                "https://httpbin.org/redirect-to?url=/user-agent")
+                .responseString(Charsets.UTF_8)
+
+        val (data, error) = result
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, containsString("\"user-agent\": \"Fuel\""))
+
+        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+    }
+
+    @Test
     fun testNestedRedirectWithRedirectInterceptor() {
         val manager = FuelManager();
 
-        manager.addResponseInterceptor(redirectResponseInterceptor())
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
         val (request, response, result) = manager.request(Method.GET,

@@ -26,6 +26,7 @@ class HttpClient : Client {
                 useCaches = false
                 requestMethod = request.httpMethod.value
                 setDoOutput(connection, request.httpMethod)
+                instanceFollowRedirects = false
                 for ((key, value) in request.httpHeaders) {
                     setRequestProperty(key, value)
                 }
