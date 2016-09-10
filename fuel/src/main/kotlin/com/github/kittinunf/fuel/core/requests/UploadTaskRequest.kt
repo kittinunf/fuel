@@ -14,7 +14,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
 
     val BUFFER_SIZE = 1024
 
-    val CRLF = "\\r\\n"
+    val CRLF = "\r\n"
     /*val boundary = System.currentTimeMillis().toHexString()*/
     val boundary = request.httpHeaders["Content-Type"]!!.split("=", limit=2)[1]
 
