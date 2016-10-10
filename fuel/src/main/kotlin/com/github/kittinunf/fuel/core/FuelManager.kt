@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import com.github.kittinunf.fuel.toolbox.HttpClient
 import com.github.kittinunf.fuel.util.SameThreadExecutorService
 import com.github.kittinunf.fuel.util.readWriteLazy
+import java.net.Proxy
 import java.security.KeyStore
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
@@ -14,7 +15,8 @@ import javax.net.ssl.*
 
 class FuelManager {
 
-    var client: Client by readWriteLazy { HttpClient() }
+    var client: Client by readWriteLazy { HttpClient(proxy) }
+    var proxy: Proxy? = null
     var basePath: String? = null
 
     var baseHeaders: Map<String, String>? = null
