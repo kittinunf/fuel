@@ -219,7 +219,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testHttpExceptionWithValidatorInterceptor() {
-        val manager = FuelManager();
+        val manager = FuelManager()
         manager.addResponseInterceptor(validatorResponseInterceptor(200..299))
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
