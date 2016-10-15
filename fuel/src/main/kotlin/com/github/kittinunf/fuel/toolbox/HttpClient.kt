@@ -5,11 +5,12 @@ import com.github.kittinunf.fuel.core.*
 import java.io.BufferedOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
+import java.net.Proxy
 import java.net.URLConnection
 import java.util.zip.GZIPInputStream
 import javax.net.ssl.HttpsURLConnection
 
-class HttpClient : Client {
+class HttpClient(val proxy: Proxy? = null) : Client {
     override fun executeRequest(request: Request): Response {
         val response = Response()
         response.url = request.url
@@ -78,14 +79,15 @@ class HttpClient : Client {
     }
 
     private fun establishConnection(request: Request): URLConnection {
+        val urlConnection = if (proxy != null) request.url.openConnection(proxy) else request.url.openConnection()
         return if (request.url.protocol.equals("https")) {
-            val conn = request.url.openConnection() as HttpsURLConnection
+            val conn = urlConnection as HttpsURLConnection
             conn.apply {
                 sslSocketFactory = request.socketFactory
                 hostnameVerifier = request.hostnameVerifier
             }
         } else {
-            request.url.openConnection() as HttpURLConnection
+            urlConnection as HttpURLConnection
         }
     }
 
