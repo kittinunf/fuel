@@ -3,13 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.3"
 
     defaultConfig {
         applicationId "com.example.fuel"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
@@ -49,7 +49,7 @@ dependencies {
 
 buildscript {
     ext {
-        android_support_version = '23.4.0'
+        android_support_version = '24.2.1'
         gson_version = '2.3.1'
     }
 

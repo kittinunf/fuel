@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.3"
 
     defaultConfig {
         applicationId "com.example.java.fuel"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
@@ -35,7 +35,7 @@ dependencies {
 
 buildscript {
     ext {
-        android_support_version = '23.1.1'
+        android_support_version = '24.2.1'
     }
 }
 
