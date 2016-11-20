@@ -148,7 +148,7 @@ class RequestAndroidHandlerTest : BaseTestCase() {
 
     @Test
     fun httpGetRequestJsonHandlerInvalid() {
-    var req: Request? = null
+        var req: Request? = null
         var res: Response? = null
         var data: Any? = null
         var err: FuelError? = null
