@@ -1,6 +1,10 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -31,7 +35,7 @@ class RequestHandlerTest : BaseTestCase() {
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
-                println(error)
+                err = error
             }
 
         })
@@ -55,7 +59,7 @@ class RequestHandlerTest : BaseTestCase() {
         "/g".httpGet().response(object : Handler<ByteArray> {
 
             override fun success(request: Request, response: Response, value: ByteArray) {
-                println(String(value))
+                data = value
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
@@ -93,7 +97,7 @@ class RequestHandlerTest : BaseTestCase() {
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
-                println(error)
+                err = error
             }
         })
 

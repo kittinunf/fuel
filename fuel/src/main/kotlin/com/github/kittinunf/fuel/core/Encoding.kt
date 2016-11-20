@@ -6,7 +6,6 @@ import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
-import java.util.*
 import kotlin.properties.Delegates
 
 class Encoding : Fuel.RequestConvertible {
@@ -58,10 +57,10 @@ class Encoding : Fuel.RequestConvertible {
             URL(baseUrlString + if (path.startsWith('/') or path.isEmpty()) path else '/' + path)
         }
         val uri = try {
-                    url.toURI()
-                } catch (e: URISyntaxException) {
-                    URI(url.protocol, url.userInfo, url.host, url.port, url.path, url.query, url.ref)
-                }
+            url.toURI()
+        } catch (e: URISyntaxException) {
+            URI(url.protocol, url.userInfo, url.host, url.port, url.path, url.query, url.ref)
+        }
         return URL(uri.toASCIIString())
     }
 

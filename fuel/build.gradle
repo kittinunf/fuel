@@ -7,6 +7,9 @@ sourceSets {
     test.java.srcDirs += 'src/test/kotlin'
 }
 
+sourceCompatibility = JavaVersion.VERSION_1_6
+targetCompatibility = JavaVersion.VERSION_1_6
+
 repositories {
     jcenter()
 }

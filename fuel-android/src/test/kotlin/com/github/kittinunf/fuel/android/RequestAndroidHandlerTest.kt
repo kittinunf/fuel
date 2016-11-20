@@ -3,7 +3,12 @@ package com.github.kittinunf.fuel.android
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.core.Json
 import com.github.kittinunf.fuel.android.extension.responseJson
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseDeserializable
 import org.hamcrest.CoreMatchers.*
 import org.json.JSONObject
 import org.junit.Assert.assertThat
@@ -21,7 +26,7 @@ class RequestAndroidHandlerTest : BaseTestCase() {
         FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
         FuelManager.instance.baseParams = listOf("key" to "value")
 
-        FuelManager.instance.callbackExecutor = Executor { command -> command.run() }
+        FuelManager.instance.callbackExecutor = Executor(Runnable::run)
 
     }
 
@@ -95,6 +100,7 @@ class RequestAndroidHandlerTest : BaseTestCase() {
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
+                err = error
             }
         })
 
@@ -142,13 +148,14 @@ class RequestAndroidHandlerTest : BaseTestCase() {
 
     @Test
     fun httpGetRequestJsonHandlerInvalid() {
-        var req: Request? = null
+    var req: Request? = null
         var res: Response? = null
         var data: Any? = null
         var err: FuelError? = null
 
         Fuel.get("/404").responseJson(object : Handler<Json> {
             override fun success(request: Request, response: Response, value: Json) {
+                data = value
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
@@ -219,6 +226,7 @@ class RequestAndroidHandlerTest : BaseTestCase() {
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
+                err = error
             }
 
         })

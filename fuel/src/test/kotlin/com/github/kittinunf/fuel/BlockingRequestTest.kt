@@ -15,7 +15,7 @@ class BlockingRequestTest : BaseTestCase() {
 
     val manager: FuelManager by lazy { FuelManager() }
 
-    enum class HttpsBin(val relativePath: String) : Fuel.PathStringConvertible {
+    enum class HttpsBin(relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),
         POST("post"),
         PUT("put"),
@@ -195,7 +195,7 @@ class BlockingRequestTest : BaseTestCase() {
     }
 
     @Test
-    fun httpGetRequestWithNotOverridenHeaders() {
+    fun httpGetRequestWithNotOverriddenHeaders() {
         val headerKey = "Content-Type"
         val headerValue = "application/json"
         manager.baseHeaders = mapOf(headerKey to headerValue)

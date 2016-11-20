@@ -1,7 +1,11 @@
 package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Client
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import java.io.BufferedOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -80,7 +84,7 @@ class HttpClient(val proxy: Proxy? = null) : Client {
 
     private fun establishConnection(request: Request): URLConnection {
         val urlConnection = if (proxy != null) request.url.openConnection(proxy) else request.url.openConnection()
-        return if (request.url.protocol.equals("https")) {
+        return if (request.url.protocol == "https") {
             val conn = urlConnection as HttpsURLConnection
             conn.apply {
                 sslSocketFactory = request.socketFactory
@@ -92,7 +96,7 @@ class HttpClient(val proxy: Proxy? = null) : Client {
     }
 
     private fun setBodyIfAny(connection: HttpURLConnection, bytes: ByteArray) {
-        if (bytes.size != 0) {
+        if (bytes.isNotEmpty()) {
             val outStream = BufferedOutputStream(connection.outputStream)
             outStream.write(bytes)
             outStream.close()
