@@ -62,7 +62,7 @@ class HttpClient(val proxy: Proxy? = null) : Client {
                 //try - catch just in case both methods throw
                 try {
                     httpStatusCode = connection.responseCode
-                    httpResponseMessage = connection.responseMessage
+                    httpResponseMessage = connection.responseMessage.orEmpty()
                 } catch(exception: IOException) {
                     throw exception
                 }
