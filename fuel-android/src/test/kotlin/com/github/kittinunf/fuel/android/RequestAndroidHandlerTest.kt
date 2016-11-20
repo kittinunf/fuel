@@ -27,7 +27,6 @@ class RequestAndroidHandlerTest : BaseTestCase() {
         FuelManager.instance.baseParams = listOf("key" to "value")
 
         FuelManager.instance.callbackExecutor = Executor(Runnable::run)
-
     }
 
     //Model

@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     }};
 
     private TextView resultText;
+    private TextView auxText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         resultText = (TextView) findViewById(R.id.main_result_text);
+        auxText = (TextView) findViewById(R.id.main_aux_text);
 
         Button goButton = (Button) findViewById(R.id.main_go_button);
         goButton.setOnClickListener(new View.OnClickListener() {
