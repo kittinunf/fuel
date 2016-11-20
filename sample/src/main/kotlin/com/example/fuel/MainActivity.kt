@@ -42,16 +42,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun execute() {
-//        httpGet()
-//        httpPut()
-//        httpPost()
-//        httpDelete()
+        httpGet()
+        httpPut()
+        httpPost()
+        httpDelete()
         httpDownload()
-//        httpUpload()
-//        httpBasicAuthentication()
-//        httpResponseObject()
-//        httpCancel()
-//        httpRxSupport()
+        httpUpload()
+        httpBasicAuthentication()
+        httpResponseObject()
+        httpCancel()
+        httpRxSupport()
     }
 
     fun httpCancel() {
@@ -125,7 +125,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun httpDownload() {
-        Fuel.download("/bytes/104800000").destination { response, url ->
+        val n = 100
+        Fuel.download("/bytes/${1024 * n}").destination { response, url ->
             File(filesDir, "test.tmp")
         }.progress { readBytes, totalBytes ->
             val progress = "$readBytes / $totalBytes"
