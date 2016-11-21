@@ -8,12 +8,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    compileSdkVersion parent.ext.compile_sdk_version
+    buildToolsVersion parent.ext.build_tool_version
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 24
+        targetSdkVersion parent.ext.compile_sdk_version
         versionCode 1
         versionName parent.ext.publish_version
     }

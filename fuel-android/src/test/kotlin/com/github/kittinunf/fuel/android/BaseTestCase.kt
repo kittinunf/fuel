@@ -15,7 +15,7 @@ abstract class BaseTestCase {
     lateinit var lock: CountDownLatch
 
     fun await(seconds: Long = DEFAULT_TIMEOUT) {
-        lock.await(seconds, TimeUnit.SECONDS);
+        lock.await(seconds, TimeUnit.SECONDS)
     }
 
 }

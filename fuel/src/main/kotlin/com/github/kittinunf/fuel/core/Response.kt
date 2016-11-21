@@ -15,7 +15,7 @@ class Response {
     var data = ByteArray(0)
 
     override fun toString(): String {
-        val elements = mutableListOf("<-- $httpStatusCode (${url.toString()})")
+        val elements = mutableListOf("<-- $httpStatusCode ($url)")
 
         //response message
         elements.add("Response : $httpResponseMessage")
@@ -24,7 +24,7 @@ class Response {
         elements.add("Length : $httpContentLength")
 
         //body
-        elements.add("Body : ${ if (data.size != 0) String(data) else "(empty)"}")
+        elements.add("Body : ${if (data.isNotEmpty()) String(data) else "(empty)"}")
 
         //headers
         //headers
@@ -33,7 +33,7 @@ class Response {
             elements.add("$key : $value")
         }
 
-        return elements.joinToString("\n").toString()
+        return elements.joinToString("\n")
     }
 
 }

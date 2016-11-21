@@ -169,7 +169,7 @@ class Request : Fuel.RequestConvertible {
         val elements = mutableListOf("$ curl -i")
 
         //method
-        if (!httpMethod.equals(Method.GET)) {
+        if (httpMethod != Method.GET) {
             elements.add("-X $httpMethod")
         }
 
@@ -185,16 +185,16 @@ class Request : Fuel.RequestConvertible {
         }
 
         //url
-        elements.add("\"${url.toString()}\"")
+        elements.add("\"$url\"")
 
-        return elements.joinToString(" ").toString()
+        return elements.joinToString(" ")
     }
 
     override fun toString(): String {
-        val elements = mutableListOf("--> $httpMethod (${url.toString()})")
+        val elements = mutableListOf("--> $httpMethod ($url)")
 
         //body
-        elements.add("Body : ${ if (httpBody.size != 0) String(httpBody) else "(empty)"}")
+        elements.add("Body : ${if (httpBody.isNotEmpty()) String(httpBody) else "(empty)"}")
 
         //headers
         elements.add("Headers : (${httpHeaders.size})")
@@ -202,7 +202,7 @@ class Request : Fuel.RequestConvertible {
             elements.add("$key : $value")
         }
 
-        return elements.joinToString("\n").toString()
+        return elements.joinToString("\n")
     }
 
     //byte array

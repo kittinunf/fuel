@@ -118,7 +118,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testWithRedirectInterceptor() {
-        val manager = FuelManager();
+        val manager = FuelManager()
 
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
@@ -138,7 +138,7 @@ class InterceptorTest : BaseTestCase() {
     }
 
     @Test
-    fun testWithoutDefaultRedirectionInterceptor(){
+    fun testWithoutDefaultRedirectionInterceptor() {
         val manager = FuelManager()
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
         manager.removeAllResponseInterceptors()
@@ -159,7 +159,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testWithRedirectInterceptorRelative() {
-        val manager = FuelManager();
+        val manager = FuelManager()
 
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
@@ -237,7 +237,7 @@ class InterceptorTest : BaseTestCase() {
 
     @Test
     fun testHttpExceptionWithRemoveInterceptors() {
-        val manager = FuelManager();
+        val manager = FuelManager()
         manager.removeAllResponseInterceptors()
 
         val (request, response, result) = manager.request(Method.GET,

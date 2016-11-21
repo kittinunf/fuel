@@ -17,7 +17,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         FuelManager.instance.basePath = "https://httpbin.org"
     }
 
-    enum class HttpsBin(val relativePath: String) : Fuel.PathStringConvertible {
+    enum class HttpsBin(relativePath: String) : Fuel.PathStringConvertible {
         COOKIES("cookies"),
         POST("post"),
         PUT("put"),

@@ -1,6 +1,11 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -11,7 +16,7 @@ class RequestTest : BaseTestCase() {
 
     val manager: FuelManager by lazy { FuelManager() }
 
-    enum class HttpsBin(val relativePath: String) : Fuel.PathStringConvertible {
+    enum class HttpsBin(relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),
         POST("post"),
         PUT("put"),
