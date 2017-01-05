@@ -14,8 +14,8 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
 
     val BUFFER_SIZE = 1024
 
-    val CRLF = "\\r\\n"
-    val boundary = System.currentTimeMillis().toHexString()
+    val CRLF = "\r\n"
+    val boundary = request.httpHeaders["Content-Type"]?.split("=", limit=2)?.get(1) ?: System.currentTimeMillis().toHexString()
 
     var progressCallback: ((Long, Long) -> Unit)? = null
     lateinit var sourceCallback: ((Request, URL) -> File)
