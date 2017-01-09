@@ -1,13 +1,13 @@
 package com.github.kittinunf.fuel.android
 
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricGradleTestRunner
+import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(RobolectricGradleTestRunner::class)
-@Config(constants = BuildConfig::class, sdk = intArrayOf(21))
+@RunWith(RobolectricTestRunner::class)
+@Config(constants = BuildConfig::class, sdk = intArrayOf(23))
 abstract class BaseTestCase {
 
     val DEFAULT_TIMEOUT = 15L

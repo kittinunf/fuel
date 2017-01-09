@@ -30,7 +30,7 @@ allprojects {
 
         //test dependencies version
         junit_version = '4.12'
-        robolectric_version = '3.0'
+        robolectric_version = '3.2.1'
     }
 
     repositories {
