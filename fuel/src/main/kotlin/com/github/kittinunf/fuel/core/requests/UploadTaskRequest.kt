@@ -15,7 +15,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
     val BUFFER_SIZE = 1024
 
     val CRLF = "\r\n"
-    val boundary = request.httpHeaders["Content-Type"]?.split("=", limit=2)?.get(1) ?: System.currentTimeMillis().toHexString()
+    val boundary = request.httpHeaders["Content-Type"]?.split("=", limit = 2)?.get(1) ?: System.currentTimeMillis().toHexString()
 
     var progressCallback: ((Long, Long) -> Unit)? = null
     lateinit var sourceCallback: ((Request, URL) -> File)
@@ -51,7 +51,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
 
             request.body(dataStream!!.toByteArray())
             return super.call()
-        }  finally {
+        } finally {
             dataStream?.close()
             fileInputStream?.close()
         }
