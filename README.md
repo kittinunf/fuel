@@ -1,6 +1,6 @@
 # Fuel
 
-[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.0.5-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
+[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.0.6-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
 
 The easiest HTTP networking library for Kotlin/Android.
 
@@ -37,9 +37,9 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.kittinunf.fuel:fuel:1.3.1' //for JVM
-    compile 'com.github.kittinunf.fuel:fuel-android:1.3.1' //for Android
-    compile 'com.github.kittinunf.fuel:fuel-rxjava:1.3.1' //for RxJava support
+    compile 'com.github.kittinunf.fuel:fuel:<latest-version>' //for JVM
+    compile 'com.github.kittinunf.fuel:fuel-android:<latest-version>' //for Android
+    compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
 }
 ```
 
