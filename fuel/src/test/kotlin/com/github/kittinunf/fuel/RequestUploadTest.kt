@@ -1,6 +1,10 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -37,6 +41,33 @@ class RequestUploadTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpUploadWithPostAndParamsCase() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.upload("/post", param = listOf("foo" to "bar")).source { request, url ->
+            File(currentDir, "lorem_ipsum_short.tmp")
+        }.responseString { req, res, result ->
+            request = req
+            response = res
+            val (d, err) = result
+            data = d
+            error = err
+            print(d)
         }
 
         assertThat(request, notNullValue())

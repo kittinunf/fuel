@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.util.toHexString
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.OutputStream
 import java.net.URL
 import java.net.URLConnection
 
@@ -29,23 +30,31 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
             //file input
             fileInputStream = FileInputStream(file)
             dataStream = ByteArrayOutputStream().apply {
-                write(("--" + boundary + CRLF).toByteArray())
-                write(("Content-Disposition: form-data; filename=\"" + file.name + "\"").toByteArray())
-                write(CRLF.toByteArray())
-                write(("Content-Type: " + URLConnection.guessContentTypeFromName(file.name)).toByteArray())
-                write(CRLF.toByteArray())
-                write(CRLF.toByteArray())
-                flush()
+                write("--" + boundary + CRLF)
+                write("Content-Disposition: form-data; name=\"" + file.name + "\"; filename=\"" + file.name + "\"")
+                write(CRLF)
+                write("Content-Type: " + URLConnection.guessContentTypeFromName(file.name))
+                write(CRLF)
+                write(CRLF)
 
                 //input file data
                 fileInputStream!!.copyTo(this, BUFFER_SIZE) { writtenBytes ->
                     progressCallback?.invoke(writtenBytes, file.length())
                 }
 
-                write(CRLF.toByteArray())
-                flush()
-                write(("--$boundary--").toByteArray())
-                write(CRLF.toByteArray())
+                write(CRLF)
+
+                request.parameters.forEach {
+                    write("--$boundary" + CRLF)
+                    write("Content-Disposition: form-data; name=\"" + it.first + "\"" + CRLF)
+                    write("Content-Type: text/plain" + CRLF)
+                    write(CRLF)
+                    write(it.second.toString())
+                    write(CRLF)
+                }
+
+                write(("--$boundary--"))
+                write(CRLF)
                 flush()
             }
 
@@ -57,3 +66,5 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
         }
     }
 }
+
+fun OutputStream.write(str: String) = write(str.toByteArray())

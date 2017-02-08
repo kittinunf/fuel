@@ -42,6 +42,7 @@ class Encoding : Fuel.RequestConvertible {
             this.url = createUrl(modifiedPath)
             this.httpBody = data ?: ByteArray(0)
             this.type = requestType
+            this.parameters = parameters ?: emptyList()
             header(headerPairs, false)
         }
 

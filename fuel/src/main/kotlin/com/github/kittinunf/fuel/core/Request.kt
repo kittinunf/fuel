@@ -36,6 +36,7 @@ class Request : Fuel.RequestConvertible {
     var httpBody: ByteArray = ByteArray(0)
 
     val httpHeaders = mutableMapOf<String, String>()
+    var parameters = listOf<Pair<String, Any?>>()
 
     //underlying task request
     val taskRequest: TaskRequest by lazy {
