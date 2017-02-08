@@ -8,6 +8,7 @@ import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertThat
 import org.junit.Test
+import java.io.File
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
@@ -210,6 +211,26 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(response.httpStatusCode, isEqualTo(statusCode))
 
         assertThat(request.httpHeaders[headerKey], isEqualTo(headerValue))
+    }
+
+    @Test
+    fun httpUploadRequestWithParameters() {
+        val (request, response, data) =
+                manager.upload(HttpsBin.POST.path, param = listOf("foo" to "bar", "foo1" to "bar1"))
+                        .source { request, url ->
+                            val dir = System.getProperty("user.dir")
+                            val currentDir = File(dir, "src/test/assets")
+                            File(currentDir, "lorem_ipsum_long.tmp")
+                        }
+                        .responseString()
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        println(data)
+        assertThat(data.get(), notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response.httpStatusCode, isEqualTo(statusCode))
     }
 
 }

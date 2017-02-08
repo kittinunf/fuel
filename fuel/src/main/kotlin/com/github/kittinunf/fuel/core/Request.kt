@@ -33,9 +33,17 @@ class Request : Fuel.RequestConvertible {
     lateinit var httpMethod: Method
     lateinit var path: String
     lateinit var url: URL
+
+    //body
     var httpBody: ByteArray = ByteArray(0)
 
+    //headers
     val httpHeaders = mutableMapOf<String, String>()
+
+    //params
+    var parameters = listOf<Pair<String, Any?>>()
+
+    var name = ""
 
     //underlying task request
     val taskRequest: TaskRequest by lazy {
@@ -129,6 +137,11 @@ class Request : Fuel.RequestConvertible {
         uploadTaskRequest.apply {
             sourceCallback = source
         }
+        return this
+    }
+
+    fun name(name: () -> String): Request {
+        this.name = name()
         return this
     }
 
