@@ -31,7 +31,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
             fileInputStream = FileInputStream(file)
             dataStream = ByteArrayOutputStream().apply {
                 write("--" + boundary + CRLF)
-                write("Content-Disposition: form-data; name=\"" + file.name + "\"; filename=\"" + file.name + "\"")
+                write("Content-Disposition: form-data; name=\"" + request.name + "\"; filename=\"" + file.name + "\"")
                 write(CRLF)
                 write("Content-Type: " + URLConnection.guessContentTypeFromName(file.name))
                 write(CRLF)

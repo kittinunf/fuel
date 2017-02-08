@@ -59,16 +59,19 @@ class RequestUploadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.upload("/post", param = listOf("foo" to "bar")).source { request, url ->
-            File(currentDir, "lorem_ipsum_short.tmp")
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-            print(d)
-        }
+        manager.upload("/post", param = listOf("foo" to "bar"))
+                .source { request, url ->
+                    File(currentDir, "lorem_ipsum_short.tmp")
+                }
+                .name { "file-name" }
+                .responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                    print(d)
+                }
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
