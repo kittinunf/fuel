@@ -11,8 +11,6 @@ import org.junit.Assert.assertThat
 import org.junit.Test
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-
-
 class RxFuelTest {
 
     init {
