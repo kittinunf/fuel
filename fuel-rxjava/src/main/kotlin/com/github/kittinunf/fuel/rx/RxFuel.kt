@@ -32,7 +32,7 @@ private fun <T : Any> Request.rx_response(deserializable: Deserializable<T>): Ob
                     }
                 }
             }
-            source.doOnSubscribe { this.cancel() }
+            source.doOnUnsubscribe { this.cancel() }
         }
 
 fun Request.rx_bytes() = rx_result(ByteArrayDeserializer())
@@ -56,6 +56,6 @@ private fun <T : Any> Request.rx_result(deserializable: Deserializable<T>): Obse
                     }
                 }
             }
-            source.doOnSubscribe { this.cancel() }
+            source.doOnUnsubscribe { this.cancel() }
         }
 
