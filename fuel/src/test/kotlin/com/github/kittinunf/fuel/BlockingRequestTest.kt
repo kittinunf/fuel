@@ -219,7 +219,7 @@ class BlockingRequestTest : BaseTestCase() {
                 manager.upload(HttpsBin.POST.path, param = listOf("foo" to "bar", "foo1" to "bar1"))
                         .source { request, url ->
                             val dir = System.getProperty("user.dir")
-                            val currentDir = File(dir, "/fuel/src/test/assets")
+                            val currentDir = File(dir, "/src/test/assets")
                             File(currentDir, "lorem_ipsum_long.tmp")
                         }
                         .responseString()
