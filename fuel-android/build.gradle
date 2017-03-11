@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'com.novoda.bintray-release'
 
+apply plugin: 'jacoco-android'
+
 repositories {
     jcenter()
 }
@@ -24,6 +26,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             consumerProguardFiles 'proguard-rules.pro'

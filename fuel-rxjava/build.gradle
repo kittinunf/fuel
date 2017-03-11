@@ -2,6 +2,8 @@ apply plugin: 'kotlin'
 
 apply plugin: 'com.novoda.bintray-release'
 
+apply plugin: 'jacoco'
+
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
     test.java.srcDirs += 'src/test/kotlin'
@@ -27,6 +29,14 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
+    }
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled = false
+        xml.enabled = true
+        csv.enabled = false
     }
 }
 
