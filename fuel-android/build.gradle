@@ -26,9 +26,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            testCoverageEnabled true
-        }
         release {
             minifyEnabled false
             consumerProguardFiles 'proguard-rules.pro'
@@ -48,6 +45,12 @@ android {
         unitTests.returnDefaultValues = true
     }
 
+}
+
+jacocoAndroidUnitTestReport {
+  csv.enabled false
+  html.enabled true
+  xml.enabled true
 }
 
 dependencies {
