@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'com.novoda.bintray-release'
 
+apply plugin: 'jacoco-android'
+
 repositories {
     jcenter()
 }
@@ -43,6 +45,12 @@ android {
         unitTests.returnDefaultValues = true
     }
 
+}
+
+jacocoAndroidUnitTestReport {
+    csv.enabled false
+    html.enabled true
+    xml.enabled true
 }
 
 dependencies {
