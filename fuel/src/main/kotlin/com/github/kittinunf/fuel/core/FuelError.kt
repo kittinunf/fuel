@@ -7,5 +7,5 @@ class FuelError : Exception() {
     var errorData = ByteArray(0)
     var response = Response()
 
-    override fun toString(): String = "Exception : ${exception.message}"
+    override fun toString(): String = "${exception.javaClass.canonicalName}: ${exception.message ?: "<no message>"}"
 }
