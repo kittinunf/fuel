@@ -24,7 +24,6 @@ class RequestAndroidSyncTest : BaseTestCase() {
         FuelManager.instance.baseParams = listOf("key" to "value")
 
         //configure SSLContext that accepts any cert, you should not do this in your app but this is in test ¯\_(ツ)_/¯
-
         val acceptsAllTrustManager = object : X509TrustManager {
             override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
 
