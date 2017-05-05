@@ -19,35 +19,41 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
     val boundary = request.httpHeaders["Content-Type"]?.split("=", limit = 2)?.get(1) ?: System.currentTimeMillis().toHexString()
 
     var progressCallback: ((Long, Long) -> Unit)? = null
-    lateinit var sourceCallback: ((Request, URL) -> File)
+    lateinit var sourceCallback: (Request, URL) -> Array<File>
 
     var dataStream: ByteArrayOutputStream? = null
     var fileInputStream: FileInputStream? = null
 
     override fun call(): Response {
         try {
-            val file = sourceCallback.invoke(request, request.url)
-            //file input
-            fileInputStream = FileInputStream(file)
             dataStream = ByteArrayOutputStream().apply {
-                write("--" + boundary + CRLF)
-                write("Content-Disposition: form-data; name=\"" + request.name + "\"; filename=\"" + file.name + "\"")
-                write(CRLF)
-                write("Content-Type: " + URLConnection.guessContentTypeFromName(file.name))
-                write(CRLF)
-                write(CRLF)
+                val files = sourceCallback.invoke(request, request.url)
 
-                //input file data
-                fileInputStream!!.copyTo(this, BUFFER_SIZE) { writtenBytes ->
-                    progressCallback?.invoke(writtenBytes, file.length())
+                files.forEachIndexed { i, file ->
+                    val postFix = if (files.size == 1) "" else "${i + 1}"
+                    fileInputStream = FileInputStream(file)
+
+                    write("--$boundary$CRLF")
+                    write("Content-Disposition: form-data; name=\"" + request.name + "$postFix\"; filename=\"${file.name}\"")
+                    write(CRLF)
+                    write("Content-Type: " + URLConnection.guessContentTypeFromName(file.name))
+                    write(CRLF)
+                    write(CRLF)
+
+                    //input file data
+                    fileInputStream?.copyTo(this, BUFFER_SIZE) { writtenBytes ->
+                        progressCallback?.invoke(writtenBytes, file.length())
+                    }
+
+                    write(CRLF)
+
+                    fileInputStream?.close()
                 }
 
-                write(CRLF)
-
                 request.parameters.forEach {
-                    write("--$boundary" + CRLF)
-                    write("Content-Disposition: form-data; name=\"" + it.first + "\"" + CRLF)
-                    write("Content-Type: text/plain" + CRLF)
+                    write("--$boundary$CRLF")
+                    write("Content-Disposition: form-data; name=\"${it.first}\"$CRLF")
+                    write("Content-Type: text/plain$CRLF")
                     write(CRLF)
                     write(it.second.toString())
                     write(CRLF)
