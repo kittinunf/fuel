@@ -15,11 +15,16 @@ import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestAndroidHandlerTest : BaseTestCase() {
+class RequestAndroidAsyncTest : BaseTestCase() {
 
     init {
         FuelManager.instance.basePath = "https://httpbin.org"
@@ -27,6 +32,22 @@ class RequestAndroidHandlerTest : BaseTestCase() {
         FuelManager.instance.baseParams = listOf("key" to "value")
 
         FuelManager.instance.callbackExecutor = Executor(Runnable::run)
+
+        //configure SSLContext that accepts any cert, you should not do this in your app but this is in test ¯\_(ツ)_/¯
+        val acceptsAllTrustManager = object : X509TrustManager {
+            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+
+            override fun getAcceptedIssuers(): Array<X509Certificate>? = null
+
+            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+        }
+
+        FuelManager.instance.socketFactory = {
+            val context = SSLContext.getInstance("TLS")
+            context.init(null, arrayOf<TrustManager>(acceptsAllTrustManager), SecureRandom())
+            SSLContext.setDefault(context)
+            context.socketFactory
+        }()
     }
 
     //Model
@@ -49,6 +70,36 @@ class RequestAndroidHandlerTest : BaseTestCase() {
     @Before
     fun setUp() {
         lock = CountDownLatch(1)
+    }
+
+    @Test
+    fun httpGetRequestString() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        Fuel.get("/user-agent").responseString { req, res, result ->
+            val (d, e) = result
+            data = d
+            error = e
+
+            request = req
+            response = res
+
+            lock.countDown()
+        }
+
+        await()
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+        assertThat(data as String, isA(String::class.java))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
     @Test
