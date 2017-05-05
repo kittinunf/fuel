@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+                Fuel.get("http://httpbin.org/get", params).responseString();
+
                 //put
                 Fuel.put("http://httpbin.org/put").responseString(new Handler<String>() {
                     @Override
