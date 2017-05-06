@@ -31,7 +31,8 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 files.forEachIndexed { i, file ->
                     val postFix = if (files.size == 1) "" else "${i + 1}"
 
-                    write("--$boundary$CRLF")
+                    write("--$boundary")
+                    write(CRLF)
                     write("Content-Disposition: form-data; name=\"" + request.name + "$postFix\"; filename=\"${file.name}\"")
                     write(CRLF)
                     write("Content-Type: " + URLConnection.guessContentTypeFromName(file.name))
@@ -49,9 +50,12 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 }
 
                 request.parameters.forEach {
-                    write("--$boundary$CRLF")
-                    write("Content-Disposition: form-data; name=\"${it.first}\"$CRLF")
-                    write("Content-Type: text/plain$CRLF")
+                    write("--$boundary")
+                    write(CRLF)
+                    write("Content-Disposition: form-data; name=\"${it.first}\"")
+                    write(CRLF)
+                    write("Content-Type: text/plain")
+                    write(CRLF)
                     write(CRLF)
                     write(it.second.toString())
                     write(CRLF)

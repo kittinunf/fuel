@@ -23,7 +23,7 @@ class RequestUploadTest : BaseTestCase() {
 
     val currentDir: File by lazy {
         val dir = System.getProperty("user.dir")
-        File(dir, "fuel/src/test/assets")
+        File(dir, "src/test/assets")
     }
 
     @Test
