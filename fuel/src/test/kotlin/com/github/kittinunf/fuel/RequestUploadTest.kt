@@ -201,4 +201,38 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
+    @Test
+    fun httpUploadWithMultipleFiles() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.upload("/post", param = listOf("foo" to "bar"))
+                .sources { request, url ->
+                    listOf(File(currentDir, "lorem_ipsum_short.tmp"),
+                            File(currentDir, "lorem_ipsum_long.tmp"))
+                }
+                .name { "file-name" }
+                .responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                    print(d)
+                }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val string = data as String
+        assertThat(string, containsString("file-name1"))
+        assertThat(string, containsString("file-name2"))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+    }
 }

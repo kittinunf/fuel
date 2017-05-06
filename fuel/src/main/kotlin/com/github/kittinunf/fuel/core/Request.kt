@@ -131,12 +131,20 @@ class Request : Fuel.RequestConvertible {
         return this
     }
 
-    fun source(source: (Request, URL) -> File): Request {
+    fun sources(source: (Request, URL) -> Iterable<File>): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
 
         uploadTaskRequest.apply {
             sourceCallback = source
         }
+        return this
+    }
+
+    fun source(source: (Request, URL) -> File): Request {
+        sources { request, url ->
+            listOf(source.invoke(request, request.url))
+        }
+
         return this
     }
 
