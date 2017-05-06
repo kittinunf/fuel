@@ -10,6 +10,11 @@ import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestTest : BaseTestCase() {
@@ -20,9 +25,16 @@ class RequestTest : BaseTestCase() {
         USER_AGENT("user-agent"),
         POST("post"),
         PUT("put"),
+        PATCH("patch"),
         DELETE("delete");
 
         override val path = "https://httpbin.org/$relativePath"
+    }
+
+    enum class MockBin(path: String) : Fuel.PathStringConvertible {
+        PATH("");
+
+        override val path = "http://mockbin.org/request/$path"
     }
 
     class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
@@ -36,6 +48,23 @@ class RequestTest : BaseTestCase() {
             }
             return encoder.request
         }
+    }
+
+    init {
+        val acceptsAllTrustManager = object : X509TrustManager {
+            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+
+            override fun getAcceptedIssuers(): Array<X509Certificate>? = null
+
+            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+        }
+
+        manager.socketFactory = {
+            val context = SSLContext.getInstance("TLS")
+            context.init(null, arrayOf<TrustManager>(acceptsAllTrustManager), SecureRandom())
+            SSLContext.setDefault(context)
+            context.socketFactory
+        }()
     }
 
     @Test
@@ -131,7 +160,7 @@ class RequestTest : BaseTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(Method.GET, "http://httpbin.org/get", listOf(paramKey to paramValue)).responseString { req, res, result ->
+        manager.request(Method.POST, "http://httpbin.org/post", listOf(paramKey to paramValue)).responseString { req, res, result ->
             request = req
             response = res
 
@@ -222,6 +251,40 @@ class RequestTest : BaseTestCase() {
     }
 
     @Test
+    fun httpPatchRequestWithParameters() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val paramKey = "foo2"
+        val paramValue = "bar2"
+
+        // for some reason httpbin doesn't support underlying POST for PATCH endpoint
+        manager.request(Method.PATCH, "http://mockbin.org/request", listOf(paramKey to paramValue)).responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        val string = data as String
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString(paramKey))
+        assertThat(string, containsString(paramValue))
+    }
+
+    @Test
     fun httpDeleteRequestWithParameters() {
         var request: Request? = null
         var response: Response? = null
@@ -287,7 +350,7 @@ class RequestTest : BaseTestCase() {
     }
 
     @Test
-    fun httpGetRequestWithPathStringConvertible() {
+    fun httpGetRequestUserAgentWithPathStringConvertible() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -343,7 +406,37 @@ class RequestTest : BaseTestCase() {
     }
 
     @Test
-    fun httpGetRequestWithRequestConvertibleAndOverriddenParameters() {
+    fun httpPatchRequestWithRequestConvertible() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val paramKey = "foo"
+        val paramValue = "bar"
+
+        manager.request(Method.PATCH, MockBin.PATH, listOf(paramKey to paramValue)).responseString { req, res, result ->
+            request = req
+            response = res
+
+            result.fold({
+                data = it
+            }, {
+                error = it
+            })
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpPostRequestWithRequestConvertibleAndOverriddenParameters() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -391,7 +484,6 @@ class RequestTest : BaseTestCase() {
 
             request.cancel()
 
-            println(request.cUrlString())
             assertThat(request, notNullValue())
             assertThat(response, nullValue())
             assertThat(data, nullValue())

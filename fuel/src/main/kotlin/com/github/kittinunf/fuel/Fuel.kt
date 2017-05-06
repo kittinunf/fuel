@@ -59,6 +59,17 @@ class Fuel {
             return request(Method.PUT, convertible, parameters)
         }
 
+        //patch
+        @JvmStatic @JvmOverloads
+        fun patch(path: String, parameters: List<Pair<String, Any?>>? = null): Request {
+            return request(Method.PATCH, path, parameters)
+        }
+
+        @JvmStatic @JvmOverloads
+        fun patch(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request {
+            return request(Method.PATCH, convertible, parameters)
+        }
+
         //delete
         @JvmStatic @JvmOverloads
         fun delete(path: String, parameters: List<Pair<String, Any?>>? = null): Request {
@@ -149,6 +160,16 @@ fun String.httpPut(parameters: List<Pair<String, Any?>>? = null): Request {
 @JvmOverloads
 fun Fuel.PathStringConvertible.httpPut(parameter: List<Pair<String, Any?>>? = null): Request {
     return Fuel.put(this, parameter)
+}
+
+@JvmOverloads
+fun String.httpPatch(parameters: List<Pair<String, Any?>>? = null): Request {
+    return Fuel.patch(this, parameters)
+}
+
+@JvmOverloads
+fun Fuel.PathStringConvertible.httpPatch(parameter: List<Pair<String, Any?>>? = null): Request {
+    return Fuel.patch(this, parameter)
 }
 
 @JvmOverloads

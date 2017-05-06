@@ -242,6 +242,7 @@ class Request : Fuel.RequestConvertible {
 
     fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
 
+    @JvmOverloads
     fun responseString(charset: Charset = Charsets.UTF_8) = response(stringDeserializer(charset))
 
     //object
