@@ -10,6 +10,11 @@ import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestTest : BaseTestCase() {
@@ -37,6 +42,23 @@ class RequestTest : BaseTestCase() {
             }
             return encoder.request
         }
+    }
+
+    init {
+        val acceptsAllTrustManager = object : X509TrustManager {
+            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+
+            override fun getAcceptedIssuers(): Array<X509Certificate>? = null
+
+            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+        }
+
+        manager.socketFactory = {
+            val context = SSLContext.getInstance("TLS")
+            context.init(null, arrayOf<TrustManager>(acceptsAllTrustManager), SecureRandom())
+            SSLContext.setDefault(context)
+            context.socketFactory
+        }()
     }
 
     @Test
@@ -229,10 +251,11 @@ class RequestTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        val paramKey = "foo"
-        val paramValue = "bar"
+        val paramKey = "foo2"
+        val paramValue = "bar2"
 
-        manager.request(Method.PATCH, "http://httpbin.org/patch", listOf(paramKey to paramValue)).responseString { req, res, result ->
+        // for some reason httpbin doesn't support underlying POST for PATCH endpoint
+        manager.request(Method.PATCH, "http://mockbin.org/request", listOf(paramKey to paramValue)).responseString { req, res, result ->
             request = req
             response = res
 
@@ -425,7 +448,6 @@ class RequestTest : BaseTestCase() {
 
             request.cancel()
 
-            println(request.cUrlString())
             assertThat(request, notNullValue())
             assertThat(response, nullValue())
             assertThat(data, nullValue())

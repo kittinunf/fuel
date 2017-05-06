@@ -34,8 +34,8 @@ class HttpClient(val proxy: Proxy? = null) : Client {
                 instanceFollowRedirects = false
                 for ((key, value) in request.httpHeaders) {
                     setRequestProperty(key, value)
-                    if (request.httpMethod == Method.PATCH) setRequestProperty("X-HTTP-Method-Override", "PATCH")
                 }
+                if (request.httpMethod == Method.PATCH) setRequestProperty("X-HTTP-Method-Override", "PATCH")
                 setBodyIfAny(connection, request.httpBody)
             }
 
