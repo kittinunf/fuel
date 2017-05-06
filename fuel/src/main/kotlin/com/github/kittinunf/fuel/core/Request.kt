@@ -131,7 +131,7 @@ class Request : Fuel.RequestConvertible {
         return this
     }
 
-    fun sources(source: (Request, URL) -> Collection<File>): Request {
+    fun sources(source: (Request, URL) -> Iterable<File>): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
 
         uploadTaskRequest.apply {

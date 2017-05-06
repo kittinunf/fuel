@@ -19,7 +19,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
     val boundary = request.httpHeaders["Content-Type"]?.split("=", limit = 2)?.get(1) ?: System.currentTimeMillis().toHexString()
 
     var progressCallback: ((Long, Long) -> Unit)? = null
-    lateinit var sourceCallback: (Request, URL) -> Collection<File>
+    lateinit var sourceCallback: (Request, URL) -> Iterable<File>
 
     var dataStream: ByteArrayOutputStream? = null
 
@@ -29,7 +29,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 val files = sourceCallback.invoke(request, request.url)
 
                 files.forEachIndexed { i, file ->
-                    val postFix = if (files.size == 1) "" else "${i + 1}"
+                    val postFix = if (files.count() == 1) "" else "${i + 1}"
 
                     write("--$boundary")
                     write(CRLF)
