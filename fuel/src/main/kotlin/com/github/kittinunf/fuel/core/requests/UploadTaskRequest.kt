@@ -19,10 +19,9 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
     val boundary = request.httpHeaders["Content-Type"]?.split("=", limit = 2)?.get(1) ?: System.currentTimeMillis().toHexString()
 
     var progressCallback: ((Long, Long) -> Unit)? = null
-    lateinit var sourceCallback: (Request, URL) -> Array<File>
+    lateinit var sourceCallback: (Request, URL) -> Collection<File>
 
     var dataStream: ByteArrayOutputStream? = null
-    var fileInputStream: FileInputStream? = null
 
     override fun call(): Response {
         try {
@@ -31,7 +30,6 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
 
                 files.forEachIndexed { i, file ->
                     val postFix = if (files.size == 1) "" else "${i + 1}"
-                    fileInputStream = FileInputStream(file)
 
                     write("--$boundary$CRLF")
                     write("Content-Disposition: form-data; name=\"" + request.name + "$postFix\"; filename=\"${file.name}\"")
@@ -41,13 +39,13 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
                     write(CRLF)
 
                     //input file data
-                    fileInputStream?.copyTo(this, BUFFER_SIZE) { writtenBytes ->
-                        progressCallback?.invoke(writtenBytes, file.length())
+                    FileInputStream(file).use {
+                        it.copyTo(this, BUFFER_SIZE) { writtenBytes ->
+                            progressCallback?.invoke(writtenBytes, file.length())
+                        }
                     }
 
                     write(CRLF)
-
-                    fileInputStream?.close()
                 }
 
                 request.parameters.forEach {
@@ -68,7 +66,6 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
             return super.call()
         } finally {
             dataStream?.close()
-            fileInputStream?.close()
         }
     }
 }

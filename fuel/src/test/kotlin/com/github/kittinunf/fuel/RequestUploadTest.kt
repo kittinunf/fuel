@@ -23,7 +23,7 @@ class RequestUploadTest : BaseTestCase() {
 
     val currentDir: File by lazy {
         val dir = System.getProperty("user.dir")
-        File(dir, "src/test/assets")
+        File(dir, "fuel/src/test/assets")
     }
 
     @Test
@@ -210,7 +210,7 @@ class RequestUploadTest : BaseTestCase() {
 
         manager.upload("/post", param = listOf("foo" to "bar"))
                 .sources { request, url ->
-                    arrayOf(File(currentDir, "lorem_ipsum_short.tmp"),
+                    listOf(File(currentDir, "lorem_ipsum_short.tmp"),
                             File(currentDir, "lorem_ipsum_long.tmp"))
                 }
                 .name { "file-name" }
