@@ -18,7 +18,7 @@ buildscript {
 
 allprojects {
     ext {
-        publish_version = '1.5.0'
+        publish_version = '1.6.0'
 
         //dependencies version
         kotlin_version = '1.0.6'
