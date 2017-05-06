@@ -324,6 +324,18 @@ Fuel.upload("/put", Method.PUT).source { request, url ->
     // calls to http://example.com/api/put with PUT
 
 }
+
+//upload with multiple files
+Fuel.upload("/post").sources { request, url ->
+    listOf(
+        File.createTempFile("temp1", ".tmp"),
+        File.createTempFile("temp2", ".tmp")
+    )
+}.name {
+    "temp"
+}.responseString { request, response, result ->
+
+}
 ```
 
 ### Authentication
