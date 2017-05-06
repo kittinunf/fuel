@@ -28,6 +28,12 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         override val path = "/$relativePath"
     }
 
+    enum class MockBin(path: String) : Fuel.PathStringConvertible {
+        PATH("");
+
+        override val path = "https://mockbin.org/request/$path"
+    }
+
     @Test
     fun httpGetRequestWithSharedInstance() {
         var request: Request? = null
@@ -90,6 +96,35 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         var error: FuelError? = null
 
         HttpsBin.PUT.httpPut().responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        val string = data as String
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString("https"))
+    }
+
+    @Test
+    fun httpPatchRequestWithSharedInstance() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        MockBin.PATH.httpPatch().responseString { req, res, result ->
             request = req
             response = res
 

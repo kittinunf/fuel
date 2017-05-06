@@ -31,6 +31,12 @@ class RequestTest : BaseTestCase() {
         override val path = "https://httpbin.org/$relativePath"
     }
 
+    enum class MockBin(path: String) : Fuel.PathStringConvertible {
+        PATH("");
+
+        override val path = "http://mockbin.org/request/$path"
+    }
+
     class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
         override val request = createRequest()
 
@@ -344,7 +350,7 @@ class RequestTest : BaseTestCase() {
     }
 
     @Test
-    fun httpGetRequestWithPathStringConvertible() {
+    fun httpGetRequestUserAgentWithPathStringConvertible() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -400,7 +406,37 @@ class RequestTest : BaseTestCase() {
     }
 
     @Test
-    fun httpGetRequestWithRequestConvertibleAndOverriddenParameters() {
+    fun httpPatchRequestWithRequestConvertible() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val paramKey = "foo"
+        val paramValue = "bar"
+
+        manager.request(Method.PATCH, MockBin.PATH, listOf(paramKey to paramValue)).responseString { req, res, result ->
+            request = req
+            response = res
+
+            result.fold({
+                data = it
+            }, {
+                error = it
+            })
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpPostRequestWithRequestConvertibleAndOverriddenParameters() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
