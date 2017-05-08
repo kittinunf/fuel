@@ -45,6 +45,9 @@ class Request : Fuel.RequestConvertible {
 
     var name = ""
 
+    var names = arrayListOf<String>()
+    var mediaTypes = arrayListOf<String>()
+
     //underlying task request
     val taskRequest: TaskRequest by lazy {
         when (type) {
@@ -131,11 +134,34 @@ class Request : Fuel.RequestConvertible {
         return this
     }
 
-    fun sources(source: (Request, URL) -> Iterable<File>): Request {
+    fun dataParts(dataParts: (Request, URL) -> Iterable<DataPart>): Request {
+        val parts = dataParts.invoke(request, request.url)
+
+        mediaTypes.clear()
+        mediaTypes.addAll(parts.map { it.mediaType })
+
+        names.clear()
+        names.addAll(parts.map { it.fileName })
+
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
 
         uploadTaskRequest.apply {
-            sourceCallback = source
+            sourceCallback = { request, url ->
+                parts.map { it.file }
+            }
+        }
+
+        return this
+    }
+
+    fun sources(sources: (Request, URL) -> Iterable<File>): Request {
+        mediaTypes.clear()
+        names.clear()
+
+        val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
+
+        uploadTaskRequest.apply {
+            sourceCallback = sources
         }
         return this
     }

@@ -1,10 +1,6 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -231,6 +227,48 @@ class RequestUploadTest : BaseTestCase() {
         val string = data as String
         assertThat(string, containsString("file-name1"))
         assertThat(string, containsString("file-name2"))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpUploadWithDataParts() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.upload("/post", param = listOf("foo" to "bar"))
+                .sources { request, url ->
+                    listOf(File(currentDir, "lorem_ipsum_short.tmp"),
+                            File(currentDir, "lorem_ipsum_long.tmp"))
+                }
+                // Override with Data parts
+                .dataParts { request, url ->
+                    listOf(DataPart("first-file", "image/jpeg", File(currentDir, "lorem_ipsum_short.tmp")),
+                            DataPart("second-file", "image/jpeg", File(currentDir, "lorem_ipsum_long.tmp")))
+                }
+                // Ignore single name
+                .name { "filename" }
+                .responseString { req, res, result ->
+                    request = req
+                    response = res
+                    print(req)
+                    val (d, err) = result
+                    data = d
+                    error = err
+                    print(d)
+                }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val string = data as String
+        assertThat(string, containsString("first-file"))
+        assertThat(string, containsString("second-file"))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.httpStatusCode, isEqualTo(statusCode))
