@@ -254,7 +254,6 @@ class RequestUploadTest : BaseTestCase() {
                 .responseString { req, res, result ->
                     request = req
                     response = res
-                    print(req)
                     val (d, err) = result
                     data = d
                     error = err

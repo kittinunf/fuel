@@ -10,6 +10,7 @@ import java.io.FileInputStream
 import java.io.OutputStream
 import java.net.URL
 import java.net.URLConnection
+import javax.activation.MimetypesFileTypeMap
 
 class UploadTaskRequest(request: Request) : TaskRequest(request) {
 
@@ -31,12 +32,12 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 files.forEachIndexed { i, file ->
                     val postFix = if (files.count() == 1) "" else "${i + 1}"
                     val fileName = request.names.getOrElse(i) { request.name + postFix }
-                    
+
                     write("--$boundary")
                     write(CRLF)
                     write("Content-Disposition: form-data; name=\"$fileName\"; filename=\"${file.name}\"")
                     write(CRLF)
-                    write("Content-Type: " + request.mediaTypes.getOrElse(i) { URLConnection.guessContentTypeFromName(file.name) ?: "" })
+                    write("Content-Type: " + request.mediaTypes.getOrElse(i) { guessContentType(file) })
                     write(CRLF)
                     write(CRLF)
 
@@ -72,6 +73,10 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
         } finally {
             dataStream?.close()
         }
+    }
+
+    private fun guessContentType(file: File): String {
+        return URLConnection.guessContentTypeFromName(file.name) ?: MimetypesFileTypeMap().getContentType(file)
     }
 }
 
