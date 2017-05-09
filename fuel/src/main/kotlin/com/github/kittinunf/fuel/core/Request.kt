@@ -45,8 +45,8 @@ class Request : Fuel.RequestConvertible {
 
     var name = ""
 
-    var names = mutableListOf<String>()
-    var mediaTypes = mutableListOf<String>()
+    val names = mutableListOf<String>()
+    val mediaTypes = mutableListOf<String>()
 
     //underlying task request
     val taskRequest: TaskRequest by lazy {

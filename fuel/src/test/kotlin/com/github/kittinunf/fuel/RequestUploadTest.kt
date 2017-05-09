@@ -240,17 +240,10 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/post", param = listOf("foo" to "bar"))
-                .sources { request, url ->
-                    listOf(File(currentDir, "lorem_ipsum_short.tmp"),
-                            File(currentDir, "lorem_ipsum_long.tmp"))
-                }
-                // Override with Data parts
                 .dataParts { request, url ->
                     listOf(DataPart("first-file", "image/jpeg", File(currentDir, "lorem_ipsum_short.tmp")),
                             DataPart("second-file", "image/jpeg", File(currentDir, "lorem_ipsum_long.tmp")))
                 }
-                // Ignore single name
-                .name { "filename" }
                 .responseString { req, res, result ->
                     request = req
                     response = res
