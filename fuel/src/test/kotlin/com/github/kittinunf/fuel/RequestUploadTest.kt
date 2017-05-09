@@ -233,16 +233,15 @@ class RequestUploadTest : BaseTestCase() {
     }
 
     @Test
-    fun httpUploadWithDataParts() {
+    fun httpUploadWithDataPart() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
         var error: FuelError? = null
 
         manager.upload("/post", param = listOf("foo" to "bar"))
-                .dataParts { request, url ->
-                    listOf(DataPart("first-file", "image/jpeg", File(currentDir, "lorem_ipsum_short.tmp")),
-                            DataPart("second-file", "image/jpeg", File(currentDir, "lorem_ipsum_long.tmp")))
+                .dataPart { request, url ->
+                    DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg")
                 }
                 .responseString { req, res, result ->
                     request = req
@@ -259,7 +258,42 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val string = data as String
-        assertThat(string, containsString("first-file"))
+        assertThat(string, containsString("lorem_ipsum_short"))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpUploadWithMultipleDataParts() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.upload("/post", param = listOf("foo" to "bar"))
+                .dataParts { request, url ->
+                    listOf(
+                            DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg"),
+                            DataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "second-file", type = "image/jpeg")
+                    )
+                }
+                .responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                    print(d)
+                }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val string = data as String
+        assertThat(string, containsString("lorem_ipsum_short"))
         assertThat(string, containsString("second-file"))
 
         val statusCode = HttpURLConnection.HTTP_OK
