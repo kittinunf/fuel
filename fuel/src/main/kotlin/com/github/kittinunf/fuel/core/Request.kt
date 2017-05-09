@@ -134,23 +134,19 @@ class Request : Fuel.RequestConvertible {
         return this
     }
 
-    fun dataPart(dataPart: (Request, URL) -> DataPart): Request {
-        dataParts { request, url ->
-            listOf(dataPart.invoke(request, url))
-        }
-
-        return this
-    }
-
     fun dataParts(dataParts: (Request, URL) -> Iterable<DataPart>): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
         val parts = dataParts.invoke(request, request.url)
 
-        mediaTypes.clear()
-        mediaTypes.addAll(parts.map { it.type })
+        mediaTypes.apply {
+            clear()
+            addAll(parts.map { it.type })
+        }
 
-        names.clear()
-        names.addAll(parts.map { it.name })
+        names.apply {
+            clear()
+            addAll(parts.map { it.name })
+        }
 
         uploadTaskRequest.apply {
             sourceCallback = { request, url -> parts.map { it.file } }

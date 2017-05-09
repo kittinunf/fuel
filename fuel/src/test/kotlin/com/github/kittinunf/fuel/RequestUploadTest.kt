@@ -233,38 +233,6 @@ class RequestUploadTest : BaseTestCase() {
     }
 
     @Test
-    fun httpUploadWithDataPart() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
-
-        manager.upload("/post", param = listOf("foo" to "bar"))
-                .dataPart { request, url ->
-                    DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg")
-                }
-                .responseString { req, res, result ->
-                    request = req
-                    response = res
-                    val (d, err) = result
-                    data = d
-                    error = err
-                    print(d)
-                }
-
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
-
-        val string = data as String
-        assertThat(string, containsString("lorem_ipsum_short"))
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
-    }
-
-    @Test
     fun httpUploadWithMultipleDataParts() {
         var request: Request? = null
         var response: Response? = null
