@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.rx.rx_response
 import com.github.kittinunf.fuel.rx.rx_responseObject
 import com.github.kittinunf.fuel.rx.rx_responseString
 import com.github.kittinunf.fuel.rx.rx_string
+import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -25,26 +26,25 @@ class RxFuelTest {
     fun rxTestResponse() {
         val (response, data) = Fuel.get("/get").rx_response()
                 .test()
-                .awaitTerminalEvent()
+                .apply { awaitTerminalEvent() }
                 .assertNoErrors()
                 .assertValueCount(1)
-                .assertCompleted()
-                .onNextEvents[0]
+                .assertComplete()
+                .values()[0]
 
         assertThat(response, notNullValue())
         assertThat(data, notNullValue())
     }
 
-
     @Test
     fun rxTestResponseString() {
         val (response, data) = Fuel.get("/get").rx_responseString()
                 .test()
-                .awaitTerminalEvent()
+                .apply { awaitTerminalEvent() }
                 .assertNoErrors()
                 .assertValueCount(1)
-                .assertCompleted()
-                .onNextEvents[0]
+                .assertComplete()
+                .values()[0]
 
         assertThat(response, notNullValue())
         assertThat(data, notNullValue())
@@ -54,23 +54,25 @@ class RxFuelTest {
     fun rxTestString() {
         val data = Fuel.get("/get").rx_string()
                 .test()
-                .awaitTerminalEvent()
+                .apply { awaitTerminalEvent() }
                 .assertNoErrors()
                 .assertValueCount(1)
-                .assertCompleted()
-                .onNextEvents[0]
+                .assertComplete()
+                .values()[0]
 
         assertThat(data, notNullValue())
     }
 
     @Test
     fun rxTestStringError() {
-        Fuel.get("/gt").rx_string()
+        val data = Fuel.get("/gt").rx_string()
                 .test()
-                .awaitTerminalEvent()
-                .assertNoValues()
-                .assertError(Throwable::class.java)
-                .assertNotCompleted()
+                .apply { awaitTerminalEvent() }
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertComplete()
+                .values()[0]
+        assert(data is Result.Failure)
     }
 
     //Model
@@ -90,11 +92,11 @@ class RxFuelTest {
         val (response, model) = Fuel.get("/user-agent")
                 .rx_responseObject(HttpBinUserAgentModelDeserializer())
                 .test()
-                .awaitTerminalEvent()
+                .apply { awaitTerminalEvent() }
                 .assertNoErrors()
                 .assertValueCount(1)
-                .assertCompleted()
-                .onNextEvents[0]
+                .assertComplete()
+                .values()[0]
 
         assertThat(response, notNullValue())
         assertThat(model, notNullValue())
@@ -102,13 +104,16 @@ class RxFuelTest {
 
     @Test
     fun rxTestResponseObjectError() {
-        Fuel.get("/useragent").rx_responseObject(HttpBinUserAgentModelDeserializer())
+        val (response, model) = Fuel.get("/useragent")
+                .rx_responseObject(HttpBinUserAgentModelDeserializer())
                 .test()
-                .awaitTerminalEvent()
-                .assertNoValues()
-                .assertError(Throwable::class.java)
-                .assertNotCompleted()
+                .apply { awaitTerminalEvent() }
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertComplete()
+                .values()[0]
+        assertThat(response, notNullValue())
+        assert(model is Result.Failure)
     }
-
 
 }
