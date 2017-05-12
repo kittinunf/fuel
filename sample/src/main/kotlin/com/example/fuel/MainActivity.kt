@@ -166,8 +166,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun httpRxSupport() {
-        "http://jsonplaceholder.typicode.com/photos/1".httpGet().rx_object(Photo.Deserializer()).subscribe {
-            Log.d(TAG, it.toString())
+        "http://jsonplaceholder.typicode.com/photos/1".httpGet().rx_object(Photo.Deserializer()).subscribe { result ->
+            Log.d(TAG, result.toString())
         }
     }
 
