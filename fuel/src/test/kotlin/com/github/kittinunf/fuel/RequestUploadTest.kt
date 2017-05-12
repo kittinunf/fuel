@@ -1,10 +1,6 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -231,6 +227,42 @@ class RequestUploadTest : BaseTestCase() {
         val string = data as String
         assertThat(string, containsString("file-name1"))
         assertThat(string, containsString("file-name2"))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpUploadWithMultipleDataParts() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.upload("/post", param = listOf("foo" to "bar"))
+                .dataParts { request, url ->
+                    listOf(
+                            DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg"),
+                            DataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "second-file", type = "image/jpeg")
+                    )
+                }
+                .responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                    print(d)
+                }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val string = data as String
+        assertThat(string, containsString("lorem_ipsum_short"))
+        assertThat(string, containsString("second-file"))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.httpStatusCode, isEqualTo(statusCode))
