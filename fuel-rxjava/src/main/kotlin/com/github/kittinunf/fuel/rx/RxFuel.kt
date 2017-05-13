@@ -15,9 +15,8 @@ fun <T : Any> Request.rx_responseObject(deserializable: Deserializable<T>) = rx_
 
 private fun <T : Any> Request.rx_response(deserializable: Deserializable<T>): Single<Pair<Response, Result<T, FuelError>>> =
         Single.create { emitter ->
-            response(deserializable) { _, response, result ->
-                emitter.onSuccess(response to result)
-            }
+            val (_, response, result) = response(deserializable)
+            emitter.onSuccess(response to result)
             emitter.setCancellable { this.cancel() }
         }
 
@@ -29,9 +28,8 @@ fun <T : Any> Request.rx_object(deserializable: Deserializable<T>) = rx_result(d
 
 private fun <T : Any> Request.rx_result(deserializable: Deserializable<T>): Single<Result<T, FuelError>> =
         Single.create { emitter ->
-            response(deserializable) { _, _, result ->
-                emitter.onSuccess(result)
-            }
+            val (_, _, result) = response(deserializable)
+            emitter.onSuccess(result)
             emitter.setCancellable { this.cancel() }
         }
 
