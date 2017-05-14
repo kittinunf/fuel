@@ -42,7 +42,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:$android_support_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
     compile "com.google.code.gson:gson:$gson_version"
-
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile project(':fuel-rxjava')
     compile project(':fuel-android')
 }

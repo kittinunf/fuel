@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
-    compile "io.reactivex:rxjava:$parent.ext.rxjava_version"
+    compile "io.reactivex.rxjava2:rxjava:$parent.ext.rxjava_version"
 
     compile project(':fuel')
 

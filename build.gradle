@@ -21,9 +21,9 @@ allprojects {
         publish_version = '1.6.0'
 
         //dependencies version
-        kotlin_version = '1.0.6'
+        kotlin_version = '1.1.2'
         result_version = '1.0.5'
-        rxjava_version = '1.2.5'
+        rxjava_version = '2.1.0'
 
         //android dependencies version
         compile_sdk_version = 25
