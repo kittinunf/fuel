@@ -296,7 +296,7 @@ Fuel.get("http://httpbin.org/get", params).timeout(timeout).readTimeout(readTime
 ``` Kotlin
 Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
     File.createTempFile("temp", ".tmp")
-}.response { req, res, result -> {
+}.response { req, res, result -> 
 
 }
 
@@ -304,7 +304,7 @@ Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
     File.createTempFile("temp", ".tmp")
 }.progress { readBytes, totalBytes ->
     val progress = readBytes.toFloat() / totalBytes.toFloat()
-}.response { req, res, result -> {
+}.response { req, res, result -> 
 
 }
 ```
@@ -396,7 +396,7 @@ data class User(val firstName: String = "",
 }
 
 //Use httpGet extension
-"http://www.example.com/user/1".httpGet().responseObject(User.Deserializer()) { req, res, result
+"http://www.example.com/user/1".httpGet().responseObject(User.Deserializer()) { req, res, result ->
     //result is of type Result<User, Exception>
     val (user, err) = result
 
