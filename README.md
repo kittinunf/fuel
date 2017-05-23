@@ -396,7 +396,7 @@ data class User(val firstName: String = "",
 }
 
 //Use httpGet extension
-"http://www.example.com/user/1".httpGet().responseObject(User.Deserializer()) { req, res, result ->
+"http://www.example.com/user/1".httpGet().responseObject(User.Deserializer(), { req, res, result ->
     //result is of type Result<User, Exception>
     val (user, err) = result
 
