@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import java.io.BufferedOutputStream
+import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.Proxy
@@ -46,22 +47,11 @@ class HttpClient(val proxy: Proxy? = null) : Client {
 
                 val contentEncoding = connection.contentEncoding ?: ""
 
-                val dataStream = if (connection.errorStream != null) {
-                    connection.errorStream
-                } else {
-                    try {
-                        connection.inputStream
-                    } catch(exception: IOException) {
-                        null
-                    }
-                }
-
-                if (dataStream != null) {
-                    data = if (contentEncoding.compareTo("gzip", true) == 0) {
-                        GZIPInputStream(dataStream).readBytes()
-                    } else {
-                        dataStream.readBytes()
-                    }
+                dataStream = try {
+                    val stream = connection.errorStream ?: connection.inputStream
+                    if (contentEncoding.compareTo("gzip", true) == 0) GZIPInputStream(stream) else stream
+                } catch (exception: IOException) {
+                    ByteArrayInputStream(kotlin.ByteArray(0))
                 }
 
                 //try - catch just in case both methods throw
@@ -79,7 +69,9 @@ class HttpClient(val proxy: Proxy? = null) : Client {
                 this.response = response
             }
         } finally {
-            connection.disconnect()
+            //As per Android documentation, a connection that is not explicitly disconnected
+            //will be pooled and reused!  So, don't close it as we need inputStream later!
+            //connection.disconnect()
         }
     }
 
