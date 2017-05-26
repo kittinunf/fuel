@@ -18,7 +18,7 @@ class Encoding : Fuel.RequestConvertible {
 
     var encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
         var modifiedPath = path
-        var data: ByteArray? = null
+        var data: String? = null
         val headerPairs: MutableMap<String, Any> = defaultHeaders()
         if (encodeParameterInUrl(method)) {
             var querySign = ""
@@ -34,16 +34,16 @@ class Encoding : Fuel.RequestConvertible {
             headerPairs += "Content-Type" to "multipart/form-data; boundary=" + boundary
         } else {
             headerPairs += "Content-Type" to "application/x-www-form-urlencoded"
-            data = queryFromParameters(parameters).toByteArray()
+            data = queryFromParameters(parameters)
         }
         Request().apply {
             httpMethod = method
             this.path = modifiedPath
             this.url = createUrl(modifiedPath)
-            this.httpBody = data ?: ByteArray(0)
             this.type = requestType
             this.parameters = parameters ?: emptyList()
             header(headerPairs, false)
+            if (data != null) body(data ?: "")
         }
 
     }

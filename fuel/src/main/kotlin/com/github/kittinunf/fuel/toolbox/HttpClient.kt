@@ -31,13 +31,13 @@ class HttpClient(val proxy: Proxy? = null) : Client {
                 doInput = true
                 useCaches = false
                 requestMethod = if (request.httpMethod == Method.PATCH) Method.POST.value else request.httpMethod.value
-                setDoOutput(connection, request.httpMethod)
                 instanceFollowRedirects = false
                 for ((key, value) in request.httpHeaders) {
                     setRequestProperty(key, value)
                 }
                 if (request.httpMethod == Method.PATCH) setRequestProperty("X-HTTP-Method-Override", "PATCH")
-                setBodyIfAny(connection, request.httpBody)
+                setDoOutput(connection, request.httpMethod)
+                setBodyIfDoOutput(connection, request)
             }
 
             return response.apply {
@@ -88,11 +88,18 @@ class HttpClient(val proxy: Proxy? = null) : Client {
         }
     }
 
-    private fun setBodyIfAny(connection: HttpURLConnection, bytes: ByteArray) {
-        if (bytes.isNotEmpty()) {
+    private fun setBodyIfDoOutput(connection: HttpURLConnection, request: Request) {
+        val bodyCallback = request.bodyCallback
+        if (bodyCallback != null && connection.doOutput) {
+            val contentLength = bodyCallback.invoke(request, null, 0)
+
+            if (request.type == Request.Type.UPLOAD)
+                connection.setFixedLengthStreamingMode(contentLength.toInt())
+
             val outStream = BufferedOutputStream(connection.outputStream)
-            outStream.write(bytes)
-            outStream.close()
+            outStream.use {
+                bodyCallback.invoke(request, outStream, contentLength)
+            }
         }
     }
 
