@@ -490,5 +490,19 @@ class RequestTest : BaseTestCase() {
             assertThat(error, nullValue())
         }
     }
+
+    @Test
+    fun bodyWithContentType() {
+        val foo = "foo"
+        val bar = "bar"
+        val body = "{ $foo : $bar }"
+
+        val request = manager.request(Method.GET, "http://httpbin.org/").body(body, Request.ContentType.Text)
+        assertThat(request.httpHeaders["Content-Type"], nullValue())
+
+        val contentType = Request.ContentType.JSON
+        request.body(body, contentType)
+        assertThat(request.httpHeaders["Content-Type"], equalTo(contentType.string))
+    }
 }
 
