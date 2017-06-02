@@ -9,7 +9,7 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.livedata.liveData_object
+import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rx_object
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun httpLiveDataSupport() {
-        "http://jsonplaceholder.typicode.com/photos/1".httpGet().liveData_object(Photo.Deserializer())
+        "http://jsonplaceholder.typicode.com/photos/1".httpGet().liveDataObject(Photo.Deserializer())
                 .observeForever { result ->
                     Log.d(TAG, result.toString())
                 }

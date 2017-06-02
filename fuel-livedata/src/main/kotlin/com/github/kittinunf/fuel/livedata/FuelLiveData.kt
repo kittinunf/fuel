@@ -12,13 +12,13 @@ import java.nio.charset.Charset
  * Created by Ihor Kucherenko on 01.06.17.
  * https://github.com/KucherenkoIhor
  */
-fun Request.liveData_response() = liveData_response(ByteArrayDeserializer())
+fun Request.liveDataResponse() = liveDataResponse(ByteArrayDeserializer())
 
-fun Request.liveData_responseString(charset: Charset = Charsets.UTF_8) = liveData_response(StringDeserializer(charset))
+fun Request.liveDataResponseString(charset: Charset = Charsets.UTF_8) = liveDataResponse(StringDeserializer(charset))
 
-fun <T : Any> Request.liveData_responseObject(deserializable: Deserializable<T>) = liveData_response(deserializable)
+fun <T : Any> Request.liveDataResponseObject(deserializable: Deserializable<T>) = liveDataResponse(deserializable)
 
-private fun <T : Any> Request.liveData_response(deserializable: Deserializable<T>): LiveData<Pair<Response, Result<T, FuelError>>> {
+private fun <T : Any> Request.liveDataResponse(deserializable: Deserializable<T>): LiveData<Pair<Response, Result<T, FuelError>>> {
     val liveData = MutableLiveData<Pair<Response, Result<T, FuelError>>>()
     val handler: (Request, Response, Result<T, FuelError>) -> Unit = { request, response, result ->
         liveData.value = response to result
@@ -27,13 +27,13 @@ private fun <T : Any> Request.liveData_response(deserializable: Deserializable<T
     return liveData
 }
 
-fun Request.liveData_bytes() = liveData_result(ByteArrayDeserializer())
+fun Request.liveDataBytes() = liveDataResult(ByteArrayDeserializer())
 
-fun Request.liveData_string(charset: Charset = Charsets.UTF_8) = liveData_result(StringDeserializer(charset))
+fun Request.liveDataString(charset: Charset = Charsets.UTF_8) = liveDataResult(StringDeserializer(charset))
 
-fun <T : Any> Request.liveData_object(deserializable: Deserializable<T>) = liveData_result(deserializable)
+fun <T : Any> Request.liveDataObject(deserializable: Deserializable<T>) = liveDataResult(deserializable)
 
-private fun <T : Any> Request.liveData_result(deserializable: Deserializable<T>): LiveData<Result<T, FuelError>> {
+private fun <T : Any> Request.liveDataResult(deserializable: Deserializable<T>): LiveData<Result<T, FuelError>> {
     val liveData = MutableLiveData<Result<T, FuelError>>()
     val handler: (Request, Response, Result<T, FuelError>) -> Unit = { request, response, result ->
         liveData.value = result
