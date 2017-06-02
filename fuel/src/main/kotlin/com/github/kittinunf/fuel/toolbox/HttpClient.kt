@@ -57,10 +57,13 @@ class HttpClient(val proxy: Proxy? = null) : Client {
                 }
 
                 if (dataStream != null) {
-                    data = if (contentEncoding.compareTo("gzip", true) == 0) {
-                        GZIPInputStream(dataStream).readBytes()
-                    } else {
-                        dataStream.readBytes()
+                    // HEAD responses have no input stream. Trying to parse an empty GZIPInputStream fails.
+                    data = if (request.httpMethod == Method.HEAD) ByteArray(0) else {
+                        if (contentEncoding.compareTo("gzip", true) == 0) {
+                            GZIPInputStream(dataStream).readBytes()
+                        } else {
+                            dataStream.readBytes()
+                        }
                     }
                 }
 
