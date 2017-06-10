@@ -1,4 +1,5 @@
-include ':fuel', ':fuel-livedata',
+include ':fuel',
+        ':fuel-livedata',
         ':fuel-rxjava',
         ':fuel-android',
         ':sample',
