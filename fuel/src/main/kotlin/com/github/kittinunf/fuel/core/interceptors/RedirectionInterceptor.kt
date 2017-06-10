@@ -5,7 +5,7 @@ import java.net.MalformedURLException
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
-class RedirectException() : Exception("Redirection fail, not found URL to redirect to")
+class RedirectException : Exception("Redirection fail, not found URL to redirect to")
 
 fun redirectResponseInterceptor(manager: FuelManager) =
         { next: (Request, Response) -> Response ->

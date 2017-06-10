@@ -160,7 +160,7 @@ class Request : Fuel.RequestConvertible {
         }
 
         uploadTaskRequest.apply {
-            sourceCallback = { request, url -> parts.map { it.file } }
+            sourceCallback = { _, _ -> parts.map { it.file } }
         }
 
         return this
@@ -179,7 +179,7 @@ class Request : Fuel.RequestConvertible {
     }
 
     fun source(source: (Request, URL) -> File): Request {
-        sources { request, url ->
+        sources { request, _ ->
             listOf(source.invoke(request, request.url))
         }
 

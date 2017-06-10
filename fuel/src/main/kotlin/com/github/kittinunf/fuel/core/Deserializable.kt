@@ -35,9 +35,9 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 }
 
 fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit): Request {
-    response(deserializable, { request, response, value ->
+    response(deserializable, { _, response, value ->
         handler(this@response, response, Result.Success(value))
-    }, { request, response, error ->
+    }, { _, response, error ->
         handler(this@response, response, Result.Failure(error))
     })
     return this

@@ -11,7 +11,11 @@ import java.security.KeyStore
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import javax.net.ssl.*
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.TrustManagerFactory
 
 class FuelManager {
 
@@ -71,7 +75,7 @@ class FuelManager {
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 
@@ -94,7 +98,7 @@ class FuelManager {
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 
@@ -113,7 +117,7 @@ class FuelManager {
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 
@@ -125,7 +129,7 @@ class FuelManager {
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
         request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ req: Request, res: Response -> res }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 

@@ -14,7 +14,6 @@ import org.junit.Test
  */
 class FuelLiveDataTest {
 
-
     init {
         FuelManager.instance.basePath = "https://httpbin.org"
 
