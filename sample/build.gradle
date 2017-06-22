@@ -45,11 +45,12 @@ dependencies {
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile project(':fuel-rxjava')
     compile project(':fuel-android')
+    compile project(':fuel-livedata')
 }
 
 buildscript {
     ext {
-        android_support_version = '25.0.1'
+        android_support_version = '25.3.1'
         gson_version = '2.3.1'
     }
 

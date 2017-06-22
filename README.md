@@ -1,6 +1,7 @@
 # Fuel
 
 [ ![Kotlin](https://img.shields.io/badge/Kotlin-1.1.2-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
+[![Codecov](https://codecov.io/github/kittinunf/Fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/Fuel)
 
 The easiest HTTP networking library for Kotlin/Android.
 
@@ -68,7 +69,7 @@ dependencies {
 
 //if we set baseURL beforehand, simply use relativePath
 FuelManager.instance.basePath = "http://httpbin.org"
-"/get".httpGet().responseString { request, response, result ->    
+"/get".httpGet().responseString { request, response, result ->
     //make a GET to http://httpbin.org/get and do something with response
     val (data, error) = result
     if (error != null) {
@@ -296,7 +297,7 @@ Fuel.get("http://httpbin.org/get", params).timeout(timeout).readTimeout(readTime
 ``` Kotlin
 Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
     File.createTempFile("temp", ".tmp")
-}.response { req, res, result -> 
+}.response { req, res, result ->
 
 }
 
@@ -304,7 +305,7 @@ Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
     File.createTempFile("temp", ".tmp")
 }.progress { readBytes, totalBytes ->
     val progress = readBytes.toFloat() / totalBytes.toFloat()
-}.response { req, res, result -> 
+}.response { req, res, result ->
 
 }
 ```

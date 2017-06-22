@@ -1,0 +1,89 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+apply plugin: 'com.novoda.bintray-release'
+
+apply plugin: 'jacoco-android'
+
+repositories {
+    jcenter()
+}
+
+android {
+    compileSdkVersion parent.ext.compile_sdk_version
+    buildToolsVersion parent.ext.build_tool_version
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion parent.ext.compile_sdk_version
+        versionCode 1
+        versionName parent.ext.publish_version
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+}
+
+jacocoAndroidUnitTestReport {
+    csv.enabled false
+    html.enabled true
+    xml.enabled true
+}
+
+dependencies {
+
+    compile "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
+
+    compile project(':fuel')
+
+    testCompile "junit:junit:$parent.ext.junit_version"
+    testCompile "org.robolectric:robolectric:$parent.ext.robolectric_version"
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
+    }
+}
+
+publish {
+    artifactId = 'fuel-livedata'
+    autoPublish = true
+    desc = 'The easiest HTTP networking library in Kotlin/Android'
+    groupId = 'com.github.kittinunf.fuel'
+    licences = ['MIT']
+    publishVersion = parent.ext.publish_version
+    uploadName = 'Fuel-LiveData'
+    website = 'https://github.com/kittinunf/Fuel'
+}
+
+

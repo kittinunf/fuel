@@ -4,15 +4,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.*
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.httpDelete
-import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.fuel.httpPost
-import com.github.kittinunf.fuel.httpPut
+import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rx_object
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
@@ -54,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         httpResponseObject()
         httpCancel()
         httpRxSupport()
+        httpLiveDataSupport()
     }
 
     fun httpCancel() {
@@ -172,6 +170,13 @@ class MainActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { result ->
+                    Log.d(TAG, result.toString())
+                }
+    }
+
+    fun httpLiveDataSupport() {
+        "http://jsonplaceholder.typicode.com/photos/1".httpGet().liveDataObject(Photo.Deserializer())
+                .observeForever { result ->
                     Log.d(TAG, result.toString())
                 }
     }
