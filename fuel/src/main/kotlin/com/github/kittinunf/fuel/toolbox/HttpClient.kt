@@ -51,6 +51,9 @@ class HttpClient(val proxy: Proxy? = null) : Client {
                     val stream = connection.errorStream ?: connection.inputStream
                     if (contentEncoding.compareTo("gzip", true) == 0) GZIPInputStream(stream) else stream
                 } catch (exception: IOException) {
+                    try {
+                        connection.errorStream ?: connection.inputStream ?. close()
+                    } catch (exception: IOException) { }
                     ByteArrayInputStream(kotlin.ByteArray(0))
                 }
 

@@ -158,6 +158,7 @@ class RequestDownloadTest : BaseTestCase() {
 
         var read = -1L
         var total = -1L
+        var lastPercent = 0L
 
         manager.download("http://speedtest.tele2.net/100MB.zip").destination { response, url ->
             val f = File.createTempFile("100MB.zip", null)
@@ -166,7 +167,11 @@ class RequestDownloadTest : BaseTestCase() {
         }.progress { readBytes, totalBytes ->
             read = readBytes
             total = totalBytes
-            println("read: $read, total: $total")
+            val percent = readBytes * 100 / totalBytes
+            if (percent > lastPercent) {
+                println("read: $read, total: $total, $percent% ")
+                lastPercent = percent
+            }
         }.responseString { req, res, result ->
             request = req
             response = res
