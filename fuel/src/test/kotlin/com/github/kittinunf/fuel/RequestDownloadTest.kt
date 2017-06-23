@@ -149,4 +149,45 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
 
+    @Test
+    fun httpDownloadBigFileWithProgressValidCase() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        var read = -1L
+        var total = -1L
+        var lastPercent = 0L
+
+        manager.download("http://speedtest.tele2.net/100MB.zip").destination { response, url ->
+            val f = File.createTempFile("100MB.zip", null)
+            println(f.absolutePath)
+            f
+        }.progress { readBytes, totalBytes ->
+            read = readBytes
+            total = totalBytes
+            val percent = readBytes * 100 / totalBytes
+            if (percent > lastPercent) {
+                println("read: $read, total: $total, $percent% ")
+                lastPercent = percent
+            }
+        }.responseString { req, res, result ->
+            request = req
+            response = res
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+    }
+
 }

@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import java.io.BufferedOutputStream
+import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.Proxy
@@ -30,13 +31,13 @@ class HttpClient(val proxy: Proxy? = null) : Client {
                 doInput = true
                 useCaches = false
                 requestMethod = if (request.httpMethod == Method.PATCH) Method.POST.value else request.httpMethod.value
-                setDoOutput(connection, request.httpMethod)
                 instanceFollowRedirects = false
                 for ((key, value) in request.httpHeaders) {
                     setRequestProperty(key, value)
                 }
                 if (request.httpMethod == Method.PATCH) setRequestProperty("X-HTTP-Method-Override", "PATCH")
-                setBodyIfAny(connection, request.httpBody)
+                setDoOutput(connection, request.httpMethod)
+                setBodyIfDoOutput(connection, request)
             }
 
             return response.apply {
@@ -46,25 +47,14 @@ class HttpClient(val proxy: Proxy? = null) : Client {
 
                 val contentEncoding = connection.contentEncoding ?: ""
 
-                val dataStream = if (connection.errorStream != null) {
-                    connection.errorStream
-                } else {
+                dataStream = try {
+                    val stream = connection.errorStream ?: connection.inputStream
+                    if (contentEncoding.compareTo("gzip", true) == 0) GZIPInputStream(stream) else stream
+                } catch (exception: IOException) {
                     try {
-                        connection.inputStream
-                    } catch(exception: IOException) {
-                        null
-                    }
-                }
-
-                if (dataStream != null) {
-                    // HEAD responses have no input stream. Trying to parse an empty GZIPInputStream fails.
-                    data = if (request.httpMethod == Method.HEAD) ByteArray(0) else {
-                        if (contentEncoding.compareTo("gzip", true) == 0) {
-                            GZIPInputStream(dataStream).readBytes()
-                        } else {
-                            dataStream.readBytes()
-                        }
-                    }
+                        connection.errorStream ?: connection.inputStream ?. close()
+                    } catch (exception: IOException) { }
+                    ByteArrayInputStream(kotlin.ByteArray(0))
                 }
 
                 //try - catch just in case both methods throw
@@ -82,7 +72,9 @@ class HttpClient(val proxy: Proxy? = null) : Client {
                 this.response = response
             }
         } finally {
-            connection.disconnect()
+            //As per Android documentation, a connection that is not explicitly disconnected
+            //will be pooled and reused!  So, don't close it as we need inputStream later!
+            //connection.disconnect()
         }
     }
 
@@ -99,11 +91,18 @@ class HttpClient(val proxy: Proxy? = null) : Client {
         }
     }
 
-    private fun setBodyIfAny(connection: HttpURLConnection, bytes: ByteArray) {
-        if (bytes.isNotEmpty()) {
+    private fun setBodyIfDoOutput(connection: HttpURLConnection, request: Request) {
+        val bodyCallback = request.bodyCallback
+        if (bodyCallback != null && connection.doOutput) {
+            val contentLength = bodyCallback.invoke(request, null, 0)
+
+            if (request.type == Request.Type.UPLOAD)
+                connection.setFixedLengthStreamingMode(contentLength.toInt())
+
             val outStream = BufferedOutputStream(connection.outputStream)
-            outStream.write(bytes)
-            outStream.close()
+            outStream.use {
+                bodyCallback.invoke(request, outStream, contentLength)
+            }
         }
     }
 

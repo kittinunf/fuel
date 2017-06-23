@@ -124,7 +124,7 @@ class InterceptorTest : BaseTestCase() {
 
         val (request, response, result) = manager.request(Method.GET,
                 "https://httpbin.org/redirect-to",
-                listOf("url" to "http://www.example.com"))
+                listOf("url" to "http://www.google.com"))
                 .header(mapOf("User-Agent" to "Fuel"))
                 .response()
 
@@ -204,7 +204,7 @@ class InterceptorTest : BaseTestCase() {
 
         val (request, response, result) = manager.request(Method.GET,
                 "https://httpbin.org/redirect-to",
-                listOf("url" to "https://httpbin.org/redirect-to?url=http://www.example.com"))
+                listOf("url" to "https://httpbin.org/redirect-to?url=http://www.google.com"))
                 .header(mapOf("User-Agent" to "Fuel"))
                 .response()
 

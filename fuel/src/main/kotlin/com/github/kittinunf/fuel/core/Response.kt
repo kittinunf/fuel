@@ -1,5 +1,9 @@
 package com.github.kittinunf.fuel.core
 
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream
+import java.io.ByteArrayInputStream
+import java.io.IOException
+import java.io.InputStream
 import java.net.URL
 
 class Response {
@@ -12,7 +16,14 @@ class Response {
     var httpContentLength = 0L
 
     //data
-    var data = ByteArray(0)
+    internal var dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
+    val data: ByteArray by lazy {
+        try {
+            dataStream.use { dataStream.readBytes() }
+        } catch (ex: IOException) {  // If dataStream closed by deserializer
+            ByteArray(0)
+        }
+    }
 
     override fun toString(): String {
         val elements = mutableListOf("<-- $httpStatusCode ($url)")

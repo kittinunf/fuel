@@ -16,7 +16,6 @@ class DownloadTaskRequest(request: Request) : TaskRequest(request) {
     var progressCallback: ((Long, Long) -> Unit)? = null
     lateinit var destinationCallback: ((Response, URL) -> File)
 
-    lateinit var dataStream: InputStream
     lateinit var fileOutputStream: FileOutputStream
 
     override fun call(): Response {
@@ -24,11 +23,9 @@ class DownloadTaskRequest(request: Request) : TaskRequest(request) {
         val file = destinationCallback.invoke(response, request.url)
         //file output
         fileOutputStream = FileOutputStream(file)
-        dataStream = ByteArrayInputStream(response.data)
-        dataStream.copyTo(fileOutputStream, BUFFER_SIZE) { readBytes ->
-            progressCallback?.invoke(readBytes, response.httpContentLength)
+        response.dataStream.copyTo(fileOutputStream, BUFFER_SIZE) { readBytes ->
+                progressCallback?.invoke(readBytes, response.httpContentLength)
         }
         return response
     }
-
 }
