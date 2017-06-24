@@ -82,8 +82,6 @@ publish {
     groupId = 'com.github.kittinunf.fuel'
     licences = ['MIT']
     publishVersion = parent.ext.publish_version
-    uploadName = 'Fuel-LiveData'
+    uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }
-
-
