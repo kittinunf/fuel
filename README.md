@@ -19,6 +19,7 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Automatically invoke handler on Android Main Thread when using Android Module
 - [x] Special test mode for easier testing
 - [x] RxJava 2.x support out of the box
+- [x] Google Components [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) support
 
 ## Installation
 
@@ -41,6 +42,7 @@ dependencies {
     compile 'com.github.kittinunf.fuel:fuel:<latest-version>' //for JVM
     compile 'com.github.kittinunf.fuel:fuel-android:<latest-version>' //for Android
     compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
+    compile 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>' //for LiveData support
 }
 ```
 
@@ -538,6 +540,16 @@ fun <T : Any> Request.rx_responseObject(deserializable: Deserializable<T>): Sing
 fun Request.rx_data(): Single<Result<ByteArray, FuelError>>
 fun Request.rx_string(charset: Charset): Single<Result<String, FuelError>>
 fun <T : Any> Request.rx_object(deserializable: Deserializable<T>): Single<Result<T, FuelError>>
+```
+
+### LiveData Support
+
+* Fuel supports [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html)
+
+``` Kotlin
+Fuel.get("www.example.com/get").liveDataResponse().observe(this) {
+  //do something
+}
 ```
 
 ## Other libraries

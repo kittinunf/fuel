@@ -4,15 +4,15 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.result.Result
-import org.hamcrest.CoreMatchers
-import org.junit.Assert
+import org.hamcrest.CoreMatchers.instanceOf
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 /**
  * @see [Testing documentation](http://d.android.com/tools/testing)
  */
 class FuelLiveDataTest {
-
 
     init {
         FuelManager.instance.basePath = "https://httpbin.org"
@@ -26,8 +26,8 @@ class FuelLiveDataTest {
     fun liveDataTestResponse() {
         Fuel.get("/get").liveDataResponse()
                 .observeForever {
-                    Assert.assertThat(it?.first, CoreMatchers.notNullValue())
-                    Assert.assertThat(it?.second, CoreMatchers.notNullValue())
+                    assertThat(it?.first, notNullValue())
+                    assertThat(it?.second, notNullValue())
                 }
     }
 
@@ -35,8 +35,8 @@ class FuelLiveDataTest {
     fun liveDataTestResponseString() {
         Fuel.get("/get").liveDataResponseString()
                 .observeForever {
-                    Assert.assertThat(it?.first, CoreMatchers.notNullValue())
-                    Assert.assertThat(it?.second, CoreMatchers.notNullValue())
+                    assertThat(it?.first, notNullValue())
+                    assertThat(it?.second, notNullValue())
                 }
     }
 
@@ -44,7 +44,7 @@ class FuelLiveDataTest {
     fun liveDataTestString() {
         Fuel.get("/get").liveDataString()
                 .observeForever {
-                    Assert.assertThat(it, CoreMatchers.notNullValue())
+                    assertThat(it, notNullValue())
                 }
     }
 
@@ -52,7 +52,7 @@ class FuelLiveDataTest {
     fun liveTestStringError() {
         Fuel.get("/gt").liveDataString()
                 .observeForever {
-                    assert(it is Result.Failure)
+                    assertThat(it, instanceOf(Result.Failure::class.java))
                 }
     }
 
@@ -73,8 +73,8 @@ class FuelLiveDataTest {
         Fuel.get("/user-agent")
                 .liveDataResponseObject(HttpBinUserAgentModelDeserializer())
                 .observeForever {
-                    Assert.assertThat(it?.first, CoreMatchers.notNullValue())
-                    Assert.assertThat(it?.second, CoreMatchers.notNullValue())
+                    assertThat(it?.first, notNullValue())
+                    assertThat(it?.second, notNullValue())
                 }
     }
 
@@ -83,8 +83,8 @@ class FuelLiveDataTest {
         Fuel.get("/useragent")
                 .liveDataResponseObject(HttpBinUserAgentModelDeserializer())
                 .observeForever {
-                    Assert.assertThat(it?.first, CoreMatchers.notNullValue())
-                    assert(it?.second is Result.Failure)
+                    assertThat(it?.first, notNullValue())
+                    assertThat(it?.second, instanceOf(Result.Failure::class.java))
                 }
     }
 
