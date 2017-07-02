@@ -9,6 +9,7 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rx_object
 import com.github.kittinunf.result.Result
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         FuelManager.instance.basePath = "http://httpbin.org"
         FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
         FuelManager.instance.baseParams = listOf("key" to "value")
+        FuelManager.instance.addResponseInterceptor { loggingResponseInterceptor() }
 
         mainGoButton.setOnClickListener {
             execute()
