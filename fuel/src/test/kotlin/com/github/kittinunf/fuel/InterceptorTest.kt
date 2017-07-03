@@ -3,7 +3,7 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
-import com.github.kittinunf.fuel.core.interceptors.loggingInterceptor
+import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
@@ -30,7 +30,7 @@ class InterceptorTest : BaseTestCase() {
     @Test
     fun testWithLoggingInterceptor() {
         val manager = FuelManager()
-        manager.addRequestInterceptor(loggingInterceptor())
+        manager.addRequestInterceptor(loggingRequestInterceptor())
 
         val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response()
         val (data, error) = result
@@ -79,7 +79,7 @@ class InterceptorTest : BaseTestCase() {
         val manager = FuelManager()
 
         var interceptorCalled = false
-        fun <T> customLoggingBreakingInterceptor() = { next: (T) -> T ->
+        fun <T> customLoggingBreakingInterceptor() = { _: (T) -> T ->
             { t: T ->
                 println("1: ${t.toString()}")
                 interceptorCalled = true
