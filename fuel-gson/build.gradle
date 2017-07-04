@@ -57,6 +57,7 @@ dependencies {
     compile "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
     compile project(':fuel')
+    compile "com.google.code.gson:gson:$rootProject.gson_version"
     testCompile "junit:junit:$parent.ext.junit_version"
     testCompile "org.robolectric:robolectric:$parent.ext.robolectric_version"
 }
@@ -72,7 +73,7 @@ buildscript {
 }
 
 publish {
-    artifactId = 'fuel-livedata'
+    artifactId = 'fuel-gson'
     autoPublish = true
     desc = 'The easiest HTTP networking library in Kotlin/Android'
     groupId = 'com.github.kittinunf.fuel'
@@ -81,3 +82,4 @@ publish {
     uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }
+
