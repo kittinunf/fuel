@@ -1,65 +1,21 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-
+apply plugin: 'kotlin'
 apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'jacoco'
 
-apply plugin: 'jacoco-android'
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    test.java.srcDirs += 'src/test/kotlin'
+}
 
 repositories {
     jcenter()
 }
 
-android {
-    compileSdkVersion parent.ext.compile_sdk_version
-    buildToolsVersion parent.ext.build_tool_version
-
-    defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion parent.ext.compile_sdk_version
-        versionCode 1
-        versionName parent.ext.publish_version
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            consumerProguardFiles 'proguard-rules.pro'
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
-    }
-
-    lintOptions {
-        abortOnError false
-    }
-
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
-
-}
-
-jacocoAndroidUnitTestReport {
-    csv.enabled false
-    html.enabled true
-    xml.enabled true
-}
-
 dependencies {
-    compile "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
+    compile "com.google.code.gson:gson:$rootProject.gson_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
     compile project(':fuel')
-    compile "com.google.code.gson:gson:$rootProject.gson_version"
     testCompile "junit:junit:$parent.ext.junit_version"
-    testCompile "org.robolectric:robolectric:$parent.ext.robolectric_version"
 }
 
 buildscript {
@@ -69,6 +25,14 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
+    }
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled = false
+        xml.enabled = true
+        csv.enabled = false
     }
 }
 
@@ -82,4 +46,5 @@ publish {
     uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }
+
 
