@@ -11,6 +11,7 @@ import com.github.kittinunf.result.Result
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
+import java.io.Reader
 import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.Callable

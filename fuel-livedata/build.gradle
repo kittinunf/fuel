@@ -54,13 +54,9 @@ jacocoAndroidUnitTestReport {
 }
 
 dependencies {
-
     compile "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
-
     compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
-
     compile project(':fuel')
-
     testCompile "junit:junit:$parent.ext.junit_version"
     testCompile "org.robolectric:robolectric:$parent.ext.robolectric_version"
 }

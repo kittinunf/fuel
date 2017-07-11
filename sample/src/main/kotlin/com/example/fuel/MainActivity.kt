@@ -5,11 +5,9 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.kittinunf.fuel.*
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
+import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rx_object
 import com.github.kittinunf.result.Result
@@ -51,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         httpUpload()
         httpBasicAuthentication()
         httpResponseObject()
+        httpGsonResponseObject()
         httpCancel()
         httpRxSupport()
         httpLiveDataSupport()
@@ -73,6 +72,14 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, request.toString())
             updateUI(response, result)
         }
+    }
+
+    fun httpGsonResponseObject() {
+        "http://jsonplaceholder.typicode.com/photos/1".httpGet()
+                .responseObject { request: Request, response: Response, result: Result<Photo, FuelError> ->
+                    Log.d(TAG, request.toString())
+                    updateUI(response, result)
+                }
     }
 
     fun httpGet() {

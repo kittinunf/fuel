@@ -33,6 +33,7 @@ allprojects {
         //test dependencies version
         junit_version = '4.12'
         robolectric_version = '3.2.1'
+        gson_version = '2.3.1'
     }
 
     repositories {
