@@ -11,7 +11,6 @@ import com.github.kittinunf.result.Result
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
-import java.io.Reader
 import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.Callable
@@ -45,6 +44,8 @@ class Request : Fuel.RequestConvertible {
                 bodyCallback?.invoke(request, this, 0)
             }.toByteArray()
         }
+
+    lateinit var client: Client
 
     //headers
     val httpHeaders = mutableMapOf<String, String>()
@@ -113,8 +114,8 @@ class Request : Fuel.RequestConvertible {
     }
 
     fun body(body: ByteArray): Request {
-        bodyCallback = { request, outpustream, totalLength ->
-            outpustream?.write(body)
+        bodyCallback = { request, outputStream, totalLength ->
+            outputStream?.write(body)
             body.size.toLong()
         }
         return this
