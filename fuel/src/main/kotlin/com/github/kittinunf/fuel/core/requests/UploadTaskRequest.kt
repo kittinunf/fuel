@@ -10,7 +10,6 @@ import java.io.FileInputStream
 import java.io.OutputStream
 import java.net.URL
 import java.net.URLConnection
-import javax.activation.MimetypesFileTypeMap
 
 class UploadTaskRequest(request: Request) : TaskRequest(request) {
 
@@ -83,7 +82,7 @@ class UploadTaskRequest(request: Request) : TaskRequest(request) {
 
     private fun guessContentType(file: File): String {
         try {
-            return URLConnection.guessContentTypeFromName(file.name) ?: MimetypesFileTypeMap().getContentType(file)
+            return URLConnection.guessContentTypeFromName(file.name) ?: "application/octet-stream"
         } catch (ex: NoClassDefFoundError) {
             // The MimetypesFileTypeMap class doesn't exists on old Android devices.
             return "application/octet-stream"
