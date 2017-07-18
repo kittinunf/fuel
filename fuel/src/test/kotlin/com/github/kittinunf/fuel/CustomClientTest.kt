@@ -16,7 +16,7 @@ class CustomClientTest : BaseTestCase() {
 
     val manager: FuelManager by lazy {
         val dir = System.getProperty("user.dir")
-        val currentDir = File(dir, "fuel/src/test/assets")
+        val currentDir = File(dir, "src/test/assets")
         val mockJson = File(currentDir, "mock.json")
 
         FuelManager().apply {
