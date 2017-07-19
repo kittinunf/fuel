@@ -69,6 +69,7 @@ class FuelManager {
             parameters = if (param == null) baseParams else baseParams + param
         })
 
+        request.client = client
         request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
@@ -92,6 +93,7 @@ class FuelManager {
             requestType = Request.Type.DOWNLOAD
         }.request
 
+        request.client = client
         request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
@@ -111,6 +113,7 @@ class FuelManager {
             requestType = Request.Type.UPLOAD
         }.request
 
+        request.client = client
         request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
@@ -123,6 +126,7 @@ class FuelManager {
 
     fun request(convertible: Fuel.RequestConvertible): Request {
         val request = convertible.request
+        request.client = client
         request.httpHeaders += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
