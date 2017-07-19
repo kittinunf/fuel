@@ -2,7 +2,7 @@
 
 echo $TRAVIS_BRANCH
 
-if [[ "$TRAVIS_BRANCH" == release-v* ]]; then
+if [[ "$TRAVIS_BRANCH" == */release-v* ]]; then
 
   echo "We're on release branch, deploying"
 
