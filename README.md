@@ -1,6 +1,6 @@
 # Fuel
 
-[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.1.2-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
+[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.1.3-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
 [![Codecov](https://codecov.io/github/kittinunf/Fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/Fuel)
 
 The easiest HTTP networking library for Kotlin/Android.
@@ -20,6 +20,7 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Special test mode for easier testing
 - [x] RxJava 2.x support out of the box
 - [x] Google Components [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) support
+- [x] Gson module support
 
 ## Installation
 
@@ -30,6 +31,10 @@ The easiest HTTP networking library for Kotlin/Android.
 ### Dependency - fuel-rxjava
 
 * [RxJava](https://github.com/ReactiveX/RxJava) - RxJava – Reactive Extensions for the JVM
+
+### Dependency - fuel-gson
+
+* [Gson](https://github.com/google/gson) - Gson - A Java serialization/deserialization library to convert Java Objects into JSON and back
 
 ### Gradle
 
@@ -43,6 +48,7 @@ dependencies {
     compile 'com.github.kittinunf.fuel:fuel-android:<latest-version>' //for Android
     compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
     compile 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>' //for LiveData support
+    compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>' //for Gson support
 }
 ```
 
@@ -407,6 +413,18 @@ data class User(val firstName: String = "",
     println(user.lastName)
 }
 
+```
+
+### Gson Deserialization
+
+* Fuel also provides a built in support for Gson Deserialization. This is possible by including the [Gson](https://github.com/kittinunf/Fuel/tree/master/fuel-gson) module in your dependency block.
+
+``` Kotlin
+
+data class HttpBinUserAgentModel(var userAgent: String = "")
+
+Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel> { _, _, result ->
+}
 ```
 
 * There are 4 methods to support response deserialization depending on your needs (also depending on JSON parsing library of your choice), and you are required to implement only one of them.

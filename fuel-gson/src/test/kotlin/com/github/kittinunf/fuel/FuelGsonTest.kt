@@ -1,11 +1,16 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.gson.GsonDeserializer
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.result.Result
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
+import org.hamcrest.CoreMatchers.instanceOf
+import org.hamcrest.CoreMatchers.notNullValue
+import org.junit.Assert.assertThat
 import org.junit.Test
 
 /**
@@ -29,8 +34,8 @@ class FuelGsonTest {
     fun gsonTestResponseObject() {
         Fuel.get("/user-agent")
                 .responseObject(GsonDeserializer<HttpBinUserAgentModel>()) { _, _, result ->
-                    MatcherAssert.assertThat(result.component1(), CoreMatchers.notNullValue())
-                    MatcherAssert.assertThat(result.component2(), CoreMatchers.notNullValue())
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), notNullValue())
                 }
     }
 
@@ -38,26 +43,26 @@ class FuelGsonTest {
     fun gsonTestResponseObjectError() {
         Fuel.get("/useragent")
                 .responseObject(GsonDeserializer<HttpBinUserAgentModel>()) { _, _, result ->
-                    MatcherAssert.assertThat(result.component1(), CoreMatchers.notNullValue())
-                    MatcherAssert.assertThat(result.component2(), CoreMatchers.instanceOf(Result.Failure::class.java))
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
                 }
     }
 
     @Test
     fun gsonTestResponseDeserializerObject() {
         Fuel.get("/user-agent")
-                .responseObject { _: Request, _: Response, result: Result<HttpBinUserAgentModel, FuelError> ->
-                    MatcherAssert.assertThat(result.component1(), CoreMatchers.notNullValue())
-                    MatcherAssert.assertThat(result.component2(), CoreMatchers.notNullValue())
+                .responseObject<HttpBinUserAgentModel> { _, _, result ->
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), notNullValue())
                 }
     }
 
     @Test
     fun gsonTestResponseDeserializerObjectError() {
         Fuel.get("/useragent")
-                .responseObject { _: Request, _: Response, result: Result<HttpBinUserAgentModel, FuelError> ->
-                    MatcherAssert.assertThat(result.component1(), CoreMatchers.notNullValue())
-                    MatcherAssert.assertThat(result.component2(), CoreMatchers.instanceOf(Result.Failure::class.java))
+                .responseObject<HttpBinUserAgentModel> { _, _, result ->
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
                 }
     }
 
@@ -66,11 +71,11 @@ class FuelGsonTest {
         Fuel.get("/user-agent")
                 .responseObject(object : Handler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                        MatcherAssert.assertThat(value, CoreMatchers.notNullValue())
+                        assertThat(value, notNullValue())
                     }
 
                     override fun failure(request: Request, response: Response, error: FuelError) {
-                        MatcherAssert.assertThat(error, CoreMatchers.notNullValue())
+                        assertThat(error, notNullValue())
                     }
 
                 })
@@ -81,11 +86,11 @@ class FuelGsonTest {
         Fuel.get("/useragent")
                 .responseObject(object : Handler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                        MatcherAssert.assertThat(value, CoreMatchers.notNullValue())
+                        assertThat(value, notNullValue())
                     }
 
                     override fun failure(request: Request, response: Response, error: FuelError) {
-                        MatcherAssert.assertThat(error, CoreMatchers.instanceOf(Result.Failure::class.java))
+                        assertThat(error, instanceOf(Result.Failure::class.java))
                     }
 
                 })
@@ -94,12 +99,12 @@ class FuelGsonTest {
     @Test
     fun gsonTestResponseSyncObject() {
         val triple = Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel>()
-        MatcherAssert.assertThat(triple.third.component1(), CoreMatchers.notNullValue())
+        assertThat(triple.third.component1(), notNullValue())
     }
 
     @Test
     fun gsonTestResponseSyncObjectError() {
         val triple = Fuel.get("/useragent").responseObject<HttpBinUserAgentModel>()
-        MatcherAssert.assertThat(triple.third.component2(), CoreMatchers.instanceOf(FuelError::class.java))
+        assertThat(triple.third.component2(), instanceOf(FuelError::class.java))
     }
 }
