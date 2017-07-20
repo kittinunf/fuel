@@ -1,5 +1,8 @@
 #!/bin/bash
-if [[ "$TRAVIS_BRANCH" == release-v* ]]; then
+
+echo $TRAVIS_BRANCH
+
+if [[ "$TRAVIS_BRANCH" == */release-v* ]]; then
 
   echo "We're on release branch, deploying"
 
