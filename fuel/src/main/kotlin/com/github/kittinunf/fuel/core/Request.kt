@@ -147,6 +147,23 @@ class Request : Fuel.RequestConvertible {
         return this
     }
 
+    fun blobs(blobs: (Request, URL) -> Iterable<Blob>): Request {
+        val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
+
+        uploadTaskRequest.apply {
+            sourceCallback = blobs
+        }
+        return this
+    }
+
+    fun blob(blob: (Request, URL) -> Blob): Request {
+        blobs { request, _ ->
+            listOf(blob.invoke(request, request.url))
+        }
+
+        return this
+    }
+
     fun dataParts(dataParts: (Request, URL) -> Iterable<DataPart>): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
         val parts = dataParts.invoke(request, request.url)
@@ -162,7 +179,9 @@ class Request : Fuel.RequestConvertible {
         }
 
         uploadTaskRequest.apply {
-            sourceCallback = { _, _ -> parts.map { it.file } }
+            sourceCallback = { _, _ ->
+                parts.map { Blob(it.file.name, it.file.length(), { it.file.inputStream() }) }
+            }
         }
 
         return this
@@ -173,10 +192,14 @@ class Request : Fuel.RequestConvertible {
         names.clear()
 
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
+        val files = sources.invoke(request, request.url)
 
         uploadTaskRequest.apply {
-            sourceCallback = sources
+            sourceCallback = { _, _ ->
+                files.map { Blob(it.name, it.length(), { it.inputStream() }) }
+            }
         }
+
         return this
     }
 

@@ -267,4 +267,41 @@ class RequestUploadTest : BaseTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.httpStatusCode, isEqualTo(statusCode))
     }
+
+    @Test
+    fun httpUploadWithNamedBlob() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+
+        val file = File(currentDir, "lorem_ipsum_short.tmp")
+
+        manager.upload("/post", param = listOf("foo" to "bar"))
+
+                .blob { request, url ->
+                    request.name = "coolblob"
+                    Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name)
+                }
+                .responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                    print(d)
+                }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val string = data as String
+        assertThat(string, containsString("coolblob"))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+    }
 }
