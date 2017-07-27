@@ -11,7 +11,9 @@ fun redirectResponseInterceptor(manager: FuelManager) =
         { next: (Request, Response) -> Response ->
             { request: Request, response: Response ->
                 if (response.httpStatusCode == HttpsURLConnection.HTTP_MOVED_PERM ||
-                        response.httpStatusCode == HttpsURLConnection.HTTP_MOVED_TEMP) {
+                        response.httpStatusCode == HttpsURLConnection.HTTP_MOVED_TEMP ||
+                        response.httpStatusCode == 307   // 307 TEMPORARY REDIRECT - https://httpstatuses.com/307
+                   ) {
                     val redirectedUrl = response.httpResponseHeaders["Location"]
                     if (redirectedUrl != null && !redirectedUrl.isEmpty()) {
                         val encoding = Encoding().apply {
@@ -40,4 +42,4 @@ fun redirectResponseInterceptor(manager: FuelManager) =
             }
         }
 
- 
+
