@@ -6,15 +6,12 @@ import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
 class RedirectException : Exception("Redirection fail, not found URL to redirect to")
+val HTTP_3XX_RANGE = 300..399
 
 fun redirectResponseInterceptor(manager: FuelManager) =
         { next: (Request, Response) -> Response ->
             { request: Request, response: Response ->
-                if (response.httpStatusCode == HttpsURLConnection.HTTP_MOVED_PERM ||
-                        response.httpStatusCode == HttpsURLConnection.HTTP_MOVED_TEMP ||
-                        response.httpStatusCode == HttpsURLConnection.HTTP_SEE_OTHER || // 303 SEE OTHER - https://httpstatuses.com/303
-                        response.httpStatusCode == 307   // 307 TEMPORARY REDIRECT - https://httpstatuses.com/307
-                   ) {
+                if (HTTP_3XX_RANGE.contains(response.httpStatusCode)) { // Check if response is 3xx HTTP Status Code
                     val redirectedUrl = response.httpResponseHeaders["Location"]
                     if (redirectedUrl != null && !redirectedUrl.isEmpty()) {
                         val encoding = Encoding().apply {
