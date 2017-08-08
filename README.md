@@ -80,7 +80,7 @@ FuelManager.instance.basePath = "http://httpbin.org"
 "/get".httpGet().responseString { request, response, result ->
     //make a GET to http://httpbin.org/get and do something with response
     val (data, error) = result
-    if (error != null) {
+    if (error == null) {
         //do something when success
     } else {
         //error handling
