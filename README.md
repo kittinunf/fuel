@@ -347,6 +347,14 @@ Fuel.upload("/post").sources { request, url ->
 }
 ```
 
+### Upload from an `InputStream`
+
+``` Kotlin
+Fuel.upload("/post").blob { request, url ->
+    Blob("filename.png", 1166976, { someObject.getInputStream() })
+}
+```
+
 ### Authentication
 
 * Support Basic Authentication right off the box
