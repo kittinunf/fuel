@@ -351,7 +351,7 @@ Fuel.upload("/post").sources { request, url ->
 
 ``` Kotlin
 Fuel.upload("/post").blob { request, url ->
-    Blob("filename.png", 1166976, { someObject.getInputStream() })
+    Blob("filename.png", someObject.length, { someObject.getInputStream() })
 }
 ```
 
