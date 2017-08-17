@@ -350,8 +350,11 @@ Fuel.upload("/post").sources { request, url ->
 ```Kotlin
 Fuel.upload("/post").sources { request, url ->
     listOf(
-        DataPart(File.createTempFile("temp1", ".tmp"), "file1"), 
-        DataPart(File.createTempFile("temp2", ".tmp"), "file2")
+    	//DataPart takes a file, and you can specify the name and/or type
+        DataPart(File.createTempFile("temp1", ".tmp"), "image/jpeg"), 
+        DataPart(File.createTempFile("temp2", ".tmp"), "file2"),
+	DataPart(File.createTempFile("temp3", ".tmp"), "third-file", "image/jpeg")
+	
     )
 }.name {
     "temp"
