@@ -5,10 +5,10 @@ import com.github.kittinunf.fuel.core.*
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URL
-import java.net.HttpURLConnection.HTTP_MULT_CHOICE //300
-import java.net.HttpURLConnection.HTTP_MOVED_PERM //301
-import java.net.HttpURLConnection.HTTP_MOVED_TEMP//302
-import java.net.HttpURLConnection.HTTP_SEE_OTHER//303
+import javax.net.ssl.HttpsURLConnection.HTTP_MULT_CHOICE //300
+import javax.net.ssl.HttpsURLConnection.HTTP_MOVED_PERM //301
+import javax.net.ssl.HttpsURLConnection.HTTP_MOVED_TEMP//302
+import javax.net.ssl.HttpsURLConnection.HTTP_SEE_OTHER//303
 
 class RedirectException : Exception("Redirection fail, not found URL to redirect to")
 
