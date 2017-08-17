@@ -346,7 +346,31 @@ Fuel.upload("/post").sources { request, url ->
 
 }
 ```
+### Specify custom field names for files
+```Kotlin
+Fuel.upload("/post").sources { request, url ->
+    listOf(
+        DataPart(File.createTempFile("temp1", ".tmp"), "file1"), 
+        DataPart(File.createTempFile("temp2", ".tmp"), "file2")
+    )
+}.name {
+    "temp"
+}.responseString { request, response, result ->
 
+}
+```
+### Upload a multipart form without a file
+
+``` Kotlin
+val formData = listOf("Email" to "mail@example.com", "Name" to "Joe Smith" )
+Fuel.upload("/post", param = formData)
+    //Upload normally requires a file, but we can give it an empty list of `DataPart`
+    .dataParts{ request, url -> listOf<DataPart>() } 
+    .responseString { request, response, result ->
+	...
+    }
+```
+	
 ### Upload from an `InputStream`
 
 ``` Kotlin
