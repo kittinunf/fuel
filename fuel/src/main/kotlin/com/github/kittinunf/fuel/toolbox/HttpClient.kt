@@ -42,7 +42,7 @@ class HttpClient(val proxy: Proxy? = null) : Client {
 
             return response.apply {
 
-                httpResponseHeaders = connection.headerFields ?: emptyMap()
+                httpResponseHeaders = connection.headerFields.filterKeys { it != null } ?: emptyMap()
                 httpContentLength = connection.contentLength.toLong()
 
                 val contentEncoding = connection.contentEncoding ?: ""
