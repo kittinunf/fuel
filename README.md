@@ -21,6 +21,7 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] RxJava 2.x support out of the box
 - [x] Google Components [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) support
 - [x] Gson module support
+- [x] API Routing
 
 ## Installation
 
@@ -576,6 +577,56 @@ fun <T : Any> Request.rx_object(deserializable: Deserializable<T>): Single<Resul
 Fuel.get("www.example.com/get").liveDataResponse().observe(this) {
   //do something
 }
+```
+
+### Routing Support
+
+In order to organize better your network stack FuelRouting interface allows you to easily setup a Router design pattern.
+
+```Kotlin
+sealed class WeatherApi: FuelRouting {
+
+    override val basePath = "https://www.metaweather.com"
+
+    class weatherFor(val location: String): WeatherApi() {}
+
+    override val method: Method
+        get() {
+            when(this) {
+                is weatherFor -> return Method.GET
+            }
+        }
+
+    override val path: String
+        get() {
+            return when(this) {
+                is weatherFor -> "/api/location/search/"
+            }
+        }
+
+    override val params: List<Pair<String, Any?>>?
+        get() {
+            return when(this) {
+                is weatherFor -> listOf("query" to this.location)
+            }
+        }
+
+    override val headers: Map<String, String>?
+        get() {
+            return null
+        }
+
+}
+
+
+// Usage
+Fuel.request(WeatherApi.weatherFor("london")).responseJson { request, response, result ->
+            result.fold(success = { json ->
+                Log.d("qdp success", json.array().toString())
+            }, failure = { error ->
+                Log.e("qdp error", error.toString())
+            })
+        }
 ```
 
 ## Other libraries
