@@ -1,6 +1,5 @@
-package retrofitpoc.boostcode.retrofitpoc
+package com.github.kittinunf.fuel.util
 
-import android.util.Log
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Encoding
 import com.github.kittinunf.fuel.core.Method
@@ -21,8 +20,6 @@ interface FuelRouting: Fuel.RequestConvertible {
     // contain the headers for the call
     val headers: Map<String, String>?
 
-    // debug enabler
-    val isDebug: Boolean
 
     // request variable according Fuel.RequestConvertible interface
     override val request: Request
@@ -34,17 +31,6 @@ interface FuelRouting: Fuel.RequestConvertible {
                 this.urlString = path
                 this.parameters = params
                 // FIXME: headers are missing
-            }
-
-            // check if debug mode is on
-            // TODO: consider to strip off on release
-            if (isDebug) {
-                Log.d("⛽ base path", basePath)
-                Log.d("⛽ path", path)
-                Log.d("⛽ method", method.toString())
-                Log.d("⛽ parameters", params.toString())
-                Log.d("⛽ headers", headers.toString())
-                Log.d("⛽ encoder", encoder.request.cUrlString())
             }
 
             // return the generated encoder
