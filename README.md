@@ -350,16 +350,13 @@ Fuel.upload("/post").sources { request, url ->
 ```Kotlin
 Fuel.upload("/post").sources { request, url ->
     listOf(
-    	//DataPart takes a file, and you can specify the name and/or type
+        //DataPart takes a file, and you can specify the name and/or type
         DataPart(File.createTempFile("temp1", ".tmp"), "image/jpeg"), 
         DataPart(File.createTempFile("temp2", ".tmp"), "file2"),
-	DataPart(File.createTempFile("temp3", ".tmp"), "third-file", "image/jpeg")
-	
+        DataPart(File.createTempFile("temp3", ".tmp"), "third-file", "image/jpeg")
     )
-}.name {
-    "temp"
 }.responseString { request, response, result ->
-
+    ...
 }
 ```
 ### Upload a multipart form without a file
@@ -370,7 +367,7 @@ Fuel.upload("/post", param = formData)
     //Upload normally requires a file, but we can give it an empty list of `DataPart`
     .dataParts{ request, url -> listOf<DataPart>() } 
     .responseString { request, response, result ->
-	...
+        ...
     }
 ```
 	
