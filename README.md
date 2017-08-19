@@ -365,7 +365,7 @@ Fuel.upload("/post").sources { request, url ->
 val formData = listOf("Email" to "mail@example.com", "Name" to "Joe Smith" )
 Fuel.upload("/post", param = formData)
     //Upload normally requires a file, but we can give it an empty list of `DataPart`
-    .dataParts{ request, url -> listOf<DataPart>() } 
+    .dataParts { request, url -> listOf<DataPart>() } 
     .responseString { request, response, result ->
         ...
     }
