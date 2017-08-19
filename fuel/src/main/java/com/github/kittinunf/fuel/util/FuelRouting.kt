@@ -9,19 +9,33 @@ import com.github.kittinunf.fuel.core.Request
  * Created by matteocrippa on 8/16/17.
  */
 interface FuelRouting: Fuel.RequestConvertible {
-    // contain the base path of the call
+    /**
+     * Base path handler for the remote call.
+     */
     val basePath: String
-    // contain the method for the call
+    /**
+     * Method handler for the remote requests.
+     */
     val method: Method
-    // contain the path for the call
+    /**
+     * Path handler for the request.
+     */
     val path: String
-    // contain the parameters for the call
+    /**
+     * Parameters for the remote call.
+     * It uses a pair with String, Any.
+     */
     val params: List<Pair<String, Any?>>?
-    // contain the headers for the call
+    /**
+     * Headers for remote call.
+     */
     val headers: Map<String, String>?
 
 
-    // request variable according Fuel.RequestConvertible interface
+    /**
+     * @return a Request object.
+     * Request call, it adheres to Fuel.RequestConvertible.
+     */
     override val request: Request
         get() {
             // generate the encoder according provided parameters, headers, path, etc.
