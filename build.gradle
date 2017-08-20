@@ -21,7 +21,7 @@ allprojects {
         publish_version = '1.9.0'
 
         //dependencies version
-        kotlin_version = '1.1.3'
+        kotlin_version = '1.1.4'
         result_version = '1.1.0'
         rxjava_version = '2.1.0'
         archLifecycleVersion = "1.0.0-alpha3"
