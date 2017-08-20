@@ -1,10 +1,6 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.Client
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertThat
@@ -21,13 +17,10 @@ class CustomClientTest : BaseTestCase() {
 
         FuelManager().apply {
             client = object : Client {
-                override fun executeRequest(request: Request): Response {
-                    return Response().apply {
-                        dataStream = mockJson.inputStream()
-                        httpStatusCode = 200
-                        request.client = client
-                    }
-                }
+                override fun executeRequest(request: Request): Response = Response(
+                        url = request.url,
+                        dataStream = mockJson.inputStream(),
+                        httpStatusCode = 200)
             }
         }
     }

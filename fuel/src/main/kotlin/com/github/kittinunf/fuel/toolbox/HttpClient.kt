@@ -1,11 +1,7 @@
 package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.Client
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.*
 import java.io.BufferedOutputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -17,9 +13,6 @@ import javax.net.ssl.HttpsURLConnection
 
 class HttpClient(val proxy: Proxy? = null) : Client {
     override fun executeRequest(request: Request): Response {
-        val response = Response()
-        response.url = request.url
-
         val connection = establishConnection(request) as HttpURLConnection
 
         try {
@@ -40,33 +33,27 @@ class HttpClient(val proxy: Proxy? = null) : Client {
                 setBodyIfDoOutput(connection, request)
             }
 
-            return response.apply {
+            val contentEncoding = connection.contentEncoding ?: ""
 
-                httpResponseHeaders = connection.headerFields.filterKeys { it != null } ?: emptyMap()
-                httpContentLength = connection.contentLength.toLong()
-
-                val contentEncoding = connection.contentEncoding ?: ""
-
-                dataStream = try {
-                    val stream = connection.errorStream ?: connection.inputStream
-                    if (contentEncoding.compareTo("gzip", true) == 0) GZIPInputStream(stream) else stream
-                } catch (exception: IOException) {
-                    try {
-                        connection.errorStream ?: connection.inputStream ?. close()
-                    } catch (exception: IOException) { }
-                    ByteArrayInputStream(kotlin.ByteArray(0))
-                }
-
-                //try - catch just in case both methods throw
-                try {
-                    httpStatusCode = connection.responseCode
-                    httpResponseMessage = connection.responseMessage.orEmpty()
-                } catch(exception: IOException) {
-                    throw exception
-                }
-            }
-        } catch(exception: Exception) {
-            throw FuelError(exception, response.data, response)
+            return Response(
+                    url = request.url,
+                    httpResponseHeaders = connection.headerFields.filterKeys { it != null } ?: emptyMap(),
+                    httpContentLength = connection.contentLength.toLong(),
+                    httpStatusCode = connection.responseCode,
+                    httpResponseMessage = connection.responseMessage.orEmpty(),
+                    dataStream = try {
+                        val stream = connection.errorStream ?: connection.inputStream
+                        if (contentEncoding.compareTo("gzip", true) == 0) GZIPInputStream(stream) else stream
+                    } catch (exception: IOException) {
+                        try {
+                            connection.errorStream ?: connection.inputStream?.close()
+                        } catch (exception: IOException) {
+                        }
+                        ByteArrayInputStream(ByteArray(0))
+                    }
+            )
+        } catch (exception: Exception) {
+            throw FuelError(exception, ByteArray(0), Response(request.url))
         } finally {
             //As per Android documentation, a connection that is not explicitly disconnected
             //will be pooled and reused!  So, don't close it as we need inputStream later!

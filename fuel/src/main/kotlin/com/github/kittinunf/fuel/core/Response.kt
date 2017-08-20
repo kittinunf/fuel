@@ -5,17 +5,14 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 
-class Response {
-
-    lateinit var url: URL
-
-    var httpStatusCode = -1
-    var httpResponseMessage = ""
-    var httpResponseHeaders = emptyMap<String, List<String>>()
-    var httpContentLength = 0L
-
-    //data
-    var dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
+class Response(
+        val url: URL,
+        val httpStatusCode: Int = -1,
+        val httpResponseMessage: String = "",
+        val httpResponseHeaders: Map<String, List<String>> = emptyMap<String, List<String>>(),
+        val httpContentLength: Long = 0L,
+        val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
+) {
     val data: ByteArray by lazy {
         try {
             dataStream.use { dataStream.readBytes() }
@@ -24,26 +21,18 @@ class Response {
         }
     }
 
-    override fun toString(): String {
-        val elements = mutableListOf("<-- $httpStatusCode ($url)")
-
-        //response message
-        elements.add("Response : $httpResponseMessage")
-
-        //content length
-        elements.add("Length : $httpContentLength")
-
-        //body
-        elements.add("Body : ${if (data.isNotEmpty()) String(data) else "(empty)"}")
-
-        //headers
-        //headers
-        elements.add("Headers : (${httpResponseHeaders.size})")
+    override fun toString(): String = buildString {
+        appendln("<-- $httpStatusCode ($url)")
+        appendln("Response : $httpResponseMessage")
+        appendln("Length : $httpContentLength")
+        appendln("Body : ${if (data.isNotEmpty()) String(data) else "(empty)"}")
+        appendln("Headers : (${httpResponseHeaders.size})")
         for ((key, value) in httpResponseHeaders) {
-            elements.add("$key : $value")
+            appendln("$key : $value")
         }
-
-        return elements.joinToString("\n")
     }
 
+    companion object {
+        fun error(): Response = Response(URL("http://."))
+    }
 }

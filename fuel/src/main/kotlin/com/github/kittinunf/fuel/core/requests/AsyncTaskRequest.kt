@@ -22,6 +22,5 @@ class AsyncTaskRequest(val task: TaskRequest) : TaskRequest(task.request) {
         }
     }
 
-    private fun errorResponse() = Response().apply { url = request.url }
-
+    private fun errorResponse() = Response(request.url)
 }

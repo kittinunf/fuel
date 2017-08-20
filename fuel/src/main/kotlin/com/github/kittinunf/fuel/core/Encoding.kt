@@ -7,11 +7,11 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
 
-class Encoding(var httpMethod: Method,
-               var urlString: String,
-               var requestType: Request.Type = Request.Type.REQUEST,
-               var baseUrlString: String? = null,
-               var parameters: List<Pair<String, Any?>>? = null) : Fuel.RequestConvertible {
+class Encoding(val httpMethod: Method,
+               val urlString: String,
+               val requestType: Request.Type = Request.Type.REQUEST,
+               val baseUrlString: String? = null,
+               val parameters: List<Pair<String, Any?>>? = null) : Fuel.RequestConvertible {
 
     private val encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
         var modifiedPath = path
