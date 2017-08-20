@@ -11,24 +11,27 @@ import java.net.URLConnection
 import java.util.zip.GZIPInputStream
 import javax.net.ssl.HttpsURLConnection
 
-class HttpClient(val proxy: Proxy? = null) : Client {
+internal class HttpClient(private val proxy: Proxy? = null) : Client {
     override fun executeRequest(request: Request): Response {
         val connection = establishConnection(request) as HttpURLConnection
 
         try {
             connection.apply {
-                val timeout = Fuel.testConfiguration.timeout?.let { if (it == -1) Int.MAX_VALUE else it } ?: request.timeoutInMillisecond
-                val timeoutRead = Fuel.testConfiguration.timeoutRead?.let { if (it == -1) Int.MAX_VALUE else it } ?: request.timeoutReadInMillisecond
-                connectTimeout = timeout
-                readTimeout = timeoutRead
+                connectTimeout = Fuel.testConfiguration.coerceTimeout(request.timeoutInMillisecond)
+                readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.timeoutReadInMillisecond)
                 doInput = true
                 useCaches = false
                 requestMethod = if (request.httpMethod == Method.PATCH) Method.POST.value else request.httpMethod.value
                 instanceFollowRedirects = false
+
                 for ((key, value) in request.httpHeaders) {
                     setRequestProperty(key, value)
                 }
-                if (request.httpMethod == Method.PATCH) setRequestProperty("X-HTTP-Method-Override", "PATCH")
+
+                if (request.httpMethod == Method.PATCH) {
+                    setRequestProperty("X-HTTP-Method-Override", "PATCH")
+                }
+
                 setDoOutput(connection, request.httpMethod)
                 setBodyIfDoOutput(connection, request)
             }
@@ -37,7 +40,7 @@ class HttpClient(val proxy: Proxy? = null) : Client {
 
             return Response(
                     url = request.url,
-                    httpResponseHeaders = connection.headerFields.filterKeys { it != null } ?: emptyMap(),
+                    httpResponseHeaders = connection.headerFields.filterKeys { it != null },
                     httpContentLength = connection.contentLength.toLong(),
                     httpStatusCode = connection.responseCode,
                     httpResponseMessage = connection.responseMessage.orEmpty(),
@@ -77,23 +80,20 @@ class HttpClient(val proxy: Proxy? = null) : Client {
     private fun setBodyIfDoOutput(connection: HttpURLConnection, request: Request) {
         val bodyCallback = request.bodyCallback
         if (bodyCallback != null && connection.doOutput) {
-            val contentLength = bodyCallback.invoke(request, null, 0)
+            val contentLength = bodyCallback(request, null, 0)
 
             if (request.type == Request.Type.UPLOAD)
                 connection.setFixedLengthStreamingMode(contentLength.toInt())
 
-            val outStream = BufferedOutputStream(connection.outputStream)
-            outStream.use {
-                bodyCallback.invoke(request, outStream, contentLength)
+            BufferedOutputStream(connection.outputStream).use {
+                bodyCallback(request, it, contentLength)
             }
         }
     }
 
-    private fun setDoOutput(connection: HttpURLConnection, method: Method) {
-        when (method) {
-            Method.GET, Method.DELETE, Method.HEAD -> connection.doOutput = false
-            Method.POST, Method.PUT, Method.PATCH -> connection.doOutput = true
-        }
+    private fun setDoOutput(connection: HttpURLConnection, method: Method) = when (method) {
+        Method.GET, Method.DELETE, Method.HEAD -> connection.doOutput = false
+        Method.POST, Method.PUT, Method.PATCH -> connection.doOutput = true
     }
 }
 
