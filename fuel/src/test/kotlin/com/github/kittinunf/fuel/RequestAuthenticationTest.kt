@@ -9,16 +9,10 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestAuthenticationTest : BaseTestCase() {
+    private val user: String = "username"
+    private val password: String = "password"
 
-    val user: String
-    val password: String
-
-    init {
-        user = "username"
-        password = "password"
-    }
-
-    val manager: FuelManager by lazy {
+    private val manager: FuelManager by lazy {
         FuelManager().apply {
             basePath = "http://httpbin.org"
         }

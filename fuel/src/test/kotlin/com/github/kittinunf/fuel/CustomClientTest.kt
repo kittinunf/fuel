@@ -9,8 +9,7 @@ import java.io.File
 import java.nio.charset.Charset
 
 class CustomClientTest : BaseTestCase() {
-
-    val manager: FuelManager by lazy {
+    private val manager: FuelManager by lazy {
         val dir = System.getProperty("user.dir")
         val currentDir = File(dir, "src/test/assets")
         val mockJson = File(currentDir, "mock.json")

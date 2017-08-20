@@ -12,7 +12,6 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
-
     init {
         FuelManager.instance.basePath = "https://httpbin.org"
     }
@@ -182,7 +181,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        HttpsBin.UPLOAD.httpUpload().source { request, url ->
+        HttpsBin.UPLOAD.httpUpload().source { _, _ ->
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
@@ -211,8 +210,8 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        HttpsBin.DOWNLOAD.httpDownload().destination { response, url ->
-            File.createTempFile(123456.toString(), null)
+        HttpsBin.DOWNLOAD.httpDownload().destination { _, _ ->
+            File.createTempFile("123456", null)
         }.responseString { req, res, result ->
             request = req
             response = res

@@ -19,17 +19,13 @@ class RequestObjectTest : BaseTestCase() {
     //Deserializer
     class HttpBinUserAgentModelDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
 
-        override fun deserialize(content: String): HttpBinUserAgentModel {
-            return HttpBinUserAgentModel(content)
-        }
+        override fun deserialize(content: String): HttpBinUserAgentModel = HttpBinUserAgentModel(content)
 
     }
 
     class HttpBinMalformedDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
 
-        override fun deserialize(reader: Reader): HttpBinUserAgentModel {
-            throw IllegalStateException("Malformed data")
-        }
+        override fun deserialize(reader: Reader): HttpBinUserAgentModel = throw IllegalStateException("Malformed data")
 
     }
 

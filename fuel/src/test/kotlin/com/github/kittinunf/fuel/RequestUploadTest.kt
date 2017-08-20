@@ -10,14 +10,13 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestUploadTest : BaseTestCase() {
-
-    val manager: FuelManager by lazy {
+    private val manager: FuelManager by lazy {
         FuelManager().apply {
             basePath = "http://httpbin.org"
         }
     }
 
-    val currentDir: File by lazy {
+    private val currentDir: File by lazy {
         val dir = System.getProperty("user.dir")
         File(dir, "src/test/assets")
     }
@@ -29,7 +28,7 @@ class RequestUploadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.upload("/post").source { request, url ->
+        manager.upload("/post").source { _, _ ->
             File(currentDir, "lorem_ipsum_short.tmp")
         }.responseString { req, res, result ->
             request = req
@@ -56,7 +55,7 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/post", param = listOf("foo" to "bar"))
-                .source { request, url ->
+                .source { _, _ ->
                     File(currentDir, "lorem_ipsum_short.tmp")
                 }
                 .name { "file-name" }
@@ -85,7 +84,7 @@ class RequestUploadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.upload("/put", Method.PUT).source { request, url ->
+        manager.upload("/put", Method.PUT).source { _, _ ->
             File(currentDir, "lorem_ipsum_long.tmp")
         }.responseString { req, res, result ->
             request = req
@@ -114,7 +113,7 @@ class RequestUploadTest : BaseTestCase() {
         var read = -1L
         var total = -1L
 
-        manager.upload("/post").source { request, url ->
+        manager.upload("/post").source { _, _ ->
             File(currentDir, "lorem_ipsum_long.tmp")
         }.progress { readBytes, totalBytes ->
             read = readBytes
@@ -146,9 +145,9 @@ class RequestUploadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.upload("/pos").source { request, url ->
+        manager.upload("/pos").source { _, _ ->
             File(currentDir, "lorem_ipsum_short.tmp")
-        }.progress { readBytes, totalBytes ->
+        }.progress { _, _ ->
 
         }.responseString { req, res, result ->
             request = req
@@ -174,9 +173,9 @@ class RequestUploadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.upload("/post").source { request, url ->
+        manager.upload("/post").source { _, _ ->
             File(currentDir, "not_found_file.tmp")
-        }.progress { readBytes, totalBytes ->
+        }.progress { _, _ ->
 
         }.responseString { req, res, result ->
             request = req
@@ -205,7 +204,7 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/post", param = listOf("foo" to "bar"))
-                .sources { request, url ->
+                .sources { _, _ ->
                     listOf(File(currentDir, "lorem_ipsum_short.tmp"),
                             File(currentDir, "lorem_ipsum_long.tmp"))
                 }
@@ -240,7 +239,7 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/post", param = listOf("foo" to "bar"))
-                .dataParts { request, url ->
+                .dataParts { _, _ ->
                     listOf(
                             DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg"),
                             DataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "second-file", type = "image/jpeg")
@@ -280,8 +279,8 @@ class RequestUploadTest : BaseTestCase() {
 
         manager.upload("/post", param = listOf("foo" to "bar"))
 
-                .blob { request, url ->
-                    request.name = "coolblob"
+                .blob { r, _ ->
+                    r.name = "coolblob"
                     Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name)
                 }
                 .responseString { req, res, result ->

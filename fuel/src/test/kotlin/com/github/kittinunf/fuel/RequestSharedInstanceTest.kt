@@ -9,7 +9,6 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestSharedInstanceTest : BaseTestCase() {
-
     init {
         FuelManager.instance.basePath = "https://httpbin.org"
         FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
@@ -23,10 +22,10 @@ class RequestSharedInstanceTest : BaseTestCase() {
         DELETE("delete")
     }
 
-    class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
+    class HttpBinConvertible(val method: Method, private val relativePath: String) : Fuel.RequestConvertible {
         override val request = createRequest()
 
-        fun createRequest(): Request {
+        private fun createRequest(): Request {
             val encoder = Encoding(
                     httpMethod = method,
                     urlString = "https://httpbin.org$relativePath",
@@ -398,7 +397,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var read = -1L
         var total = -1L
 
-        Fuel.upload("/post").source { request, url ->
+        Fuel.upload("/post").source { _, _ ->
             val dir = System.getProperty("user.dir")
             File(dir, "src/test/assets/lorem_ipsum_long.tmp")
         }.progress { readBytes, totalBytes ->
@@ -435,7 +434,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var total = -1L
 
         val numberOfBytes = 1048576
-        Fuel.download("/bytes/$numberOfBytes").destination { response, url ->
+        Fuel.download("/bytes/$numberOfBytes").destination { _, _ ->
             File.createTempFile(numberOfBytes.toString(), null)
         }.progress { readBytes, totalBytes ->
             read = readBytes

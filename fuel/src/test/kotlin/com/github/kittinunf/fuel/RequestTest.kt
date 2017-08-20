@@ -13,8 +13,7 @@ import javax.net.ssl.X509TrustManager
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestTest : BaseTestCase() {
-
-    val manager: FuelManager by lazy { FuelManager() }
+    private val manager: FuelManager by lazy { FuelManager() }
 
     enum class HttpsBin(relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),
@@ -32,10 +31,10 @@ class RequestTest : BaseTestCase() {
         override val path = "http://mockbin.org/request/$path"
     }
 
-    class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
+    class HttpBinConvertible(val method: Method, private val relativePath: String) : Fuel.RequestConvertible {
         override val request = createRequest()
 
-        fun createRequest(): Request {
+        private fun createRequest(): Request {
             val encoder = Encoding(
                     httpMethod = method,
                     urlString = "http://httpbin.org/$relativePath",
@@ -501,7 +500,7 @@ class RequestTest : BaseTestCase() {
             var data: Any? = null
             var error: FuelError? = null
 
-            val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString { req, res, result ->
+            val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString { _, res, result ->
                 response = res
 
                 val (d, err) = result
