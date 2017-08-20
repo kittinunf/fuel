@@ -9,11 +9,7 @@ fun validatorResponseInterceptor(validRange: IntRange) =
         { next: (Request, Response) -> Response ->
             { request: Request, response: Response ->
                 if (!validRange.contains(response.httpStatusCode)) {
-                    val error = FuelError().apply {
-                        exception = HttpException(response.httpStatusCode, response.httpResponseMessage)
-                        errorData = response.data
-                        this.response = response
-                    }
+                    val error = FuelError(HttpException(response.httpStatusCode, response.httpResponseMessage), response.data, response)
                     throw error
                 } else {
                     next(request, response)

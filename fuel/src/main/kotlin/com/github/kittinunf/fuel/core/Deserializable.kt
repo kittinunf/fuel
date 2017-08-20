@@ -2,9 +2,7 @@ package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.core.requests.AsyncTaskRequest
 import com.github.kittinunf.result.Result
-import java.io.ByteArrayInputStream
 import java.io.InputStream
-import java.io.InputStreamReader
 import java.io.Reader
 
 interface Deserializable<out T : Any> {
@@ -63,7 +61,7 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
                 deliverable.fold({
                     success(this@response, response, it)
                 }, {
-                    failure(this@response, response, FuelError().apply { exception = it })
+                    failure(this@response, response, FuelError(it))
                 })
             }
         }

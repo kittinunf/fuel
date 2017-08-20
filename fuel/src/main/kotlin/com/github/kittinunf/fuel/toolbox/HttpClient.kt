@@ -66,11 +66,7 @@ class HttpClient(val proxy: Proxy? = null) : Client {
                 }
             }
         } catch(exception: Exception) {
-            throw FuelError().apply {
-                this.exception = exception
-                this.errorData = response.data
-                this.response = response
-            }
+            throw FuelError(exception, response.data, response)
         } finally {
             //As per Android documentation, a connection that is not explicitly disconnected
             //will be pooled and reused!  So, don't close it as we need inputStream later!
