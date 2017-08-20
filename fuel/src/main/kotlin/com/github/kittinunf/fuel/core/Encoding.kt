@@ -1,7 +1,6 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.util.toHexString
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
@@ -29,7 +28,7 @@ class Encoding(val httpMethod: Method,
                 modifiedPath += (querySign + queryParamString)
             }
             requestType == Request.Type.UPLOAD -> {
-                val boundary = System.currentTimeMillis().toHexString()
+                val boundary = System.currentTimeMillis().toString(16)
                 headerPairs += "Content-Type" to "multipart/form-data; boundary=" + boundary
             }
             else -> {
