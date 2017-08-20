@@ -6,12 +6,10 @@ interface Environment {
     var callbackExecutor: Executor
 }
 
-fun createEnvironment(): Environment {
-    try {
-        return Class.forName(AndroidEnvironmentClass).newInstance() as Environment
-    } catch(exception: ClassNotFoundException) {
-        return DefaultEnvironment()
-    }
+fun createEnvironment(): Environment = try {
+    Class.forName(AndroidEnvironmentClass).newInstance() as Environment
+} catch(exception: ClassNotFoundException) {
+    DefaultEnvironment()
 }
 
 class DefaultEnvironment : Environment {
