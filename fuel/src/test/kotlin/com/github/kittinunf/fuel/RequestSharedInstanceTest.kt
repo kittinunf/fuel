@@ -27,11 +27,11 @@ class RequestSharedInstanceTest : BaseTestCase() {
         override val request = createRequest()
 
         fun createRequest(): Request {
-            val encoder = Encoding().apply {
-                httpMethod = method
-                urlString = "https://httpbin.org$relativePath"
-                parameters = listOf("foo" to "bar")
-            }
+            val encoder = Encoding(
+                    httpMethod = method,
+                    urlString = "https://httpbin.org$relativePath",
+                    parameters = listOf("foo" to "bar")
+            )
             return encoder.request
         }
     }

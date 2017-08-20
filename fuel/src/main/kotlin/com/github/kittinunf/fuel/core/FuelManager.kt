@@ -11,14 +11,9 @@ import java.security.KeyStore
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import javax.net.ssl.HostnameVerifier
-import javax.net.ssl.HttpsURLConnection
-import javax.net.ssl.SSLContext
-import javax.net.ssl.SSLSocketFactory
-import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.*
 
 class FuelManager {
-
     var client: Client by readWriteLazy { HttpClient(proxy) }
     var proxy: Proxy? = null
     var basePath: String? = null
@@ -62,12 +57,12 @@ class FuelManager {
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
     fun request(method: Method, path: String, param: List<Pair<String, Any?>>? = null): Request {
-        val request = request(Encoding().apply {
-            httpMethod = method
-            baseUrlString = basePath
-            urlString = path
-            parameters = if (param == null) baseParams else baseParams + param
-        })
+        val request = request(Encoding(
+                httpMethod = method,
+                urlString = path,
+                baseUrlString = basePath,
+                parameters = if (param == null) baseParams else baseParams + param
+        ).request)
 
         request.client = client
         request.httpHeaders += baseHeaders.orEmpty()
@@ -85,13 +80,13 @@ class FuelManager {
     }
 
     fun download(path: String, param: List<Pair<String, Any?>>? = null): Request {
-        val request = Encoding().apply {
-            httpMethod = Method.GET
-            baseUrlString = basePath
-            urlString = path
-            parameters = if (param == null) baseParams else baseParams + param
-            requestType = Request.Type.DOWNLOAD
-        }.request
+        val request = Encoding(
+                httpMethod = Method.GET,
+                urlString = path,
+                requestType = Request.Type.DOWNLOAD,
+                baseUrlString = basePath,
+                parameters = if (param == null) baseParams else baseParams + param
+        ).request
 
         request.client = client
         request.httpHeaders += baseHeaders.orEmpty()
@@ -105,13 +100,13 @@ class FuelManager {
     }
 
     fun upload(path: String, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
-        val request = Encoding().apply {
-            httpMethod = method
-            baseUrlString = basePath
-            urlString = path
-            parameters = if (param == null) baseParams else baseParams + param
-            requestType = Request.Type.UPLOAD
-        }.request
+        val request = Encoding(
+                httpMethod = method,
+                urlString = path,
+                requestType = Request.Type.UPLOAD,
+                baseUrlString = basePath,
+                parameters = if (param == null) baseParams else baseParams + param
+        ).request
 
         request.client = client
         request.httpHeaders += baseHeaders.orEmpty()
