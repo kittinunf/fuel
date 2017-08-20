@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit
  * Executes all submitted tasks directly in the same thread as the caller.
  */
 class SameThreadExecutorService : AbstractExecutorService() {
-
     //volatile because can be viewed by other threads
     @Volatile private var terminated: Boolean = false
 
@@ -15,13 +14,9 @@ class SameThreadExecutorService : AbstractExecutorService() {
         terminated = true
     }
 
-    override fun isShutdown(): Boolean {
-        return terminated
-    }
+    override fun isShutdown(): Boolean = terminated
 
-    override fun isTerminated(): Boolean {
-        return terminated
-    }
+    override fun isTerminated(): Boolean = terminated
 
     @Throws(InterruptedException::class)
     override fun awaitTermination(theTimeout: Long, theUnit: TimeUnit): Boolean {
@@ -29,11 +24,7 @@ class SameThreadExecutorService : AbstractExecutorService() {
         return terminated
     }
 
-    override fun shutdownNow(): List<Runnable> {
-        return emptyList()
-    }
+    override fun shutdownNow(): List<Runnable> = emptyList()
 
-    override fun execute(theCommand: Runnable) {
-        theCommand.run()
-    }
+    override fun execute(theCommand: Runnable) = theCommand.run()
 }
