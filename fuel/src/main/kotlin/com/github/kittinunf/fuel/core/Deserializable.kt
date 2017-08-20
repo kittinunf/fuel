@@ -53,35 +53,32 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler
 private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
                                                               success: (Request, Response, T) -> Unit,
                                                               failure: (Request, Response, FuelError) -> Unit): Request {
-    val request = AsyncTaskRequest(taskRequest)
-    request.apply {
-        successCallback = { response ->
-            val deliverable = Result.of { deserializable.deserialize(response) }
-            callback {
-                deliverable.fold({
-                    success(this@response, response, it)
-                }, {
-                    failure(this@response, response, FuelError(it))
-                })
-            }
-        }
+    val asyncRequest = AsyncTaskRequest(taskRequest)
 
-        failureCallback = { error, response ->
-            callback {
-                failure(this@response, response, error)
-            }
+    asyncRequest.successCallback = { response ->
+        val deliverable = Result.of { deserializable.deserialize(response) }
+        callback {
+            deliverable.fold({
+                success(this, response, it)
+            }, {
+                failure(this, response, FuelError(it))
+            })
         }
     }
 
-    submit(request)
+    asyncRequest.failureCallback = { error, response ->
+        callback {
+            failure(this, response, error)
+        }
+    }
+
+    submit(asyncRequest)
     return this
 }
 
-fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
-    try {
-        val response = taskRequest.call()
-        return Triple(this, response, Result.Success(deserializable.deserialize(response)))
-    } catch (error: FuelError) {
-        return Triple(this, error.response, Result.error(error))
-    }
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> = try {
+    val response = taskRequest.call()
+    Triple(this, response, Result.Success(deserializable.deserialize(response)))
+} catch (error: FuelError) {
+    Triple(this, error.response, Result.error(error))
 }
