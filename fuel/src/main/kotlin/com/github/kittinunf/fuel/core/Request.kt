@@ -59,7 +59,7 @@ class Request : Fuel.RequestConvertible {
     val mediaTypes = mutableListOf<String>()
 
     //underlying task request
-    val taskRequest: TaskRequest by lazy {
+    internal val taskRequest: TaskRequest by lazy {
         when (type) {
             Type.DOWNLOAD -> DownloadTaskRequest(this)
             Type.UPLOAD -> UploadTaskRequest(this)
@@ -194,10 +194,8 @@ class Request : Fuel.RequestConvertible {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
         val files = sources.invoke(request, request.url)
 
-        uploadTaskRequest.apply {
-            sourceCallback = { _, _ ->
-                files.map { Blob(it.name, it.length(), { it.inputStream() }) }
-            }
+        uploadTaskRequest.sourceCallback = { _, _ ->
+            files.map { Blob(it.name, it.length(), it::inputStream) }
         }
 
         return this
