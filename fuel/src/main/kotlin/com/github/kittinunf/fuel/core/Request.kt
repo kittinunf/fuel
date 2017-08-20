@@ -20,7 +20,18 @@ import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
-class Request : Fuel.RequestConvertible {
+class Request(
+        val httpMethod: Method,
+        val path: String,
+        val url: URL,
+        var type: Type = Type.REQUEST,
+        val httpHeaders: MutableMap<String, String> = mutableMapOf<String, String>(),
+        val parameters: List<Pair<String, Any?>> = listOf<Pair<String, Any?>>(),
+        var name: String = "",
+        val names: MutableList<String> = mutableListOf<String>(),
+        val mediaTypes: MutableList<String> = mutableListOf<String>(),
+        var timeoutInMillisecond: Int = 15000,
+        var timeoutReadInMillisecond: Int = timeoutInMillisecond) : Fuel.RequestConvertible {
 
     enum class Type {
         REQUEST,
@@ -28,35 +39,16 @@ class Request : Fuel.RequestConvertible {
         UPLOAD
     }
 
-    var timeoutInMillisecond = 15000
-    var timeoutReadInMillisecond = timeoutInMillisecond
-
-    var type: Type = Type.REQUEST
-    lateinit var httpMethod: Method
-    lateinit var path: String
-    lateinit var url: URL
 
     //body
     var bodyCallback: ((Request, OutputStream?, Long) -> Long)? = null
-    val httpBody: ByteArray
-        get() {
-            return ByteArrayOutputStream().apply {
-                bodyCallback?.invoke(request, this, 0)
-            }.toByteArray()
-        }
 
-    lateinit var client: Client
+    private fun getHttpBody(): ByteArray = ByteArrayOutputStream().apply {
+        bodyCallback?.invoke(request, this, 0)
+    }.toByteArray()
 
-    //headers
-    val httpHeaders = mutableMapOf<String, String>()
+    internal lateinit var client: Client
 
-    //params
-    var parameters = listOf<Pair<String, Any?>>()
-
-    var name = ""
-
-    val names = mutableListOf<String>()
-    val mediaTypes = mutableListOf<String>()
 
     //underlying task request
     internal val taskRequest: TaskRequest by lazy {
@@ -67,19 +59,19 @@ class Request : Fuel.RequestConvertible {
         }
     }
 
-    var taskFuture: Future<*>? = null
+    private var taskFuture: Future<*>? = null
 
     //configuration
-    var socketFactory: SSLSocketFactory? = null
-    var hostnameVerifier: HostnameVerifier? = null
+    internal var socketFactory: SSLSocketFactory? = null
+    internal var hostnameVerifier: HostnameVerifier? = null
 
     //callers
-    lateinit var executor: ExecutorService
-    lateinit var callbackExecutor: Executor
+    internal lateinit var executor: ExecutorService
+    internal lateinit var callbackExecutor: Executor
 
     //interceptor
-    var requestInterceptor: ((Request) -> Request)? = null
-    var responseInterceptor: ((Request, Response) -> Response)? = null
+    internal var requestInterceptor: ((Request) -> Request)? = null
+    internal var responseInterceptor: ((Request, Response) -> Response)? = null
 
     //interfaces
     fun timeout(timeout: Int): Request {
@@ -114,7 +106,7 @@ class Request : Fuel.RequestConvertible {
     }
 
     fun body(body: ByteArray): Request {
-        bodyCallback = { request, outputStream, totalLength ->
+        bodyCallback = { _, outputStream, _ ->
             outputStream?.write(body)
             body.size.toLong()
         }
@@ -130,18 +122,15 @@ class Request : Fuel.RequestConvertible {
     }
 
     fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
-        if (taskRequest as? DownloadTaskRequest != null) {
-            val download = taskRequest as DownloadTaskRequest
-            download.apply {
-                progressCallback = handler
+        val taskRequest = taskRequest
+        when (taskRequest) {
+            is DownloadTaskRequest -> {
+                taskRequest.progressCallback = handler
             }
-        } else if (taskRequest as? UploadTaskRequest != null) {
-            val upload = taskRequest as UploadTaskRequest
-            upload.apply {
-                progressCallback = handler
+            is UploadTaskRequest -> {
+                taskRequest.progressCallback = handler
             }
-        } else {
-            throw IllegalStateException("progress is only used with RequestType.DOWNLOAD or RequestType.UPLOAD")
+            else -> throw IllegalStateException("progress is only used with RequestType.DOWNLOAD or RequestType.UPLOAD")
         }
 
         return this
@@ -149,24 +138,19 @@ class Request : Fuel.RequestConvertible {
 
     fun blobs(blobs: (Request, URL) -> Iterable<Blob>): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
+        uploadTaskRequest.sourceCallback = blobs
 
-        uploadTaskRequest.apply {
-            sourceCallback = blobs
-        }
         return this
     }
 
     fun blob(blob: (Request, URL) -> Blob): Request {
-        blobs { request, _ ->
-            listOf(blob.invoke(request, request.url))
-        }
-
+        blobs { request, _ -> listOf(blob(request, request.url)) }
         return this
     }
 
     fun dataParts(dataParts: (Request, URL) -> Iterable<DataPart>): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
-        val parts = dataParts.invoke(request, request.url)
+        val parts = dataParts(request, request.url)
 
         mediaTypes.apply {
             clear()
@@ -178,10 +162,8 @@ class Request : Fuel.RequestConvertible {
             addAll(parts.map { it.name })
         }
 
-        uploadTaskRequest.apply {
-            sourceCallback = { _, _ ->
-                parts.map { Blob(it.file.name, it.file.length(), { it.file.inputStream() }) }
-            }
+        uploadTaskRequest.sourceCallback = { _, _ ->
+            parts.map { (file) -> Blob(file.name, file.length(), file::inputStream) }
         }
 
         return this
@@ -192,7 +174,7 @@ class Request : Fuel.RequestConvertible {
         names.clear()
 
         val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
-        val files = sources.invoke(request, request.url)
+        val files = sources(request, request.url)
 
         uploadTaskRequest.sourceCallback = { _, _ ->
             files.map { Blob(it.name, it.length(), it::inputStream) }
@@ -203,7 +185,7 @@ class Request : Fuel.RequestConvertible {
 
     fun source(source: (Request, URL) -> File): Request {
         sources { request, _ ->
-            listOf(source.invoke(request, request.url))
+            listOf(source(request, request.url))
         }
 
         return this
@@ -217,9 +199,7 @@ class Request : Fuel.RequestConvertible {
     fun destination(destination: (Response, URL) -> File): Request {
         val downloadTaskRequest = taskRequest as? DownloadTaskRequest ?: throw IllegalStateException("destination is only used with RequestType.DOWNLOAD")
 
-        downloadTaskRequest.apply {
-            destinationCallback = destination
-        }
+        downloadTaskRequest.destinationCallback = destination
         return this
     }
 
@@ -247,44 +227,35 @@ class Request : Fuel.RequestConvertible {
     override val request: Request
         get() = this
 
-    fun cUrlString(): String {
-        val elements = mutableListOf("$ curl -i")
+    override fun toString(): String = buildString {
+        appendln("\"Body : ${if (getHttpBody().isNotEmpty()) String(getHttpBody()) else "(empty)"}\"")
+        appendln("\"Headers : (${httpHeaders.size})\"")
+        for ((key, value) in httpHeaders) {
+            appendln("$key : $value")
+        }
+    }
+
+    fun cUrlString(): String = buildString {
+        append("$ curl -i")
 
         //method
         if (httpMethod != Method.GET) {
-            elements.add("-X $httpMethod")
+            append("-X $httpMethod")
         }
 
         //body
-        val escapedBody = String(httpBody).replace("\"", "\\\"")
+        val escapedBody = String(getHttpBody()).replace("\"", "\\\"")
         if (escapedBody.isNotEmpty()) {
-            elements.add("-d \"$escapedBody\"")
+            append("-d \"$escapedBody\"")
         }
 
         //headers
         for ((key, value) in httpHeaders) {
-            elements.add("-H \"$key:$value\"")
+            append("-H \"$key:$value\"")
         }
 
         //url
-        elements.add("\"$url\"")
-
-        return elements.joinToString(" ")
-    }
-
-    override fun toString(): String {
-        val elements = mutableListOf("--> $httpMethod ($url)")
-
-        //body
-        elements.add("Body : ${if (httpBody.isNotEmpty()) String(httpBody) else "(empty)"}")
-
-        //headers
-        elements.add("Headers : (${httpHeaders.size})")
-        for ((key, value) in httpHeaders) {
-            elements.add("$key : $value")
-        }
-
-        return elements.joinToString("\n")
+        append("\"$url\"")
     }
 
     //byte array

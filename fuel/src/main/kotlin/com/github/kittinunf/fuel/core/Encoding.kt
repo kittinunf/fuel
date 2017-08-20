@@ -36,12 +36,13 @@ class Encoding(val httpMethod: Method,
                 data = queryFromParameters(parameters)
             }
         }
-        Request().apply {
-            httpMethod = method
-            this.path = modifiedPath
-            this.url = createUrl(modifiedPath)
-            this.type = requestType
-            this.parameters = parameters ?: emptyList()
+        Request(
+                httpMethod = method,
+                path = modifiedPath,
+                url = createUrl(modifiedPath),
+                type = requestType,
+                parameters = parameters ?: emptyList()
+        ).apply {
             header(headerPairs, false)
             if (data != null) body(data ?: "")
         }

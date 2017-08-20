@@ -51,7 +51,7 @@ class FuelManager {
     private val responseInterceptors: MutableList<((Request, Response) -> Response) -> ((Request, Response) -> Response)> =
             mutableListOf(redirectResponseInterceptor(this), validatorResponseInterceptor(200..299))
 
-    fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
+    private fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
 
     //callback executor
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
@@ -75,9 +75,8 @@ class FuelManager {
         return request
     }
 
-    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request {
-        return request(method, convertible.path, param)
-    }
+    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request =
+            request(method, convertible.path, param)
 
     fun download(path: String, param: List<Pair<String, Any?>>? = null): Request {
         val request = Encoding(
