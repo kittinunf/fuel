@@ -40,7 +40,7 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
 
             return Response(
                     url = request.url,
-                    httpResponseHeaders = connection.headerFields.filterKeys { it != null },
+                    headers = connection.headerFields.filterKeys { it != null },
                     contentLength = connection.contentLength.toLong(),
                     statusCode = connection.responseCode,
                     responseMessage = connection.responseMessage.orEmpty(),
