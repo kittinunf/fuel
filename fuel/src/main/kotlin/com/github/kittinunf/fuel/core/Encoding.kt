@@ -15,7 +15,7 @@ class Encoding(val httpMethod: Method,
     private val encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
         var modifiedPath = path
         var data: String? = null
-        val headerPairs: MutableMap<String, Any> = defaultHeaders()
+        val headerPairs: MutableMap<String, Any> = defaultHeaders.toMutableMap()
         when {
             encodeParameterInUrl(method) -> {
                 var querySign = ""
@@ -73,8 +73,7 @@ class Encoding(val httpMethod: Method,
 
     private fun queryFromParameters(params: List<Pair<String, Any?>>?): String = params.orEmpty()
             .filterNot { it.second == null }
-            .mapTo(mutableListOf()) { "${it.first}=${it.second}" }
-            .joinToString("&")
+            .joinToString("&") { "${it.first}=${it.second}" }
 
-    private fun defaultHeaders(): MutableMap<String, Any> = mutableMapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
+    private val defaultHeaders: Map<String, Any> = mapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
 }

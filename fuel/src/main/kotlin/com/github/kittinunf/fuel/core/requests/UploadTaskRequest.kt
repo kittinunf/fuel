@@ -87,6 +87,3 @@ private fun guessContentType(name: String): String = try {
     // The MimetypesFileTypeMap class doesn't exists on old Android devices.
     "application/octet-stream"
 }
-
-
-
