@@ -44,10 +44,9 @@ interface FuelRouting: Fuel.RequestConvertible {
                 this.httpMethod = method
                 this.urlString = path
                 this.parameters = params
-                // FIXME: headers are missing
             }
 
-            // return the generated encoder
-            return encoder.request
+            // return the generated encoder with header injected
+            return encoder.request.header(headers)
         }
 }
