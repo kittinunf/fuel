@@ -46,7 +46,7 @@ interface FuelRouting: Fuel.RequestConvertible {
                 this.parameters = params
             }
 
-            // return the generated encoder with header injected
+            // return the generated encoder with custom header injected
             return encoder.request.header(headers)
         }
 }
