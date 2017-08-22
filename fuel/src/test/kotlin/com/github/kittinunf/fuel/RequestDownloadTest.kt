@@ -6,7 +6,6 @@ import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
-import org.junit.Ignore
 import org.junit.Test
 import java.io.File
 import java.io.IOException
@@ -47,7 +46,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -84,7 +83,7 @@ class RequestDownloadTest : BaseTestCase() {
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -115,7 +114,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -146,7 +145,7 @@ class RequestDownloadTest : BaseTestCase() {
 
         val statusCode = -1
         assertThat(error?.exception as IOException, isA(IOException::class.java))
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -187,7 +186,7 @@ class RequestDownloadTest : BaseTestCase() {
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
 }

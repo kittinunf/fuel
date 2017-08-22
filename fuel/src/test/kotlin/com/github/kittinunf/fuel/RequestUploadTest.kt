@@ -44,7 +44,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -74,7 +74,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -100,7 +100,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -133,7 +133,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(read == total && read != -1L && total != -1L, isEqualTo(true))
     }
@@ -163,7 +163,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -193,7 +193,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(error?.exception as FileNotFoundException, isA(FileNotFoundException::class.java))
 
         val statusCode = -1
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -228,7 +228,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(string, containsString("file-name2"))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -264,7 +264,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(string, containsString("second-file"))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -301,6 +301,6 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(string, containsString("coolblob"))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 }

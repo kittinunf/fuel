@@ -7,12 +7,24 @@ import java.net.URL
 
 class Response(
         val url: URL,
-        val httpStatusCode: Int = -1,
-        val httpResponseMessage: String = "",
-        val httpResponseHeaders: Map<String, List<String>> = emptyMap<String, List<String>>(),
-        val httpContentLength: Long = 0L,
+        val statusCode: Int = -1,
+        val responseMessage: String = "",
+        val headers: Map<String, List<String>> = emptyMap(),
+        val contentLength: Long = 0L,
         val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
 ) {
+    @Deprecated(replaceWith = ReplaceWith("contentLength"), message = "http naming is deprecated, use 'contentLength' instead")
+    val httpContentLength get() = contentLength
+
+    @Deprecated(replaceWith = ReplaceWith("responseMessage"), message = "http naming is deprecated, use 'responseMessage' instead")
+    val httpResponseMessage get() = responseMessage
+
+    @Deprecated(replaceWith = ReplaceWith("statusCode"), message = "http naming is deprecated, use 'statusCode' instead")
+    val httpStatusCode get() = statusCode
+
+    @Deprecated(replaceWith = ReplaceWith("headers"), message = "http naming is deprecated, use 'headers' instead")
+    val httpResponseHeaders get() = headers
+
     val data: ByteArray by lazy {
         try {
             dataStream.use { dataStream.readBytes() }
@@ -22,12 +34,12 @@ class Response(
     }
 
     override fun toString(): String = buildString {
-        appendln("<-- $httpStatusCode ($url)")
-        appendln("Response : $httpResponseMessage")
-        appendln("Length : $httpContentLength")
+        appendln("<-- $statusCode ($url)")
+        appendln("Response : $responseMessage")
+        appendln("Length : $contentLength")
         appendln("Body : ${if (data.isNotEmpty()) String(data) else "(empty)"}")
-        appendln("Headers : (${httpResponseHeaders.size})")
-        for ((key, value) in httpResponseHeaders) {
+        appendln("Headers : (${headers.size})")
+        for ((key, value) in headers) {
             appendln("$key : $value")
         }
     }

@@ -55,7 +55,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -82,7 +82,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("https"))
     }
@@ -111,7 +111,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("https"))
     }
@@ -140,7 +140,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("https"))
     }
@@ -169,7 +169,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("https"))
     }
@@ -200,7 +200,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -227,7 +227,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
 }

@@ -21,18 +21,18 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
                 readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.timeoutReadInMillisecond)
                 doInput = true
                 useCaches = false
-                requestMethod = if (request.httpMethod == Method.PATCH) Method.POST.value else request.httpMethod.value
+                requestMethod = if (request.method == Method.PATCH) Method.POST.value else request.method.value
                 instanceFollowRedirects = false
 
-                for ((key, value) in request.httpHeaders) {
+                for ((key, value) in request.headers) {
                     setRequestProperty(key, value)
                 }
 
-                if (request.httpMethod == Method.PATCH) {
+                if (request.method == Method.PATCH) {
                     setRequestProperty("X-HTTP-Method-Override", "PATCH")
                 }
 
-                setDoOutput(connection, request.httpMethod)
+                setDoOutput(connection, request.method)
                 setBodyIfDoOutput(connection, request)
             }
 
@@ -41,9 +41,9 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
             return Response(
                     url = request.url,
                     httpResponseHeaders = connection.headerFields.filterKeys { it != null },
-                    httpContentLength = connection.contentLength.toLong(),
-                    httpStatusCode = connection.responseCode,
-                    httpResponseMessage = connection.responseMessage.orEmpty(),
+                    contentLength = connection.contentLength.toLong(),
+                    statusCode = connection.responseCode,
+                    responseMessage = connection.responseMessage.orEmpty(),
                     dataStream = try {
                         val stream = connection.errorStream ?: connection.inputStream
                         if (contentEncoding.compareTo("gzip", true) == 0) GZIPInputStream(stream) else stream

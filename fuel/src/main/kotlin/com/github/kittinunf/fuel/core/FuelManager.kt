@@ -69,7 +69,7 @@ class FuelManager {
         ).request)
 
         request.client = client
-        request.httpHeaders += baseHeaders.orEmpty()
+        request.headers += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -92,7 +92,7 @@ class FuelManager {
         ).request
 
         request.client = client
-        request.httpHeaders += baseHeaders.orEmpty()
+        request.headers += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -112,7 +112,7 @@ class FuelManager {
         ).request
 
         request.client = client
-        request.httpHeaders += baseHeaders.orEmpty()
+        request.headers += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -125,7 +125,7 @@ class FuelManager {
     fun request(convertible: Fuel.RequestConvertible): Request {
         val request = convertible.request
         request.client = client
-        request.httpHeaders += baseHeaders.orEmpty()
+        request.headers += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()

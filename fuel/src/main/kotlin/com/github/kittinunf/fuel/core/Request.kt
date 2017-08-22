@@ -21,17 +21,23 @@ import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
 class Request(
-        val httpMethod: Method,
+        val method: Method,
         val path: String,
         val url: URL,
         var type: Type = Type.REQUEST,
-        val httpHeaders: MutableMap<String, String> = mutableMapOf<String, String>(),
-        val parameters: List<Pair<String, Any?>> = listOf<Pair<String, Any?>>(),
+        val headers: MutableMap<String, String> = mutableMapOf(),
+        val parameters: List<Pair<String, Any?>> = listOf(),
         var name: String = "",
-        val names: MutableList<String> = mutableListOf<String>(),
-        val mediaTypes: MutableList<String> = mutableListOf<String>(),
+        val names: MutableList<String> = mutableListOf(),
+        val mediaTypes: MutableList<String> = mutableListOf(),
         var timeoutInMillisecond: Int = 15000,
         var timeoutReadInMillisecond: Int = timeoutInMillisecond) : Fuel.RequestConvertible {
+
+    @Deprecated(replaceWith = ReplaceWith("method"), message = "http naming is deprecated, use 'method' instead")
+    val httpMethod get() = method
+
+    @Deprecated(replaceWith = ReplaceWith("headers"), message = "http naming is deprecated, use 'headers' instead")
+    val httpHeaders get() = headers
 
     enum class Type {
         REQUEST,
@@ -87,7 +93,7 @@ class Request(
     fun header(vararg pairs: Pair<String, Any>?): Request {
         pairs.forEach {
             if (it != null)
-                httpHeaders.plusAssign(Pair(it.first, it.second.toString()))
+                headers += Pair(it.first, it.second.toString())
         }
         return this
     }
@@ -97,8 +103,8 @@ class Request(
     internal fun header(pairs: Map<String, Any>?, replace: Boolean): Request {
         pairs?.forEach {
             it.let {
-                if (!httpHeaders.containsKey(it.key) || replace) {
-                    httpHeaders.plusAssign(Pair(it.key, it.value.toString()))
+                if (!headers.containsKey(it.key) || replace) {
+                    headers += Pair(it.key, it.value.toString())
                 }
             }
         }
@@ -229,8 +235,8 @@ class Request(
 
     override fun toString(): String = buildString {
         appendln("\"Body : ${if (getHttpBody().isNotEmpty()) String(getHttpBody()) else "(empty)"}\"")
-        appendln("\"Headers : (${httpHeaders.size})\"")
-        for ((key, value) in httpHeaders) {
+        appendln("\"Headers : (${headers.size})\"")
+        for ((key, value) in headers) {
             appendln("$key : $value")
         }
     }
@@ -239,8 +245,8 @@ class Request(
         append("$ curl -i")
 
         //method
-        if (httpMethod != Method.GET) {
-            append("-X $httpMethod")
+        if (method != Method.GET) {
+            append("-X $method")
         }
 
         //body
@@ -250,7 +256,7 @@ class Request(
         }
 
         //headers
-        for ((key, value) in httpHeaders) {
+        for ((key, value) in headers) {
             append("-H \"$key:$value\"")
         }
 

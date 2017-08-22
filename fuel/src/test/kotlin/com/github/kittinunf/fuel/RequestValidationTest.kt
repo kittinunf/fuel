@@ -42,7 +42,7 @@ class RequestValidationTest : BaseTestCase() {
         assertThat(error?.errorData, notNullValue())
         assertThat(data, nullValue())
 
-        assertThat(response?.httpStatusCode, isEqualTo(preDefinedStatusCode))
+        assertThat(response?.statusCode, isEqualTo(preDefinedStatusCode))
     }
 
     @Test
@@ -72,7 +72,7 @@ class RequestValidationTest : BaseTestCase() {
         assertThat(error, notNullValue())
         assertThat(data, nullValue())
 
-        assertThat(response?.httpStatusCode, isEqualTo(preDefinedStatusCode))
+        assertThat(response?.statusCode, isEqualTo(preDefinedStatusCode))
     }
 
     @Test
@@ -106,7 +106,7 @@ class RequestValidationTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response?.httpStatusCode, isEqualTo(preDefinedStatusCode))
+        assertThat(response?.statusCode, isEqualTo(preDefinedStatusCode))
     }
 
 }

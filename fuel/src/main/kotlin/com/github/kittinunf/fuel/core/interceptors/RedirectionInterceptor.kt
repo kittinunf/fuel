@@ -10,14 +10,14 @@ class RedirectException : Exception("Redirection fail, not found URL to redirect
 fun redirectResponseInterceptor(manager: FuelManager) =
         { next: (Request, Response) -> Response ->
             { request: Request, response: Response ->
-                if (response.httpStatusCode == HttpsURLConnection.HTTP_MOVED_PERM ||
-                        response.httpStatusCode == HttpsURLConnection.HTTP_MOVED_TEMP ||
-                        response.httpStatusCode == 307   // 307 TEMPORARY REDIRECT - https://httpstatuses.com/307
+                if (response.statusCode == HttpsURLConnection.HTTP_MOVED_PERM ||
+                        response.statusCode == HttpsURLConnection.HTTP_MOVED_TEMP ||
+                        response.statusCode == 307   // 307 TEMPORARY REDIRECT - https://httpstatuses.com/307
                         ) {
-                    val redirectedUrl = response.httpResponseHeaders["Location"]
+                    val redirectedUrl = response.headers["Location"]
                     if (redirectedUrl != null && !redirectedUrl.isEmpty()) {
                         val encoding = Encoding(
-                                httpMethod = request.httpMethod,
+                                httpMethod = request.method,
                                 urlString = try {
                                     URL(redirectedUrl[0]).toString()
                                 } catch (e: MalformedURLException) {

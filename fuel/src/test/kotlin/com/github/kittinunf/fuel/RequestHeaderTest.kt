@@ -39,7 +39,7 @@ class RequestHeaderTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         val string = String(data as ByteArray)
         assertThat(string, containsString(headerKey))

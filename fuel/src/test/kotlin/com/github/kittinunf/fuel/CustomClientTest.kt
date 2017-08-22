@@ -19,7 +19,7 @@ class CustomClientTest : BaseTestCase() {
                 override fun executeRequest(request: Request): Response = Response(
                         url = request.url,
                         dataStream = mockJson.inputStream(),
-                        httpStatusCode = 200)
+                        statusCode = 200)
             }
         }
     }

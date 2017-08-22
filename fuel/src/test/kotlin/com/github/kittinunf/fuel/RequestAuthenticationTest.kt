@@ -39,7 +39,7 @@ class RequestAuthenticationTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_UNAUTHORIZED
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -63,7 +63,7 @@ class RequestAuthenticationTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
 }

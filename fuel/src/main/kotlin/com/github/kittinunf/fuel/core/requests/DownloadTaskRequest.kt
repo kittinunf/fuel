@@ -16,7 +16,7 @@ internal class DownloadTaskRequest(request: Request) : TaskRequest(request) {
         val file = destinationCallback(response, request.url)
         val fileOutputStream = FileOutputStream(file)
         response.dataStream.copyTo(fileOutputStream, BUFFER_SIZE) { readBytes ->
-            progressCallback?.invoke(readBytes, response.httpContentLength)
+            progressCallback?.invoke(readBytes, response.contentLength)
         }
         return response
     }

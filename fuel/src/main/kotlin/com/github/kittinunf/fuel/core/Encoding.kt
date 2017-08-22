@@ -37,7 +37,7 @@ class Encoding(val httpMethod: Method,
             }
         }
         Request(
-                httpMethod = method,
+                method = method,
                 path = modifiedPath,
                 url = createUrl(modifiedPath),
                 type = requestType,
