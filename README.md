@@ -7,7 +7,7 @@ The easiest HTTP networking library for Kotlin/Android.
 
 ## Features
 
-- [x] Support basic HTTP GET/POST/PUT/DELETE/HEAD in a fluent style interface
+- [x] Support basic HTTP GET/POST/PUT/DELETE/HEAD/PATCH in a fluent style interface
 - [x] Support both asynchronous and blocking requests
 - [x] Download file
 - [x] Upload file (multipart/form-data)
@@ -212,6 +212,15 @@ Fuel.delete("http://httpbin.org/delete").response { request, response, result ->
 
 ``` Kotlin
 Fuel.head("http://httpbin.org/get").response { request, response, result ->
+   // request body should be empty.
+}
+```
+
+### PATCH
+* The default `client` is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](http://developer.android.com/reference/java/net/HttpURLConnection.html). [`java.net.HttpUrlConnnection`](http://developer.android.com/reference/java/net/HttpURLConnection.html) does not support a [`PATCH`](http://download.java.net/jdk7/archive/b123/docs/api/java/net/HttpURLConnection.html#setRequestMethod(java.lang.String)) method. [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) converts `PATCH` requests to a `POST` request and adds a `X-HTTP-Method-Override: PATCH` header. While this is a semi-standard industry practice not all APIs are configured to accept this header by default.
+
+``` Kotlin
+Fuel.patch("http://httpbin.org/patch").response { request, response, result ->
    // request body should be empty.
 }
 ```
