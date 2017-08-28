@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.activity_main.mainClearButton
 import kotlinx.android.synthetic.main.activity_main.mainGoButton
 import kotlinx.android.synthetic.main.activity_main.mainResultText
 import java.io.File
+import java.io.Reader
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,10 +34,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        FuelManager.instance.basePath = "http://httpbin.org"
-        FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
-        FuelManager.instance.baseParams = listOf("key" to "value")
-        FuelManager.instance.addResponseInterceptor { loggingResponseInterceptor() }
+
+        FuelManager.instance.apply {
+            basePath = "http://httpbin.org"
+            baseHeaders = mapOf("Device" to "Android")
+            baseParams = listOf("key" to "value")
+            addResponseInterceptor { loggingResponseInterceptor() }
+        }
 
         mainGoButton.setOnClickListener {
             execute()
@@ -60,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         httpGsonResponseObject()
         httpCancel()
         httpRxSupport()
-        httpLiveDataSupport()
+//        httpLiveDataSupport()
     }
 
     private fun httpCancel() {
@@ -215,7 +219,7 @@ class MainActivity : AppCompatActivity() {
     ) {
 
         class Deserializer : ResponseDeserializable<Photo> {
-            override fun deserialize(content: String): Photo? = Gson().fromJson(content, Photo::class.java)
+            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Photo::class.java)
         }
     }
 
