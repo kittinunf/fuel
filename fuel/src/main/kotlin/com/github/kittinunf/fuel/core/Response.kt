@@ -18,7 +18,7 @@ class Response {
     var dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
     val data: ByteArray by lazy {
         try {
-            dataStream.use { dataStream.readBytes() }
+            dataStream.readBytes()
         } catch (ex: IOException) {  // If dataStream closed by deserializer
             ByteArray(0)
         }

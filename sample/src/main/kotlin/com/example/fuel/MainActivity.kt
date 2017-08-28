@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         httpGsonResponseObject()
         httpCancel()
         httpRxSupport()
-//        httpLiveDataSupport()
+        httpLiveDataSupport()
     }
 
     private fun httpCancel() {
