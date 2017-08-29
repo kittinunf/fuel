@@ -59,6 +59,5 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
-        classpath "org.jetbrains.kotlin:kotlin-android-extensions:$parent.ext.kotlin_version"
     }
 }

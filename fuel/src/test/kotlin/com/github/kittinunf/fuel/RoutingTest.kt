@@ -19,8 +19,8 @@ class RoutingTest: BaseTestCase() {
 
         override val basePath = "https://httpbin.org/"
 
-        class getTest: TestApi() {}
-        class getParamsTest(val name: String, val value: String): TestApi() {}
+        class getTest: TestApi()
+        class getParamsTest(val name: String, val value: String): TestApi()
 
         override val method: Method
             get() {
