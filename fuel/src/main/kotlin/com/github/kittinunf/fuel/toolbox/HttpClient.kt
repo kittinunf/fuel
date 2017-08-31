@@ -1,7 +1,11 @@
 package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.Client
+import com.github.kittinunf.fuel.core.FuelError
 import java.io.BufferedOutputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
