@@ -27,8 +27,8 @@ allprojects {
         archLifecycleVersion = "1.0.0-alpha3"
 
         //android dependencies version
-        compile_sdk_version = 25
-        build_tool_version = '25.0.3'
+        compile_sdk_version = 26
+        build_tool_version = '26.0.1'
 
         //test dependencies version
         junit_version = '4.12'

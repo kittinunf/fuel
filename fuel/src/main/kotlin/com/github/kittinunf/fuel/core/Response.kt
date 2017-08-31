@@ -27,7 +27,7 @@ class Response(
 
     val data: ByteArray by lazy {
         try {
-            dataStream.use { dataStream.readBytes() }
+            dataStream.readBytes()
         } catch (ex: IOException) {  // If dataStream closed by deserializer
             ByteArray(0)
         }
