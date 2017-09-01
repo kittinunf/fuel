@@ -18,7 +18,6 @@ import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 
 class FuelManager {
-
     var client: Client by readWriteLazy { HttpClient(proxy) }
     var proxy: Proxy? = null
     var basePath: String? = null
@@ -56,21 +55,21 @@ class FuelManager {
     private val responseInterceptors: MutableList<((Request, Response) -> Response) -> ((Request, Response) -> Response)> =
             mutableListOf(redirectResponseInterceptor(this), validatorResponseInterceptor(200..299))
 
-    fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
+    private fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
 
     //callback executor
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
     fun request(method: Method, path: String, param: List<Pair<String, Any?>>? = null): Request {
-        val request = request(Encoding().apply {
-            httpMethod = method
-            baseUrlString = basePath
-            urlString = path
-            parameters = if (param == null) baseParams else baseParams + param
-        })
+        val request = request(Encoding(
+                httpMethod = method,
+                urlString = path,
+                baseUrlString = basePath,
+                parameters = if (param == null) baseParams else baseParams + param
+        ).request)
 
         request.client = client
-        request.httpHeaders += baseHeaders.orEmpty()
+        request.headers += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -80,21 +79,20 @@ class FuelManager {
         return request
     }
 
-    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request {
-        return request(method, convertible.path, param)
-    }
+    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request =
+            request(method, convertible.path, param)
 
     fun download(path: String, param: List<Pair<String, Any?>>? = null): Request {
-        val request = Encoding().apply {
-            httpMethod = Method.GET
-            baseUrlString = basePath
-            urlString = path
-            parameters = if (param == null) baseParams else baseParams + param
-            requestType = Request.Type.DOWNLOAD
-        }.request
+        val request = Encoding(
+                httpMethod = Method.GET,
+                urlString = path,
+                requestType = Request.Type.DOWNLOAD,
+                baseUrlString = basePath,
+                parameters = if (param == null) baseParams else baseParams + param
+        ).request
 
         request.client = client
-        request.httpHeaders += baseHeaders.orEmpty()
+        request.headers += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -105,16 +103,16 @@ class FuelManager {
     }
 
     fun upload(path: String, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
-        val request = Encoding().apply {
-            httpMethod = method
-            baseUrlString = basePath
-            urlString = path
-            parameters = if (param == null) baseParams else baseParams + param
-            requestType = Request.Type.UPLOAD
-        }.request
+        val request = Encoding(
+                httpMethod = method,
+                urlString = path,
+                requestType = Request.Type.UPLOAD,
+                baseUrlString = basePath,
+                parameters = if (param == null) baseParams else baseParams + param
+        ).request
 
         request.client = client
-        request.httpHeaders += baseHeaders.orEmpty()
+        request.headers += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
@@ -127,7 +125,7 @@ class FuelManager {
     fun request(convertible: Fuel.RequestConvertible): Request {
         val request = convertible.request
         request.client = client
-        request.httpHeaders += baseHeaders.orEmpty()
+        request.headers += baseHeaders.orEmpty()
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()

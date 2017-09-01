@@ -11,8 +11,7 @@ import org.junit.Test
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestValidationTest : BaseTestCase() {
-
-    val manager: FuelManager by lazy {
+    private val manager: FuelManager by lazy {
         FuelManager().apply {
             basePath = "http://httpbin.org"
         }
@@ -43,7 +42,7 @@ class RequestValidationTest : BaseTestCase() {
         assertThat(error?.errorData, notNullValue())
         assertThat(data, nullValue())
 
-        assertThat(response?.httpStatusCode, isEqualTo(preDefinedStatusCode))
+        assertThat(response?.statusCode, isEqualTo(preDefinedStatusCode))
     }
 
     @Test
@@ -73,7 +72,7 @@ class RequestValidationTest : BaseTestCase() {
         assertThat(error, notNullValue())
         assertThat(data, nullValue())
 
-        assertThat(response?.httpStatusCode, isEqualTo(preDefinedStatusCode))
+        assertThat(response?.statusCode, isEqualTo(preDefinedStatusCode))
     }
 
     @Test
@@ -107,7 +106,7 @@ class RequestValidationTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response?.httpStatusCode, isEqualTo(preDefinedStatusCode))
+        assertThat(response?.statusCode, isEqualTo(preDefinedStatusCode))
     }
 
 }

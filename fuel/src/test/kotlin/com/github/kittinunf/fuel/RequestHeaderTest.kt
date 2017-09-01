@@ -8,8 +8,7 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestHeaderTest : BaseTestCase() {
-
-    val manager: FuelManager by lazy {
+    private val manager: FuelManager by lazy {
         FuelManager().apply {
             basePath = "http://httpbin.org"
         }
@@ -40,7 +39,7 @@ class RequestHeaderTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         val string = String(data as ByteArray)
         assertThat(string, containsString(headerKey))

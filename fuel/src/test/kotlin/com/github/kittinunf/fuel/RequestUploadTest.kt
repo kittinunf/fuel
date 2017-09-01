@@ -10,14 +10,13 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestUploadTest : BaseTestCase() {
-
-    val manager: FuelManager by lazy {
+    private val manager: FuelManager by lazy {
         FuelManager().apply {
             basePath = "http://httpbin.org"
         }
     }
 
-    val currentDir: File by lazy {
+    private val currentDir: File by lazy {
         val dir = System.getProperty("user.dir")
         File(dir, "src/test/assets")
     }
@@ -29,7 +28,7 @@ class RequestUploadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.upload("/post").source { request, url ->
+        manager.upload("/post").source { _, _ ->
             File(currentDir, "lorem_ipsum_short.tmp")
         }.responseString { req, res, result ->
             request = req
@@ -45,7 +44,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -56,7 +55,7 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/post", param = listOf("foo" to "bar"))
-                .source { request, url ->
+                .source { _, _ ->
                     File(currentDir, "lorem_ipsum_short.tmp")
                 }
                 .name { "file-name" }
@@ -75,7 +74,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -85,7 +84,7 @@ class RequestUploadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.upload("/put", Method.PUT).source { request, url ->
+        manager.upload("/put", Method.PUT).source { _, _ ->
             File(currentDir, "lorem_ipsum_long.tmp")
         }.responseString { req, res, result ->
             request = req
@@ -101,7 +100,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -114,7 +113,7 @@ class RequestUploadTest : BaseTestCase() {
         var read = -1L
         var total = -1L
 
-        manager.upload("/post").source { request, url ->
+        manager.upload("/post").source { _, _ ->
             File(currentDir, "lorem_ipsum_long.tmp")
         }.progress { readBytes, totalBytes ->
             read = readBytes
@@ -134,7 +133,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(read == total && read != -1L && total != -1L, isEqualTo(true))
     }
@@ -146,9 +145,9 @@ class RequestUploadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.upload("/pos").source { request, url ->
+        manager.upload("/pos").source { _, _ ->
             File(currentDir, "lorem_ipsum_short.tmp")
-        }.progress { readBytes, totalBytes ->
+        }.progress { _, _ ->
 
         }.responseString { req, res, result ->
             request = req
@@ -164,7 +163,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -174,9 +173,9 @@ class RequestUploadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.upload("/post").source { request, url ->
+        manager.upload("/post").source { _, _ ->
             File(currentDir, "not_found_file.tmp")
-        }.progress { readBytes, totalBytes ->
+        }.progress { _, _ ->
 
         }.responseString { req, res, result ->
             request = req
@@ -194,7 +193,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(error?.exception as FileNotFoundException, isA(FileNotFoundException::class.java))
 
         val statusCode = -1
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -205,7 +204,7 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/post", param = listOf("foo" to "bar"))
-                .sources { request, url ->
+                .sources { _, _ ->
                     listOf(File(currentDir, "lorem_ipsum_short.tmp"),
                             File(currentDir, "lorem_ipsum_long.tmp"))
                 }
@@ -229,7 +228,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(string, containsString("file-name2"))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -240,7 +239,7 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/post", param = listOf("foo" to "bar"))
-                .dataParts { request, url ->
+                .dataParts { _, _ ->
                     listOf(
                             DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg"),
                             DataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "second-file", type = "image/jpeg")
@@ -265,7 +264,7 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(string, containsString("second-file"))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -280,8 +279,8 @@ class RequestUploadTest : BaseTestCase() {
 
         manager.upload("/post", param = listOf("foo" to "bar"))
 
-                .blob { request, url ->
-                    request.name = "coolblob"
+                .blob { r, _ ->
+                    r.name = "coolblob"
                     Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name)
                 }
                 .responseString { req, res, result ->
@@ -302,6 +301,6 @@ class RequestUploadTest : BaseTestCase() {
         assertThat(string, containsString("coolblob"))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 }

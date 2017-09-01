@@ -24,7 +24,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -40,7 +40,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -70,7 +70,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
         assertThat(interceptorCalled, isEqualTo(true))
     }
 
@@ -111,7 +111,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
         assertThat(interceptorCalled, isEqualTo(true))
         assertThat(interceptorNotCalled, isEqualTo(true))
     }
@@ -134,7 +134,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -154,7 +154,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_MOVED_TEMP))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_MOVED_TEMP))
     }
 
     @Test
@@ -174,7 +174,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -193,7 +193,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, containsString("\"user-agent\": \"Fuel\""))
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -214,7 +214,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -232,7 +232,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, notNullValue())
         assertThat(data, nullValue())
 
-        assertThat(response.httpStatusCode, isEqualTo(418))
+        assertThat(response.statusCode, isEqualTo(418))
     }
 
     @Test
@@ -249,7 +249,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.httpStatusCode, isEqualTo(418))
+        assertThat(response.statusCode, isEqualTo(418))
     }
 
 }

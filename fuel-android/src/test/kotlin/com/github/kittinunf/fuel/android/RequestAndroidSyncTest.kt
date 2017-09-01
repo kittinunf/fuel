@@ -51,7 +51,7 @@ class RequestAndroidSyncTest : BaseTestCase() {
         assertThat(data, notNullValue())
         assertThat(data as String, isA(String::class.java))
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -66,7 +66,7 @@ class RequestAndroidSyncTest : BaseTestCase() {
         assertThat(data as Json, isA(Json::class.java))
         assertThat(data.obj(), isA(JSONObject::class.java))
 
-        assertThat(response.httpStatusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
 }

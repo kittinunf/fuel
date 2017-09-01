@@ -17,4 +17,8 @@ data class TestConfiguration(
         /**
          * If set to true, it will block the thread for every request.
          */
-        var blocking: Boolean = true)
+        var blocking: Boolean = true) {
+
+    fun coerceTimeout(timeout: Int) = this.timeout?.let { if (it == -1) Int.MAX_VALUE else it } ?: timeout
+    fun coerceTimeoutRead(timeout: Int) = this.timeoutRead?.let { if (it == -1) Int.MAX_VALUE else it } ?: timeout
+}

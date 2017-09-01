@@ -39,13 +39,12 @@ interface FuelRouting: Fuel.RequestConvertible {
     override val request: Request
         get() {
             // generate the encoder according provided parameters, headers, path, etc.
-            val encoder = Encoding().apply {
-                this.baseUrlString = basePath
-                this.httpMethod = method
-                this.urlString = path
-                this.parameters = params
-            }
-
+            val encoder = Encoding(
+                    baseUrlString = basePath,
+                    httpMethod = method,
+                    urlString = path,
+                    parameters = params
+            )
             // return the generated encoder with custom header injected
             return encoder.request.header(headers)
         }

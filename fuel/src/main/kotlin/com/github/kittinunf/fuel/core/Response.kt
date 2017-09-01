@@ -5,17 +5,26 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 
-class Response {
+class Response(
+        val url: URL,
+        val statusCode: Int = -1,
+        val responseMessage: String = "",
+        val headers: Map<String, List<String>> = emptyMap(),
+        val contentLength: Long = 0L,
+        val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
+) {
+    @Deprecated(replaceWith = ReplaceWith("contentLength"), message = "http naming is deprecated, use 'contentLength' instead")
+    val httpContentLength get() = contentLength
 
-    lateinit var url: URL
+    @Deprecated(replaceWith = ReplaceWith("responseMessage"), message = "http naming is deprecated, use 'responseMessage' instead")
+    val httpResponseMessage get() = responseMessage
 
-    var httpStatusCode = -1
-    var httpResponseMessage = ""
-    var httpResponseHeaders = emptyMap<String, List<String>>()
-    var httpContentLength = 0L
+    @Deprecated(replaceWith = ReplaceWith("statusCode"), message = "http naming is deprecated, use 'statusCode' instead")
+    val httpStatusCode get() = statusCode
 
-    //data
-    var dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
+    @Deprecated(replaceWith = ReplaceWith("headers"), message = "http naming is deprecated, use 'headers' instead")
+    val httpResponseHeaders get() = headers
+
     val data: ByteArray by lazy {
         try {
             dataStream.readBytes()
@@ -24,26 +33,18 @@ class Response {
         }
     }
 
-    override fun toString(): String {
-        val elements = mutableListOf("<-- $httpStatusCode ($url)")
-
-        //response message
-        elements.add("Response : $httpResponseMessage")
-
-        //content length
-        elements.add("Length : $httpContentLength")
-
-        //body
-        elements.add("Body : ${if (data.isNotEmpty()) String(data) else "(empty)"}")
-
-        //headers
-        //headers
-        elements.add("Headers : (${httpResponseHeaders.size})")
-        for ((key, value) in httpResponseHeaders) {
-            elements.add("$key : $value")
+    override fun toString(): String = buildString {
+        appendln("<-- $statusCode ($url)")
+        appendln("Response : $responseMessage")
+        appendln("Length : $contentLength")
+        appendln("Body : ${if (data.isNotEmpty()) String(data) else "(empty)"}")
+        appendln("Headers : (${headers.size})")
+        for ((key, value) in headers) {
+            appendln("$key : $value")
         }
-
-        return elements.joinToString("\n")
     }
 
+    companion object {
+        fun error(): Response = Response(URL("http://."))
+    }
 }

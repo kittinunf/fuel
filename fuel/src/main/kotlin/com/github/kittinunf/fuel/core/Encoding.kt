@@ -1,49 +1,50 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.util.toHexString
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
-import kotlin.properties.Delegates
 
-class Encoding : Fuel.RequestConvertible {
+class Encoding(val httpMethod: Method,
+               val urlString: String,
+               val requestType: Request.Type = Request.Type.REQUEST,
+               val baseUrlString: String? = null,
+               val parameters: List<Pair<String, Any?>>? = null) : Fuel.RequestConvertible {
 
-    var requestType: Request.Type = Request.Type.REQUEST
-    var httpMethod: Method by Delegates.notNull()
-    var baseUrlString: String? = null
-    var urlString: String by Delegates.notNull()
-    var parameters: List<Pair<String, Any?>>? = null
-
-    var encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
+    private val encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
         var modifiedPath = path
         var data: String? = null
-        val headerPairs: MutableMap<String, Any> = defaultHeaders()
-        if (encodeParameterInUrl(method)) {
-            var querySign = ""
-            val queryParamString = queryFromParameters(parameters)
-            if (queryParamString.isNotEmpty()) {
-                if (path.count() > 0) {
-                    querySign = if (path.last() == '?') "" else "?"
+        val headerPairs = defaultHeaders.toMutableMap()
+        when {
+            encodeParameterInUrl(method) -> {
+                var querySign = ""
+                val queryParamString = queryFromParameters(parameters)
+                if (queryParamString.isNotEmpty()) {
+                    if (path.count() > 0) {
+                        querySign = if (path.last() == '?') "" else "?"
+                    }
                 }
+                modifiedPath += (querySign + queryParamString)
             }
-            modifiedPath += (querySign + queryParamString)
-        } else if (requestType == Request.Type.UPLOAD) {
-            val boundary = System.currentTimeMillis().toHexString()
-            headerPairs += "Content-Type" to "multipart/form-data; boundary=" + boundary
-        } else {
-            headerPairs += "Content-Type" to "application/x-www-form-urlencoded"
-            data = queryFromParameters(parameters)
+            requestType == Request.Type.UPLOAD -> {
+                val boundary = System.currentTimeMillis().toString(16)
+                headerPairs += "Content-Type" to "multipart/form-data; boundary=" + boundary
+            }
+            else -> {
+                headerPairs += "Content-Type" to "application/x-www-form-urlencoded"
+                data = queryFromParameters(parameters)
+            }
         }
-        Request().apply {
-            httpMethod = method
-            this.path = modifiedPath
-            this.url = createUrl(modifiedPath)
-            this.type = requestType
-            this.parameters = parameters ?: emptyList()
+        Request(
+                method = method,
+                path = modifiedPath,
+                url = createUrl(modifiedPath),
+                type = requestType,
+                parameters = parameters ?: emptyList()
+        ).apply {
             header(headerPairs, false)
-            if (data != null) body(data ?: "")
+            if (data != null) body(data!!)
         }
 
     }
@@ -65,23 +66,14 @@ class Encoding : Fuel.RequestConvertible {
         return URL(uri.toASCIIString())
     }
 
-    private fun encodeParameterInUrl(method: Method): Boolean {
-        when (method) {
-            Method.GET, Method.DELETE, Method.HEAD -> return true
-            else -> return false
-        }
+    private fun encodeParameterInUrl(method: Method): Boolean = when (method) {
+        Method.GET, Method.DELETE, Method.HEAD -> true
+        else -> false
     }
 
-    private fun queryFromParameters(params: List<Pair<String, Any?>>?): String {
-        return params?.let {
-            params.filterNot { it.second == null }
-                    .mapTo(mutableListOf()) { "${it.first}=${it.second}" }
-                    .joinToString("&")
-        } ?: ""
-    }
+    private fun queryFromParameters(params: List<Pair<String, Any?>>?): String = params.orEmpty()
+            .filterNot { it.second == null }
+            .joinToString("&") { "${it.first}=${it.second}" }
 
-    companion object {
-        private fun defaultHeaders(): MutableMap<String, Any> = mutableMapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
-    }
-
+    private val defaultHeaders = mapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
 }

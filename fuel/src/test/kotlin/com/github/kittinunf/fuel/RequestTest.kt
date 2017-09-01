@@ -1,11 +1,6 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.Encoding
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -18,8 +13,7 @@ import javax.net.ssl.X509TrustManager
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestTest : BaseTestCase() {
-
-    val manager: FuelManager by lazy { FuelManager() }
+    private val manager: FuelManager by lazy { FuelManager() }
 
     enum class HttpsBin(relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),
@@ -37,15 +31,15 @@ class RequestTest : BaseTestCase() {
         override val path = "http://mockbin.org/request/$path"
     }
 
-    class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
+    class HttpBinConvertible(val method: Method, private val relativePath: String) : Fuel.RequestConvertible {
         override val request = createRequest()
 
-        fun createRequest(): Request {
-            val encoder = Encoding().apply {
-                httpMethod = method
-                urlString = "http://httpbin.org/$relativePath"
-                parameters = listOf("foo" to "bar")
-            }
+        private fun createRequest(): Request {
+            val encoder = Encoding(
+                    httpMethod = method,
+                    urlString = "http://httpbin.org/$relativePath",
+                    parameters = listOf("foo" to "bar")
+            )
             return encoder.request
         }
     }
@@ -89,7 +83,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -114,7 +108,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -144,7 +138,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -177,7 +171,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -211,7 +205,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(foo))
         assertThat(string, containsString(bar))
@@ -244,7 +238,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -278,7 +272,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -311,7 +305,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -344,7 +338,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, equalTo(""))
     }
@@ -376,7 +370,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, equalTo(""))
     }
@@ -405,7 +399,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("user-agent"))
     }
@@ -434,7 +428,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -464,7 +458,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -493,7 +487,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -506,7 +500,7 @@ class RequestTest : BaseTestCase() {
             var data: Any? = null
             var error: FuelError? = null
 
-            val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString { req, res, result ->
+            val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString { _, res, result ->
                 response = res
 
                 val (d, err) = result

@@ -99,7 +99,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(data as String, isA(String::class.java))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -130,7 +130,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat((data as Json).obj(), isA(JSONObject::class.java))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -164,7 +164,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat((data as Json).obj(), isA(JSONObject::class.java))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(res?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -193,7 +193,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -225,7 +225,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(res?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -255,7 +255,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat((data as HttpBinHeadersModel).headers.isNotEmpty(), isEqualTo(true))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -291,7 +291,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat((data as HttpBinHeadersModel).headers.isNotEmpty(), isEqualTo(true))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(res?.statusCode, isEqualTo(statusCode))
     }
 
 }
