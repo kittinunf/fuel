@@ -5,7 +5,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.gson.GsonDeserializer
+import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.instanceOf
@@ -33,7 +33,7 @@ class FuelGsonTest {
     @Test
     fun gsonTestResponseObject() {
         Fuel.get("/user-agent")
-                .responseObject(GsonDeserializer<HttpBinUserAgentModel>()) { _, _, result ->
+                .responseObject(gsonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
                     assertThat(result.component1(), notNullValue())
                     assertThat(result.component2(), notNullValue())
                 }
@@ -42,7 +42,7 @@ class FuelGsonTest {
     @Test
     fun gsonTestResponseObjectError() {
         Fuel.get("/useragent")
-                .responseObject(GsonDeserializer<HttpBinUserAgentModel>()) { _, _, result ->
+                .responseObject(gsonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
                     assertThat(result.component1(), notNullValue())
                     assertThat(result.component2(), instanceOf(Result.Failure::class.java))
                 }
