@@ -35,7 +35,7 @@ dependencies {
 
 buildscript {
     ext {
-        android_support_version = '25.0.1'
+        android_support_version = '26.0.2'
     }
 }
 
