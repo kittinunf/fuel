@@ -8,7 +8,6 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpDelete
 import com.github.kittinunf.fuel.httpGet
@@ -18,6 +17,7 @@ import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rx_object
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.mainAuxText
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             basePath = "http://httpbin.org"
             baseHeaders = mapOf("Device" to "Android")
             baseParams = listOf("key" to "value")
-            addResponseInterceptor { loggingResponseInterceptor() }
+//            addResponseInterceptor { loggingResponseInterceptor() }
         }
 
         mainGoButton.setOnClickListener {
@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         httpDownload()
         httpUpload()
         httpBasicAuthentication()
+        httpListResponseObject()
         httpResponseObject()
         httpGsonResponseObject()
         httpCancel()
@@ -80,15 +81,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpResponseObject() {
-        "http://jsonplaceholder.typicode.com/photos/1".httpGet().responseObject(Photo.Deserializer()) { request, _, result ->
-            Log.d(TAG, request.toString())
-            update(result)
-        }
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+                .responseObject(Issue.Deserializer()) { request, _, result ->
+                    Log.d(TAG, request.toString())
+                    update(result)
+                }
+    }
+
+
+    private fun httpListResponseObject() {
+        "https://api.github.com/repos/kittinunf/Fuel/issues".httpGet()
+                .responseObject(Issue.ListDeserializer()) { _, _, result ->
+                    update(result)
+                }
     }
 
     private fun httpGsonResponseObject() {
-        "http://jsonplaceholder.typicode.com/photos/1".httpGet()
-                .responseObject<Photo> { request, _, result ->
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+                .responseObject<Issue> { request, _, result ->
                     Log.d(TAG, request.toString())
                     update(result)
                 }
@@ -187,7 +197,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpRxSupport() {
-        "http://jsonplaceholder.typicode.com/photos/1".httpGet().rx_object(Photo.Deserializer())
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+                .rx_object(Issue.Deserializer())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { result ->
@@ -196,7 +207,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpLiveDataSupport() {
-        "http://jsonplaceholder.typicode.com/photos/1".httpGet().liveDataObject(Photo.Deserializer())
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+                .liveDataObject(Issue.Deserializer())
                 .observeForever { result ->
                     Log.d(TAG, result.toString())
                 }
@@ -210,16 +222,20 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    data class Photo(
-            val albumId: Int = 0,
+    data class Issue(
             val id: Int = 0,
             val title: String = "",
-            val url: String = "",
-            val thumbnailUrl: String = ""
+            val url: String = ""
     ) {
+        class Deserializer : ResponseDeserializable<Issue> {
+            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Issue::class.java)
+        }
 
-        class Deserializer : ResponseDeserializable<Photo> {
-            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Photo::class.java)
+        class ListDeserializer : ResponseDeserializable<List<Issue>> {
+            override fun deserialize(reader: Reader): List<Issue> {
+                val type = object : TypeToken<List<Issue>>() {}.type
+                return Gson().fromJson(reader, type)
+            }
         }
     }
 
