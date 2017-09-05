@@ -53,19 +53,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun execute() {
-//        httpGet()
-//        httpPut()
-//        httpPost()
-//        httpDelete()
-//        httpDownload()
-//        httpUpload()
-//        httpBasicAuthentication()
-//        httpResponseObject()
-//        httpGsonResponseObject()
-//        httpCancel()
-//        httpRxSupport()
-//        httpLiveDataSupport()
-        httpListDataSupport()
+        httpGet()
+        httpPut()
+        httpPost()
+        httpDelete()
+        httpDownload()
+        httpUpload()
+        httpBasicAuthentication()
+        httpListResponseObject()
+        httpResponseObject()
+        httpGsonResponseObject()
+        httpCancel()
+        httpRxSupport()
+        httpLiveDataSupport()
     }
 
     private fun httpCancel() {
@@ -81,15 +81,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpResponseObject() {
-        "http://jsonplaceholder.typicode.com/photos/1".httpGet()
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
                 .responseObject(Issue.Deserializer()) { request, _, result ->
                     Log.d(TAG, request.toString())
                     update(result)
                 }
     }
 
+
+    private fun httpListResponseObject() {
+        "https://api.github.com/repos/kittinunf/Fuel/issues".httpGet()
+                .responseObject(Issue.ListDeserializer()) { _, _, result ->
+                    update(result)
+                }
+    }
+
     private fun httpGsonResponseObject() {
-        "http://jsonplaceholder.typicode.com/photos/1".httpGet()
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
                 .responseObject<Issue> { request, _, result ->
                     Log.d(TAG, request.toString())
                     update(result)
@@ -188,15 +196,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun httpListDataSupport() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues".httpGet()
-                .responseObject(Issue.ListDeserializer()) { _, _, result ->
-                    update(result)
-                }
-    }
-
     private fun httpRxSupport() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues".httpGet()
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
                 .rx_object(Issue.Deserializer())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -206,7 +207,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpLiveDataSupport() {
-        "http://jsonplaceholder.typicode.com/photos/1".httpGet()
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
                 .liveDataObject(Issue.Deserializer())
                 .observeForever { result ->
                     Log.d(TAG, result.toString())
