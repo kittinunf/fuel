@@ -3,5 +3,6 @@ include ':fuel',
         ':fuel-livedata',
         ':fuel-rxjava',
         ':fuel-android',
+        ':fuel-jackson',
         ':sample',
         ':sample-java'

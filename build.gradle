@@ -34,6 +34,7 @@ allprojects {
         junit_version = '4.12'
         robolectric_version = '3.4.2'
         gson_version = '2.3.1'
+        jackson_version = '2.9.0'
     }
 
     repositories {

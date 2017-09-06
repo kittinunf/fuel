@@ -1,0 +1,67 @@
+group 'com.github.kittiunf.fuel'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
+    }
+}
+
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'jacoco'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    test.java.srcDirs += 'src/test/kotlin'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:$rootProject.jackson_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
+    compile project(':fuel')
+    testCompile "junit:junit:$parent.ext.junit_version"
+}
+
+
+jacocoTestReport {
+    reports {
+        html.enabled = false
+        xml.enabled = true
+        csv.enabled = false
+    }
+}
+
+publish {
+    artifactId = 'fuel-jacskon'
+    autoPublish = true
+    desc = 'The easiest HTTP networking library in Kotlin/Android'
+    groupId = 'com.github.kittinunf.fuel'
+    licences = ['MIT']
+    publishVersion = parent.ext.publish_version
+    uploadName = 'Fuel-Android'
+    website = 'https://github.com/kittinunf/Fuel'
+}
