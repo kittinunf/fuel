@@ -8,8 +8,10 @@ import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.result.Result
+import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.notNullValue
+import org.junit.Assert
 import org.junit.Assert.assertThat
 import org.junit.Test
 
@@ -106,5 +108,19 @@ class FuelGsonTest {
     fun gsonTestResponseSyncObjectError() {
         val triple = Fuel.get("/useragent").responseObject<HttpBinUserAgentModel>()
         assertThat(triple.third.component2(), instanceOf(FuelError::class.java))
+    }
+
+    data class IssueInfo(val id: Int, val title: String, val number: Int)
+
+    /**
+     * Test for https://github.com/kittinunf/Fuel/issues/233
+     */
+    @Test
+    fun testProcessingGenericList() {
+        Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseObject<List<IssueInfo>> { _, _, result ->
+            val issues = result.get()
+            Assert.assertNotEquals(issues.size, 0)
+            assertThat(issues[0], CoreMatchers.isA(IssueInfo::class.java))
+        }
     }
 }
