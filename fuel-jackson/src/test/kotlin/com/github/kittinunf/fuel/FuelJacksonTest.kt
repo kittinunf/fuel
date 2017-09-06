@@ -6,6 +6,8 @@ import com.github.kittiunf.fuel.jackson.jacksonDeserializerOf
 import com.github.kittiunf.fuel.jackson.responseObject
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.isA
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
 
@@ -98,5 +100,16 @@ class FuelJacksonTest {
     fun jacksonTestResponseSyncObjectError() {
         val triple = Fuel.get("/useragent").responseObject<HttpBinUserAgentModel>()
         assertThat(triple.third.component2(), instanceOf(FuelError::class.java))
+    }
+
+    data class IssueInfo(val id: Int, val title: String, val number: Int)
+
+    @Test
+    fun testProcessingGenericList() {
+        Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseObject<List<IssueInfo>> { _, _, result ->
+            val issues = result.get()
+            assertNotEquals(issues.size, 0)
+            assertThat(issues[0], isA(IssueInfo::class.java))
+        }
     }
 }
