@@ -6,7 +6,7 @@ if [[ "$TRAVIS_BRANCH" == */release-v* ]]; then
 
   echo "We're on release branch, deploying"
 
-  modules=("fuel" "fuel-android" "fuel-rxjava" "fuel-livedata" "fuel-gson")
+  modules=("fuel" "fuel-android" "fuel-rxjava" "fuel-livedata" "fuel-gson" "fuel-jackson")
 
   for i in "${modules[@]}"
   do
