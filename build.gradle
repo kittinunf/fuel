@@ -42,3 +42,13 @@ allprojects {
         maven { url "https://maven.google.com" }
     }
 }
+
+project.plugins.withType(GroovyBasePlugin) {
+    test {
+        testLogging {
+            events "failed"
+            exceptionFormat "short"
+        }
+    }
+}
+
