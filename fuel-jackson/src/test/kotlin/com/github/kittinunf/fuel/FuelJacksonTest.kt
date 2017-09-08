@@ -4,9 +4,7 @@ import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.result.Result
 import com.github.kittiunf.fuel.jackson.jacksonDeserializerOf
 import com.github.kittiunf.fuel.jackson.responseObject
-import org.hamcrest.CoreMatchers.instanceOf
-import org.hamcrest.CoreMatchers.notNullValue
-import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.Matchers.*
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -28,8 +26,9 @@ class FuelJacksonTest {
     fun jacksonTestResponseObject() {
         Fuel.get("/user-agent")
                 .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), notNullValue())
+                    assertThat(result.component1(), instanceOf(HttpBinUserAgentModel::class.java))
+                    assertThat(result.component1()?.userAgent, (not(isEmptyString())))
+                    assertThat(result.component2(), instanceOf(FuelError::class.java))
                 }
     }
 
@@ -111,5 +110,21 @@ class FuelJacksonTest {
             assertNotEquals(issues.size, 0)
             assertThat(issues[0], isA(IssueInfo::class.java))
         }
+    }
+
+    @Test
+    fun manualDeserializationShouldWork() {
+        Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").response { _: Request, response: Response, result: Result<ByteArray, FuelError> ->
+            var issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response)
+            assertThat(issueList[0], isA(IssueInfo::class.java))
+            issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
+            assertThat(issueList[0], isA(IssueInfo::class.java))
+        }
+        Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseString { _: Request, _: Response, result: Result<String, FuelError> ->
+            val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
+            assertThat(issueList[0], isA(IssueInfo::class.java))
+
+        }
+
     }
 }
