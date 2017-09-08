@@ -35,8 +35,4 @@ inline fun <reified T : Any> jacksonDeserializerOf() = object : ResponseDeserial
     override fun deserialize(inputStream: InputStream): T? {
         return mapper.readValue(inputStream)
     }
-
-    override fun deserialize(response: Response): T {
-        return mapper.readValue(response.dataStream)
-    }
 }

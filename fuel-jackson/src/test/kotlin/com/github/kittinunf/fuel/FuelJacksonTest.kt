@@ -117,6 +117,10 @@ class FuelJacksonTest {
         Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").response { _: Request, response: Response, result: Result<ByteArray, FuelError> ->
             var issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response)
             assertThat(issueList[0], isA(IssueInfo::class.java))
+            issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response.dataStream)!!
+            assertThat(issueList[0], isA(IssueInfo::class.java))
+            issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response.dataStream.reader())!!
+            assertThat(issueList[0], isA(IssueInfo::class.java))
             issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
             assertThat(issueList[0], isA(IssueInfo::class.java))
         }
