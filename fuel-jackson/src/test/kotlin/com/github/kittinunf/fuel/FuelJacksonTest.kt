@@ -4,7 +4,7 @@ import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.result.Result
 import com.github.kittiunf.fuel.jackson.jacksonDeserializerOf
 import com.github.kittiunf.fuel.jackson.responseObject
-import org.hamcrest.Matchers.*
+import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -27,7 +27,7 @@ class FuelJacksonTest {
         Fuel.get("/user-agent")
                 .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
                     assertThat(result.component1(), instanceOf(HttpBinUserAgentModel::class.java))
-                    assertThat(result.component1()?.userAgent, (not(isEmptyString())))
+                    assertThat(result.component1()?.userAgent, not(""))
                     assertThat(result.component2(), instanceOf(FuelError::class.java))
                 }
     }

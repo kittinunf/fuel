@@ -44,7 +44,6 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
     compile project(':fuel')
     testCompile "junit:junit:$parent.ext.junit_version"
-    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
 }
 
 
