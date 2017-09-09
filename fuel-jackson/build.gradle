@@ -57,7 +57,7 @@ jacocoTestReport {
 }
 
 publish {
-    artifactId = 'fuel-jacskon'
+    artifactId = 'fuel-jackson'
     autoPublish = true
     desc = 'The easiest HTTP networking library in Kotlin/Android'
     groupId = 'com.github.kittinunf.fuel'
