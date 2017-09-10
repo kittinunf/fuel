@@ -15,7 +15,6 @@ import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
@@ -44,7 +43,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
 
         FuelManager.instance.socketFactory = {
             val context = SSLContext.getInstance("TLS")
-            context.init(null, arrayOf<TrustManager>(acceptsAllTrustManager), SecureRandom())
+            context.init(null, arrayOf<TrustManager>(acceptsAllTrustManager), null)
             SSLContext.setDefault(context)
             context.socketFactory
         }()
