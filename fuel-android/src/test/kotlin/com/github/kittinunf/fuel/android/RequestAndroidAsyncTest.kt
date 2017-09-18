@@ -34,6 +34,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
 
         //configure SSLContext that accepts any cert, you should not do this in your app but this is in test ¯\_(ツ)_/¯
         val acceptsAllTrustManager = object : X509TrustManager {
+
             override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
 
             override fun getAcceptedIssuers(): Array<X509Certificate>? = null
@@ -42,7 +43,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         }
 
         FuelManager.instance.socketFactory = {
-            val context = SSLContext.getInstance("TLS")
+            val context = SSLContext.getInstance("SSL")
             context.init(null, arrayOf<TrustManager>(acceptsAllTrustManager), null)
             SSLContext.setDefault(context)
             context.socketFactory
