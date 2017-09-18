@@ -21,7 +21,7 @@ before_script:
   - chmod +x deploy_bintray.sh
 
 script:
-  - ./gradlew :fuel-android:test --info
+  - ./gradlew :fuel:test --info
 
 after_success:
   - ./gradlew jacocoTestReport
