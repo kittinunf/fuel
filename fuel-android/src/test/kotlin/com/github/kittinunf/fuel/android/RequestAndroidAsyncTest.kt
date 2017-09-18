@@ -22,10 +22,12 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 class RequestAndroidAsyncTest : BaseTestCase() {
 
     init {
-        FuelManager.instance.basePath = "https://httpbin.org"
-        FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
-        FuelManager.instance.baseParams = listOf("key" to "value")
-        FuelManager.instance.callbackExecutor = Executor(Runnable::run)
+        FuelManager.instance.apply {
+            basePath = "https://httpbin.org"
+            baseHeaders = mapOf("foo" to "bar")
+            baseParams = listOf("key" to "value")
+            callbackExecutor = Executor(Runnable::run)
+        }
     }
 
     //Model

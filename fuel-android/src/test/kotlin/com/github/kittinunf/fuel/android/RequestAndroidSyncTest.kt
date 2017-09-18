@@ -9,35 +9,16 @@ import org.json.JSONObject
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestAndroidSyncTest : BaseTestCase() {
 
     init {
-        FuelManager.instance.basePath = "https://httpbin.org"
-        FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
-        FuelManager.instance.baseParams = listOf("key" to "value")
-
-        //configure SSLContext that accepts any cert, you should not do this in your app but this is in test ¯\_(ツ)_/¯
-        val acceptsAllTrustManager = object : X509TrustManager {
-            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-
-            override fun getAcceptedIssuers(): Array<X509Certificate>? = null
-
-            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+        FuelManager.instance.apply {
+            basePath = "https://httpbin.org"
+            baseHeaders = mapOf("foo" to "bar")
+            baseParams = listOf("key" to "value")
         }
-
-        FuelManager.instance.socketFactory = {
-            val context = SSLContext.getInstance("TLS")
-            context.init(null, arrayOf<TrustManager>(acceptsAllTrustManager), SecureRandom())
-            SSLContext.setDefault(context)
-            context.socketFactory
-        }()
     }
 
     @Test
