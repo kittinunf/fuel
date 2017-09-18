@@ -23,7 +23,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
 
     init {
         FuelManager.instance.apply {
-            basePath = "https://httpbin.org"
+            basePath = "http://httpbin.org"
             baseHeaders = mapOf("foo" to "bar")
             baseParams = listOf("key" to "value")
             callbackExecutor = Executor(Runnable::run)
