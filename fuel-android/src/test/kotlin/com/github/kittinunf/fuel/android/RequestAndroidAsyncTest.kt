@@ -15,12 +15,8 @@ import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.security.cert.X509Certificate
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestAndroidAsyncTest : BaseTestCase() {
@@ -29,25 +25,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         FuelManager.instance.basePath = "https://httpbin.org"
         FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
         FuelManager.instance.baseParams = listOf("key" to "value")
-
         FuelManager.instance.callbackExecutor = Executor(Runnable::run)
-
-        //configure SSLContext that accepts any cert, you should not do this in your app but this is in test ¯\_(ツ)_/¯
-        val acceptsAllTrustManager = object : X509TrustManager {
-
-            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-
-            override fun getAcceptedIssuers(): Array<X509Certificate>? = null
-
-            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-        }
-
-        FuelManager.instance.socketFactory = {
-            val context = SSLContext.getInstance("SSL")
-            context.init(null, arrayOf<TrustManager>(acceptsAllTrustManager), null)
-            SSLContext.setDefault(context)
-            context.socketFactory
-        }()
     }
 
     //Model
