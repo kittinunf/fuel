@@ -1,5 +1,6 @@
 package com.github.kittiunf.fuel.jackson
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -8,7 +9,7 @@ import com.github.kittinunf.result.Result
 import java.io.InputStream
 import java.io.Reader
 
-val mapper : ObjectMapper = ObjectMapper().registerKotlinModule()
+val mapper : ObjectMapper = ObjectMapper().registerKotlinModule().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
 inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) {
     response(jacksonDeserializerOf(), handler)
