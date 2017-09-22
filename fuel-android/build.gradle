@@ -60,6 +60,7 @@ dependencies {
 
     testCompile "junit:junit:$parent.ext.junit_version"
     testCompile "org.robolectric:robolectric:$parent.ext.robolectric_version"
+    compile 'com.github.kittinunf.result:result:1.2.0'
 }
 
 buildscript {

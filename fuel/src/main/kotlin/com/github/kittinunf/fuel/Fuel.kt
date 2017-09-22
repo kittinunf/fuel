@@ -27,11 +27,13 @@ class Fuel {
 
         //convenience methods
         //get
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun get(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.GET, path, parameters)
 
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun get(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.GET, convertible, parameters)
 

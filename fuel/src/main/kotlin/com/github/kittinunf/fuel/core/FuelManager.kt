@@ -42,7 +42,7 @@ class FuelManager {
 
     //background executor
     var executor: ExecutorService by readWriteLazy {
-        Executors.newCachedThreadPool { command ->
+            Executors.newCachedThreadPool { command ->
             Thread {
                 Thread.currentThread().priority = Thread.NORM_PRIORITY
                 command.run()
