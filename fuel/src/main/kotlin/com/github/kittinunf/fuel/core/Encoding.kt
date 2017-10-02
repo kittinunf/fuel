@@ -1,10 +1,7 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
-import java.net.MalformedURLException
-import java.net.URI
-import java.net.URISyntaxException
-import java.net.URL
+import java.net.*
 
 class Encoding(val httpMethod: Method,
                val urlString: String,
@@ -73,7 +70,7 @@ class Encoding(val httpMethod: Method,
 
     private fun queryFromParameters(params: List<Pair<String, Any?>>?): String = params.orEmpty()
             .filterNot { it.second == null }
-            .joinToString("&") { "${it.first}=${it.second}" }
+            .joinToString("&") { "${URLEncoder.encode(it.first,"UTF-8")}=${URLEncoder.encode("${it.second}","UTF-8")}"}
 
     private val defaultHeaders = mapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
 }
