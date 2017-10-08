@@ -676,10 +676,11 @@ Fuel.request(WeatherApi.weatherFor("london")).responseJson { request, response, 
 ```
 
 ## Other libraries
-If you like Fuel, you might also like other libraries;
+If you like Fuel, you might also like other libraries of mine;
 * [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
 * [Fuse](https://github.com/kittinunf/Fuse) - A simple generic LRU memory/disk cache for Android written in Kotlin
-* [Forge] (https://github.com/kittinunf/Forge) - Functional style JSON parsing written in Kotlin
+* [Forge](https://github.com/kittinunf/Forge) - Functional style JSON parsing written in Kotlin
+* [ReactiveAndroid](https://github.com/kittinunf/ReactiveAndroid) - Reactive events and properties with RxJava for Android SDK
 
 ## Credits
 
