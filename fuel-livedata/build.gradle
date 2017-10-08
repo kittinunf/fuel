@@ -81,3 +81,7 @@ publish {
     uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }
+
+tasks.withType(Javadoc) {
+    enabled = false
+}
