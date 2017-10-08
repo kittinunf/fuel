@@ -5,6 +5,7 @@ import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
+import java.net.URLEncoder
 
 class Encoding(val httpMethod: Method,
                val urlString: String,
@@ -73,7 +74,8 @@ class Encoding(val httpMethod: Method,
 
     private fun queryFromParameters(params: List<Pair<String, Any?>>?): String = params.orEmpty()
             .filterNot { it.second == null }
-            .joinToString("&") { "${it.first}=${it.second}" }
+            .map { (key, value) ->  URLEncoder.encode(key, "UTF-8") to URLEncoder.encode("$value", "UTF-8") }
+            .joinToString("&") { (key, value) -> "$key=$value" }
 
     private val defaultHeaders = mapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
 }
