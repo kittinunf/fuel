@@ -62,6 +62,7 @@ dependencies {
     compile 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>' //for LiveData support
     compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
     compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>' //for Gson support
+    compile 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>' //for Gson support
 }
 ```
 
@@ -677,8 +678,8 @@ Fuel.request(WeatherApi.weatherFor("london")).responseJson { request, response, 
 ## Other libraries
 If you like Fuel, you might also like other libraries;
 * [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
-* [Kovenant](https://github.com/mplatvoet/kovenant) - Kovenant. Promises for Kotlin.
 * [Fuse](https://github.com/kittinunf/Fuse) - A simple generic LRU memory/disk cache for Android written in Kotlin
+* [Forge] (https://github.com/kittinunf/Forge) - Functional style JSON parsing written in Kotlin
 
 ## Credits
 
