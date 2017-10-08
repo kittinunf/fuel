@@ -29,6 +29,14 @@ The easiest HTTP networking library for Kotlin/Android.
 
 * [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
 
+### Dependency - fuel-android
+
+* [Android SDK](https://developer.android.com/studio/index.html) - Android SDK
+
+### Dependency - fuel-livedata
+
+* [Live Data](https://developer.android.com/topic/libraries/architecture/livedata.html) - Android Architecture Components - LiveData
+
 ### Dependency - fuel-rxjava
 
 * [RxJava](https://github.com/ReactiveX/RxJava) - RxJava – Reactive Extensions for the JVM
@@ -36,6 +44,10 @@ The easiest HTTP networking library for Kotlin/Android.
 ### Dependency - fuel-gson
 
 * [Gson](https://github.com/google/gson) - Gson - A Java serialization/deserialization library to convert Java Objects into JSON and back
+
+### Dependency - fuel-jackson
+
+* [Jackson](https://github.com/FasterXML/jackson-module-kotlin) - Jackson - The JSON library for Java
 
 ### Gradle
 
@@ -47,8 +59,8 @@ repositories {
 dependencies {
     compile 'com.github.kittinunf.fuel:fuel:<latest-version>' //for JVM
     compile 'com.github.kittinunf.fuel:fuel-android:<latest-version>' //for Android
-    compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
     compile 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>' //for LiveData support
+    compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
     compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>' //for Gson support
 }
 ```
