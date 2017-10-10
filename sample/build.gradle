@@ -3,13 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion compileSdkVersion
-    buildToolsVersion buildToolVersion
+    compileSdkVersion fuelCompileSdkVersion
+    buildToolsVersion fuelBuildToolVersion
 
     defaultConfig {
         applicationId "com.example.fuel"
         minSdkVersion 16
-        targetSdkVersion compileSdkVersion
+        targetSdkVersion fuelCompileSdkVersion
         versionCode 1
         versionName "1.0"
     }

@@ -6,12 +6,12 @@ apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'jacoco-android'
 
 android {
-    compileSdkVersion compileSdkVersion
-    buildToolsVersion buildToolVersion
+    compileSdkVersion fuelCompileSdkVersion
+    buildToolsVersion fuelBuildToolVersion
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion compileSdkVersion
+        targetSdkVersion fuelCompileSdkVersion
         versionCode 1
         versionName publish_version
     }

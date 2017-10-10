@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion compileSdkVersion
-    buildToolsVersion buildToolVersion
+    compileSdkVersion fuelCompileSdkVersion
+    buildToolsVersion fuelBuildToolVersion
 
     defaultConfig {
         applicationId "com.example.java.fuel"
         minSdkVersion 16
-        targetSdkVersion compileSdkVersion
+        targetSdkVersion fuelCompileSdkVersion
         versionCode 1
         versionName "1.0"
     }

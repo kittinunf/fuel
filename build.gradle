@@ -11,8 +11,8 @@ buildscript {
         archLifecycleVersion = "1.0.0-alpha9"
 
         //android dependencies version
-        compileSdkVersion = 26
-        buildToolVersion = '26.0.1'
+        fuelCompileSdkVersion = 26
+        fuelBuildToolVersion = '26.0.1'
         androidSupportVersion = '26.1.0'
 
         //test dependencies version
