@@ -18,6 +18,7 @@ internal class DownloadTaskRequest(request: Request) : TaskRequest(request) {
         response.dataStream.copyTo(fileOutputStream, BUFFER_SIZE) { readBytes ->
             progressCallback?.invoke(readBytes, response.contentLength)
         }
+        fileOutputStream.close()
         return response
     }
 }
