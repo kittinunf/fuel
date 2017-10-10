@@ -14,11 +14,11 @@ internal class DownloadTaskRequest(request: Request) : TaskRequest(request) {
     override fun call(): Response {
         val response = super.call()
         val file = destinationCallback(response, request.url)
-        val fileOutputStream = FileOutputStream(file)
-        response.dataStream.copyTo(fileOutputStream, BUFFER_SIZE) { readBytes ->
-            progressCallback?.invoke(readBytes, response.contentLength)
+        FileOutputStream(file).use {
+            response.dataStream.copyTo(it, BUFFER_SIZE) { readBytes ->
+                progressCallback?.invoke(readBytes, response.contentLength)
+            }
         }
-        fileOutputStream.close()
         return response
     }
 }
