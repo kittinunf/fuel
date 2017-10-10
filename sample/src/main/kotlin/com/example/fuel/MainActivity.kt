@@ -174,14 +174,13 @@ class MainActivity : AppCompatActivity() {
     private fun httpUpload() {
         Fuel.upload("/post").source { _, _ ->
             //create random file with some non-sense string
-            val f = File(filesDir, "out.tmp")
-            f.writer().use {
-                while (f.length() < 100) {
-                    it.write("abcdefghijklmnopqrstuvwxyz")
-                    it.appendln()
+            val file = File(filesDir, "out.tmp")
+            file.writer().use { writer ->
+                repeat(100) {
+                    writer.appendln("abcdefghijklmnopqrstuvwxyz")
                 }
             }
-            f
+            file
         }.progress { writtenBytes, totalBytes ->
             Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
         }.responseString { request, _, result ->
