@@ -10,12 +10,12 @@ sourceSets {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
 
     compile project(':fuel')
 
-    testCompile "junit:junit:$junit_version"
+    testCompile "junit:junit:$junitVersion"
 }
 
 jacocoTestReport {

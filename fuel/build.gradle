@@ -13,10 +13,10 @@ sourceCompatibility = JavaVersion.VERSION_1_6
 targetCompatibility = JavaVersion.VERSION_1_6
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "com.github.kittinunf.result:result:$result_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "com.github.kittinunf.result:result:$resultVersion"
 
-    testCompile "junit:junit:$junit_version"
+    testCompile "junit:junit:$junitVersion"
 }
 
 jacocoTestReport {

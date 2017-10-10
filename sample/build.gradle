@@ -3,13 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion compile_sdk_version
-    buildToolsVersion build_tool_version
+    compileSdkVersion compileSdkVersion
+    buildToolsVersion buildToolVersion
 
     defaultConfig {
         applicationId "com.example.fuel"
         minSdkVersion 16
-        targetSdkVersion compile_sdk_version
+        targetSdkVersion compileSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -32,8 +32,8 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:appcompat-v7:$android_support_version"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "com.android.support:appcompat-v7:$androidSupportVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile project(':fuel-rxjava')
     compile project(':fuel-android')

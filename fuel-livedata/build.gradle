@@ -6,12 +6,12 @@ apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'jacoco-android'
 
 android {
-    compileSdkVersion compile_sdk_version
-    buildToolsVersion build_tool_version
+    compileSdkVersion compileSdkVersion
+    buildToolsVersion buildToolVersion
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion compile_sdk_version
+        targetSdkVersion compileSdkVersion
         versionCode 1
         versionName publish_version
     }
@@ -46,10 +46,10 @@ jacocoAndroidUnitTestReport {
 
 dependencies {
     compile "android.arch.lifecycle:extensions:$archLifecycleVersion"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     compile project(':fuel')
-    testCompile "junit:junit:$junit_version"
-    testCompile "org.robolectric:robolectric:$robolectric_version"
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.robolectric:robolectric:$robolectricVersion"
 }
 
 publish {
