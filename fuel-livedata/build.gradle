@@ -10,14 +10,14 @@ repositories {
 }
 
 android {
-    compileSdkVersion parent.ext.compile_sdk_version
-    buildToolsVersion parent.ext.build_tool_version
+    compileSdkVersion compile_sdk_version.toInteger()
+    buildToolsVersion build_tool_version
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion parent.ext.compile_sdk_version
+        targetSdkVersion compile_sdk_version
         versionCode 1
-        versionName parent.ext.publish_version
+        versionName publish_version
     }
 
     sourceSets {
@@ -54,11 +54,11 @@ jacocoAndroidUnitTestReport {
 }
 
 dependencies {
-    compile "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
+    compile "android.arch.lifecycle:extensions:$archLifecycleVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile project(':fuel')
-    testCompile "junit:junit:$parent.ext.junit_version"
-    testCompile "org.robolectric:robolectric:$parent.ext.robolectric_version"
+    testCompile "junit:junit:$junit_version"
+    testCompile "org.robolectric:robolectric:$robolectric_version"
 }
 
 buildscript {
@@ -67,7 +67,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -77,7 +77,7 @@ publish {
     desc = 'The easiest HTTP networking library in Kotlin/Android'
     groupId = 'com.github.kittinunf.fuel'
     licences = ['MIT']
-    publishVersion = parent.ext.publish_version
+    publishVersion = publish_version
     uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }
