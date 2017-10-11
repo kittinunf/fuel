@@ -33,7 +33,7 @@ publish {
     desc = 'The easiest HTTP networking library in Kotlin/Android'
     groupId = 'com.github.kittinunf.fuel'
     licences = ['MIT']
-    publishVersion = publish_version
+    publishVersion = publishVersion
     uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }
