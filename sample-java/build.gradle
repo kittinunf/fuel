@@ -5,11 +5,11 @@ android {
     buildToolsVersion parent.build_tool_version
 
     defaultConfig {
-        applicationId "com.example.java.fuel"
+        applicationId 'com.example.java.fuel'
         minSdkVersion 16
         targetSdkVersion parent.ext.compile_sdk_version
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
     }
 
     buildTypes {
