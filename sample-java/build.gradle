@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion parent.ext.compile_sdk_version
-    buildToolsVersion parent.build_tool_version
+    compileSdkVersion compile_sdk_version.toInteger()
+    buildToolsVersion build_tool_version
 
     defaultConfig {
         applicationId 'com.example.java.fuel'
         minSdkVersion 16
-        targetSdkVersion parent.ext.compile_sdk_version
+        targetSdkVersion compile_sdk_version
         versionCode 1
         versionName '1.0'
     }
@@ -32,10 +32,3 @@ dependencies {
 
     compile project(':fuel-android')
 }
-
-buildscript {
-    ext {
-        android_support_version = '26.0.2'
-    }
-}
-

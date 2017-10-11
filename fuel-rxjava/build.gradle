@@ -14,12 +14,12 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
-    compile "io.reactivex.rxjava2:rxjava:$parent.ext.rxjava_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
 
     compile project(':fuel')
 
-    testCompile "junit:junit:$parent.ext.junit_version"
+    testCompile "junit:junit:$junit_version"
 }
 
 buildscript {
@@ -28,7 +28,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -46,7 +46,7 @@ publish {
     desc = 'The easiest HTTP networking library in Kotlin/Android'
     groupId = 'com.github.kittinunf.fuel'
     licences = ['MIT']
-    publishVersion = parent.ext.publish_version
+    publishVersion = publish_version
     uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }
