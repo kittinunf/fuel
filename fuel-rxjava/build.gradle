@@ -9,27 +9,13 @@ sourceSets {
     test.java.srcDirs += 'src/test/kotlin'
 }
 
-repositories {
-    jcenter()
-}
-
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
-    compile "io.reactivex.rxjava2:rxjava:$parent.ext.rxjava_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
 
     compile project(':fuel')
 
-    testCompile "junit:junit:$parent.ext.junit_version"
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
-    }
+    testCompile "junit:junit:$junitVersion"
 }
 
 jacocoTestReport {
@@ -46,7 +32,7 @@ publish {
     desc = 'The easiest HTTP networking library in Kotlin/Android'
     groupId = 'com.github.kittinunf.fuel'
     licences = ['MIT']
-    publishVersion = parent.ext.publish_version
+    publishVersion = publishVersion
     uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }
