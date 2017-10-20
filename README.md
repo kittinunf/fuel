@@ -62,7 +62,7 @@ dependencies {
     compile 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>' //for LiveData support
     compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
     compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>' //for Gson support
-    compile 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>' //for Gson support
+    compile 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>' //for Jackson support
 }
 ```
 
