@@ -16,7 +16,7 @@ inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, 
 
 inline fun <reified T : Any> Request.responseObject(handler: Handler<T>) = response(gsonDeserializerOf(), handler)
 
-inline fun <reified T : Any> Request.responseObject() = response(gsonDeserializerOf())
+inline fun <reified T : Any> Request.responseObject() = response(gsonDeserializerOf<T>())
 
 inline fun <reified T : Any> gsonDeserializerOf() = object : ResponseDeserializable<T> {
     override fun deserialize(reader: Reader): T = Gson().fromJson<T>(reader, object : TypeToken<T>() {}.type)
