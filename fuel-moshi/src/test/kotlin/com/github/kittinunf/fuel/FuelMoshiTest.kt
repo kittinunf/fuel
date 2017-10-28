@@ -21,7 +21,7 @@ class FuelMoshiTest {
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
     @Test
-    fun gsonTestResponseObject() {
+    fun moshiTestResponseObject() {
         Fuel.get("/user-agent")
                 .responseObject(moshiDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
                     Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
@@ -30,7 +30,7 @@ class FuelMoshiTest {
     }
 
     @Test
-    fun gsonTestResponseObjectError() {
+    fun moshiTestResponseObjectError() {
         Fuel.get("/useragent")
                 .responseObject(moshiDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
                     Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
@@ -39,7 +39,7 @@ class FuelMoshiTest {
     }
 
     @Test
-    fun gsonTestResponseDeserializerObject() {
+    fun moshiTestResponseDeserializerObject() {
         Fuel.get("/user-agent")
                 .responseObject<HttpBinUserAgentModel> { _, _, result ->
                     Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
@@ -48,7 +48,7 @@ class FuelMoshiTest {
     }
 
     @Test
-    fun gsonTestResponseDeserializerObjectError() {
+    fun moshiTestResponseDeserializerObjectError() {
         Fuel.get("/useragent")
                 .responseObject<HttpBinUserAgentModel> { _, _, result ->
                     Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
@@ -57,7 +57,7 @@ class FuelMoshiTest {
     }
 
     @Test
-    fun gsonTestResponseHandlerObject() {
+    fun moshiTestResponseHandlerObject() {
         Fuel.get("/user-agent")
                 .responseObject(object : Handler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
@@ -72,7 +72,7 @@ class FuelMoshiTest {
     }
 
     @Test
-    fun gsonTestResponseHandlerObjectError() {
+    fun moshiTestResponseHandlerObjectError() {
         Fuel.get("/useragent")
                 .responseObject(object : Handler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
@@ -87,13 +87,13 @@ class FuelMoshiTest {
     }
 
     @Test
-    fun gsonTestResponseSyncObject() {
+    fun moshiTestResponseSyncObject() {
         val triple = Fuel.get("/user-agent").responseObject()
         Assert.assertThat(triple.third.component1(), CoreMatchers.notNullValue())
     }
 
     @Test
-    fun gsonTestResponseSyncObjectError() {
+    fun moshiTestResponseSyncObjectError() {
         val triple = Fuel.get("/useragent").responseObject()
         Assert.assertThat(triple.third.component2(), CoreMatchers.instanceOf(FuelError::class.java))
     }
