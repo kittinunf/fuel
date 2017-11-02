@@ -102,6 +102,7 @@ class FuelGsonTest {
     fun gsonTestResponseSyncObject() {
         val triple = Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel>()
         assertThat(triple.third.component1(), notNullValue())
+        assertThat(triple.third.component1(), instanceOf(HttpBinUserAgentModel::class.java))
     }
 
     @Test
