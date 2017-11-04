@@ -1,0 +1,35 @@
+apply plugin: 'kotlin'
+apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'jacoco'
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    test.java.srcDirs += 'src/test/kotlin'
+}
+
+dependencies {
+    compile project(':fuel')
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "com.squareup.moshi:moshi-kotlin:$moshiVersion"
+
+    testCompile "junit:junit:$junitVersion"
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled = false
+        xml.enabled = true
+        csv.enabled = false
+    }
+}
+
+publish {
+    artifactId = 'fuel-moshi'
+    autoPublish = true
+    desc = 'The easiest HTTP networking library in Kotlin/Android'
+    groupId = 'com.github.kittinunf.fuel'
+    licences = ['MIT']
+    publishVersion = publishVersion
+    uploadName = 'Fuel-Moshi'
+    website = 'https://github.com/kittinunf/Fuel'
+}
