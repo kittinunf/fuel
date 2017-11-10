@@ -21,6 +21,7 @@ buildscript {
         gsonVersion = '2.3.1'
         jacksonVersion = '2.9.0'
         moshiVersion = '1.5.0'
+        forgeVersion = '0.3.0'
     }
 
     repositories {
