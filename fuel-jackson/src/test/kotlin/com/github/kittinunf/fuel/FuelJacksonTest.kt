@@ -1,10 +1,17 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.result.Result
-import com.github.kittiunf.fuel.jackson.jacksonDeserializerOf
-import com.github.kittiunf.fuel.jackson.responseObject
-import org.hamcrest.CoreMatchers.*
+import com.github.kittinunf.fuel.jackson.jacksonDeserializerOf
+import com.github.kittinunf.fuel.jackson.responseObject
+import org.hamcrest.CoreMatchers.instanceOf
+import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.CoreMatchers.not
+import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -91,14 +98,19 @@ class FuelJacksonTest {
 
     @Test
     fun jacksonTestResponseSyncObject() {
-        val triple = Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel>()
-        assertThat(triple.third.component1(), notNullValue())
+        val (_, res, result) = Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel>()
+        assertThat(res, notNullValue())
+        assertThat(result.get(), notNullValue())
+        assertThat(result.get(), isA(HttpBinUserAgentModel::class.java))
+        assertThat(result, notNullValue())
     }
 
     @Test
     fun jacksonTestResponseSyncObjectError() {
-        val triple = Fuel.get("/useragent").responseObject<HttpBinUserAgentModel>()
-        assertThat(triple.third.component2(), instanceOf(FuelError::class.java))
+        val (_, res, result) = Fuel.get("/useragent").responseObject<HttpBinUserAgentModel>()
+        assertThat(res, notNullValue())
+        assertThat(result.get(), notNullValue())
+        assertThat(result, notNullValue())
     }
 
     data class IssueInfo(val id: Int, val title: String, val number: Int)
