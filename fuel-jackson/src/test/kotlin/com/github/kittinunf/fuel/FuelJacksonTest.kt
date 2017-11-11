@@ -8,13 +8,16 @@ import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.jackson.jacksonDeserializerOf
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
+import java.net.HttpURLConnection
 
 class FuelJacksonTest {
 
@@ -109,8 +112,11 @@ class FuelJacksonTest {
     fun jacksonTestResponseSyncObjectError() {
         val (_, res, result) = Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issue/1").responseObject<IssueInfo>()
         assertThat(res, notNullValue())
-        assertThat(result.get(), notNullValue())
         assertThat(result, notNullValue())
+        val (value, error) = result
+        assertThat(value, nullValue())
+        assertThat(error, notNullValue())
+        assertThat((error as FuelError).response.statusCode, equalTo(HttpURLConnection.HTTP_NOT_FOUND))
     }
 
     data class IssueInfo(val id: Int, val title: String, val number: Int)
