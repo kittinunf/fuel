@@ -5,9 +5,9 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.result.Result
 import com.github.kittinunf.fuel.jackson.jacksonDeserializerOf
 import com.github.kittinunf.fuel.jackson.responseObject
+import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.not
@@ -98,16 +98,16 @@ class FuelJacksonTest {
 
     @Test
     fun jacksonTestResponseSyncObject() {
-        val (_, res, result) = Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel>()
+        val (_, res, result) = Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues/1").responseObject<IssueInfo>()
         assertThat(res, notNullValue())
         assertThat(result.get(), notNullValue())
-        assertThat(result.get(), isA(HttpBinUserAgentModel::class.java))
+        assertThat(result.get(), isA(IssueInfo::class.java))
         assertThat(result, notNullValue())
     }
 
     @Test
     fun jacksonTestResponseSyncObjectError() {
-        val (_, res, result) = Fuel.get("/useragent").responseObject<HttpBinUserAgentModel>()
+        val (_, res, result) = Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issue/1").responseObject<IssueInfo>()
         assertThat(res, notNullValue())
         assertThat(result.get(), notNullValue())
         assertThat(result, notNullValue())
