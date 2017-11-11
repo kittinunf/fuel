@@ -23,7 +23,7 @@ inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, 
 
 inline fun <reified T : Any> Request.responseObject(handler: Handler<T>) = response(jacksonDeserializerOf(), handler)
 
-inline fun <reified T : Any> Request.responseObject() = response(jacksonDeserializerOf())
+inline fun <reified T : Any> Request.responseObject() = response(jacksonDeserializerOf<T>())
 
 inline fun <reified T : Any> jacksonDeserializerOf() = object : ResponseDeserializable<T> {
     override fun deserialize(reader: Reader): T? {
