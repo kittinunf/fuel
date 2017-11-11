@@ -8,8 +8,8 @@ import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.result.Result
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.instanceOf
+import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert
 import org.junit.Assert.assertThat
@@ -121,7 +121,7 @@ class FuelGsonTest {
         Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseObject<List<IssueInfo>> { _, _, result ->
             val issues = result.get()
             Assert.assertNotEquals(issues.size, 0)
-            assertThat(issues[0], CoreMatchers.isA(IssueInfo::class.java))
+            assertThat(issues[0], isA(IssueInfo::class.java))
         }
     }
 }
