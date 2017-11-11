@@ -7,7 +7,7 @@ buildscript {
         //dependencies version
         kotlinVersion = '1.1.51'
         resultVersion = '1.2.0'
-        rxjavaVersion = '2.1.3'
+        rxjavaVersion = '2.1.6'
         archLifecycleVersion = "1.0.0"
 
         //android dependencies version
