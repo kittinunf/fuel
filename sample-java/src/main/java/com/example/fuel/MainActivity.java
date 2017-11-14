@@ -1,5 +1,6 @@
 package com.example.fuel;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.fuel.databinding.ActivityMainBinding;
 import com.github.kittinunf.fuel.Fuel;
 import com.github.kittinunf.fuel.core.FuelError;
 import com.github.kittinunf.fuel.core.Handler;
@@ -33,19 +35,15 @@ public class MainActivity extends AppCompatActivity {
         add(new Pair<String, String>("foo2", "bar2"));
     }};
 
-    private TextView resultText;
-    private TextView auxText;
+    ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        resultText = (TextView) findViewById(R.id.main_result_text);
-        auxText = (TextView) findViewById(R.id.main_aux_text);
-
-        Button goButton = (Button) findViewById(R.id.main_go_button);
-        goButton.setOnClickListener(new View.OnClickListener() {
+        binding.mainGoButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -54,12 +52,11 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        Button clearButton = (Button) findViewById(R.id.main_clear_button);
-        clearButton.setOnClickListener(new View.OnClickListener() {
+        binding.mainClearButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                resultText.setText("");
+                binding.mainResultText.setText("");
             }
 
         });
@@ -105,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     private void httpPost() {
         //post
         Fuel.post("http://httpbin.org/post", params).responseString(new Handler<String>() {
@@ -200,10 +198,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (error == null) {
-                    resultText.setText(resultText.getText() + result);
+                    binding.mainResultText.append(result);
                 } else {
                     Log.e(TAG, "error: " + error.getException().getMessage());
-                    resultText.setText(resultText.getText() + error.getException().getMessage());
+                    binding.mainResultText.append(error.getException().getMessage());
                 }
             }
         });
