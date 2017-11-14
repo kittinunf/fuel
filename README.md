@@ -1,6 +1,6 @@
 # Fuel
 
-[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.1.4.3-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
+[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.1.60-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
 [![Codecov](https://codecov.io/github/kittinunf/Fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/Fuel)
 
 The easiest HTTP networking library for Kotlin/Android.
@@ -49,6 +49,10 @@ The easiest HTTP networking library for Kotlin/Android.
 
 * [Jackson](https://github.com/FasterXML/jackson-module-kotlin) - Jackson - The JSON library for Java
 
+### Dependency - fuel-moshi
+
+* [Moshi](https://github.com/square/moshi) - Moshi - A modern JSON library for Android and Java
+
 ### Gradle
 
 ``` Groovy
@@ -63,6 +67,7 @@ dependencies {
     compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
     compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>' //for Gson support
     compile 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>' //for Jackson support
+    compile 'com.github.kittinunf.fuel:fuel-moshi:<latest-version>' //for Moshi support
 }
 ```
 
