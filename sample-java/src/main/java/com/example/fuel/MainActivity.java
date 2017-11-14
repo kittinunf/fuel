@@ -49,114 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-
-                //get
-                Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                Fuel.get("http://httpbin.org/get", params).responseString();
-
-                //put
-                Fuel.put("http://httpbin.org/put").responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                //post
-                Fuel.post("http://httpbin.org/post", params).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                //delete
-                Fuel.delete("http://httpbin.org/delete").responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                Fuel.download("http://httpbin.org/bytes/1048").destination(new Function2<Response, URL, File>() {
-                    @Override
-                    public File invoke(Response response, URL url) {
-                        File sd = Environment.getExternalStorageDirectory();
-                        File location = new File(sd.getAbsolutePath() + "/test");
-                        location.mkdir();
-                        return new File(location, "test-java.tmp");
-                    }
-                }).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                String username = "username";
-                String password = "P@s$vv0|2|)";
-                Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password).authenticate(username, password).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                Fuel.upload("http://httpbin.org/post").source(new Function2<Request, URL, File>() {
-                    @Override
-                    public File invoke(Request request, URL url) {
-                        File sd = Environment.getExternalStorageDirectory();
-                        File location = new File(sd.getAbsolutePath() + "/test");
-                        location.mkdir();
-                        return new File(location, "test-java.tmp");
-                    }
-                }).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
+                execute();
             }
 
         });
@@ -169,6 +62,136 @@ public class MainActivity extends AppCompatActivity {
                 resultText.setText("");
             }
 
+        });
+    }
+
+    private void execute() {
+        httpGet();
+        httpPut();
+        httpPost();
+        httpDelete();
+        httpDownload();
+        httpUpload();
+        httpBasicAuthentication();
+    }
+
+    private void httpGet() {
+        Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+
+        Fuel.get("http://httpbin.org/get", params).responseString();
+    }
+
+    private void httpPut() {
+        //put
+        Fuel.put("http://httpbin.org/put").responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+    }
+    private void httpPost() {
+        //post
+        Fuel.post("http://httpbin.org/post", params).responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+    }
+
+    private void httpDelete() {
+        //delete
+        Fuel.delete("http://httpbin.org/delete").responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+    }
+
+    private void httpDownload() {
+        Fuel.download("http://httpbin.org/bytes/1048").destination(new Function2<Response, URL, File>() {
+            @Override
+            public File invoke(Response response, URL url) {
+                File sd = Environment.getExternalStorageDirectory();
+                File location = new File(sd.getAbsolutePath() + "/test");
+                location.mkdir();
+                return new File(location, "test-java.tmp");
+            }
+        }).responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+    }
+
+    private void httpUpload() {
+        Fuel.upload("http://httpbin.org/post").source(new Function2<Request, URL, File>() {
+            @Override
+            public File invoke(Request request, URL url) {
+                File sd = Environment.getExternalStorageDirectory();
+                File location = new File(sd.getAbsolutePath() + "/test");
+                location.mkdir();
+                return new File(location, "test-java.tmp");
+            }
+        }).responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+    }
+
+    private void httpBasicAuthentication() {
+        String username = "username";
+        String password = "P@s$vv0|2|)";
+        Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password).authenticate(username, password).responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
         });
     }
 
