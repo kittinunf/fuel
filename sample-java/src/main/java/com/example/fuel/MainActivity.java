@@ -1,5 +1,6 @@
 package com.example.fuel;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.fuel.databinding.ActivityMainBinding;
 import com.github.kittinunf.fuel.Fuel;
 import com.github.kittinunf.fuel.core.FuelError;
 import com.github.kittinunf.fuel.core.Handler;
@@ -33,142 +35,160 @@ public class MainActivity extends AppCompatActivity {
         add(new Pair<String, String>("foo2", "bar2"));
     }};
 
-    private TextView resultText;
-    private TextView auxText;
+    ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        resultText = (TextView) findViewById(R.id.main_result_text);
-        auxText = (TextView) findViewById(R.id.main_aux_text);
-
-        Button goButton = (Button) findViewById(R.id.main_go_button);
-        goButton.setOnClickListener(new View.OnClickListener() {
+        binding.mainGoButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-
-                //get
-                Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                Fuel.get("http://httpbin.org/get", params).responseString();
-
-                //put
-                Fuel.put("http://httpbin.org/put").responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                //post
-                Fuel.post("http://httpbin.org/post", params).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                //delete
-                Fuel.delete("http://httpbin.org/delete").responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                Fuel.download("http://httpbin.org/bytes/1048").destination(new Function2<Response, URL, File>() {
-                    @Override
-                    public File invoke(Response response, URL url) {
-                        File sd = Environment.getExternalStorageDirectory();
-                        File location = new File(sd.getAbsolutePath() + "/test");
-                        location.mkdir();
-                        return new File(location, "test-java.tmp");
-                    }
-                }).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                String username = "username";
-                String password = "P@s$vv0|2|)";
-                Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password).authenticate(username, password).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
-
-                Fuel.upload("http://httpbin.org/post").source(new Function2<Request, URL, File>() {
-                    @Override
-                    public File invoke(Request request, URL url) {
-                        File sd = Environment.getExternalStorageDirectory();
-                        File location = new File(sd.getAbsolutePath() + "/test");
-                        location.mkdir();
-                        return new File(location, "test-java.tmp");
-                    }
-                }).responseString(new Handler<String>() {
-                    @Override
-                    public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                        updateUI(error, null);
-                    }
-
-                    @Override
-                    public void success(@NotNull Request request, @NotNull Response response, String data) {
-                        updateUI(null, data);
-                    }
-                });
+                execute();
             }
 
         });
 
-        Button clearButton = (Button) findViewById(R.id.main_clear_button);
-        clearButton.setOnClickListener(new View.OnClickListener() {
+        binding.mainClearButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                resultText.setText("");
+                binding.mainResultText.setText("");
             }
 
+        });
+    }
+
+    private void execute() {
+        httpGet();
+        httpPut();
+        httpPost();
+        httpDelete();
+        httpDownload();
+        httpUpload();
+        httpBasicAuthentication();
+    }
+
+    private void httpGet() {
+        Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+
+        Fuel.get("http://httpbin.org/get", params).responseString();
+    }
+
+    private void httpPut() {
+        //put
+        Fuel.put("http://httpbin.org/put").responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+    }
+
+    private void httpPost() {
+        //post
+        Fuel.post("http://httpbin.org/post", params).responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+    }
+
+    private void httpDelete() {
+        //delete
+        Fuel.delete("http://httpbin.org/delete").responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+    }
+
+    private void httpDownload() {
+        Fuel.download("http://httpbin.org/bytes/1048").destination(new Function2<Response, URL, File>() {
+            @Override
+            public File invoke(Response response, URL url) {
+                File sd = Environment.getExternalStorageDirectory();
+                File location = new File(sd.getAbsolutePath() + "/test");
+                location.mkdir();
+                return new File(location, "test-java.tmp");
+            }
+        }).responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+    }
+
+    private void httpUpload() {
+        Fuel.upload("http://httpbin.org/post").source(new Function2<Request, URL, File>() {
+            @Override
+            public File invoke(Request request, URL url) {
+                File sd = Environment.getExternalStorageDirectory();
+                File location = new File(sd.getAbsolutePath() + "/test");
+                location.mkdir();
+                return new File(location, "test-java.tmp");
+            }
+        }).responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
+        });
+    }
+
+    private void httpBasicAuthentication() {
+        String username = "username";
+        String password = "P@s$vv0|2|)";
+        Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password).authenticate(username, password).responseString(new Handler<String>() {
+            @Override
+            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                updateUI(error, null);
+            }
+
+            @Override
+            public void success(@NotNull Request request, @NotNull Response response, String data) {
+                updateUI(null, data);
+            }
         });
     }
 
@@ -177,10 +197,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (error == null) {
-                    resultText.setText(resultText.getText() + result);
+                    binding.mainResultText.append(result);
                 } else {
                     Log.e(TAG, "error: " + error.getException().getMessage());
-                    resultText.setText(resultText.getText() + error.getException().getMessage());
+                    binding.mainResultText.append(error.getException().getMessage());
                 }
             }
         });
