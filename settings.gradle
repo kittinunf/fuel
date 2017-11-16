@@ -4,5 +4,7 @@ include ':fuel',
         ':fuel-rxjava',
         ':fuel-android',
         ':fuel-jackson',
+        ':fuel-fastjson',
         ':sample',
         ':sample-java'
+

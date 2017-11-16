@@ -20,6 +20,7 @@ buildscript {
         robolectricVersion = '3.4.2'
         gsonVersion = '2.3.1'
         jacksonVersion = '2.9.0'
+        fastjsonVersion = '1.2.36'
     }
 
     repositories {
