@@ -29,7 +29,7 @@ class InterceptorTest : BaseTestCase() {
     }
 
     @Test
-    fun testWithLoggingInterceptor() {
+    fun testWithLoggingRequestInterceptor() {
         val manager = FuelManager()
         manager.addRequestInterceptor(loggingRequestInterceptor())
 
@@ -58,6 +58,27 @@ class InterceptorTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+    }
+
+    @Test
+    fun testWithResponseToString() {
+        val manager = FuelManager()
+        manager.addResponseInterceptor { loggingResponseInterceptor() }
+
+        val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response()
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+
+        assertThat(response.toString(), containsString("Response :"))
+        assertThat(response.toString(), containsString("Length :"))
+        assertThat(response.toString(), containsString("Body :"))
+        assertThat(response.toString(), containsString("Headers :"))
     }
 
     @Test
