@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
+import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
@@ -31,6 +32,22 @@ class InterceptorTest : BaseTestCase() {
     fun testWithLoggingInterceptor() {
         val manager = FuelManager()
         manager.addRequestInterceptor(loggingRequestInterceptor())
+
+        val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response()
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+    }
+
+    @Test
+    fun testWithLoggingResponseInterceptor() {
+        val manager = FuelManager()
+        manager.addResponseInterceptor { loggingResponseInterceptor() }
 
         val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response()
         val (data, error) = result
