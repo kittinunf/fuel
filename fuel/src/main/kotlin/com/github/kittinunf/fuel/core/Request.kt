@@ -246,22 +246,22 @@ class Request(
 
         //method
         if (method != Method.GET) {
-            append("-X $method")
+            append(" -X $method")
         }
 
         //body
         val escapedBody = String(getHttpBody()).replace("\"", "\\\"")
         if (escapedBody.isNotEmpty()) {
-            append("-d \"$escapedBody\"")
+            append(" -d \"$escapedBody\"")
         }
 
         //headers
         for ((key, value) in headers) {
-            append("-H \"$key:$value\"")
+            append(" -H \"$key:$value\"")
         }
 
         //url
-        append("\"$url\"")
+        append(" $url")
     }
 
     //byte array
