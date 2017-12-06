@@ -5,6 +5,7 @@ import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
+import java.net.URL
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
@@ -515,6 +516,28 @@ class RequestTest : BaseTestCase() {
             assertThat(data, nullValue())
             assertThat(error, nullValue())
         }
+    }
+
+    @Test
+    fun httpGetCurlString() {
+        val request = Request(method = Method.GET,
+                path = "",
+                url = URL("http://httpbin.org/get"),
+                headers = mutableMapOf("Authentication" to "Bearer xxx"),
+                parameters = listOf("foo" to "xxx"))
+
+        assertThat(request.cUrlString(), isEqualTo("$ curl -i -H \"Authentication:Bearer xxx\" http://httpbin.org/get"))
+    }
+
+    @Test
+    fun httpPostCurlString() {
+        val request = Request(method = Method.POST,
+                path = "",
+                url = URL("http://httpbin.org/post"),
+                headers = mutableMapOf("Authentication" to "Bearer xxx"),
+                parameters = listOf("foo" to "xxx"))
+
+        assertThat(request.cUrlString(), isEqualTo("$ curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
     }
 }
 
