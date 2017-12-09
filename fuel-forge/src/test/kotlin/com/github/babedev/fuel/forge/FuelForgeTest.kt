@@ -69,7 +69,7 @@ class FuelForgeTest {
     @Test
     fun forgeTestResponseHandlerObject() {
         Fuel.get("/user-agent")
-                .responseObject<HttpBinUserAgentModel>(httpBinUserDeserializer, object : Handler<HttpBinUserAgentModel> {
+                .responseObject(httpBinUserDeserializer, object : Handler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                         Assert.assertThat(value, CoreMatchers.notNullValue())
                     }
