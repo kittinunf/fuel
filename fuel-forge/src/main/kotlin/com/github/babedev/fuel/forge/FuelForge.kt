@@ -18,15 +18,8 @@ inline fun <reified T : Any> forgeDeserializerOf(noinline deserializer: JSON.() 
 
     override fun deserialize(content: String): T? {
         val result = Forge.modelFromJson(content, deserializer)
-        var res: T? = null
 
-        result.fold({
-            res = it as T
-        }, {
-            res = null
-        })
-
-        return res
+        return result.component1()
     }
 
 }
