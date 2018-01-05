@@ -376,15 +376,15 @@ Fuel.upload("/post").sources { request, url ->
 ```
 ### Specify custom field names for files
 ```Kotlin
-Fuel.upload("/post").sources { request, url ->
-    listOf(
+Fuel.upload("/post").dataParts { request, url -> 
+    listOf( 
         //DataPart takes a file, and you can specify the name and/or type
-        DataPart(File.createTempFile("temp1", ".tmp"), "image/jpeg"), 
-        DataPart(File.createTempFile("temp2", ".tmp"), "file2"),
-        DataPart(File.createTempFile("temp3", ".tmp"), "third-file", "image/jpeg")
-    )
+	DataPart(File.createTempFile("temp1", ".tmp"), "image/jpeg"), 
+	DataPart(File.createTempFile("temp2", ".tmp"), "file2"), 
+	DataPart(File.createTempFile("temp3", ".tmp"), "third-file", "image/jpeg") 
+    ) 
 }.responseString { request, response, result ->
-    ...
+    ... 
 }
 ```
 ### Upload a multipart form without a file
