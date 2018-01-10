@@ -1,11 +1,17 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.moshi.moshiDeserializerOf
 import com.github.kittinunf.fuel.moshi.responseObject
 import com.github.kittinunf.result.Result
-import org.hamcrest.CoreMatchers
-import org.junit.Assert
+import org.hamcrest.CoreMatchers.instanceOf
+import org.hamcrest.CoreMatchers.notNullValue
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertThat
 import org.junit.Test
 
 class FuelMoshiTest {
@@ -24,8 +30,8 @@ class FuelMoshiTest {
     fun moshiTestResponseObject() {
         Fuel.get("/user-agent")
                 .responseObject(moshiDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
-                    Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
-                    Assert.assertThat(result.component2(), CoreMatchers.notNullValue())
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), notNullValue())
                 }
     }
 
@@ -33,8 +39,8 @@ class FuelMoshiTest {
     fun moshiTestResponseObjectError() {
         Fuel.get("/useragent")
                 .responseObject(moshiDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
-                    Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
-                    Assert.assertThat(result.component2(), CoreMatchers.instanceOf(Result.Failure::class.java))
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
                 }
     }
 
@@ -42,8 +48,8 @@ class FuelMoshiTest {
     fun moshiTestResponseDeserializerObject() {
         Fuel.get("/user-agent")
                 .responseObject<HttpBinUserAgentModel> { _, _, result ->
-                    Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
-                    Assert.assertThat(result.component2(), CoreMatchers.notNullValue())
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), notNullValue())
                 }
     }
 
@@ -51,8 +57,8 @@ class FuelMoshiTest {
     fun moshiTestResponseDeserializerObjectError() {
         Fuel.get("/useragent")
                 .responseObject<HttpBinUserAgentModel> { _, _, result ->
-                    Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
-                    Assert.assertThat(result.component2(), CoreMatchers.instanceOf(Result.Failure::class.java))
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
                 }
     }
 
@@ -61,11 +67,11 @@ class FuelMoshiTest {
         Fuel.get("/user-agent")
                 .responseObject(object : Handler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                        Assert.assertThat(value, CoreMatchers.notNullValue())
+                        assertThat(value, notNullValue())
                     }
 
                     override fun failure(request: Request, response: Response, error: FuelError) {
-                        Assert.assertThat(error, CoreMatchers.notNullValue())
+                        assertThat(error, notNullValue())
                     }
 
                 })
@@ -76,11 +82,11 @@ class FuelMoshiTest {
         Fuel.get("/useragent")
                 .responseObject(object : Handler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                        Assert.assertThat(value, CoreMatchers.notNullValue())
+                        assertThat(value, notNullValue())
                     }
 
                     override fun failure(request: Request, response: Response, error: FuelError) {
-                        Assert.assertThat(error, CoreMatchers.instanceOf(Result.Failure::class.java))
+                        assertThat(error, instanceOf(Result.Failure::class.java))
                     }
 
                 })
@@ -88,14 +94,15 @@ class FuelMoshiTest {
 
     @Test
     fun moshiTestResponseSyncObject() {
-        val triple = Fuel.get("/user-agent").responseObject()
-        Assert.assertThat(triple.third.component1(), CoreMatchers.notNullValue())
+        val triple = Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel>()
+        assertThat(triple.third.component1(), notNullValue())
+        assertThat(triple.third.component1(), instanceOf(HttpBinUserAgentModel::class.java))
     }
 
     @Test
     fun moshiTestResponseSyncObjectError() {
-        val triple = Fuel.get("/useragent").responseObject()
-        Assert.assertThat(triple.third.component2(), CoreMatchers.instanceOf(FuelError::class.java))
+        val triple = Fuel.get("/useragent").responseObject<HttpBinUserAgentModel>()
+        assertThat(triple.third.component2(), instanceOf(FuelError::class.java))
     }
 
     data class IssueInfo(val id: Int, val title: String, val number: Int)
@@ -107,8 +114,8 @@ class FuelMoshiTest {
     fun testProcessingGenericList() {
         Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseObject<List<IssueInfo>> { _, _, result ->
             val issues = result.get()
-            Assert.assertNotEquals(issues.size, 0)
-            Assert.assertThat(issues[0], CoreMatchers.isA(IssueInfo::class.java))
+            assertNotEquals(issues.size, 0)
+            assertThat(issues[0], instanceOf(IssueInfo::class.java))
         }
     }
 }
