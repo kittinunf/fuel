@@ -10,7 +10,7 @@ inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, 
 
 inline fun <reified T : Any> Request.responseObject(handler: Handler<T>) = response(moshiDeserializerOf(), handler)
 
-fun Request.responseObject() = response(moshiDeserializerOf())
+inline fun <reified T : Any> Request.responseObject() = response(moshiDeserializerOf<T>())
 
 inline fun <reified T : Any> moshiDeserializerOf() = object : ResponseDeserializable<T> {
     override fun deserialize(content: String): T? =
