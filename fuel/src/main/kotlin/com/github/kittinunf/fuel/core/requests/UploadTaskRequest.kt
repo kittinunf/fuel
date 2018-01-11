@@ -60,7 +60,7 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
         return contentLength
     }
 
-    private val boundary = request.headers["Content-Type"]?.split("=", limit = 2)?.get(1) ?: System.currentTimeMillis().toString(16)
+    private val boundary = request.headers["Content-Type"]?.split("=", limit = 2)?.getOrNull(1) ?: System.currentTimeMillis().toString(16)
 
     init {
         request.bodyCallback = bodyCallBack
