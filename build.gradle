@@ -7,7 +7,7 @@ buildscript {
         //dependencies version
         kotlinVersion = '1.2.10'
         resultVersion = '1.3.0'
-        rxjavaVersion = '2.1.6'
+        rxjavaVersion = '2.1.8'
         archLifecycleVersion = "1.0.0"
 
         //android dependencies version
@@ -18,8 +18,8 @@ buildscript {
         //test dependencies version
         junitVersion = '4.12'
         robolectricVersion = '3.4.2'
-        gsonVersion = '2.3.1'
-        jacksonVersion = '2.9.0'
+        gsonVersion = '2.8.2'
+        jacksonVersion = '2.9.3'
         moshiVersion = '1.5.0'
     }
 
