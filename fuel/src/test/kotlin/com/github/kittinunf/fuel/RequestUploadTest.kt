@@ -1,12 +1,14 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.requests.retrieveBoundaryInfo
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.HttpURLConnection
+import java.net.URL
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestUploadTest : BaseTestCase() {
@@ -366,5 +368,23 @@ class RequestUploadTest : BaseTestCase() {
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun getBoundaryWithBoundaryHeaders() {
+        val request = Request(Method.POST, "", URL("http://httpbin.org"))
+        request.header(Pair("Content-Type", "multipart/form-data; boundary=160f77ec3eff"))
+
+        val boundary = retrieveBoundaryInfo(request)
+
+        assertThat(boundary, equalTo("160f77ec3eff"))
+    }
+
+    @Test
+    fun getBoundaryWithEmptyHeaders() {
+        val request = Request(Method.POST, "", URL("http://httpbin.org"))
+        val boundary = retrieveBoundaryInfo(request)
+
+        assertThat(boundary, notNullValue())
     }
 }
