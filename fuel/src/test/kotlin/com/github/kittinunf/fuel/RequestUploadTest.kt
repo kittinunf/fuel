@@ -29,14 +29,14 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/post").source { _, _ ->
-            File(currentDir, "lorem_ipsum_short.tmp")
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+                    File(currentDir, "lorem_ipsum_short.tmp")
+                }.responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                }
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -85,14 +85,14 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/put", Method.PUT).source { _, _ ->
-            File(currentDir, "lorem_ipsum_long.tmp")
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+                    File(currentDir, "lorem_ipsum_long.tmp")
+                }.responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                }
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -114,18 +114,18 @@ class RequestUploadTest : BaseTestCase() {
         var total = -1L
 
         manager.upload("/post").source { _, _ ->
-            File(currentDir, "lorem_ipsum_long.tmp")
-        }.progress { readBytes, totalBytes ->
-            read = readBytes
-            total = totalBytes
-            println("read: $read, total: $total")
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+                    File(currentDir, "lorem_ipsum_long.tmp")
+                }.progress { readBytes, totalBytes ->
+                    read = readBytes
+                    total = totalBytes
+                    println("read: $read, total: $total")
+                }.responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                }
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -146,16 +146,16 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/pos").source { _, _ ->
-            File(currentDir, "lorem_ipsum_short.tmp")
-        }.progress { _, _ ->
+                    File(currentDir, "lorem_ipsum_short.tmp")
+                }.progress { _, _ ->
 
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+                }.responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                }
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -174,16 +174,16 @@ class RequestUploadTest : BaseTestCase() {
         var error: FuelError? = null
 
         manager.upload("/post").source { _, _ ->
-            File(currentDir, "not_found_file.tmp")
-        }.progress { _, _ ->
+                    File(currentDir, "not_found_file.tmp")
+                }.progress { _, _ ->
 
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+                }.responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                }
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -274,7 +274,6 @@ class RequestUploadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-
         val file = File(currentDir, "lorem_ipsum_short.tmp")
 
         manager.upload("/post", param = listOf("foo" to "bar"))
@@ -299,6 +298,71 @@ class RequestUploadTest : BaseTestCase() {
 
         val string = data as String
         assertThat(string, containsString("coolblob"))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpUploadWithSpecifiedBoundary() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.upload("/post", param = listOf("foo" to "bar"))
+                .source { r, _ ->
+                    r.header(Pair("Content-Type", "multipart/form-data; boundary=160f77ec3eff"))
+                    File(currentDir, "lorem_ipsum_short.tmp")
+                }
+                .responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                    print(d)
+                }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val string = data as String
+        assertThat(string, containsString("boundary=160f77ec3eff"))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpUploadWithEmptyBoundary() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.upload("/post", param = listOf("foo" to "bar"))
+                .source { _, _ ->
+                    File(currentDir, "lorem_ipsum_short.tmp")
+                }
+                .responseString { req, res, result ->
+                    request = req
+                    response = res
+                    val (d, err) = result
+                    data = d
+                    error = err
+                    print(d)
+                }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val string = data as String
+        assertThat(string, containsString("boundary="))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
