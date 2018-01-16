@@ -43,9 +43,9 @@ class FuelManager {
     //background executor
     var executor: ExecutorService by readWriteLazy {
         Executors.newCachedThreadPool { command ->
-            Thread {
-                Thread.currentThread().priority = Thread.NORM_PRIORITY
-                command.run()
+            Thread(command).also { thread ->
+                thread.priority = Thread.NORM_PRIORITY
+                thread.isDaemon = true
             }
         }
     }

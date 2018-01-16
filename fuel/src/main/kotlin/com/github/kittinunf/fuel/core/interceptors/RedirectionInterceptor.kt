@@ -25,7 +25,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                                     URL(request.url, redirectedUrl[0]).toString()
                                 }
                         )
-                        manager.request(encoding).response().second
+                        next(request, manager.request(encoding).response().second)
                     } else {
                         //error
                         val error = FuelError(RedirectException(), response.data, response)

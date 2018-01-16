@@ -30,6 +30,6 @@ publish {
     groupId = 'com.github.kittinunf.fuel'
     licences = ['MIT']
     publishVersion = publishVersion
-    uploadName = 'Fuel-Moshi'
+    uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }

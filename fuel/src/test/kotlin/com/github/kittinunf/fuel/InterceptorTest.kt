@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
+import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
@@ -28,7 +29,7 @@ class InterceptorTest : BaseTestCase() {
     }
 
     @Test
-    fun testWithLoggingInterceptor() {
+    fun testWithLoggingRequestInterceptor() {
         val manager = FuelManager()
         manager.addRequestInterceptor(loggingRequestInterceptor())
 
@@ -41,6 +42,43 @@ class InterceptorTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+    }
+
+    @Test
+    fun testWithLoggingResponseInterceptor() {
+        val manager = FuelManager()
+        manager.addResponseInterceptor { loggingResponseInterceptor() }
+
+        val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response()
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+    }
+
+    @Test
+    fun testWithResponseToString() {
+        val manager = FuelManager()
+        manager.addResponseInterceptor { loggingResponseInterceptor() }
+
+        val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response()
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+
+        assertThat(response.toString(), containsString("Response :"))
+        assertThat(response.toString(), containsString("Length :"))
+        assertThat(response.toString(), containsString("Body :"))
+        assertThat(response.toString(), containsString("Headers :"))
     }
 
     @Test
@@ -250,6 +288,30 @@ class InterceptorTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         assertThat(response.statusCode, isEqualTo(418))
+    }
+
+    @Test
+    fun failsIfRequestedResourceReturns404() {
+        val manager = FuelManager()
+        val (_, _, result) = manager.request(Method.GET, "http://httpbin.org/status/404").response()
+        val (data, error) = result
+
+        assertThat(error, notNullValue())
+        assertThat(data, nullValue())
+    }
+
+    @Test
+    fun failsIfRedirectedToResourceReturning404() {
+        val manager = FuelManager()
+        val (_, _, result) = manager.request(Method.GET,
+            "http://httpbin.org/redirect-to",
+            listOf("url" to "http://httpbin.org/status/404"))
+            .header(mapOf("User-Agent" to "Fuel"))
+            .response()
+        val (data, error) = result
+
+        assertThat(error, notNullValue())
+        assertThat(data, nullValue())
     }
 
 }
