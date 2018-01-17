@@ -21,9 +21,19 @@ class FuelForgeTest {
     }
 
     data class HttpBinUserAgentModel(var userAgent: String = "", var status: String = "")
+    data class IssueInfo(val id: Int, val title: String, val number: Int?)
 
     private val httpBinUserDeserializer = { json: JSON ->
-        ::HttpBinUserAgentModel.create.map(json at "userAgent").apply(json at "status")
+        ::HttpBinUserAgentModel.create
+                .map(json at "userAgent")
+                .apply(json at "status")
+    }
+
+    private val issueInfoDeserializer = { json: JSON ->
+        ::IssueInfo.create
+                .map(json at "id")
+                .apply(json at "title")
+                .apply(json maybeAt "number")
     }
 
     @Test
@@ -78,6 +88,22 @@ class FuelForgeTest {
     }
 
     @Test
+    fun forgeTestResponseHandlerObjects() {
+        Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues")
+                .responseObjects(issueInfoDeserializer, object : Handler<List<IssueInfo>> {
+                    override fun success(request: Request, response: Response, value: List<IssueInfo>) {
+                        Assert.assertThat(value, CoreMatchers.notNullValue())
+                        Assert.assertNotEquals(value.size, 0)
+                    }
+
+                    override fun failure(request: Request, response: Response, error: FuelError) {
+                        Assert.assertThat(error, CoreMatchers.notNullValue())
+                    }
+
+                })
+    }
+
+    @Test
     fun forgeTestResponseHandlerObjectError() {
         Fuel.get("/useragent")
                 .responseObject(httpBinUserDeserializer, object : Handler<HttpBinUserAgentModel> {
@@ -92,13 +118,21 @@ class FuelForgeTest {
                 })
     }
 
-    data class IssueInfo(val id: Int, val title: String, val number: Int?)
+    @Test
+    fun forgeTestResponseObjectWithNoHandler() {
+        val result = Fuel.get("/useragent").responseObject(httpBinUserDeserializer)
+        Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
+        Assert.assertThat(result.component2(), CoreMatchers.notNullValue())
+        Assert.assertThat(result.component3(), CoreMatchers.notNullValue())
+    }
 
-    private val issueInfoDeserializer = { json: JSON ->
-        ::IssueInfo.create
-                .map(json at "id")
-                .apply(json at "title")
-                .apply(json maybeAt "number")
+    @Test
+    fun forgeTestResponseObjectsWithNoHandler() {
+        val result = Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseObjects(issueInfoDeserializer)
+        Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
+        Assert.assertThat(result.component2(), CoreMatchers.notNullValue())
+        Assert.assertThat(result.component3(), CoreMatchers.notNullValue())
+        Assert.assertNotEquals(result.component3().component1()?.size, 0)
     }
 
     @Test

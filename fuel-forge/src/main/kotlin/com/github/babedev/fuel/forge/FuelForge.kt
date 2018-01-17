@@ -12,7 +12,15 @@ inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.
 inline fun <reified T : Any> Request.responseObjects(noinline deserializer: JSON.() -> DeserializedResult<T>, noinline handler: (Request, Response, Result<List<T>, FuelError>) -> Unit) =
         response(forgesDeserializerOf(deserializer), handler)
 
-inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.() -> DeserializedResult<T>, handler: Handler<T>) = response(forgeDeserializerOf(deserializer), handler)
+inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.() -> DeserializedResult<T>, handler: Handler<T>) =
+        response(forgeDeserializerOf(deserializer), handler)
+
+inline fun <reified T : Any> Request.responseObjects(noinline deserializer: JSON.() -> DeserializedResult<T>, handler: Handler<List<T>>) =
+        response(forgesDeserializerOf(deserializer), handler)
+
+inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.() -> DeserializedResult<T>) = response(forgeDeserializerOf(deserializer))
+
+inline fun <reified T : Any> Request.responseObjects(noinline deserializer: JSON.() -> DeserializedResult<T>) = response(forgesDeserializerOf(deserializer))
 
 inline fun <reified T : Any> forgeDeserializerOf(noinline deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<T> {
 
