@@ -22,8 +22,6 @@ inline fun <reified T : Any> forgeDeserializerOf(noinline deserializer: JSON.() 
 
 inline fun <reified T : Any> forgesDeserializerOf(noinline deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<List<T>> {
 
-    override fun deserialize(content: String): List<T>? {
-        return Forge.modelsFromJson(content, deserializer).map { it.get<T>() }
-    }
+    override fun deserialize(content: String): List<T>? = Forge.modelsFromJson(content, deserializer).map { it.get<T>() }
 
 }

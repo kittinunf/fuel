@@ -1,14 +1,12 @@
 package com.github.babedev.fuel.forge
 
-import com.github.kittinunf.forge.core.JSON
-import com.github.kittinunf.forge.core.apply
-import com.github.kittinunf.forge.core.at
-import com.github.kittinunf.forge.core.map
+import com.github.kittinunf.forge.core.*
 import com.github.kittinunf.forge.util.create
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers
+import org.json.JSONException
 import org.junit.Assert
 import org.junit.Test
 
@@ -94,14 +92,17 @@ class FuelForgeTest {
                 })
     }
 
-    data class IssueInfo(val id: Int, val title: String, val number: Int)
+    data class IssueInfo(val id: Int, val title: String, val number: Int?)
 
     private val issueInfoDeserializer = { json: JSON ->
-        ::IssueInfo.create.map(json at "id").apply(json at "title").apply(json at "number")
+        ::IssueInfo.create
+                .map(json at "id")
+                .apply(json at "title")
+                .apply(json maybeAt "number")
     }
 
     @Test
-    fun testProcessingGenericList() {
+    fun forgeTestProcessingGenericList() {
         Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseObjects(issueInfoDeserializer) { _, _, result ->
                     val issues = result.get()
                     Assert.assertNotEquals(issues.size, 0)
@@ -110,7 +111,7 @@ class FuelForgeTest {
     }
 
     @Test
-    fun testDeserializeSingleItem() {
+    fun forgeTestDeserializeSingleItem() {
         val content = """ { "id": 123, "title": "title1", "number": 1 } """
 
         val issue = forgeDeserializerOf(issueInfoDeserializer).deserialize(content)
@@ -119,16 +120,13 @@ class FuelForgeTest {
         Assert.assertThat(issue?.id, CoreMatchers.equalTo(123))
     }
 
-    @Test
-    fun testDeserializeMultipleItems() {
+    @Test(expected = JSONException::class)
+    fun forgeTestInvalidDeserializer() {
         val content = """ [
             { "id": 123, "title": "title1", "number": 1 },
-            { "id": 456, "title": "title2", "number": 2 }
+            { "id": 456, "title": "title2" }
         ] """
 
-        val issues = forgesDeserializerOf(issueInfoDeserializer).deserialize(content)
-
-        Assert.assertThat(issues, CoreMatchers.notNullValue())
-        Assert.assertThat(issues?.size, CoreMatchers.equalTo(2))
+        forgeDeserializerOf(issueInfoDeserializer).deserialize(content)
     }
 }
