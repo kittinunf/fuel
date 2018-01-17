@@ -16,19 +16,14 @@ inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.
 
 inline fun <reified T : Any> forgeDeserializerOf(noinline deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<T> {
 
-    override fun deserialize(content: String): T? {
-        val result = Forge.modelFromJson(content, deserializer)
-
-        return result.component1()
-    }
+    override fun deserialize(content: String): T? = Forge.modelFromJson(content, deserializer).component1()
 
 }
 
 inline fun <reified T : Any> forgesDeserializerOf(noinline deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<List<T>> {
 
     override fun deserialize(content: String): List<T>? {
-        val result = Forge.modelsFromJson(content, deserializer)
-        return result.map { it.get<T>() }
+        return Forge.modelsFromJson(content, deserializer).map { it.get<T>() }
     }
 
 }
