@@ -25,9 +25,7 @@ class FuelForgeTest {
     data class HttpBinUserAgentModel(var userAgent: String = "", var status: String = "")
 
     private val httpBinUserDeserializer = { json: JSON ->
-        ::HttpBinUserAgentModel.create.
-                map(json at "userAgent").
-                apply(json at "status")
+        ::HttpBinUserAgentModel.create.map(json at "userAgent").apply(json at "status")
     }
 
     @Test
@@ -99,18 +97,38 @@ class FuelForgeTest {
     data class IssueInfo(val id: Int, val title: String, val number: Int)
 
     private val issueInfoDeserializer = { json: JSON ->
-        ::IssueInfo.create.
-                map(json at "id").
-                apply(json at "title").
-                apply(json at "number")
+        ::IssueInfo.create.map(json at "id").apply(json at "title").apply(json at "number")
     }
 
     @Test
     fun testProcessingGenericList() {
         Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseObjects(issueInfoDeserializer) { _, _, result ->
-            val issues = result.get()
-            Assert.assertNotEquals(issues.size, 0)
-            Assert.assertThat(issues[0], CoreMatchers.isA(IssueInfo::class.java))
-        }
+                    val issues = result.get()
+                    Assert.assertNotEquals(issues.size, 0)
+                    Assert.assertThat(issues[0], CoreMatchers.isA(IssueInfo::class.java))
+                }
+    }
+
+    @Test
+    fun testDeserializeSingleItem() {
+        val content = """ { "id": 123, "title": "title1", "number": 1 } """
+
+        val issue = forgeDeserializerOf(issueInfoDeserializer).deserialize(content)
+
+        Assert.assertThat(issue, CoreMatchers.notNullValue())
+        Assert.assertThat(issue?.id, CoreMatchers.equalTo(123))
+    }
+
+    @Test
+    fun testDeserializeMultipleItems() {
+        val content = """ [
+            { "id": 123, "title": "title1", "number": 1 },
+            { "id": 456, "title": "title2", "number": 2 }
+        ] """
+
+        val issues = forgesDeserializerOf(issueInfoDeserializer).deserialize(content)
+
+        Assert.assertThat(issues, CoreMatchers.notNullValue())
+        Assert.assertThat(issues?.size, CoreMatchers.equalTo(2))
     }
 }
