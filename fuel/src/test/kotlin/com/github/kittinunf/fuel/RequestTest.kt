@@ -105,8 +105,63 @@ class RequestTest : BaseTestCase() {
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
+        assertThat(response?.guessContentType(), isEqualTo("application/json"))
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpGetRequestWithImageResponse() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/image/png").responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response?.guessContentType(), isEqualTo("image/png"))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpGetRequestWithBytesResponse() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/bytes/555").responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response?.guessContentType(), isEqualTo("application/octet-stream"))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
@@ -539,5 +594,6 @@ class RequestTest : BaseTestCase() {
 
         assertThat(request.cUrlString(), isEqualTo("$ curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
     }
+
 }
 
