@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
+import java.net.URLConnection
 
 class Response(
         val url: URL,
@@ -33,15 +34,46 @@ class Response(
         }
     }
 
-    override fun toString(): String = buildString {
-        appendln("<-- $statusCode ($url)")
-        appendln("Response : $responseMessage")
-        appendln("Length : $contentLength")
-        appendln("Body : ${if (data.isNotEmpty()) String(data) else "(empty)"}")
-        appendln("Headers : (${headers.size})")
-        for ((key, value) in headers) {
-            appendln("$key : $value")
+//    override fun toString(): String = buildString {
+//        appendln("<-- $statusCode ($url)")
+//        appendln("Response : $responseMessage")
+//        appendln("Length : $contentLength")
+//        appendln("Body : ${if (data.isNotEmpty()) String(data) else "(empty)"}")
+//        appendln("Headers : (${headers.size})")
+//        for ((key, value) in headers) {
+//            appendln("$key : $value")
+//        }
+//    }
+
+    override  fun toString(): String {
+        var dataString = "(empty)"
+        val contentType = guessContentType()
+        if (contentType.isNotEmpty() && !contentType.contains("text/")) {
+            dataString = "${data.size} bytes of ${guessContentType()}"
+        } else if (data.isNotEmpty()) {
+            dataString = String(data)
         }
+
+        return buildString {
+            appendln("<-- $statusCode ($url)")
+            appendln("Response : $responseMessage")
+            appendln("Length : $contentLength")
+            appendln("Body : ($dataString)")
+            appendln("Headers : (${headers.size})")
+            for ((key, value) in headers) {
+                appendln("$key : $value")
+            }
+        }
+    }
+
+    fun guessContentType(): String {
+        val contentTypeFromHeaders = headers["Content-Type"]?.first()
+        if (contentTypeFromHeaders is String) {
+            return contentTypeFromHeaders
+        }
+
+        val contentTypeFromStream = URLConnection.guessContentTypeFromStream(ByteArrayInputStream(data))
+        return if(contentTypeFromStream.isNullOrEmpty()) "unknown" else contentTypeFromStream
     }
 
     companion object {
