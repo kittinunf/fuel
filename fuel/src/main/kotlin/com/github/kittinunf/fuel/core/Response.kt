@@ -34,22 +34,15 @@ class Response(
         }
     }
 
-//    override fun toString(): String = buildString {
-//        appendln("<-- $statusCode ($url)")
-//        appendln("Response : $responseMessage")
-//        appendln("Length : $contentLength")
-//        appendln("Body : ${if (data.isNotEmpty()) String(data) else "(empty)"}")
-//        appendln("Headers : (${headers.size})")
-//        for ((key, value) in headers) {
-//            appendln("$key : $value")
-//        }
-//    }
-
     override  fun toString(): String {
         var dataString = "(empty)"
         val contentType = guessContentType()
-        if (contentType.isNotEmpty() && !contentType.contains("text/")) {
-            dataString = "${data.size} bytes of ${guessContentType()}"
+
+        if (contentType.isNotEmpty() &&
+                (contentType.contains("image/") ||
+                        contentType.contains("application/octet-stream")
+                        )) {
+            dataString = "$contentLength bytes of ${guessContentType()}"
         } else if (data.isNotEmpty()) {
             dataString = String(data)
         }
@@ -73,7 +66,7 @@ class Response(
         }
 
         val contentTypeFromStream = URLConnection.guessContentTypeFromStream(ByteArrayInputStream(data))
-        return if(contentTypeFromStream.isNullOrEmpty()) "unknown" else contentTypeFromStream
+        return if(contentTypeFromStream.isNullOrEmpty()) "(unknown)" else contentTypeFromStream
     }
 
     companion object {
