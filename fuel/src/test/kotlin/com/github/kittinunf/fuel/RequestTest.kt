@@ -162,6 +162,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         assertThat(response?.guessContentType(), isEqualTo("application/octet-stream"))
+        assertThat(response?.toString(), containsString("Body : (555 bytes of application/octet-stream)"))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
