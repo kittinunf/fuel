@@ -60,7 +60,7 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
         return contentLength
     }
 
-    private val boundary = request.headers["Content-Type"]?.split("=", limit = 2)?.get(1) ?: System.currentTimeMillis().toString(16)
+    private val boundary = retrieveBoundaryInfo(request)
 
     init {
         request.bodyCallback = bodyCallBack
@@ -86,4 +86,9 @@ private fun guessContentType(name: String): String = try {
 } catch (ex: NoClassDefFoundError) {
     // The MimetypesFileTypeMap class doesn't exists on old Android devices.
     "application/octet-stream"
+}
+
+fun retrieveBoundaryInfo(request: Request): String {
+    return request.headers["Content-Type"]?.split("boundary=", limit = 2)?.getOrNull(1)
+            ?: System.currentTimeMillis().toString(16)
 }
