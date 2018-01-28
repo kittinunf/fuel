@@ -35,16 +35,16 @@ class Response(
     }
 
     override  fun toString(): String {
-        var dataString = "(empty)"
         val contentType = guessContentType()
 
-        if (contentType.isNotEmpty() &&
-                (contentType.contains("image/") ||
-                        contentType.contains("application/octet-stream")
-                        )) {
-            dataString = "$contentLength bytes of ${guessContentType()}"
+        val dataString = if (contentType.isNotEmpty() &&
+                            (contentType.contains("image/") ||
+                            contentType.contains("application/octet-stream"))) {
+             "$contentLength bytes of ${guessContentType()}"
         } else if (data.isNotEmpty()) {
-            dataString = String(data)
+             String(data)
+        } else {
+            "(empty)"
         }
 
         return buildString {
@@ -66,7 +66,7 @@ class Response(
         }
 
         val contentTypeFromStream = URLConnection.guessContentTypeFromStream(ByteArrayInputStream(data))
-        return if(contentTypeFromStream.isNullOrEmpty()) "(unknown)" else contentTypeFromStream
+        return if (contentTypeFromStream.isNullOrEmpty()) "(unknown)" else contentTypeFromStream
     }
 
     companion object {
