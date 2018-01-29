@@ -53,6 +53,10 @@ The easiest HTTP networking library for Kotlin/Android.
 
 * [Moshi](https://github.com/square/moshi) - Moshi - A modern JSON library for Android and Java
 
+### Dependency - fuel-forge
+
+* [Forge](https://github.com/kittinunf/forge) - Forge - Functional style JSON parsing written in Kotlin
+
 ### Gradle
 
 ``` Groovy
