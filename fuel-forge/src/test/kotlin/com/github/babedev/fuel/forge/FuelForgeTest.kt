@@ -138,14 +138,14 @@ class FuelForgeTest {
     @Test
     fun forgeTestProcessingGenericList() {
         Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseObjects(issueInfoDeserializer) { _, _, result ->
-                    val issues = result.get()
-                    Assert.assertNotEquals(issues.size, 0)
-                    Assert.assertThat(issues[0], CoreMatchers.isA(IssueInfo::class.java))
-                }
+            val issues = result.get()
+            Assert.assertNotEquals(issues.size, 0)
+            Assert.assertThat(issues[0], CoreMatchers.isA(IssueInfo::class.java))
+        }
     }
 
     @Test
-    fun forgeTestDeserializeSingleItem() {
+    fun forgeTestDeserializeItem() {
         val content = """ { "id": 123, "title": "title1", "number": 1 } """
 
         val issue = forgeDeserializerOf(issueInfoDeserializer).deserialize(content)
@@ -155,12 +155,33 @@ class FuelForgeTest {
     }
 
     @Test(expected = JSONException::class)
-    fun forgeTestInvalidDeserializer() {
+    fun forgeTestInvalidItemDeserializer() {
         val content = """ [
             { "id": 123, "title": "title1", "number": 1 },
             { "id": 456, "title": "title2" }
         ] """
 
         forgeDeserializerOf(issueInfoDeserializer).deserialize(content)
+    }
+
+    @Test
+    fun forgeTestDeserializeItems() {
+        val content = """ [
+            { "id": 123, "title": "title1", "number": 1 },
+            { "id": 456, "title": "title2" }
+        ] """
+
+        val issues = forgesDeserializerOf(issueInfoDeserializer).deserialize(content)
+
+        Assert.assertThat(issues, CoreMatchers.notNullValue())
+        Assert.assertThat(issues?.size, CoreMatchers.equalTo(2))
+        Assert.assertThat(issues?.first()?.id, CoreMatchers.equalTo(123))
+    }
+
+    @Test(expected = JSONException::class)
+    fun forgeTestInvalidItemsDeserializer() {
+        val content = """ { "id": 123, "title": "title1", "number": 1 } """
+
+        forgesDeserializerOf(issueInfoDeserializer).deserialize(content)
     }
 }
