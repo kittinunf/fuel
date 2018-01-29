@@ -34,18 +34,9 @@ class Response(
         }
     }
 
-    override  fun toString(): String {
-        val contentType = guessContentType()
-
-        val dataString = if (contentType.isNotEmpty() &&
-                            (contentType.contains("image/") ||
-                            contentType.contains("application/octet-stream"))) {
-             "$contentLength bytes of ${guessContentType()}"
-        } else if (data.isNotEmpty()) {
-             String(data)
-        } else {
-            "(empty)"
-        }
+    override fun toString(): String {
+        val contentType = guessContentType(headers)
+        val dataString = processBody(contentType, data)
 
         return buildString {
             appendln("<-- $statusCode ($url)")
@@ -59,14 +50,26 @@ class Response(
         }
     }
 
-    fun guessContentType(): String {
+    internal fun guessContentType(headers: Map<String, List<String>>): String {
         val contentTypeFromHeaders = headers["Content-Type"]?.first()
-        if (contentTypeFromHeaders is String) {
+        if (contentTypeFromHeaders is String && !contentTypeFromHeaders.isNullOrEmpty()) {
             return contentTypeFromHeaders
         }
 
         val contentTypeFromStream = URLConnection.guessContentTypeFromStream(ByteArrayInputStream(data))
         return if (contentTypeFromStream.isNullOrEmpty()) "(unknown)" else contentTypeFromStream
+    }
+
+    internal fun processBody(contentType: String, bodyData: ByteArray): String {
+        return if (contentType.isNotEmpty() &&
+                (contentType.contains("image/") ||
+                        contentType.contains("application/octet-stream"))) {
+            "$contentLength bytes of ${guessContentType(headers)}"
+        } else if (bodyData.isNotEmpty()) {
+            String(bodyData)
+        } else {
+            "(empty)"
+        }
     }
 
     companion object {

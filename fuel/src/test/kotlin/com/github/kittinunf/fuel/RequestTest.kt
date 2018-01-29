@@ -105,7 +105,6 @@ class RequestTest : BaseTestCase() {
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
-        assertThat(response?.guessContentType(), isEqualTo("application/json"))
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
@@ -134,7 +133,7 @@ class RequestTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response?.guessContentType(), isEqualTo("image/png"))
+        assertThat(response?.toString(), containsString("bytes of image/png"))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
@@ -161,11 +160,83 @@ class RequestTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response?.guessContentType(), isEqualTo("application/octet-stream"))
         assertThat(response?.toString(), containsString("Body : (555 bytes of application/octet-stream)"))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun testProcessBodyWithUnknownContentTypeAndNoData() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/bytes/555").responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+
+        assertThat(response?.processBody("(unknown)", ByteArray(0)), isEqualTo("(empty)"))
+    }
+
+    @Test
+    fun testGuessContentTypeWithNoContentTypeInHeaders() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/bytes/555").responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val headers: Map<String, List<String>> = mapOf(Pair("Content-Type", listOf("")))
+        assertThat(response?.guessContentType(headers), isEqualTo("(unknown)"))
+    }
+
+    @Test
+    fun testGuessContentTypeWithNoHeaders() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/image/png").responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val headers: Map<String, List<String>> = mapOf(Pair("Content-Type", listOf("")))
+        assertThat(response?.guessContentType(headers), isEqualTo("image/png"))
     }
 
     @Test
