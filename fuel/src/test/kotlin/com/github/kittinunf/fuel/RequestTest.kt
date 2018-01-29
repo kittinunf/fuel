@@ -63,6 +63,32 @@ class RequestTest : BaseTestCase() {
     }
 
     @Test
+    fun testResponseURLShouldSameWithRequestURL() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/get").response { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(request?.url, notNullValue())
+        assertThat(response?.url, notNullValue())
+        assertThat(request?.url, isEqualTo(response?.url))
+    }
+
+    @Test
     fun httpGetRequestWithDataResponse() {
         var request: Request? = null
         var response: Response? = null
@@ -170,7 +196,6 @@ class RequestTest : BaseTestCase() {
     fun testProcessBodyWithUnknownContentTypeAndNoData() {
         var request: Request? = null
         var response: Response? = null
-        var data: Any? = null
         var error: FuelError? = null
 
         manager.request(Method.GET, "http://httpbin.org/bytes/555").responseString { req, res, result ->
@@ -178,7 +203,6 @@ class RequestTest : BaseTestCase() {
             response = res
 
             val (d, err) = result
-            data = d
             error = err
         }
 
