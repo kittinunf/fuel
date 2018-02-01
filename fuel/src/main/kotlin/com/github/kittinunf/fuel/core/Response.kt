@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
+import java.net.URLConnection
 
 class Response(
         val url: URL,
@@ -33,14 +34,41 @@ class Response(
         }
     }
 
-    override fun toString(): String = buildString {
-        appendln("<-- $statusCode ($url)")
-        appendln("Response : $responseMessage")
-        appendln("Length : $contentLength")
-        appendln("Body : ${if (data.isNotEmpty()) String(data) else "(empty)"}")
-        appendln("Headers : (${headers.size})")
-        for ((key, value) in headers) {
-            appendln("$key : $value")
+    override fun toString(): String {
+        val contentType = guessContentType(headers)
+        val dataString = processBody(contentType, data)
+
+        return buildString {
+            appendln("<-- $statusCode ($url)")
+            appendln("Response : $responseMessage")
+            appendln("Length : $contentLength")
+            appendln("Body : ($dataString)")
+            appendln("Headers : (${headers.size})")
+            for ((key, value) in headers) {
+                appendln("$key : $value")
+            }
+        }
+    }
+
+    internal fun guessContentType(headers: Map<String, List<String>>): String {
+        val contentTypeFromHeaders = headers["Content-Type"]?.first()
+        if (contentTypeFromHeaders is String && !contentTypeFromHeaders.isNullOrEmpty()) {
+            return contentTypeFromHeaders
+        }
+
+        val contentTypeFromStream = URLConnection.guessContentTypeFromStream(ByteArrayInputStream(data))
+        return if (contentTypeFromStream.isNullOrEmpty()) "(unknown)" else contentTypeFromStream
+    }
+
+    internal fun processBody(contentType: String, bodyData: ByteArray): String {
+        return if (contentType.isNotEmpty() &&
+                (contentType.contains("image/") ||
+                        contentType.contains("application/octet-stream"))) {
+            "$contentLength bytes of ${guessContentType(headers)}"
+        } else if (bodyData.isNotEmpty()) {
+            String(bodyData)
+        } else {
+            "(empty)"
         }
     }
 
