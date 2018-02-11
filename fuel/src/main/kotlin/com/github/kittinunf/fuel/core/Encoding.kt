@@ -11,7 +11,9 @@ class Encoding(val httpMethod: Method,
                val urlString: String,
                val requestType: Request.Type = Request.Type.REQUEST,
                val baseUrlString: String? = null,
-               val parameters: List<Pair<String, Any?>>? = null) : Fuel.RequestConvertible {
+               val parameters: List<Pair<String, Any?>>? = null,
+               val timeoutInMillisecond: Int = 15000,
+               val timeoutReadInMillisecond: Int = timeoutInMillisecond) : Fuel.RequestConvertible {
 
     private val encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
         var modifiedPath = path
@@ -42,10 +44,12 @@ class Encoding(val httpMethod: Method,
                 path = modifiedPath,
                 url = createUrl(modifiedPath),
                 type = requestType,
-                parameters = parameters ?: emptyList()
+                parameters = parameters ?: emptyList(),
+                timeoutInMillisecond = timeoutInMillisecond,
+                timeoutReadInMillisecond = timeoutReadInMillisecond
         ).apply {
             header(headerPairs, false)
-            if (data != null) body(data!!)
+            if (data != null) body(data)
         }
 
     }
