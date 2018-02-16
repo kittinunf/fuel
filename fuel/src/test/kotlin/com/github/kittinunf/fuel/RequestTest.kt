@@ -691,5 +691,26 @@ class RequestTest : BaseTestCase() {
         assertThat(request.cUrlString(), isEqualTo("$ curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
     }
 
+    @Test
+    fun httpStringWithOutParams(){
+        val request = Request(Method.GET, "",
+                url = URL("http://httpbin.org/post"),
+                headers = mutableMapOf("Content-Type" to "text/html"))
+
+        assertThat(request.httpString(), startsWith("GET http"))
+        assertThat(request.httpString(), containsString("Content-Type"))
+    }
+
+    @Test
+    fun httpStringWithParams(){
+        val request = Request(Method.POST, "",
+                url = URL("http://httpbin.org/post"),
+                headers = mutableMapOf("Content-Type" to "text/html"),
+                parameters = listOf("foo" to "xxx")).body("it's a body")
+
+        assertThat(request.httpString(), startsWith("POST http"))
+        assertThat(request.httpString(), containsString("Content-Type"))
+        assertThat(request.httpString(), containsString("body"))
+    }
 }
 
