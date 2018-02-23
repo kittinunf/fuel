@@ -21,6 +21,7 @@ buildscript {
         gsonVersion = '2.8.2'
         jacksonVersion = '2.9.3'
         moshiVersion = '1.5.0'
+        kotlinCoroutinesVersion = '0.22.2'
     }
 
     repositories {
