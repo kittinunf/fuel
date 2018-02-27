@@ -27,6 +27,10 @@ interface FuelRouting: Fuel.RequestConvertible {
      */
     val params: List<Pair<String, Any?>>?
     /**
+     * Body to handle other type of request (e.g. application/json )
+     */
+    val body: String?
+    /**
      * Headers for remote call.
      */
     val headers: Map<String, String>?
@@ -45,6 +49,9 @@ interface FuelRouting: Fuel.RequestConvertible {
                     urlString = path,
                     parameters = params
             )
+            body?.let {
+                encoder.request.body(it)
+            }
             // return the generated encoder with custom header injected
             return encoder.request.header(headers)
         }
