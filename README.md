@@ -641,18 +641,21 @@ sealed class WeatherApi: FuelRouting {
     override val basePath = "https://www.metaweather.com"
 
     class weatherFor(val location: String): WeatherApi() {}
+    class weatherSpecific(val location: String) : WeatherApi() {}
 
     override val method: Method
         get() {
             when(this) {
-                is weatherFor -> return Method.GET
+                is weatherFor -> return Method.GET,
+		is weatherSpecific -> return Method.POST
             }
         }
 
     override val path: String
         get() {
             return when(this) {
-                is weatherFor -> "/api/location/search/"
+                is weatherFor -> "/api/location/search/",
+		is weatherSpecific -> "/api/location/search/"
             }
         }
 
@@ -660,6 +663,17 @@ sealed class WeatherApi: FuelRouting {
         get() {
             return when(this) {
                 is weatherFor -> listOf("query" to this.location)
+		is weatherSpecific -> listOf()
+            }
+        }
+	
+	override val body: String?
+        get() = when (this) {
+            is weatherFor -> null
+            is weatherSpecific -> {
+                val json = JSONObject()
+                json.put("location", this.location)
+                json.toString()
             }
         }
 
