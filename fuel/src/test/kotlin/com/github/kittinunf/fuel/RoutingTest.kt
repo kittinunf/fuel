@@ -45,6 +45,11 @@ class RoutingTest: BaseTestCase() {
                     else -> null
                 }
             }
+        
+        override val body: String?
+            get() {
+                return null
+            }
 
         override val headers: Map<String, String>?
             get() {
