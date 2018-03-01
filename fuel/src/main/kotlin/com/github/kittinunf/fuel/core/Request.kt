@@ -241,6 +241,20 @@ class Request(
         }
     }
 
+    fun httpString(): String = buildString {
+        // url
+        val params = parameters.map { "${it.first}=${it.second}" }.joinToString(separator = "&", prefix = "?")
+        appendln("${method.value} ${url}${params}")
+        appendln()
+        // headers
+        for ((key, value) in headers) {
+            appendln("$key : $value")
+        }
+        // body
+        appendln()
+        appendln(String(getHttpBody()))
+    }
+
     fun cUrlString(): String = buildString {
         append("$ curl -i")
 
