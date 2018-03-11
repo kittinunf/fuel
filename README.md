@@ -83,15 +83,15 @@ dependencies {
 ``` Kotlin
 //an extension over string (support GET, PUT, POST, DELETE with httpGet(), httpPut(), httpPost(), httpDelete())
 "http://httpbin.org/get".httpGet().responseString { request, response, result ->
-	//do something with response
-	when (result) {
-        is Result.Failure -> {
-            error = result.getAs()
-        }
-        is Result.Success -> {
-            data = result.getAs()
-        }
+  //do something with response
+  when (result) {
+    is Result.Failure -> {
+      val ex = result.getException()
     }
+    is Result.Success -> {
+      val data = result.get()
+    }
+  }
 }
 
 //if we set baseURL beforehand, simply use relativePath
