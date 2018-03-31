@@ -675,7 +675,9 @@ class RequestTest : BaseTestCase() {
                 path = "",
                 url = URL("http://httpbin.org/get"),
                 headers = mutableMapOf("Authentication" to "Bearer xxx"),
-                parameters = listOf("foo" to "xxx"))
+                parameters = listOf("foo" to "xxx"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
 
         assertThat(request.cUrlString(), isEqualTo("$ curl -i -H \"Authentication:Bearer xxx\" http://httpbin.org/get"))
     }
@@ -686,7 +688,9 @@ class RequestTest : BaseTestCase() {
                 path = "",
                 url = URL("http://httpbin.org/post"),
                 headers = mutableMapOf("Authentication" to "Bearer xxx"),
-                parameters = listOf("foo" to "xxx"))
+                parameters = listOf("foo" to "xxx"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
 
         assertThat(request.cUrlString(), isEqualTo("$ curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
     }

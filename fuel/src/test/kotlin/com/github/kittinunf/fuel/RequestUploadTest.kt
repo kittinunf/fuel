@@ -372,7 +372,9 @@ class RequestUploadTest : BaseTestCase() {
 
     @Test
     fun getBoundaryWithBoundaryHeaders() {
-        val request = Request(Method.POST, "", URL("http://httpbin.org"))
+        val request = Request(Method.POST, "", URL("http://httpbin.org"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
         request.header(Pair("Content-Type", "multipart/form-data; boundary=160f77ec3eff"))
 
         val boundary = retrieveBoundaryInfo(request)
@@ -382,7 +384,9 @@ class RequestUploadTest : BaseTestCase() {
 
     @Test
     fun getBoundaryWithEmptyHeaders() {
-        val request = Request(Method.POST, "", URL("http://httpbin.org"))
+        val request = Request(Method.POST, "", URL("http://httpbin.org"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
         val boundary = retrieveBoundaryInfo(request)
 
         assertThat(boundary, notNullValue())

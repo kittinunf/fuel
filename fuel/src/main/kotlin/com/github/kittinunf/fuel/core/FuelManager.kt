@@ -21,6 +21,8 @@ class FuelManager {
     var client: Client by readWriteLazy { HttpClient(proxy) }
     var proxy: Proxy? = null
     var basePath: String? = null
+    var timeoutInMillisecond: Int = 15000
+    var timeoutReadInMillisecond: Int = timeoutInMillisecond
 
     var baseHeaders: Map<String, String>? = null
     var baseParams: List<Pair<String, Any?>> = emptyList()
@@ -65,7 +67,9 @@ class FuelManager {
                 httpMethod = method,
                 urlString = path,
                 baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param
+                parameters = if (param == null) baseParams else baseParams + param,
+                timeoutInMillisecond = timeoutInMillisecond,
+                timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request)
 
         request.client = client
@@ -88,7 +92,9 @@ class FuelManager {
                 urlString = path,
                 requestType = Request.Type.DOWNLOAD,
                 baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param
+                parameters = if (param == null) baseParams else baseParams + param,
+                timeoutInMillisecond = timeoutInMillisecond,
+                timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request
 
         request.client = client
@@ -108,7 +114,9 @@ class FuelManager {
                 urlString = path,
                 requestType = Request.Type.UPLOAD,
                 baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param
+                parameters = if (param == null) baseParams else baseParams + param,
+                timeoutInMillisecond = timeoutInMillisecond,
+                timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request
 
         request.client = client
