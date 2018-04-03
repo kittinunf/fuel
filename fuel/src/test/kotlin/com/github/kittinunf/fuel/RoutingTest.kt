@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
@@ -17,6 +18,8 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
  */
 class RoutingTest: BaseTestCase() {
     sealed class TestApi : FuelRouting {
+
+        private val manager: FuelManager by lazy { FuelManager() }
 
         override val basePath = "https://httpbin.org/"
 
@@ -77,7 +80,7 @@ class RoutingTest: BaseTestCase() {
             var data: Any? = null
             var error: FuelError? = null
 
-            Fuel.request(TestApi.GetTest()).responseString { req, res, result ->
+            manager.request(TestApi.GetTest()).responseString { req, res, result ->
                 request = req
                 response = res
 
@@ -106,7 +109,7 @@ class RoutingTest: BaseTestCase() {
             val paramKey = "foo"
             val paramValue = "bar"
 
-            Fuel.request(TestApi.GetParamsTest(name = paramKey, value = paramValue)).responseString { req, res, result ->
+            manager.request(TestApi.GetParamsTest(name = paramKey, value = paramValue)).responseString { req, res, result ->
                 request = req
                 response = res
 
@@ -138,7 +141,7 @@ class RoutingTest: BaseTestCase() {
 
             val paramValue = "42"
 
-            Fuel.request(TestApi.GetBodyTest(paramValue)).responseString { req, res, result ->
+            manager.request(TestApi.GetBodyTest(paramValue)).responseString { req, res, result ->
                 request = req
                 response = res
 
