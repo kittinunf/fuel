@@ -1,11 +1,13 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.util.FuelRouting
 import org.hamcrest.CoreMatchers.*
+import org.json.JSONObject
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -15,100 +17,150 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
  * Created by matteocrippa on 8/19/17.
  */
 class RoutingTest: BaseTestCase() {
-    sealed class TestApi: FuelRouting {
+    sealed class TestApi : FuelRouting {
+
+        private val manager: FuelManager by lazy { FuelManager() }
 
         override val basePath = "https://httpbin.org/"
 
-        class getTest: TestApi()
-        class getParamsTest(val name: String, val value: String): TestApi()
+        class GetTest : TestApi()
+        class GetParamsTest(val name: String, val value: String) : TestApi()
+        class GetBodyTest(val value: String) : TestApi()
 
         override val method: Method
             get() {
-                when(this) {
-                    is getTest -> return Method.GET
-                    is getParamsTest -> return Method.GET
+                return when (this) {
+                    is GetTest -> Method.GET
+                    is GetParamsTest -> Method.GET
+                    is GetBodyTest -> Method.POST
                 }
             }
 
         override val path: String
             get() {
-                return when(this) {
-                    is getTest -> "/get"
-                    is getParamsTest -> "/get"
+                return when (this) {
+                    is GetTest -> "/get"
+                    is GetParamsTest -> "/get"
+                    is GetBodyTest -> "/get"
                 }
             }
 
         override val params: List<Pair<String, Any?>>?
             get() {
-                return when(this) {
-                    is getParamsTest -> listOf(this.name to this.value)
+                return when (this) {
+                    is GetParamsTest -> listOf(this.name to this.value)
+                    else -> null
+                }
+            }
+
+        override val body: String?
+            get() {
+                return when (this) {
+                    is GetParamsTest -> {
+                        val json = JSONObject()
+                        json.put("id", this.value)
+                        json.toString()
+                    }
                     else -> null
                 }
             }
 
         override val headers: Map<String, String>?
             get() {
-                return null
+                return when (this) {
+                    is GetParamsTest -> mapOf("Content-Type" to "application/json")
+                    else -> null
+                }
             }
 
-    }
+        @Test
+        fun httpRouterGet() {
+            var request: Request? = null
+            var response: Response? = null
+            var data: Any? = null
+            var error: FuelError? = null
 
-    @Test
-    fun httpRouterGet() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+            manager.request(TestApi.GetTest()).responseString { req, res, result ->
+                request = req
+                response = res
 
-        Fuel.request(TestApi.getTest()).responseString { req, res, result ->
-            request = req
-            response = res
+                val (d, err) = result
+                data = d
+                error = err
+            }
 
-            val (d, err) = result
-            data = d
-            error = err
+            assertThat(request, notNullValue())
+            assertThat(response, notNullValue())
+            assertThat(error, nullValue())
+            assertThat(data, notNullValue())
+
+            val statusCode = HttpURLConnection.HTTP_OK
+            assertThat(response?.statusCode, isEqualTo(statusCode))
         }
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
+        @Test
+        fun httpRouterGetParams() {
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
-    }
+            var request: Request? = null
+            var response: Response? = null
+            var data: Any? = null
+            var error: FuelError? = null
 
-    @Test
-    fun httpRouterGetParams() {
+            val paramKey = "foo"
+            val paramValue = "bar"
 
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+            manager.request(TestApi.GetParamsTest(name = paramKey, value = paramValue)).responseString { req, res, result ->
+                request = req
+                response = res
 
-        val paramKey = "foo"
-        val paramValue = "bar"
+                val (d, err) = result
+                data = d
+                error = err
+            }
 
-        Fuel.request(TestApi.getParamsTest(name = paramKey, value = paramValue)).responseString { req, res, result ->
-            request = req
-            response = res
+            val string = data as String
 
-            val (d, err) = result
-            data = d
-            error = err
+            assertThat(request, notNullValue())
+            assertThat(response, notNullValue())
+            assertThat(error, nullValue())
+            assertThat(data, notNullValue())
+
+            val statusCode = HttpURLConnection.HTTP_OK
+            assertThat(response?.statusCode, isEqualTo(statusCode))
+
+            assertThat(string, containsString(paramKey))
+            assertThat(string, containsString(paramValue))
         }
 
-        val string = data as String
+        @Test
+        fun httpRouterGetBody() {
+            var request: Request? = null
+            var response: Response? = null
+            var data: Any? = null
+            var error: FuelError? = null
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
+            val paramValue = "42"
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+            manager.request(TestApi.GetBodyTest(paramValue)).responseString { req, res, result ->
+                request = req
+                response = res
 
-        assertThat(string, containsString(paramKey))
-        assertThat(string, containsString(paramValue))
+                val (d, err) = result
+                data = d
+                error = err
+            }
+
+            val string = data as String
+
+            assertThat(request, notNullValue())
+            assertThat(response, notNullValue())
+            assertThat(error, nullValue())
+            assertThat(data, notNullValue())
+
+            val statusCode = HttpURLConnection.HTTP_OK
+            assertThat(response?.statusCode, isEqualTo(statusCode))
+
+            assertThat(string, containsString("42"))
+        }
     }
 }

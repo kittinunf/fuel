@@ -15,6 +15,7 @@ targetCompatibility = JavaVersion.VERSION_1_6
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     compile "com.github.kittinunf.result:result:$resultVersion"
+    compile 'org.json:json:20160212'
 
     testCompile "junit:junit:$junitVersion"
 }
