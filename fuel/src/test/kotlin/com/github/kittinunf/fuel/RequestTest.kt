@@ -699,7 +699,9 @@ class RequestTest : BaseTestCase() {
     fun httpStringWithOutParams(){
         val request = Request(Method.GET, "",
                 url = URL("http://httpbin.org/post"),
-                headers = mutableMapOf("Content-Type" to "text/html"))
+                headers = mutableMapOf("Content-Type" to "text/html"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
 
         assertThat(request.httpString(), startsWith("GET http"))
         assertThat(request.httpString(), containsString("Content-Type"))
@@ -710,7 +712,9 @@ class RequestTest : BaseTestCase() {
         val request = Request(Method.POST, "",
                 url = URL("http://httpbin.org/post"),
                 headers = mutableMapOf("Content-Type" to "text/html"),
-                parameters = listOf("foo" to "xxx")).body("it's a body")
+                parameters = listOf("foo" to "xxx"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000).body("it's a body")
 
         assertThat(request.httpString(), startsWith("POST http"))
         assertThat(request.httpString(), containsString("Content-Type"))
