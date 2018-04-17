@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion fuelCompileSdkVersion
-    buildToolsVersion fuelBuildToolVersion
 
     defaultConfig {
         applicationId "com.example.java.fuel"
@@ -28,6 +27,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+    //noinspection GradleDependency
     compile "com.android.support:appcompat-v7:$androidSupportVersion"
 
     compile project(':fuel-android')

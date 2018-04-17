@@ -7,7 +7,6 @@ apply plugin: 'jacoco-android'
 
 android {
     compileSdkVersion fuelCompileSdkVersion
-    buildToolsVersion fuelBuildToolVersion
 
     defaultConfig {
         minSdkVersion 14
