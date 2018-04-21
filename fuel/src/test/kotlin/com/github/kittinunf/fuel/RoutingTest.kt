@@ -161,6 +161,6 @@ class RoutingTest: BaseTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
 
-        //assertThat(string, containsString("42"))
+        assertThat(string, containsString("42"))
     }
 }
