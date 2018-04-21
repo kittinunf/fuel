@@ -24,14 +24,14 @@ class RoutingTest: BaseTestCase() {
 
         class GetTest : TestApi()
         class GetParamsTest(val name: String, val value: String) : TestApi()
-        class GetBodyTest(val value: String) : TestApi()
+        class PostBodyTest(val value: String) : TestApi()
 
         override val method: Method
             get() {
                 return when (this) {
                     is GetTest -> Method.GET
                     is GetParamsTest -> Method.GET
-                    is GetBodyTest -> Method.POST
+                    is PostBodyTest -> Method.POST
                 }
             }
 
@@ -40,7 +40,7 @@ class RoutingTest: BaseTestCase() {
                 return when (this) {
                     is GetTest -> "/get"
                     is GetParamsTest -> "/get"
-                    is GetBodyTest -> "/post"
+                    is PostBodyTest -> "/post"
                 }
             }
 
@@ -55,7 +55,7 @@ class RoutingTest: BaseTestCase() {
         override val body: String?
             get() {
                 return when (this) {
-                    is GetParamsTest -> {
+                    is PostBodyTest -> {
                         val json = JSONObject()
                         json.put("id", this.value)
                         json.toString()
@@ -67,7 +67,7 @@ class RoutingTest: BaseTestCase() {
         override val headers: Map<String, String>?
             get() {
                 return when (this) {
-                    is GetParamsTest -> mapOf("Content-Type" to "application/json")
+                    is PostBodyTest -> mapOf("Content-Type" to "application/json")
                     else -> null
                 }
             }
@@ -142,7 +142,7 @@ class RoutingTest: BaseTestCase() {
 
         val paramValue = "42"
 
-        manager.request(TestApi.GetBodyTest(paramValue)).responseString { req, res, result ->
+        manager.request(TestApi.PostBodyTest(paramValue)).responseString { req, res, result ->
             request = req
             response = res
 
@@ -161,7 +161,6 @@ class RoutingTest: BaseTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
 
-        print(string)
         assertThat(string, containsString("42"))
     }
 }
