@@ -5,7 +5,6 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import kotlinx.coroutines.experimental.runBlocking
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -17,7 +16,7 @@ class CoroutinesTest {
         FuelManager.instance.basePath = "https://httpbin.org"
 
         Fuel.testMode {
-            timeout = 15000
+            timeout = 30000
         }
     }
 
@@ -28,7 +27,7 @@ class CoroutinesTest {
             fail("This test should fail due to status code 404")
         } catch (exception: HttpException) {
             assertNotNull(exception)
-            assertEquals("HTTP Exception 404 NOT FOUND", exception.message)
+            assertTrue(exception.message!!.contains("HTTP Exception 404"))
         }
     }
 
@@ -71,13 +70,22 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testItCanAwaitForResultsOnly() = runBlocking {
-        with(Fuel.get("/uuid")) {
-            assertTrue(awaitResponseResult().isNotEmpty())
-            assertTrue(awaitStringResult().isNotEmpty())
-            assertTrue(awaitObjectResult(UUIDResponseDeserializer).uuid.isNotEmpty())
-        }
+    fun testItCanAwaitForObjectResult() = runBlocking {
+        assertTrue(Fuel.get("/uuid").awaitObjectResult(UUIDResponseDeserializer).uuid.isNotEmpty())
+    }
 
+    @Test
+    fun testItCanAwaitResponseResult() = runBlocking {
+        assertTrue(Fuel.get("/uuid").awaitResponseResult().isNotEmpty())
+    }
+
+    @Test
+    fun testItCanAwaitForStringResult() = runBlocking {
+        assertTrue(Fuel.get("/uuid").awaitStringResult().isNotEmpty())
+    }
+
+    @Test
+    fun testItCanAwaitForStringResultCanThrowException() = runBlocking {
         try {
             Fuel.get("/error/404").awaitStringResult()
             fail("This test should fail due to status code 404")
