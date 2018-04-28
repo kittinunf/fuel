@@ -1,5 +1,6 @@
 include ':fuel',
         ':fuel-coroutines',
+        ':fuel-forge',
         ':fuel-gson',
         ':fuel-livedata',
         ':fuel-rxjava',

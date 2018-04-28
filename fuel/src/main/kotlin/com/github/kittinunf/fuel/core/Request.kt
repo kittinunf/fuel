@@ -30,8 +30,8 @@ class Request(
         var name: String = "",
         val names: MutableList<String> = mutableListOf(),
         val mediaTypes: MutableList<String> = mutableListOf(),
-        var timeoutInMillisecond: Int = 15000,
-        var timeoutReadInMillisecond: Int = timeoutInMillisecond) : Fuel.RequestConvertible {
+        var timeoutInMillisecond: Int,
+        var timeoutReadInMillisecond: Int) : Fuel.RequestConvertible {
 
     @Deprecated(replaceWith = ReplaceWith("method"), message = "http naming is deprecated, use 'method' instead")
     val httpMethod get() = method

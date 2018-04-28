@@ -1,6 +1,11 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -675,7 +680,9 @@ class RequestTest : BaseTestCase() {
                 path = "",
                 url = URL("http://httpbin.org/get"),
                 headers = mutableMapOf("Authentication" to "Bearer xxx"),
-                parameters = listOf("foo" to "xxx"))
+                parameters = listOf("foo" to "xxx"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
 
         assertThat(request.cUrlString(), isEqualTo("$ curl -i -H \"Authentication:Bearer xxx\" http://httpbin.org/get"))
     }
@@ -686,7 +693,9 @@ class RequestTest : BaseTestCase() {
                 path = "",
                 url = URL("http://httpbin.org/post"),
                 headers = mutableMapOf("Authentication" to "Bearer xxx"),
-                parameters = listOf("foo" to "xxx"))
+                parameters = listOf("foo" to "xxx"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
 
         assertThat(request.cUrlString(), isEqualTo("$ curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
     }
@@ -695,7 +704,9 @@ class RequestTest : BaseTestCase() {
     fun httpStringWithOutParams(){
         val request = Request(Method.GET, "",
                 url = URL("http://httpbin.org/post"),
-                headers = mutableMapOf("Content-Type" to "text/html"))
+                headers = mutableMapOf("Content-Type" to "text/html"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
 
         assertThat(request.httpString(), startsWith("GET http"))
         assertThat(request.httpString(), containsString("Content-Type"))
@@ -706,7 +717,9 @@ class RequestTest : BaseTestCase() {
         val request = Request(Method.POST, "",
                 url = URL("http://httpbin.org/post"),
                 headers = mutableMapOf("Content-Type" to "text/html"),
-                parameters = listOf("foo" to "xxx")).body("it's a body")
+                parameters = listOf("foo" to "xxx"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000).body("it's a body")
 
         assertThat(request.httpString(), startsWith("POST http"))
         assertThat(request.httpString(), containsString("Content-Type"))
