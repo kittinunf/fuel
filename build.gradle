@@ -21,6 +21,7 @@ buildscript {
         runnerVersion = '1.0.0'
         rulesVersion = '1.0.0'
         espressoVersion = '3.0.0'
+        kotlinCoroutinesVersion = '0.22.5'
         forgeVersion = '0.3.0'
     }
 
