@@ -33,25 +33,33 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:appcompat-v7:$androidSupportVersion"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile project(':fuel-rxjava')
-    compile project(':fuel-android')
-    compile project(':fuel-livedata')
-    compile project(':fuel-gson')
-    compile project(':fuel-coroutines')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
-    androidTestCompile "com.android.support:support-annotations:$androidSupportVersion"
-    androidTestCompile "com.android.support.test:runner:$runnerVersion"
-    androidTestCompile "com.android.support.test:rules:$rulesVersion"
-    androidTestCompile "com.android.support.test.espresso:espresso-core:$espressoVersion"
-    androidTestCompile "com.android.support.test.espresso:espresso-intents:$espressoVersion"
+    implementation "com.android.support:appcompat-v7:$androidSupportVersion"
+
+    implementation project(':fuel-rxjava')
+    implementation project(':fuel-android')
+    implementation project(':fuel-livedata')
+    implementation project(':fuel-gson')
+    implementation project(':fuel-coroutines')
+
+    androidTestImplementation "com.android.support:support-annotations:$androidSupportVersion"
+    androidTestImplementation "com.android.support.test:runner:$runnerVersion"
+    androidTestImplementation "com.android.support.test:rules:$rulesVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espressoVersion"
 }
 
 kotlin {
     experimental {
         coroutines "enable"
+    }
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'android.arch.lifecycle') {
+            details.useVersion '1.1.1'
+        }
     }
 }

@@ -25,10 +25,10 @@ sourceSets {
 }
 
 dependencies {
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    compile project(':fuel')
-    testCompile "junit:junit:$junitVersion"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation project(':fuel')
+    testImplementation "junit:junit:$junitVersion"
 }
 
 

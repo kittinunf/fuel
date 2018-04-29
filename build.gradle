@@ -3,7 +3,7 @@ buildscript {
         publishVersion = '1.12.1'
 
         //dependencies version
-        kotlinVersion = '1.2.31'
+        kotlinVersion = '1.2.40'
         resultVersion = '1.4.0'
         rxjavaVersion = '2.1.12'
         archLifecycleVersion = "1.1.1"
@@ -31,7 +31,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.1'
+        classpath 'com.android.tools.build:gradle:3.1.2'
         classpath 'com.dicedmelon.gradle:jacoco-android:0.1.2'
         classpath 'com.novoda:bintray-release:0.8.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"

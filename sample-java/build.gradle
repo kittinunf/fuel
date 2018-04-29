@@ -25,10 +25,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile "com.android.support:appcompat-v7:$androidSupportVersion"
+    implementation "com.android.support:appcompat-v7:$androidSupportVersion"
 
-    compile project(':fuel-android')
+    implementation project(':fuel-android')
 }
+
 

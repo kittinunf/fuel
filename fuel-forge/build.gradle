@@ -8,11 +8,11 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':fuel')
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    compile "com.github.kittinunf.forge:forge:$forgeVersion"
+    implementation project(':fuel')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation "com.github.kittinunf.forge:forge:$forgeVersion"
 
-    testCompile "junit:junit:$junitVersion"
+    testImplementation "junit:junit:$junitVersion"
 }
 
 jacocoTestReport {
