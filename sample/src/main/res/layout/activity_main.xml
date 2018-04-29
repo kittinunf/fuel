@@ -22,11 +22,21 @@
         />
 
     <Button
+        android:id="@+id/mainGoCoroutineButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title_text"
+        android:layout_alignTop="@id/mainGoButton"
+        android:layout_toRightOf="@id/mainGoButton"
+        android:text="Go Coroutines"
+        />
+
+    <Button
         android:id="@+id/mainClearButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/mainGoButton"
-        android:layout_toRightOf="@id/mainGoButton"
+        android:layout_alignTop="@id/mainGoCoroutineButton"
+        android:layout_toRightOf="@id/mainGoCoroutineButton"
         android:text="Clear"
         />
 
