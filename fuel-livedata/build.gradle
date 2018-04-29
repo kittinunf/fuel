@@ -44,9 +44,12 @@ jacocoAndroidUnitTestReport {
 }
 
 dependencies {
-    implementation "android.arch.lifecycle:extensions:$archLifecycleVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation "android.arch.lifecycle:extensions:$archLifecycleVersion"
+
+    implementation "com.github.kittinunf.result:result:$resultVersion"
     implementation project(':fuel')
+
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
 }

@@ -8,9 +8,12 @@ sourceSets {
 }
 
 dependencies {
-    implementation "com.google.code.gson:gson:$gsonVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation "com.google.code.gson:gson:$gsonVersion"
+
+    implementation "com.github.kittinunf.result:result:$resultVersion"
     implementation project(':fuel')
+
     testImplementation "junit:junit:$junitVersion"
 }
 

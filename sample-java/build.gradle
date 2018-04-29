@@ -31,5 +31,3 @@ dependencies {
 
     implementation project(':fuel-android')
 }
-
-

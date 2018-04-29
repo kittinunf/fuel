@@ -51,6 +51,7 @@ jacocoAndroidUnitTestReport {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
+    implementation "com.github.kittinunf.result:result:$resultVersion"
     implementation project(':fuel')
 
     testImplementation "junit:junit:$junitVersion"
