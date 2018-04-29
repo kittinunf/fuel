@@ -25,9 +25,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
     implementation "com.android.support:appcompat-v7:$androidSupportVersion"
 
-    implementation project(':fuel-android')
+    api project(':fuel-android')
 }

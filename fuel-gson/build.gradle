@@ -8,13 +8,12 @@ sourceSets {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "com.google.code.gson:gson:$gsonVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "com.google.code.gson:gson:$gsonVersion"
 
-    implementation "com.github.kittinunf.result:result:$resultVersion"
-    implementation project(':fuel')
+    compile project(':fuel')
 
-    testImplementation "junit:junit:$junitVersion"
+    testCompile "junit:junit:$junitVersion"
 }
 
 jacocoTestReport {

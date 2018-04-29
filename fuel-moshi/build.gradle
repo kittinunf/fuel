@@ -8,13 +8,12 @@ sourceSets {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "com.squareup.moshi:moshi-kotlin:$moshiVersion"
 
-    implementation "com.github.kittinunf.result:result:$resultVersion"
-    implementation project(':fuel')
+    compile project(':fuel')
 
-    testImplementation "junit:junit:$junitVersion"
+    testCompile "junit:junit:$junitVersion"
 }
 
 jacocoTestReport {

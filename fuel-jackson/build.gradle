@@ -18,22 +18,19 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
     test.java.srcDirs += 'src/test/kotlin'
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
 
-    implementation "com.github.kittinunf.result:result:$resultVersion"
-    implementation project(':fuel')
+    compile project(':fuel')
 
-    testImplementation "junit:junit:$junitVersion"
+    testCompile "junit:junit:$junitVersion"
 }
-
 
 jacocoTestReport {
     reports {

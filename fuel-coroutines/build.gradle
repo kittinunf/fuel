@@ -8,14 +8,13 @@ sourceSets {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
 
-    implementation "com.github.kittinunf.result:result:$resultVersion"
-    implementation project(':fuel')
+    compile project(':fuel')
 
-    testImplementation project(':fuel-jackson')
-    testImplementation "junit:junit:$junitVersion"
+    testCompile project(':fuel-jackson')
+    testCompile "junit:junit:$junitVersion"
 }
 
 kotlin {
