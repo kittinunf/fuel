@@ -43,11 +43,11 @@ dependencies {
     implementation project(':fuel-gson')
     implementation project(':fuel-coroutines')
 
-    androidTestImplementation "com.android.support:support-annotations:$androidSupportVersion"
-    androidTestImplementation "com.android.support.test:runner:$runnerVersion"
-    androidTestImplementation "com.android.support.test:rules:$rulesVersion"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion"
-    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espressoVersion"
+//    androidTestImplementation "com.android.support:support-annotations:$androidSupportVersion"
+//    androidTestImplementation "com.android.support.test:runner:$runnerVersion"
+//    androidTestImplementation "com.android.support.test:rules:$rulesVersion"
+//    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion"
+//    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espressoVersion"
 }
 
 kotlin {
