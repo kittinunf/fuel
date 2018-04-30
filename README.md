@@ -1,6 +1,6 @@
 # Fuel
 
-[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.1.60-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
+[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.2.40-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
 [![Codecov](https://codecov.io/github/kittinunf/Fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/Fuel)
 
 The easiest HTTP networking library for Kotlin/Android.
@@ -20,7 +20,8 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Special test mode for easier testing
 - [x] RxJava 2.x support out of the box
 - [x] Google Components [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) support
-- [x] Gson module support
+- [x] Built-in object serialization module (Gson, Jackson, Moshi, Forge) :sparkles:
+- [x] Support Kotlin's [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) module
 - [x] API Routing
 
 ## Installation
