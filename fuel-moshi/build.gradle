@@ -8,9 +8,10 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':fuel')
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     compile "com.squareup.moshi:moshi-kotlin:$moshiVersion"
+
+    compile project(':fuel')
 
     testCompile "junit:junit:$junitVersion"
 }

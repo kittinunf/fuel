@@ -8,9 +8,11 @@ sourceSets {
 }
 
 dependencies {
-    compile "com.google.code.gson:gson:$gsonVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "com.google.code.gson:gson:$gsonVersion"
+
     compile project(':fuel')
+
     testCompile "junit:junit:$junitVersion"
 }
 

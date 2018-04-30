@@ -8,9 +8,10 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':fuel')
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     compile "com.github.kittinunf.forge:forge:$forgeVersion"
+
+    compile project(':fuel')
 
     testCompile "junit:junit:$junitVersion"
 }
