@@ -41,6 +41,10 @@ The easiest HTTP networking library for Kotlin/Android.
 
 * [RxJava](https://github.com/ReactiveX/RxJava) - RxJava – Reactive Extensions for the JVM
 
+### Dependency - fuel-coroutines
+
+* [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) - Kotlin Coroutines - Library support for Kotlin coroutines
+
 ### Dependency - fuel-gson
 
 * [Gson](https://github.com/google/gson) - Gson - A Java serialization/deserialization library to convert Java Objects into JSON and back
@@ -52,6 +56,10 @@ The easiest HTTP networking library for Kotlin/Android.
 ### Dependency - fuel-moshi
 
 * [Moshi](https://github.com/square/moshi) - Moshi - A modern JSON library for Android and Java
+
+### Dependency - fuel-forge
+
+* [Forge](https://github.com/kittinunf/Forge/) - Forge - Functional style JSON parsing written in Kotlin
 
 ### Gradle
 
@@ -65,9 +73,11 @@ dependencies {
     compile 'com.github.kittinunf.fuel:fuel-android:<latest-version>' //for Android
     compile 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>' //for LiveData support
     compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
+    compile 'com.github.kittinunf.fuel:fuel-coroutines:<latest-version>' //for Kotlin Coroutines support
     compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>' //for Gson support
     compile 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>' //for Jackson support
     compile 'com.github.kittinunf.fuel:fuel-moshi:<latest-version>' //for Moshi support
+    compile 'com.github.kittinunf.fuel:fuel-forge:<latest-version>' //for Forge support
 }
 ```
 
