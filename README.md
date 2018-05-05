@@ -200,7 +200,7 @@ fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Un
 ```
 
 ### Response in Json
-_requires the [android extention](#dependency---fuel-android)_
+_requires the [android extension](#dependency---fuel-android)_
 ``` Kotlin
 fun responseJson(handler: (Request, Response, Result<Json, FuelError>) -> Unit)
 
