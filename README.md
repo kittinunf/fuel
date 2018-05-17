@@ -319,16 +319,16 @@ Default read timeout for a request is 15000 milliseconds.
 * Kotlin
 ```kotlin
 val timeout = 5000 // 5000 milliseconds = 5 seconds.
-val readTimeout = 60000 // 60000 milliseconds = 1 minute.
+val timeoutRead = 60000 // 60000 milliseconds = 1 minute.
 
-"http://httpbin.org/get".httpGet().timeout(timeout).readTimeout(readTimeout).responseString { request, response, result -> }
+"http://httpbin.org/get".httpGet().timeout(timeout).timeoutRead(timeoutRead).responseString { request, response, result -> }
 ```
 
 * Java
 ``` Java
 int timeout = 5000 // 5000 milliseconds = 5 seconds.
-int readTimeout = 60000 // 60000 milliseconds = 1 minute.
-Fuel.get("http://httpbin.org/get", params).timeout(timeout).readTimeout(readTimeout).responseString(new Handler<String>() {
+int timeoutRead = 60000 // 60000 milliseconds = 1 minute.
+Fuel.get("http://httpbin.org/get", params).timeout(timeout).timeoutRead(timeoutRead).responseString(new Handler<String>() {
     @Override
     public void failure(Request request, Response response, FuelError error) {
     	//do something when it is failure
