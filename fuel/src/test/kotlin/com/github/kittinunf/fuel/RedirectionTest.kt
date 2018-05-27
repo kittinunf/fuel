@@ -30,14 +30,14 @@ class RedirectionTest : BaseTestCase() {
             data = d
             error = err
             
-            redirectionLocation = response.httpResponseHeaders["Location"]
+            redirectLocation = response.httpResponseHeaders["Location"]
         }
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertThat(redirectionLocation, "https://httpstat.us")
+        assertThat(redirectLocation, "https://httpstat.us")
 
         val statusCode = HttpsURLConnection.HTTP_SEE_OTHER
         assertThat(response?.statusCode, isEqualTo(statusCode))
