@@ -15,17 +15,17 @@ class RedirectException : Exception("Redirection fail, not found URL to redirect
 fun redirectResponseInterceptor(manager: FuelManager) =
         { next: (Request, Response) -> Response ->
             { request: Request, response: Response ->
-                when (response.httpStatusCode) {
+                when (response.statusCode) {
                     HTTP_MULT_CHOICE, //300
                     HTTP_MOVED_PERM, //301
                     HTTP_MOVED_TEMP, //302
                     HTTP_SEE_OTHER, //303
                     307,
                     308 -> {
-                        val redirectedUrl = response.httpResponseHeaders["Location"]
+                        val redirectedUrl = response.headers["Location"] ?: response.headers["location"]
                         if (redirectedUrl != null && !redirectedUrl.isEmpty()) {
                             val encoding = Encoding().apply {
-                                httpMethod = request.httpMethod
+                                httpMethod = request.method
                                 urlString =
                                         if (URI(redirectedUrl[0]).isAbsolute) {
                                             URL(redirectedUrl[0]).toString()
@@ -34,7 +34,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                                             URL(request.url, redirectedUrl[0]).toString()
                                         }
                             }
-                            manager.request(encoding).response().second
+                            next(request, manager.request(encoding).response().second)
                         } else {
                             //error
                             val error = FuelError().apply {

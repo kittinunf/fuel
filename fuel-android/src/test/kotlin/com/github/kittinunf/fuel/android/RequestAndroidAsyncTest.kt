@@ -15,39 +15,19 @@ import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestAndroidAsyncTest : BaseTestCase() {
 
     init {
-        FuelManager.instance.basePath = "https://httpbin.org"
-        FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
-        FuelManager.instance.baseParams = listOf("key" to "value")
-
-        FuelManager.instance.callbackExecutor = Executor(Runnable::run)
-
-        //configure SSLContext that accepts any cert, you should not do this in your app but this is in test ¯\_(ツ)_/¯
-        val acceptsAllTrustManager = object : X509TrustManager {
-            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-
-            override fun getAcceptedIssuers(): Array<X509Certificate>? = null
-
-            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+        FuelManager.instance.apply {
+            basePath = "http://httpbin.org"
+            baseHeaders = mapOf("foo" to "bar")
+            baseParams = listOf("key" to "value")
+            callbackExecutor = Executor(Runnable::run)
         }
-
-        FuelManager.instance.socketFactory = {
-            val context = SSLContext.getInstance("TLS")
-            context.init(null, arrayOf<TrustManager>(acceptsAllTrustManager), SecureRandom())
-            SSLContext.setDefault(context)
-            context.socketFactory
-        }()
     }
 
     //Model
@@ -99,7 +79,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(data as String, isA(String::class.java))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -130,7 +110,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat((data as Json).obj(), isA(JSONObject::class.java))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -164,7 +144,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat((data as Json).obj(), isA(JSONObject::class.java))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(res?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -193,7 +173,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -225,7 +205,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(res?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -255,7 +235,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat((data as HttpBinHeadersModel).headers.isNotEmpty(), isEqualTo(true))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -291,7 +271,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat((data as HttpBinHeadersModel).headers.isNotEmpty(), isEqualTo(true))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(res?.statusCode, isEqualTo(statusCode))
     }
 
 }

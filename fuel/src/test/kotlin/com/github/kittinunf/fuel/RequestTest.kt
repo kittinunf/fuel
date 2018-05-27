@@ -10,6 +10,7 @@ import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
+import java.net.URL
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
@@ -18,8 +19,7 @@ import javax.net.ssl.X509TrustManager
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestTest : BaseTestCase() {
-
-    val manager: FuelManager by lazy { FuelManager() }
+    private val manager: FuelManager by lazy { FuelManager() }
 
     enum class HttpsBin(relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),
@@ -37,15 +37,15 @@ class RequestTest : BaseTestCase() {
         override val path = "http://mockbin.org/request/$path"
     }
 
-    class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
+    class HttpBinConvertible(val method: Method, private val relativePath: String) : Fuel.RequestConvertible {
         override val request = createRequest()
 
-        fun createRequest(): Request {
-            val encoder = Encoding().apply {
-                httpMethod = method
-                urlString = "http://httpbin.org/$relativePath"
-                parameters = listOf("foo" to "bar")
-            }
+        private fun createRequest(): Request {
+            val encoder = Encoding(
+                    httpMethod = method,
+                    urlString = "http://httpbin.org/$relativePath",
+                    parameters = listOf("foo" to "bar")
+            )
             return encoder.request
         }
     }
@@ -65,6 +65,32 @@ class RequestTest : BaseTestCase() {
             SSLContext.setDefault(context)
             context.socketFactory
         }()
+    }
+
+    @Test
+    fun testResponseURLShouldSameWithRequestURL() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/get").response { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(request?.url, notNullValue())
+        assertThat(response?.url, notNullValue())
+        assertThat(request?.url, isEqualTo(response?.url))
     }
 
     @Test
@@ -89,7 +115,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -114,7 +140,132 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpGetRequestWithImageResponse() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/image/png").responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response?.toString(), containsString("bytes of image/png"))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpGetRequestWithBytesResponse() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/bytes/555").responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response?.toString(), containsString("Body : (555 bytes of application/octet-stream)"))
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun testProcessBodyWithUnknownContentTypeAndNoData() {
+        var request: Request? = null
+        var response: Response? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/bytes/555").responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+
+        assertThat(response?.processBody("(unknown)", ByteArray(0)), isEqualTo("(empty)"))
+    }
+
+    @Test
+    fun testGuessContentTypeWithNoContentTypeInHeaders() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/bytes/555").responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val headers: Map<String, List<String>> = mapOf(Pair("Content-Type", listOf("")))
+        assertThat(response?.guessContentType(headers), isEqualTo("(unknown)"))
+    }
+
+    @Test
+    fun testGuessContentTypeWithNoHeaders() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.GET, "http://httpbin.org/image/png").responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val headers: Map<String, List<String>> = mapOf(Pair("Content-Type", listOf("")))
+        assertThat(response?.guessContentType(headers), isEqualTo("image/png"))
     }
 
     @Test
@@ -144,7 +295,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -177,7 +328,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -211,7 +362,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(foo))
         assertThat(string, containsString(bar))
@@ -244,7 +395,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -278,7 +429,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -311,7 +462,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -344,7 +495,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, equalTo(""))
     }
@@ -376,7 +527,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, equalTo(""))
     }
@@ -405,7 +556,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("user-agent"))
     }
@@ -434,7 +585,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -464,7 +615,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -493,7 +644,7 @@ class RequestTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -506,7 +657,7 @@ class RequestTest : BaseTestCase() {
             var data: Any? = null
             var error: FuelError? = null
 
-            val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString { req, res, result ->
+            val request = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString { _, res, result ->
                 response = res
 
                 val (d, err) = result
@@ -521,6 +672,58 @@ class RequestTest : BaseTestCase() {
             assertThat(data, nullValue())
             assertThat(error, nullValue())
         }
+    }
+
+    @Test
+    fun httpGetCurlString() {
+        val request = Request(method = Method.GET,
+                path = "",
+                url = URL("http://httpbin.org/get"),
+                headers = mutableMapOf("Authentication" to "Bearer xxx"),
+                parameters = listOf("foo" to "xxx"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
+
+        assertThat(request.cUrlString(), isEqualTo("$ curl -i -H \"Authentication:Bearer xxx\" http://httpbin.org/get"))
+    }
+
+    @Test
+    fun httpPostCurlString() {
+        val request = Request(method = Method.POST,
+                path = "",
+                url = URL("http://httpbin.org/post"),
+                headers = mutableMapOf("Authentication" to "Bearer xxx"),
+                parameters = listOf("foo" to "xxx"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
+
+        assertThat(request.cUrlString(), isEqualTo("$ curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
+    }
+
+    @Test
+    fun httpStringWithOutParams(){
+        val request = Request(Method.GET, "",
+                url = URL("http://httpbin.org/post"),
+                headers = mutableMapOf("Content-Type" to "text/html"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000)
+
+        assertThat(request.httpString(), startsWith("GET http"))
+        assertThat(request.httpString(), containsString("Content-Type"))
+    }
+
+    @Test
+    fun httpStringWithParams(){
+        val request = Request(Method.POST, "",
+                url = URL("http://httpbin.org/post"),
+                headers = mutableMapOf("Content-Type" to "text/html"),
+                parameters = listOf("foo" to "xxx"),
+                timeoutInMillisecond = 15000,
+                timeoutReadInMillisecond = 15000).body("it's a body")
+
+        assertThat(request.httpString(), startsWith("POST http"))
+        assertThat(request.httpString(), containsString("Content-Type"))
+        assertThat(request.httpString(), containsString("body"))
     }
 }
 

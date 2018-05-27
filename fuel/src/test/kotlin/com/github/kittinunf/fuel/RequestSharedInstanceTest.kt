@@ -9,7 +9,6 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestSharedInstanceTest : BaseTestCase() {
-
     init {
         FuelManager.instance.basePath = "https://httpbin.org"
         FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
@@ -23,15 +22,15 @@ class RequestSharedInstanceTest : BaseTestCase() {
         DELETE("delete")
     }
 
-    class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
+    class HttpBinConvertible(val method: Method, private val relativePath: String) : Fuel.RequestConvertible {
         override val request = createRequest()
 
-        fun createRequest(): Request {
-            val encoder = Encoding().apply {
-                httpMethod = method
-                urlString = "https://httpbin.org$relativePath"
-                parameters = listOf("foo" to "bar")
-            }
+        private fun createRequest(): Request {
+            val encoder = Encoding(
+                    httpMethod = method,
+                    urlString = "https://httpbin.org$relativePath",
+                    parameters = listOf("foo" to "bar")
+            )
             return encoder.request
         }
     }
@@ -58,7 +57,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         val string = data as String
 
@@ -94,7 +93,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string.toLowerCase(), containsString("foo"))
         assertThat(string.toLowerCase(), containsString("bar"))
@@ -128,7 +127,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string.toLowerCase(), containsString("foo"))
         assertThat(string.toLowerCase(), containsString("bar"))
@@ -162,7 +161,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string.toLowerCase(), containsString("foo"))
         assertThat(string.toLowerCase(), containsString("bar"))
@@ -196,7 +195,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("origin"))
     }
@@ -225,7 +224,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("https"))
     }
@@ -254,7 +253,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("https"))
     }
@@ -283,7 +282,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("https"))
     }
@@ -310,7 +309,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -335,7 +334,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -360,7 +359,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -385,7 +384,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -398,7 +397,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var read = -1L
         var total = -1L
 
-        Fuel.upload("/post").source { request, url ->
+        Fuel.upload("/post").source { _, _ ->
             val dir = System.getProperty("user.dir")
             File(dir, "src/test/assets/lorem_ipsum_long.tmp")
         }.progress { readBytes, totalBytes ->
@@ -419,7 +418,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(read == total && read != -1L && total != -1L, isEqualTo(true))
     }
@@ -435,7 +434,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         var total = -1L
 
         val numberOfBytes = 1048576
-        Fuel.download("/bytes/$numberOfBytes").destination { response, url ->
+        Fuel.download("/bytes/$numberOfBytes").destination { _, _ ->
             File.createTempFile(numberOfBytes.toString(), null)
         }.progress { readBytes, totalBytes ->
             read = readBytes
@@ -454,7 +453,7 @@ class RequestSharedInstanceTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(read, isEqualTo(total))
     }

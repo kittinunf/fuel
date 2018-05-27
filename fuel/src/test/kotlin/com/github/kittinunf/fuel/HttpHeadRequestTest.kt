@@ -24,7 +24,7 @@ class HttpHeadRequestTest : BaseTestCase() {
             err = resErr
         }
 
-        assertThat(res?.httpStatusCode, isEqualTo(200))
+        assertThat(res?.statusCode, isEqualTo(200))
         assertThat(req, notNullValue())
         assertThat(res, notNullValue())
         assertThat(err, nullValue())

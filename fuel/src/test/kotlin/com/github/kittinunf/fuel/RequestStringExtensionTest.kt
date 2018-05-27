@@ -14,7 +14,6 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestStringExtensionTest : BaseTestCase() {
-
     init {
         FuelManager.instance.basePath = "https://httpbin.org"
         FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
@@ -42,7 +41,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -66,7 +65,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -90,7 +89,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -114,7 +113,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -138,7 +137,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -150,7 +149,7 @@ class RequestStringExtensionTest : BaseTestCase() {
 
         val numberOfBytes = 32768L
 
-        "/bytes/$numberOfBytes".httpDownload().destination { response, url ->
+        "/bytes/$numberOfBytes".httpDownload().destination { _, _ ->
             val f = File.createTempFile(numberOfBytes.toString(), null)
             println(f.absolutePath)
             f
@@ -168,7 +167,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -178,7 +177,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        "/put".httpUpload(Method.PUT).source { request, url ->
+        "/put".httpUpload(Method.PUT).source { _, _ ->
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
@@ -196,7 +195,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -206,7 +205,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        "/post".httpUpload().source { request, url ->
+        "/post".httpUpload().source { _, _ ->
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
@@ -224,7 +223,7 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
 }

@@ -46,7 +46,7 @@ class RequestHandlerTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(res?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -76,7 +76,7 @@ class RequestHandlerTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(res?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -109,7 +109,7 @@ class RequestHandlerTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(res?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(res?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))

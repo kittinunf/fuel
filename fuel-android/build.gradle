@@ -5,19 +5,14 @@ apply plugin: 'com.novoda.bintray-release'
 
 apply plugin: 'jacoco-android'
 
-repositories {
-    jcenter()
-}
-
 android {
-    compileSdkVersion parent.ext.compile_sdk_version
-    buildToolsVersion parent.ext.build_tool_version
+    compileSdkVersion fuelCompileSdkVersion
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion parent.ext.compile_sdk_version
+        minSdkVersion 14
+        targetSdkVersion fuelCompileSdkVersion
         versionCode 1
-        versionName parent.ext.publish_version
+        versionName publishVersion
     }
 
     sourceSets {
@@ -25,16 +20,16 @@ android {
         test.java.srcDirs += 'src/test/kotlin'
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             consumerProguardFiles 'proguard-rules.pro'
         }
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
     }
 
     lintOptions {
@@ -54,22 +49,12 @@ jacocoAndroidUnitTestReport {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$parent.ext.kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     compile project(':fuel')
 
-    testCompile "junit:junit:$parent.ext.junit_version"
-    testCompile "org.robolectric:robolectric:$parent.ext.robolectric_version"
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$parent.ext.kotlin_version"
-    }
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.robolectric:robolectric:$robolectricVersion"
 }
 
 publish {
@@ -78,7 +63,11 @@ publish {
     desc = 'The easiest HTTP networking library in Kotlin/Android'
     groupId = 'com.github.kittinunf.fuel'
     licences = ['MIT']
-    publishVersion = parent.ext.publish_version
+    publishVersion = publishVersion
     uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
+}
+
+tasks.withType(Javadoc) {
+    enabled = false
 }

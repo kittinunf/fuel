@@ -1,15 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion parent.ext.compile_sdk_version
-    buildToolsVersion parent.build_tool_version
+    compileSdkVersion fuelCompileSdkVersion
 
     defaultConfig {
         applicationId "com.example.java.fuel"
         minSdkVersion 16
-        targetSdkVersion parent.ext.compile_sdk_version
+        targetSdkVersion fuelCompileSdkVersion
         versionCode 1
         versionName "1.0"
+    }
+
+    dataBinding{
+        enabled true
     }
 
     buildTypes {
@@ -19,23 +22,10 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
-    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.android.support:appcompat-v7:$androidSupportVersion"
 
-    compile "com.android.support:appcompat-v7:$android_support_version"
-
-    compile project(':fuel-android')
+    api project(':fuel-android')
 }
-
-buildscript {
-    ext {
-        android_support_version = '25.0.1'
-    }
-}
-

@@ -13,8 +13,7 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestDownloadTest : BaseTestCase() {
-
-    val manager: FuelManager by lazy {
+    private val manager: FuelManager by lazy {
         FuelManager().apply {
             basePath = "http://httpbin.org"
         }
@@ -29,7 +28,7 @@ class RequestDownloadTest : BaseTestCase() {
 
         val numberOfBytes = 32768L
 
-        manager.download("/bytes/$numberOfBytes").destination { response, url ->
+        manager.download("/bytes/$numberOfBytes").destination { _, _ ->
             val f = File.createTempFile(numberOfBytes.toString(), null)
             println(f.absolutePath)
             f
@@ -47,7 +46,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -61,7 +60,7 @@ class RequestDownloadTest : BaseTestCase() {
         var total = -1L
 
         val numberOfBytes = 1048576L
-        manager.download("/bytes/$numberOfBytes").destination { response, url ->
+        manager.download("/bytes/$numberOfBytes").destination { _, _ ->
             val f = File.createTempFile(numberOfBytes.toString(), null)
             println(f.absolutePath)
             f
@@ -84,7 +83,7 @@ class RequestDownloadTest : BaseTestCase() {
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -95,11 +94,11 @@ class RequestDownloadTest : BaseTestCase() {
         var error: FuelError? = null
 
         val numberOfBytes = 131072
-        manager.download("/byte/$numberOfBytes").destination { response, url ->
+        manager.download("/byte/$numberOfBytes").destination { _, _ ->
             val f = File.createTempFile(numberOfBytes.toString(), null)
             println(f.absolutePath)
             f
-        }.progress { readBytes, totalBytes ->
+        }.progress { _, _ ->
 
         }.responseString { req, res, result ->
             request = req
@@ -115,7 +114,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -126,10 +125,10 @@ class RequestDownloadTest : BaseTestCase() {
         var error: FuelError? = null
 
         val numberOfBytes = 131072
-        manager.download("/bytes/$numberOfBytes").destination { response, url ->
+        manager.download("/bytes/$numberOfBytes").destination { _, _ ->
             val dir = System.getProperty("user.dir")
             File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
-        }.progress { readBytes, totalBytes ->
+        }.progress { _, _ ->
 
         }.responseString { req, res, result ->
             request = req
@@ -146,7 +145,7 @@ class RequestDownloadTest : BaseTestCase() {
 
         val statusCode = -1
         assertThat(error?.exception as IOException, isA(IOException::class.java))
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -160,7 +159,7 @@ class RequestDownloadTest : BaseTestCase() {
         var total = -1L
         var lastPercent = 0L
 
-        manager.download("http://speedtest.tele2.net/100MB.zip").destination { response, url ->
+        manager.download("http://speedtest.tele2.net/100MB.zip").destination { _, _ ->
             val f = File.createTempFile("100MB.zip", null)
             println(f.absolutePath)
             f
@@ -187,7 +186,7 @@ class RequestDownloadTest : BaseTestCase() {
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
 }

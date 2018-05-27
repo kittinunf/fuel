@@ -10,9 +10,7 @@ import org.junit.Test
 class ErrorTest: BaseTestCase() {
     @Test
     fun testNoMessageException() {
-        val error = FuelError().apply {
-            exception = RuntimeException()
-        }
+        val error = FuelError(RuntimeException())
 
         assertThat(error.toString(), containsString("<no message>"))
         assertThat(error.toString(), not(containsString("null")))
@@ -21,10 +19,7 @@ class ErrorTest: BaseTestCase() {
 
     @Test
     fun testMessageException() {
-        val error = FuelError().apply {
-            exception = RuntimeException("error")
-        }
-
+        val error = FuelError(RuntimeException("error"))
         assertThat(error.toString(), containsString("error"))
         assertThat(error.toString(), not(containsString("<no message>")))
     }

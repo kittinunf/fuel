@@ -13,8 +13,7 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class BlockingRequestTest : BaseTestCase() {
-
-    val manager: FuelManager by lazy { FuelManager() }
+    private val manager: FuelManager by lazy { FuelManager() }
 
     enum class HttpsBin(relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),
@@ -25,15 +24,15 @@ class BlockingRequestTest : BaseTestCase() {
         override val path = "https://httpbin.org/$relativePath"
     }
 
-    class HttpBinConvertible(val method: Method, val relativePath: String) : Fuel.RequestConvertible {
+    class HttpBinConvertible(val method: Method, private val relativePath: String) : Fuel.RequestConvertible {
         override val request = createRequest()
 
-        fun createRequest(): Request {
-            val encoder = Encoding().apply {
-                httpMethod = method
-                urlString = "http://httpbin.org/$relativePath"
-                parameters = listOf("foo" to "bar")
-            }
+        private fun createRequest(): Request {
+            val encoder = Encoding(
+                    httpMethod = method,
+                    urlString = "http://httpbin.org/$relativePath",
+                    parameters = listOf("foo" to "bar")
+            )
             return encoder.request
         }
     }
@@ -46,7 +45,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -58,7 +57,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -73,7 +72,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         assertThat(data.get(), containsString(paramKey))
         assertThat(data.get(), containsString(paramValue))
@@ -90,7 +89,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         assertThat(data.get(), containsString(paramKey))
         assertThat(data.get(), containsString(paramValue))
@@ -109,7 +108,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         assertThat(data.get(), containsString(foo))
         assertThat(data.get(), containsString(bar))
@@ -127,7 +126,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         assertThat(data.get(), containsString(paramKey))
         assertThat(data.get(), containsString(paramValue))
@@ -145,7 +144,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         assertThat(data.get(), containsString(paramKey))
         assertThat(data.get(), containsString(paramValue))
@@ -160,7 +159,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         assertThat(data.get(), containsString("user-agent"))
     }
@@ -174,7 +173,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -189,7 +188,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         assertThat(data.get(), containsString(paramKey))
         assertThat(data.get(), containsString(paramValue))
@@ -208,16 +207,16 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
-        assertThat(request.httpHeaders[headerKey], isEqualTo(headerValue))
+        assertThat(request.headers[headerKey], isEqualTo(headerValue))
     }
 
     @Test
     fun httpUploadRequestWithParameters() {
         val (request, response, data) =
                 manager.upload(HttpsBin.POST.path, param = listOf("foo" to "bar", "foo1" to "bar1"))
-                        .source { request, url ->
+                        .source { _, _ ->
                             val dir = System.getProperty("user.dir")
                             val currentDir = File(dir, "src/test/assets")
                             File(currentDir, "lorem_ipsum_long.tmp")
@@ -230,7 +229,7 @@ class BlockingRequestTest : BaseTestCase() {
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
 }

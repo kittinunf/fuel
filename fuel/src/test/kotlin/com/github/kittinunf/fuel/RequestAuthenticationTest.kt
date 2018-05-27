@@ -9,16 +9,10 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestAuthenticationTest : BaseTestCase() {
+    private val user: String = "username"
+    private val password: String = "password"
 
-    val user: String
-    val password: String
-
-    init {
-        user = "username"
-        password = "password"
-    }
-
-    val manager: FuelManager by lazy {
+    private val manager: FuelManager by lazy {
         FuelManager().apply {
             basePath = "http://httpbin.org"
         }
@@ -45,7 +39,7 @@ class RequestAuthenticationTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         val statusCode = HttpURLConnection.HTTP_UNAUTHORIZED
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -69,7 +63,7 @@ class RequestAuthenticationTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.httpStatusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
 }
