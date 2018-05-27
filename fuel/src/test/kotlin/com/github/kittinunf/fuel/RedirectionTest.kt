@@ -22,7 +22,7 @@ class RedirectionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        manager.request(Method.GET, "/303").header(headerKey to headerValue).response { req, res, result ->
+        manager.request(Method.GET, "/303").response { req, res, result ->
             request = req
             response = res
 
