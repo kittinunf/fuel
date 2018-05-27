@@ -18,7 +18,6 @@ class RedirectionTest : BaseTestCase() {
     fun httpRedirection() {
         var request: Request? = null
         var response: Response? = null
-        var redirectLocation: String? = null
         var data: Any? = null
         var error: FuelError? = null
 
@@ -29,17 +28,16 @@ class RedirectionTest : BaseTestCase() {
             val (d, err) = result
             data = d
             error = err
-            
-            redirectLocation = response.httpResponseHeaders["Location"]
         }
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertThat(redirectLocation, "https://httpstat.us")
 
-        val statusCode = HttpsURLConnection.HTTP_SEE_OTHER
+        //Even though the URL gives a 303, we should receive a 200
+        //response, as Fuel will handle the redirect for the user
+        val statusCode = HttpsURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
     }
 
