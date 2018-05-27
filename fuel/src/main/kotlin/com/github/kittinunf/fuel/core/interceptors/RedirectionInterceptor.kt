@@ -1,4 +1,3 @@
-
 package com.github.kittinunf.fuel.core.interceptors
 
 import com.github.kittinunf.fuel.core.*
@@ -51,4 +50,3 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                 }
             }
         }
-
