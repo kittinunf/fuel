@@ -37,11 +37,11 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                             next(request, manager.request(encoding).response().second)
                         } else {
                             //error
-                            val error = FuelError().apply {
-                                exception = RedirectException()
-                                errorData = response.data
-                                this.response = response
-                            }
+                            val error = FuelError(
+                                exception = RedirectException(),
+                                errorData = response.data,
+                                response = response
+                            )
                             throw error
                         }
                     }
