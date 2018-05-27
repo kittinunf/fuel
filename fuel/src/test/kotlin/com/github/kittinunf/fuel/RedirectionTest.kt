@@ -22,9 +22,6 @@ class RedirectionTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        val headerKey = "Custom"
-        val headerValue = "foobar"
-
         manager.request(Method.GET, "/303").header(headerKey to headerValue).response { req, res, result ->
             request = req
             response = res
@@ -44,10 +41,6 @@ class RedirectionTest : BaseTestCase() {
 
         val statusCode = HttpsURLConnection.HTTP_SEE_OTHER
         assertThat(response?.statusCode, isEqualTo(statusCode))
-
-        val string = String(data as ByteArray)
-        assertThat(string, containsString(headerKey))
-        assertThat(string, containsString(headerValue))
     }
 
 }
