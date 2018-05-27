@@ -24,16 +24,16 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                     308 -> {
                         val redirectedUrl = response.headers["Location"] ?: response.headers["location"]
                         if (redirectedUrl != null && !redirectedUrl.isEmpty()) {
-                            val encoding = Encoding().apply {
-                                httpMethod = request.method
-                                urlString =
-                                        if (URI(redirectedUrl[0]).isAbsolute) {
-                                            URL(redirectedUrl[0]).toString()
-                                        } else {
-                                            // Maybe its a relative url. Use the original for context.
-                                            URL(request.url, redirectedUrl[0]).toString()
-                                        }
-                            }
+                            val encoding = Encoding(
+                                    httpMethod = request.method,
+                                    urlString =
+                                    if (URI(redirectedUrl[0]).isAbsolute) {
+                                        URL(redirectedUrl[0]).toString()
+                                    } else {
+                                        // Maybe its a relative url. Use the original for context.
+                                        URL(request.url, redirectedUrl[0]).toString()
+                                    }
+                            )
                             next(request, manager.request(encoding).response().second)
                         } else {
                             //error
