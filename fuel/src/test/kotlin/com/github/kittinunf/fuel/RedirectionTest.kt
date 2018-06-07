@@ -40,5 +40,4 @@ class RedirectionTest : BaseTestCase() {
         val statusCode = HttpsURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
     }
-
 }
