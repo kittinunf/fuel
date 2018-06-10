@@ -16,7 +16,7 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
         suspendCancellableCoroutine { continuation ->
             continuation.invokeOnCompletion {
                 if (continuation.isCancelled) {
-                    continuation.cancel()
+                    cancel()
                 }
             }
 
