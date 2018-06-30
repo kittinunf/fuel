@@ -38,3 +38,8 @@ publish {
     uploadName = 'Fuel-Android'
     website = 'https://github.com/kittinunf/Fuel'
 }
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
