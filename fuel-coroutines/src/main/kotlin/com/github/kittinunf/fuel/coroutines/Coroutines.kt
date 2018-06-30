@@ -1,11 +1,6 @@
-import com.github.kittinunf.fuel.core.Deserializable
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.core.Request.Companion.byteArrayDeserializer
 import com.github.kittinunf.fuel.core.Request.Companion.stringDeserializer
-import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 import kotlinx.coroutines.experimental.suspendCancellableCoroutine
 import java.nio.charset.Charset
@@ -29,6 +24,25 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
             }
         }
 
+private suspend fun <T : Any, U : Deserializable<T>> Request.awaitSafely(
+        deserializable: U
+): Triple<Request, Response, Result<T, FuelError>> =
+        suspendCancellableCoroutine { continuation ->
+            continuation.invokeOnCompletion {
+                if (continuation.isCancelled) {
+                    continuation.cancel()
+                }
+            }
+            response(deserializable) { request: Request, response: Response, result: Result<T, FuelError> ->
+                result.fold({
+                    continuation.resume(Triple(request, response, result))
+                }, {
+                    continuation.resumeWithException(it)
+                })
+            }
+        }
+
+
 suspend fun Request.awaitResponse(): Triple<Request, Response, Result<ByteArray, FuelError>> =
         await(byteArrayDeserializer())
 
@@ -49,3 +63,15 @@ suspend fun Request.awaitStringResult(
 suspend fun <U : Any> Request.awaitObjectResult(
         deserializable: ResponseDeserializable<U>
 ): U = await(deserializable).third.get()
+
+
+/**
+ * This function catches both server errors and Deserialization Errors
+ *
+ * @param deserializable
+ *
+ * @return Result object
+ * */
+suspend fun <U : Any> Request.awaitResultObject(
+        deserializable: ResponseDeserializable<U>
+): Result<U, FuelError> = awaitSafely(deserializable).third

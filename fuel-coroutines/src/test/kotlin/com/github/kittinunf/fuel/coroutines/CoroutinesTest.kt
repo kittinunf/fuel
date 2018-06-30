@@ -9,6 +9,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
+import javax.xml.ws.http.HTTPException
 
 class CoroutinesTest {
 
@@ -92,5 +93,25 @@ class CoroutinesTest {
         } catch (exception: HttpException) {
             assertNotNull(exception)
         }
+    }
+
+    @Test
+    fun testAwaitSafelyPassesObject() = runBlocking {
+        Fuel.get("/uuid").awaitResultObject(UUIDResponseDeserializer)
+                .fold({ data ->
+                    assertTrue(data.uuid.isNotEmpty())
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
+    }
+
+    @Test
+    fun testAwaitSafelyCatchesError() = runBlocking {
+        Fuel.get("/error/404").awaitResultObject(UUIDResponseDeserializer)
+                .fold({ _ ->
+                    fail("This is an error case!")
+                }, { error ->
+                    assertNotNull(error.exception as? HTTPException)
+                })
     }
 }
