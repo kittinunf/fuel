@@ -9,7 +9,7 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
         deserializable: U
 ): Triple<Request, Response, Result<T, FuelError>> =
         suspendCancellableCoroutine { continuation ->
-            continuation.invokeOnCompletion {
+            continuation.invokeOnCancellation {
                 if (continuation.isCancelled) {
                     cancel()
                 }
@@ -20,24 +20,6 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
                     continuation.resume(Triple(request, response, result))
                 }, {
                     continuation.resumeWithException(it.exception)
-                })
-            }
-        }
-
-private suspend fun <T : Any, U : Deserializable<T>> Request.awaitSafely(
-        deserializable: U
-): Triple<Request, Response, Result<T, FuelError>> =
-        suspendCancellableCoroutine { continuation ->
-            continuation.invokeOnCompletion {
-                if (continuation.isCancelled) {
-                    continuation.cancel()
-                }
-            }
-            response(deserializable) { request: Request, response: Response, result: Result<T, FuelError> ->
-                result.fold({
-                    continuation.resume(Triple(request, response, result))
-                }, {
-                    continuation.resumeWithException(it)
                 })
             }
         }
@@ -74,4 +56,13 @@ suspend fun <U : Any> Request.awaitObjectResult(
  * */
 suspend fun <U : Any> Request.awaitResultObject(
         deserializable: ResponseDeserializable<U>
-): Result<U, FuelError> = awaitSafely(deserializable).third
+): Result<U, FuelError> = try {
+    await(deserializable).third
+} catch (e: Exception) {
+    val fuelError =  when (e) {
+        is FuelError -> e
+        else -> FuelError(e)
+    }
+    Result.Failure(fuelError)
+}
+
