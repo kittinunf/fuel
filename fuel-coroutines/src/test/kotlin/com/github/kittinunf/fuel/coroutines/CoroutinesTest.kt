@@ -115,4 +115,18 @@ class CoroutinesTest {
             fail("this should have been caught")
         }
     }
+
+    @Test
+    fun testAwaitSafelyCatchesDeserializeationError() = runBlocking {
+        try {
+            Fuel.get("/ip").awaitResultObject(UUIDResponseDeserializer)
+                    .fold({ _ ->
+                        fail("This is an error case!")
+                    }, { error ->
+                        assertNotNull(error)
+                    })
+        } catch (e: Exception) {
+            fail("this should have been caught")
+        }
+    }
 }
