@@ -94,7 +94,7 @@ class CoroutinesTest {
 
     @Test
     fun testAwaitSafelyPassesObject() = runBlocking {
-        Fuel.get("/uuid").awaitResultObject(UUIDResponseDeserializer)
+        Fuel.get("/uuid").awaitSafelyObjectResult(UUIDResponseDeserializer)
                 .fold({ data ->
                     assertTrue(data.uuid.isNotEmpty())
                 }, { error ->
@@ -105,7 +105,7 @@ class CoroutinesTest {
     @Test
     fun testAwaitSafelyCatchesError() = runBlocking {
         try {
-            Fuel.get("/error/404").awaitResultObject(UUIDResponseDeserializer)
+            Fuel.get("/error/404").awaitSafelyObjectResult(UUIDResponseDeserializer)
                     .fold({ _ ->
                         fail("This is an error case!")
                     }, { error ->
@@ -119,7 +119,7 @@ class CoroutinesTest {
     @Test
     fun testAwaitSafelyCatchesDeserializeationError() = runBlocking {
         try {
-            Fuel.get("/ip").awaitResultObject(UUIDResponseDeserializer)
+            Fuel.get("/ip").awaitSafelyObjectResult(UUIDResponseDeserializer)
                     .fold({ _ ->
                         fail("This is an error case!")
                     }, { error ->

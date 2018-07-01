@@ -37,6 +37,14 @@ suspend fun Request.awaitStringResult(
         charset: Charset = Charsets.UTF_8
 ): String = awaitString(charset).third.get()
 
+/**
+ * This function will throw the an exception if an error is thrown either at the HTTP level
+ * or during deserialization
+ *
+ * @param deserializable
+ *
+ * @return Result object
+ * */
 suspend fun <U : Any> Request.awaitObjectResult(
         deserializable: ResponseDeserializable<U>
 ): U = await(deserializable).third.get()
@@ -49,7 +57,7 @@ suspend fun <U : Any> Request.awaitObjectResult(
  *
  * @return Result object
  * */
-suspend fun <U : Any> Request.awaitResultObject(
+suspend fun <U : Any> Request.awaitSafelyObjectResult(
         deserializable: ResponseDeserializable<U>
 ): Result<U, FuelError> = try {
     await(deserializable).third
