@@ -32,7 +32,7 @@ class Encoding(val httpMethod: Method,
             }
             requestType == Request.Type.UPLOAD -> {
                 val boundary = System.currentTimeMillis().toString(16)
-                headerPairs += "Content-Type" to "multipart/form-data; boundary=$boundary"
+                headerPairs += "Content-Type" to "multipart/form-data; boundary=" + boundary
             }
             else -> {
                 headerPairs += "Content-Type" to "application/x-www-form-urlencoded"
@@ -61,7 +61,7 @@ class Encoding(val httpMethod: Method,
             //give precedence to local path
             URL(path)
         } catch (e: MalformedURLException) {
-            URL(baseUrlString + if (path.startsWith('/') or path.isEmpty()) path else "/$path")
+            URL(baseUrlString + if (path.startsWith('/') or path.isEmpty()) path else '/' + path)
         }
         val uri = try {
             url.toURI()

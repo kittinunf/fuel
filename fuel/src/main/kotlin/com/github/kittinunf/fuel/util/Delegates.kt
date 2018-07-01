@@ -9,7 +9,7 @@ private class ReadWriteLazyVal<T>(private val initializer: () -> T) : ReadWriteP
 
     private var value: Any? = null
 
-    override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+    operator override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         if (value == null) {
             value = (initializer()) ?: throw IllegalStateException("Initializer block of property ${property.name} return null")
         }
@@ -17,7 +17,7 @@ private class ReadWriteLazyVal<T>(private val initializer: () -> T) : ReadWriteP
         return value as T
     }
 
-    override operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+    operator override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         this.value = value
     }
 
