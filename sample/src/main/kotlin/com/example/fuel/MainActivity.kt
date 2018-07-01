@@ -35,7 +35,6 @@ import java.io.Reader
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "Main"
-    private val bag by lazy { CompositeDisposable() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -236,14 +235,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpRxSupport() {
-        val disposable = "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
                 .rx_object(Issue.Deserializer())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { result ->
                     Log.d(TAG, result.toString())
                 }
-        bag.add(disposable)
+
     }
 
     private fun httpLiveDataSupport() {
@@ -260,11 +259,6 @@ class MainActivity : AppCompatActivity() {
         }, failure = {
             mainResultText.append(String(it.errorData))
         })
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        bag.clear()
     }
 
     data class Issue(

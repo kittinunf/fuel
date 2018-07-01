@@ -7,7 +7,7 @@ interface Environment {
 }
 
 fun createEnvironment(): Environment = try {
-    Class.forName(AndroidEnvironmentClass).constructors.first().newInstance() as Environment
+    Class.forName(AndroidEnvironmentClass).newInstance() as Environment
 } catch(exception: ClassNotFoundException) {
     DefaultEnvironment()
 }
