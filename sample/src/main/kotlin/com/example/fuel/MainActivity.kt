@@ -242,7 +242,6 @@ class MainActivity : AppCompatActivity() {
                 .subscribe { result ->
                     Log.d(TAG, result.toString())
                 }
-
     }
 
     private fun httpLiveDataSupport() {
@@ -267,7 +266,7 @@ class MainActivity : AppCompatActivity() {
             val url: String = ""
     ) {
         class Deserializer : ResponseDeserializable<Issue> {
-            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Issue::class.java)!!
+            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Issue::class.java)
         }
 
         class ListDeserializer : ResponseDeserializable<List<Issue>> {
