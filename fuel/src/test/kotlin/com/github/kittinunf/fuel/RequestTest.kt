@@ -207,7 +207,7 @@ class RequestTest : BaseTestCase() {
             request = req
             response = res
 
-            val (d, err) = result
+            val (_, err) = result
             error = err
         }
 
