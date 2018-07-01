@@ -20,6 +20,7 @@ import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.mainAuxText
 import kotlinx.android.synthetic.main.activity_main.mainClearButton
@@ -34,6 +35,7 @@ import java.io.Reader
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "Main"
+    private val bag by lazy { CompositeDisposable() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -234,13 +236,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpRxSupport() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+        val disposable = "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
                 .rx_object(Issue.Deserializer())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { result ->
                     Log.d(TAG, result.toString())
                 }
+        bag.add(disposable)
     }
 
     private fun httpLiveDataSupport() {
@@ -259,13 +262,18 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        bag.clear()
+    }
+
     data class Issue(
             val id: Int = 0,
             val title: String = "",
             val url: String = ""
     ) {
         class Deserializer : ResponseDeserializable<Issue> {
-            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Issue::class.java)
+            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Issue::class.java)!!
         }
 
         class ListDeserializer : ResponseDeserializable<List<Issue>> {

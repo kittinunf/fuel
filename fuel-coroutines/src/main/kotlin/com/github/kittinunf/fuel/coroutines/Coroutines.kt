@@ -9,12 +9,7 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
         deserializable: U
 ): Triple<Request, Response, Result<T, FuelError>> =
         suspendCancellableCoroutine { continuation ->
-            continuation.invokeOnCancellation {
-                if (continuation.isCancelled) {
-                    cancel()
-                }
-            }
-
+            continuation.invokeOnCancellation { cancel() }
             response(deserializable) { request: Request, response: Response, result: Result<T, FuelError> ->
                 result.fold({
                     continuation.resume(Triple(request, response, result))
