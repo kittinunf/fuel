@@ -49,7 +49,6 @@ suspend fun <U : Any> Request.awaitObjectResult(
         deserializable: ResponseDeserializable<U>
 ): U = await(deserializable).third.get()
 
-
 /**
  * This function catches both server errors and Deserialization Errors
  *
@@ -62,7 +61,7 @@ suspend fun <U : Any> Request.awaitSafelyObjectResult(
 ): Result<U, FuelError> = try {
     await(deserializable).third
 } catch (e: Exception) {
-    val fuelError =  when (e) {
+    val fuelError = when (e) {
         is FuelError -> e
         else -> FuelError(e)
     }
