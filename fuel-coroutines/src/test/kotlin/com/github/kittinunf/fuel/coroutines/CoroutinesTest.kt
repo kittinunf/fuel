@@ -21,7 +21,7 @@ class CoroutinesTest {
     @Test
     fun testItCanAwaitForAnError() = runBlocking {
         try {
-            Fuel.get("/not/found/address").awaitString()
+            Fuel.get("/not/found/address").awaitStringResponse()
             fail("This test should fail due to status code 404")
         } catch (exception: HttpException) {
             assertNotNull(exception)
@@ -31,7 +31,7 @@ class CoroutinesTest {
 
     @Test
     fun testItCanAwaitString() = runBlocking {
-        Fuel.get("/uuid").awaitString().third
+        Fuel.get("/uuid").awaitStringResponse().third
                 .fold({ data ->
                     assertTrue(data.isNotEmpty())
                     assertTrue(data.contains("uuid"))
@@ -59,7 +59,7 @@ class CoroutinesTest {
 
     @Test
     fun testItCanAwaitAnyObject() = runBlocking {
-        Fuel.get("/uuid").awaitObject(UUIDResponseDeserializer).third
+        Fuel.get("/uuid").awaitObjectResponse(UUIDResponseDeserializer).third
                 .fold({ data ->
                     assertTrue(data.uuid.isNotEmpty())
                 }, { error ->
@@ -69,23 +69,23 @@ class CoroutinesTest {
 
     @Test
     fun testItCanAwaitForObjectResult() = runBlocking {
-        assertTrue(Fuel.get("/uuid").awaitObjectResult(UUIDResponseDeserializer).uuid.isNotEmpty())
+        assertTrue(Fuel.get("/uuid").awaitForObject(UUIDResponseDeserializer).uuid.isNotEmpty())
     }
 
     @Test
     fun testItCanAwaitResponseResult() = runBlocking {
-        assertTrue(Fuel.get("/uuid").awaitResponseResult().isNotEmpty())
+        assertTrue(Fuel.get("/uuid").awaitForByteArray().isNotEmpty())
     }
 
     @Test
     fun testItCanAwaitForStringResult() = runBlocking {
-        assertTrue(Fuel.get("/uuid").awaitStringResult().isNotEmpty())
+        assertTrue(Fuel.get("/uuid").awaitForString().isNotEmpty())
     }
 
     @Test
     fun testItCanAwaitForStringResultCanThrowException() = runBlocking {
         try {
-            Fuel.get("/error/404").awaitStringResult()
+            Fuel.get("/error/404").awaitForString()
             fail("This test should fail due to status code 404")
         } catch (exception: HttpException) {
             assertNotNull(exception)
@@ -94,7 +94,7 @@ class CoroutinesTest {
 
     @Test
     fun testAwaitSafelyPassesObject() = runBlocking {
-        Fuel.get("/uuid").awaitSafelyObjectResult(UUIDResponseDeserializer)
+        Fuel.get("/uuid").awaitForObjectResult(UUIDResponseDeserializer)
                 .fold({ data ->
                     assertTrue(data.uuid.isNotEmpty())
                 }, { error ->
@@ -105,7 +105,7 @@ class CoroutinesTest {
     @Test
     fun testAwaitSafelyCatchesError() = runBlocking {
         try {
-            Fuel.get("/error/404").awaitSafelyObjectResult(UUIDResponseDeserializer)
+            Fuel.get("/error/404").awaitForObjectResult(UUIDResponseDeserializer)
                     .fold({ _ ->
                         fail("This is an error case!")
                     }, { error ->
@@ -117,9 +117,9 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitSafelyCatchesDeserializeationError() = runBlocking {
+    fun testAwaitSafelyCatchesDeserializeError() = runBlocking {
         try {
-            Fuel.get("/ip").awaitSafelyObjectResult(UUIDResponseDeserializer)
+            Fuel.get("/ip").awaitForObjectResult(UUIDResponseDeserializer)
                     .fold({ _ ->
                         fail("This is an error case!")
                     }, { error ->
