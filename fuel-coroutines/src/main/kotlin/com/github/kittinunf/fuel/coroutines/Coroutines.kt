@@ -2,6 +2,7 @@ import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.core.Request.Companion.byteArrayDeserializer
 import com.github.kittinunf.fuel.core.Request.Companion.stringDeserializer
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.mapError
 import kotlinx.coroutines.experimental.suspendCancellableCoroutine
 import java.nio.charset.Charset
 
@@ -10,13 +11,7 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
 ): Triple<Request, Response, Result<T, FuelError>> =
         suspendCancellableCoroutine { continuation ->
             continuation.invokeOnCancellation { cancel() }
-            response(deserializable) { request: Request, response: Response, result: Result<T, FuelError> ->
-                result.fold({
-                    continuation.resume(Triple(request, response, result))
-                }, {
-                    continuation.resumeWithException(it.exception)
-                })
-            }
+            continuation.resume(response(deserializable))
         }
 
 
@@ -35,7 +30,9 @@ suspend fun Request.awaitResponseResult(): ByteArray = awaitResponse().third.get
 
 suspend fun Request.awaitStringResult(
         charset: Charset = Charsets.UTF_8
-): String = awaitString(charset).third.get()
+): String = awaitString(charset).third
+        .mapError { throw it.exception }
+        .get()
 
 /**
  * This function will throw the an exception if an error is thrown either at the HTTP level
