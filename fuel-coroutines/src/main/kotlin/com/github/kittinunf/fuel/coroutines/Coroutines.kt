@@ -50,7 +50,9 @@ suspend fun Request.awaitStringResult(
  * */
 suspend fun <U : Any> Request.awaitObjectResult(
         deserializable: ResponseDeserializable<U>
-): U = await(deserializable).third.get()
+): U = await(deserializable).third
+        .mapError { throw it.exception }
+        .get()
 
 /**
  * This function catches both server errors and Deserialization Errors

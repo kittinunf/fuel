@@ -124,8 +124,24 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testItCanAwaitForObjectResult() = runBlocking {
-        assertTrue(Fuel.get("/uuid").awaitObjectResult(UUIDResponseDeserializer).uuid.isNotEmpty())
+    fun testAwaitObjectResultSuccess() = runBlocking {
+        try {
+            val data = Fuel.get("/uuid").awaitObjectResult(UUIDResponseDeserializer)
+            assertTrue(data.uuid.isNotEmpty())
+        } catch (exception: Exception) {
+            fail("This test should pass but got an exception: ${exception.message}")
+        }
+    }
+
+    @Test
+    fun testAwaitObjectResultExceptionDueToNetwork() = runBlocking {
+        try {
+            Fuel.get("/some/invalid/path").awaitObjectResult(UUIDResponseDeserializer)
+            fail("This test should raise an exception due to invalid URL")
+        } catch (exception: HttpException) {
+            assertNotNull(exception)
+            assertTrue(exception.message.orEmpty().contains("404"))
+        }
     }
 
     @Test
