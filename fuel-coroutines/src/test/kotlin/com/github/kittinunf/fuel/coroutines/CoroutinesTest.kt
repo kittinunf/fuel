@@ -5,9 +5,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import kotlinx.coroutines.experimental.runBlocking
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
+import org.junit.Assert.*
 import org.junit.Test
 
 class CoroutinesTest {
@@ -34,39 +32,39 @@ class CoroutinesTest {
     @Test
     fun testItCanAwaitString() = runBlocking {
         Fuel.get("/uuid").awaitString().third
-            .fold({ data ->
-                assertTrue(data.isNotEmpty())
-                assertTrue(data.contains("uuid"))
-            }, { error ->
-                fail("This test should pass but got an error: ${error.message}")
-            })
+                .fold({ data ->
+                    assertTrue(data.isNotEmpty())
+                    assertTrue(data.contains("uuid"))
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
     }
 
     @Test
     fun testItCanAwaitByteArray() = runBlocking {
         Fuel.get("/ip").awaitResponse().third
-            .fold({ data ->
-                assertTrue(data.isNotEmpty())
-            }, { error ->
-                fail("This test should pass but got an error: ${error.message}")
-            })
+                .fold({ data ->
+                    assertTrue(data.isNotEmpty())
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
     }
 
     private data class UUIDResponse(val uuid: String)
 
     private object UUIDResponseDeserializer : ResponseDeserializable<UUIDResponse> {
         override fun deserialize(content: String) =
-            jacksonObjectMapper().readValue<UUIDResponse>(content)
+                jacksonObjectMapper().readValue<UUIDResponse>(content)
     }
 
     @Test
     fun testItCanAwaitAnyObject() = runBlocking {
         Fuel.get("/uuid").awaitObject(UUIDResponseDeserializer).third
-            .fold({ data ->
-                assertTrue(data.uuid.isNotEmpty())
-            }, { error ->
-                fail("This test should pass but got an error: ${error.message}")
-            })
+                .fold({ data ->
+                    assertTrue(data.uuid.isNotEmpty())
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
     }
 
     @Test
@@ -91,6 +89,44 @@ class CoroutinesTest {
             fail("This test should fail due to status code 404")
         } catch (exception: HttpException) {
             assertNotNull(exception)
+        }
+    }
+
+    @Test
+    fun testAwaitSafelyPassesObject() = runBlocking {
+        Fuel.get("/uuid").awaitSafelyObjectResult(UUIDResponseDeserializer)
+                .fold({ data ->
+                    assertTrue(data.uuid.isNotEmpty())
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
+    }
+
+    @Test
+    fun testAwaitSafelyCatchesError() = runBlocking {
+        try {
+            Fuel.get("/error/404").awaitSafelyObjectResult(UUIDResponseDeserializer)
+                    .fold({ _ ->
+                        fail("This is an error case!")
+                    }, { error ->
+                        assertTrue( error.exception is HttpException)
+                    })
+        } catch (e: Exception) {
+            fail("this should have been caught")
+        }
+    }
+
+    @Test
+    fun testAwaitSafelyCatchesDeserializeationError() = runBlocking {
+        try {
+            Fuel.get("/ip").awaitSafelyObjectResult(UUIDResponseDeserializer)
+                    .fold({ _ ->
+                        fail("This is an error case!")
+                    }, { error ->
+                        assertNotNull(error)
+                    })
+        } catch (e: Exception) {
+            fail("this should have been caught")
         }
     }
 }
