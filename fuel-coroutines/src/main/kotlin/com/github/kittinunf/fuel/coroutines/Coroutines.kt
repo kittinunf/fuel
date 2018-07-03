@@ -1,6 +1,11 @@
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Deserializable
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Request.Companion.byteArrayDeserializer
 import com.github.kittinunf.fuel.core.Request.Companion.stringDeserializer
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.mapError
 import kotlinx.coroutines.experimental.suspendCancellableCoroutine
@@ -13,7 +18,6 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
             continuation.invokeOnCancellation { cancel() }
             continuation.resume(response(deserializable))
         }
-
 
 suspend fun Request.awaitResponse(): Triple<Request, Response, Result<ByteArray, FuelError>> =
         await(byteArrayDeserializer())
@@ -74,4 +78,3 @@ suspend fun <U : Any> Request.awaitSafelyObjectResult(
     }
     Result.Failure(fuelError)
 }
-
