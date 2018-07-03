@@ -23,13 +23,17 @@ class CoroutinesTest {
 
     @Test
     fun testAwaitStringSuccess() = runBlocking {
-        Fuel.get("/uuid").awaitString().third
-                .fold({ data ->
-                    assertTrue(data.isNotEmpty())
-                    assertTrue(data.contains("uuid"))
-                }, { error ->
-                    fail("This test should pass but got an error: ${error.message}")
-                })
+        try {
+            Fuel.get("/uuid").awaitString().third
+                    .fold({ data ->
+                        assertTrue(data.isNotEmpty())
+                        assertTrue(data.contains("uuid"))
+                    }, { error ->
+                        fail("This test should pass but got an error: ${error.message}")
+                    })
+        } catch (exception: Exception) {
+            fail("When using awaitString errors should be folded instead of thrown.")
+        }
     }
 
     @Test
@@ -48,12 +52,16 @@ class CoroutinesTest {
 
     @Test
     fun testAwaitResponseSuccess() = runBlocking {
-        Fuel.get("/ip").awaitResponse().third
-                .fold({ data ->
-                    assertTrue(data.isNotEmpty())
-                }, { error ->
-                    fail("This test should pass but got an error: ${error.message}")
-                })
+        try {
+            Fuel.get("/ip").awaitResponse().third
+                    .fold({ data ->
+                        assertTrue(data.isNotEmpty())
+                    }, { error ->
+                        fail("This test should pass but got an error: ${error.message}")
+                    })
+        } catch (exception: Exception) {
+            fail("When using awaitResponse errors should be folded instead of thrown.")
+        }
     }
 
     @Test
