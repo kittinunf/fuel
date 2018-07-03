@@ -195,40 +195,45 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitSafelyPassesObject() = runBlocking {
-        Fuel.get("/uuid").awaitSafelyObjectResult(UUIDResponseDeserializer)
-                .fold({ data ->
-                    assertTrue(data.uuid.isNotEmpty())
-                }, { error ->
-                    fail("This test should pass but got an error: ${error.message}")
-                })
-    }
-
-    @Test
-    fun testAwaitSafelyCatchesError() = runBlocking {
+    fun testAwaitSafelyObjectResultSuccess() = runBlocking {
         try {
-            Fuel.get("/error/404").awaitSafelyObjectResult(UUIDResponseDeserializer)
-                    .fold({ _ ->
-                        fail("This is an error case!")
+            Fuel.get("/uuid").awaitSafelyObjectResult(UUIDResponseDeserializer)
+                    .fold({ data ->
+                        assertTrue(data.uuid.isNotEmpty())
                     }, { error ->
-                        assertTrue(error.exception is HttpException)
+                        fail("This test should pass but got an error: ${error.message}")
                     })
-        } catch (e: Exception) {
-            fail("this should have been caught")
+        } catch (exception: Exception) {
+            fail("When using awaitSafelyObjectResult errors should be folded instead of thrown.")
         }
     }
 
     @Test
-    fun testAwaitSafelyCatchesDeserializeationError() = runBlocking {
+    fun testAwaitSafelyObjectResultErrorDueToNetwork() = runBlocking {
+        try {
+            Fuel.get("/error/404").awaitSafelyObjectResult(UUIDResponseDeserializer)
+                    .fold({
+                        fail("This test should fail due to HTTP status code.")
+                    }, { error ->
+                        assertTrue(error.exception is HttpException)
+                    })
+        } catch (exception: Exception) {
+            fail("When using awaitSafelyObjectResult errors should be folded instead of thrown.")
+        }
+    }
+
+    @Test
+    fun testAwaitSafelyObjectResultErrorDueToDeserialization() = runBlocking {
         try {
             Fuel.get("/ip").awaitSafelyObjectResult(UUIDResponseDeserializer)
-                    .fold({ _ ->
-                        fail("This is an error case!")
+                    .fold({
+                        fail("This test should fail due to HTTP status code.")
                     }, { error ->
                         assertNotNull(error)
+                        assertTrue(error.exception is JsonMappingException)
                     })
-        } catch (e: Exception) {
-            fail("this should have been caught")
+        } catch (exception: Exception) {
+            fail("When using awaitSafelyObjectResult errors should be folded instead of thrown.")
         }
     }
 }
