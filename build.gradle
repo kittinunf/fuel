@@ -21,11 +21,12 @@ buildscript {
         runnerVersion = '1.0.0'
         rulesVersion = '1.0.0'
         espressoVersion = '3.0.0'
-        kotlinCoroutinesVersion = '0.22.5'
+        kotlinCoroutinesVersion = '0.23.3'
         forgeVersion = '0.3.0'
     }
 
     repositories {
+        mavenCentral()
         jcenter()
         google()
     }

@@ -12,11 +12,9 @@ interface Deserializable<out T : Any> {
 interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     override fun deserialize(response: Response): T {
         try {
-            return deserialize(response.dataStream) ?:
-                    deserialize(response.dataStream.reader()) ?:
-                    deserialize(response.data) ?:
-                    deserialize(String(response.data)) ?:
-                    throw IllegalStateException("One of deserialize(ByteArray) or deserialize(InputStream) or deserialize(Reader) or deserialize(String) must be implemented")
+            return deserialize(response.dataStream) ?: deserialize(response.dataStream.reader())
+            ?: deserialize(response.data) ?: deserialize(String(response.data))
+            ?: throw IllegalStateException("One of deserialize(ByteArray) or deserialize(InputStream) or deserialize(Reader) or deserialize(String) must be implemented")
         } finally {
             response.dataStream.close()
         }
