@@ -121,12 +121,12 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitObjectDueToSerialization() = runBlocking {
+    fun testAwaitObjectDueToDeserialization() = runBlocking {
         try {
             Fuel.get("/uuid").awaitObject(UUIDIntResponseDeserializer).third.fold({
                 fail("This test should fail because uuid property should be a String.")
             }, {
-                fail("When using awaitObject serialization errors are thrown.")
+                fail("When using awaitObject serialization/deserialization errors are thrown.")
             })
         } catch (exception: JsonMappingException) {
             assertNotNull(exception)
@@ -175,7 +175,7 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitObjectResultExceptionDueToSerialization() = runBlocking {
+    fun testAwaitObjectResultExceptionDueToDeserialization() = runBlocking {
         try {
             Fuel.get("/uuid").awaitObjectResult(UUIDIntResponseDeserializer)
             fail("This test should fail because uuid property should be a String.")
