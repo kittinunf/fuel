@@ -124,6 +124,16 @@ class CoroutinesTest {
     }
 
     @Test
+    fun testAwaitResponseResultSuccess() = runBlocking {
+        try {
+            val data = Fuel.get("/uuid").awaitResponseResult()
+            assertTrue(data.isNotEmpty())
+        } catch (exception: Exception) {
+            fail("This test should pass but got an exception: ${exception.message}")
+        }
+    }
+
+    @Test
     fun testAwaitObjectResultSuccess() = runBlocking {
         try {
             val data = Fuel.get("/uuid").awaitObjectResult(UUIDResponseDeserializer)
@@ -152,11 +162,6 @@ class CoroutinesTest {
         } catch (exception: JsonMappingException) {
             assertNotNull(exception)
         }
-    }
-
-    @Test
-    fun testItCanAwaitResponseResult() = runBlocking {
-        assertTrue(Fuel.get("/uuid").awaitResponseResult().isNotEmpty())
     }
 
     @Test
