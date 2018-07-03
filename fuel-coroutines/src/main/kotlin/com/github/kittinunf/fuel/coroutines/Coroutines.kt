@@ -32,7 +32,9 @@ suspend fun <U : Any> Request.awaitObject(
         deserializable: ResponseDeserializable<U>
 ): Triple<Request, Response, Result<U, FuelError>> = await(deserializable)
 
-suspend fun Request.awaitResponseResult(): ByteArray = awaitResponse().third.get()
+suspend fun Request.awaitResponseResult(): ByteArray = awaitResponse().third
+        .mapError { throw it.exception }
+        .get()
 
 suspend fun Request.awaitStringResult(
         charset: Charset = Charsets.UTF_8
