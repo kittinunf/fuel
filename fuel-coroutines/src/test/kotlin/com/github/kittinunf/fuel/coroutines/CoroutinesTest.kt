@@ -5,9 +5,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import kotlinx.coroutines.experimental.runBlocking
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
+import org.junit.Assert.*
 import org.junit.Test
 
 class CoroutinesTest {
@@ -23,7 +21,7 @@ class CoroutinesTest {
     @Test
     fun testItCanAwaitForAnError() = runBlocking {
         try {
-            Fuel.get("/not/found/address").awaitString()
+            Fuel.get("/not/found/address").awaitStringResponse()
             fail("This test should fail due to status code 404")
         } catch (exception: HttpException) {
             assertNotNull(exception)
@@ -33,64 +31,102 @@ class CoroutinesTest {
 
     @Test
     fun testItCanAwaitString() = runBlocking {
-        Fuel.get("/uuid").awaitString().third
-            .fold({ data ->
-                assertTrue(data.isNotEmpty())
-                assertTrue(data.contains("uuid"))
-            }, { error ->
-                fail("This test should pass but got an error: ${error.message}")
-            })
+        Fuel.get("/uuid").awaitStringResponse().third
+                .fold({ data ->
+                    assertTrue(data.isNotEmpty())
+                    assertTrue(data.contains("uuid"))
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
     }
 
     @Test
     fun testItCanAwaitByteArray() = runBlocking {
         Fuel.get("/ip").awaitResponse().third
-            .fold({ data ->
-                assertTrue(data.isNotEmpty())
-            }, { error ->
-                fail("This test should pass but got an error: ${error.message}")
-            })
+                .fold({ data ->
+                    assertTrue(data.isNotEmpty())
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
     }
 
     private data class UUIDResponse(val uuid: String)
 
     private object UUIDResponseDeserializer : ResponseDeserializable<UUIDResponse> {
         override fun deserialize(content: String) =
-            jacksonObjectMapper().readValue<UUIDResponse>(content)
+                jacksonObjectMapper().readValue<UUIDResponse>(content)
     }
 
     @Test
     fun testItCanAwaitAnyObject() = runBlocking {
-        Fuel.get("/uuid").awaitObject(UUIDResponseDeserializer).third
-            .fold({ data ->
-                assertTrue(data.uuid.isNotEmpty())
-            }, { error ->
-                fail("This test should pass but got an error: ${error.message}")
-            })
+        Fuel.get("/uuid").awaitObjectResponse(UUIDResponseDeserializer).third
+                .fold({ data ->
+                    assertTrue(data.uuid.isNotEmpty())
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
     }
 
     @Test
     fun testItCanAwaitForObjectResult() = runBlocking {
-        assertTrue(Fuel.get("/uuid").awaitObjectResult(UUIDResponseDeserializer).uuid.isNotEmpty())
+        assertTrue(Fuel.get("/uuid").awaitForObject(UUIDResponseDeserializer).uuid.isNotEmpty())
     }
 
     @Test
     fun testItCanAwaitResponseResult() = runBlocking {
-        assertTrue(Fuel.get("/uuid").awaitResponseResult().isNotEmpty())
+        assertTrue(Fuel.get("/uuid").awaitForByteArray().isNotEmpty())
     }
 
     @Test
     fun testItCanAwaitForStringResult() = runBlocking {
-        assertTrue(Fuel.get("/uuid").awaitStringResult().isNotEmpty())
+        assertTrue(Fuel.get("/uuid").awaitForString().isNotEmpty())
     }
 
     @Test
     fun testItCanAwaitForStringResultCanThrowException() = runBlocking {
         try {
-            Fuel.get("/error/404").awaitStringResult()
+            Fuel.get("/error/404").awaitForString()
             fail("This test should fail due to status code 404")
         } catch (exception: HttpException) {
             assertNotNull(exception)
+        }
+    }
+
+    @Test
+    fun testAwaitSafelyPassesObject() = runBlocking {
+        Fuel.get("/uuid").awaitForObjectResult(UUIDResponseDeserializer)
+                .fold({ data ->
+                    assertTrue(data.uuid.isNotEmpty())
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
+    }
+
+    @Test
+    fun testAwaitSafelyCatchesError() = runBlocking {
+        try {
+            Fuel.get("/error/404").awaitForObjectResult(UUIDResponseDeserializer)
+                    .fold({ _ ->
+                        fail("This is an error case!")
+                    }, { error ->
+                        assertTrue( error.exception is HttpException)
+                    })
+        } catch (e: Exception) {
+            fail("this should have been caught")
+        }
+    }
+
+    @Test
+    fun testAwaitSafelyCatchesDeserializeError() = runBlocking {
+        try {
+            Fuel.get("/ip").awaitForObjectResult(UUIDResponseDeserializer)
+                    .fold({ _ ->
+                        fail("This is an error case!")
+                    }, { error ->
+                        assertNotNull(error)
+                    })
+        } catch (e: Exception) {
+            fail("this should have been caught")
         }
     }
 }
