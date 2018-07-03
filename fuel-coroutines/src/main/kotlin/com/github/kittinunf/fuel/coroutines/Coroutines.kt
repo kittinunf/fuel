@@ -32,14 +32,17 @@ suspend fun Request.awaitString(
         level = DeprecationLevel.WARNING,
         message = "This functions cannot handle exceptions properly which causes API inconsistency."
 )
+@Throws
 suspend fun <U : Any> Request.awaitObject(
         deserializable: ResponseDeserializable<U>
 ): Triple<Request, Response, Result<U, FuelError>> = await(deserializable)
 
+@Throws
 suspend fun Request.awaitResponseResult(): ByteArray = awaitResponse().third
         .mapError { throw it.exception }
         .get()
 
+@Throws
 suspend fun Request.awaitStringResult(
         charset: Charset = Charsets.UTF_8
 ): String = awaitString(charset).third
@@ -54,6 +57,7 @@ suspend fun Request.awaitStringResult(
  *
  * @return Result object
  * */
+@Throws
 suspend fun <U : Any> Request.awaitObjectResult(
         deserializable: ResponseDeserializable<U>
 ): U = await(deserializable).third
