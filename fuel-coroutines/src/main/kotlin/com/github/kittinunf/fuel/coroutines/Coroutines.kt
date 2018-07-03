@@ -22,6 +22,12 @@ suspend fun Request.awaitString(
         charset: Charset = Charsets.UTF_8
 ): Triple<Request, Response, Result<String, FuelError>> = await(stringDeserializer(charset))
 
+@Deprecated(
+        replaceWith = ReplaceWith(
+                expression = ".awaitSafelyObjectResult"),
+        level = DeprecationLevel.WARNING,
+        message = "This functions cannot handle exceptions properly which causes API inconsistency."
+)
 suspend fun <U : Any> Request.awaitObject(
         deserializable: ResponseDeserializable<U>
 ): Triple<Request, Response, Result<U, FuelError>> = await(deserializable)

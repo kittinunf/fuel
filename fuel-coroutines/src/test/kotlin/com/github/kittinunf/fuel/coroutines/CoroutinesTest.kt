@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.Fuel
@@ -75,13 +76,51 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testItCanAwaitAnyObject() = runBlocking {
-        Fuel.get("/uuid").awaitObject(UUIDResponseDeserializer).third
-                .fold({ data ->
-                    assertTrue(data.uuid.isNotEmpty())
-                }, { error ->
-                    fail("This test should pass but got an error: ${error.message}")
-                })
+    fun testAwaitObjectSuccess() = runBlocking {
+        try {
+            Fuel.get("/uuid").awaitObject(UUIDResponseDeserializer).third
+                    .fold({ data ->
+                        assertTrue(data.uuid.isNotEmpty())
+                    }, { error ->
+                        fail("This test should pass but got an error: ${error.message}")
+                    })
+        } catch (exception: HttpException) {
+            fail("When using awaitObject network errors should be folded instead of thrown.")
+        }
+    }
+
+    @Test
+    fun testAwaitObjectErrorDueToNetwork() = runBlocking {
+        try {
+            Fuel.get("/not/uuid/endpoint").awaitObject(UUIDResponseDeserializer).third.fold({
+                fail("This test should fail due to HTTP status code.")
+            }, { error ->
+                assertTrue(error.exception is HttpException)
+                assertTrue(error.message!!.contains("HTTP Exception 404"))
+            })
+        } catch (exception: HttpException) {
+            fail("When using awaitObject errors should be folded instead of thrown.")
+        }
+    }
+
+    private data class UUIDIntResponse(val uuid: Int)
+
+    private object UUIDIntResponseDeserializer : ResponseDeserializable<UUIDIntResponse> {
+        override fun deserialize(content: String) =
+                jacksonObjectMapper().readValue<UUIDIntResponse>(content)
+    }
+
+    @Test
+    fun testAwaitObjectDueToSerialization() = runBlocking {
+        try {
+            Fuel.get("/uuid").awaitObject(UUIDIntResponseDeserializer).third.fold({
+                fail("This test should fail because uuid property should be a String.")
+            }, {
+                fail("When using awaitObject serialization errors are thrown.")
+            })
+        } catch (exception: JsonMappingException) {
+            assertNotNull(exception)
+        }
     }
 
     @Test
