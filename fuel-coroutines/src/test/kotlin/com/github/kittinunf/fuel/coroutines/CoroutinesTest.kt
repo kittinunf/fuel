@@ -19,13 +19,24 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testItCanAwaitForAnError() = runBlocking {
+    fun testAwaitStringSuccess() = runBlocking {
+        Fuel.get("/uuid").awaitString().third
+                .fold({ data ->
+                    assertTrue(data.isNotEmpty())
+                    assertTrue(data.contains("uuid"))
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
+    }
+
+    @Test
+    fun testAwaitStringErrorDueToNetwork() = runBlocking {
         try {
             Fuel.get("/not/found/address").awaitString().third.fold({
                 fail("This test should fail due to HTTP status code.")
             }, { error ->
                 assertTrue(error.exception is HttpException)
-                assertTrue(error.message!!.contains("HTTP Exception 404"))
+                assertTrue(error.message.orEmpty().contains("HTTP Exception 404"))
             })
         } catch (exception: HttpException) {
             fail("When using awaitString errors should be folded instead of thrown.")
@@ -44,17 +55,6 @@ class CoroutinesTest {
         } catch (exception: HttpException) {
             fail("When using awaitString errors should be folded instead of thrown.")
         }
-    }
-
-    @Test
-    fun testItCanAwaitString() = runBlocking {
-        Fuel.get("/uuid").awaitString().third
-                .fold({ data ->
-                    assertTrue(data.isNotEmpty())
-                    assertTrue(data.contains("uuid"))
-                }, { error ->
-                    fail("This test should pass but got an error: ${error.message}")
-                })
     }
 
     @Test
