@@ -44,27 +44,27 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitResponseError() = runBlocking {
-        try {
-            Fuel.get("/not/found/address").awaitResponse().third.fold({
-                fail("This test should fail due to HTTP status code.")
-            }, { error ->
-                assertTrue(error.exception is HttpException)
-                assertTrue(error.message!!.contains("HTTP Exception 404"))
-            })
-        } catch (exception: HttpException) {
-            fail("When using awaitString errors should be folded instead of thrown.")
-        }
-    }
-
-    @Test
-    fun testItCanAwaitByteArray() = runBlocking {
+    fun testAwaitResponseSuccess() = runBlocking {
         Fuel.get("/ip").awaitResponse().third
                 .fold({ data ->
                     assertTrue(data.isNotEmpty())
                 }, { error ->
                     fail("This test should pass but got an error: ${error.message}")
                 })
+    }
+
+    @Test
+    fun testAwaitResponseErrorDueToNetwork() = runBlocking {
+        try {
+            Fuel.get("/invalid/url").awaitResponse().third.fold({
+                fail("This test should fail due to HTTP status code.")
+            }, { error ->
+                assertTrue(error.exception is HttpException)
+                assertTrue(error.message!!.contains("HTTP Exception 404"))
+            })
+        } catch (exception: HttpException) {
+            fail("When using awaitResponse errors should be folded instead of thrown.")
+        }
     }
 
     private data class UUIDResponse(val uuid: String)
