@@ -43,16 +43,7 @@ suspend fun <U : Any> Request.awaitObjectResponse(
         deserializable: ResponseDeserializable<U>
 ): Triple<Request, Response, Result<U, FuelError>> = await(deserializable)
 
-@Deprecated("please use 'awaitStringResponse()'", ReplaceWith("awaitStringResponse()"))
-suspend fun Request.awaitString(
-        charset: Charset = Charsets.UTF_8
-): Triple<Request, Response, Result<String, FuelError>> = awaitStringResponse(charset)
 
-
-@Deprecated("please use 'awaitObjectResponse()'", ReplaceWith("awaitObjectResponse(deserializable)"))
-suspend fun <U : Any> Request.awaitObject(
-        deserializable: ResponseDeserializable<U>
-): Triple<Request, Response, Result<U, FuelError>> = awaitObjectResponse(deserializable)
 
 /***
  *
@@ -73,14 +64,6 @@ suspend fun Request.awaitForString(charset: Charset = Charsets.UTF_8): String = 
  * @return Result object
  * */
 suspend fun <U : Any> Request.awaitForObject(deserializable: ResponseDeserializable<U>): U = await(deserializable).third.get()
-
-@Deprecated("please use 'awaitForByteArray()'", ReplaceWith("awaitForByteArray()", "deserializable"))
-suspend fun Request.awaitResponseResult(): ByteArray = awaitForByteArray()
-
-@Deprecated("please use 'awaitForString()'", ReplaceWith("awaitForString(charset)", "charset"))
-suspend fun Request.awaitStringResult(
-        charset: Charset = Charsets.UTF_8
-): String = awaitForString(charset)
 
 
 /***
@@ -115,28 +98,34 @@ suspend fun <U : Any> Request.awaitForObjectResult(
     Result.Failure(fuelError)
 }
 
-/**
- * This function will throw the an exception if an error is thrown either at the HTTP level
- * or during deserialization
- *
- * @param deserializable
- *
- * @return Result object
- * */
+
+@Deprecated("please use 'awaitForByteArray()'", ReplaceWith("awaitForByteArray()", "deserializable"))
+suspend fun Request.awaitResponseResult(): ByteArray = awaitForByteArray()
+
+@Deprecated("please use 'awaitForString()'", ReplaceWith("awaitForString(charset)", "charset"))
+suspend fun Request.awaitStringResult(
+        charset: Charset = Charsets.UTF_8
+): String = awaitForString(charset)
+
+
 @Deprecated("please use 'awaitForObject(deserializable)'", ReplaceWith("awaitForObject(deserializable)"))
 suspend fun <U : Any> Request.awaitObjectResult(
         deserializable: ResponseDeserializable<U>
 ): U = awaitForObject(deserializable)
 
-/**
- * This function catches both server errors and Deserialization Errors
- *
- * @param deserializable
- *
- * @return Result object
- * */
 @Deprecated("please use 'awaitForObjectResult(deserializable)'", ReplaceWith("awaitForObjectResult(deserializable)"))
 suspend fun <U : Any> Request.awaitSafelyObjectResult(
         deserializable: ResponseDeserializable<U>
 ): Result<U, FuelError> = awaitForObjectResult(deserializable)
 
+
+@Deprecated("please use 'awaitStringResponse()'", ReplaceWith("awaitStringResponse()"))
+suspend fun Request.awaitString(
+        charset: Charset = Charsets.UTF_8
+): Triple<Request, Response, Result<String, FuelError>> = awaitStringResponse(charset)
+
+
+@Deprecated("please use 'awaitObjectResponse()'", ReplaceWith("awaitObjectResponse(deserializable)"))
+suspend fun <U : Any> Request.awaitObject(
+        deserializable: ResponseDeserializable<U>
+): Triple<Request, Response, Result<U, FuelError>> = awaitObjectResponse(deserializable)

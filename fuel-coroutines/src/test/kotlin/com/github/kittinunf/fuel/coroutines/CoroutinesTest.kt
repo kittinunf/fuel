@@ -12,11 +12,34 @@ class CoroutinesTest {
 
     init {
         FuelManager.instance.basePath = "https://httpbin.org"
-
         Fuel.testMode {
             timeout = 30000
         }
     }
+
+    @Test
+    fun testItCanAwaitByteArray() = runBlocking {
+        Fuel.get("/ip").awaitResponse().third
+                .fold({ data ->
+                    assertTrue(data.isNotEmpty())
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
+    }
+
+    @Test
+    fun testItAwaitDoesNotThrowException() = runBlocking {
+        try {
+            Fuel.get("/error/404").awaitResponse().third.fold({
+                fail("This should not be called")
+            }, {
+
+            })
+        } catch (exception: Exception) {
+            fail("This test should fail as exception should be caught")
+        }
+    }
+
 
     @Test
     fun testItCanAwaitForAnError() = runBlocking {
@@ -40,22 +63,6 @@ class CoroutinesTest {
                 })
     }
 
-    @Test
-    fun testItCanAwaitByteArray() = runBlocking {
-        Fuel.get("/ip").awaitResponse().third
-                .fold({ data ->
-                    assertTrue(data.isNotEmpty())
-                }, { error ->
-                    fail("This test should pass but got an error: ${error.message}")
-                })
-    }
-
-    private data class UUIDResponse(val uuid: String)
-
-    private object UUIDResponseDeserializer : ResponseDeserializable<UUIDResponse> {
-        override fun deserialize(content: String) =
-                jacksonObjectMapper().readValue<UUIDResponse>(content)
-    }
 
     @Test
     fun testItCanAwaitAnyObject() = runBlocking {
@@ -109,7 +116,7 @@ class CoroutinesTest {
                     .fold({ _ ->
                         fail("This is an error case!")
                     }, { error ->
-                        assertTrue( error.exception is HttpException)
+                        assertTrue(error.exception is HttpException)
                     })
         } catch (e: Exception) {
             fail("this should have been caught")
@@ -128,5 +135,13 @@ class CoroutinesTest {
         } catch (e: Exception) {
             fail("this should have been caught")
         }
+    }
+
+
+    private data class UUIDResponse(val uuid: String)
+
+    private object UUIDResponseDeserializer : ResponseDeserializable<UUIDResponse> {
+        override fun deserialize(content: String) =
+                jacksonObjectMapper().readValue<UUIDResponse>(content)
     }
 }
