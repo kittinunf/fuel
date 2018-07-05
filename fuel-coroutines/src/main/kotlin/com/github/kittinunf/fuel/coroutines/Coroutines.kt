@@ -36,6 +36,7 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.awaitResult(
  * Triple<Request, Response, Result<T, FuelError>>
  *
  */
+
 suspend fun Request.awaitResponse(): Triple<Request, Response, Result<ByteArray, FuelError>> =
         awaitResult(byteArrayDeserializer())
 

@@ -28,6 +28,7 @@ class CoroutinesTest {
     }
 
     @Test
+
     fun testAwaitResponseDoesNotThrowException() = runBlocking {
         try {
             Fuel.get("/error/404").awaitResponse().third.fold({
@@ -63,6 +64,7 @@ class CoroutinesTest {
                 })
     }
 
+
     @Test
     fun testItCanAwaitString() = runBlocking {
         Fuel.get("/uuid").awaitStringResponse().third
@@ -78,6 +80,7 @@ class CoroutinesTest {
     @Test
     fun testItCanAwaitAnyObject() = runBlocking {
         Fuel.get("/uuid").awaitObjectResponse(UUIDResponseDeserializer).third
+
                 .fold({ data ->
                     assertTrue(data.uuid.isNotEmpty())
                 }, { error ->
@@ -149,6 +152,7 @@ class CoroutinesTest {
     fun testAwaitForObjectResultCatchesDeserializeError() = runBlocking {
         try {
             Fuel.get("/ip").awaitForObjectResult(UUIDResponseDeserializer)
+
                     .fold({ _ ->
                         fail("This is an error case!")
                     }, { error ->
@@ -158,8 +162,7 @@ class CoroutinesTest {
             fail("this should have been caught")
         }
     }
-
-
+  
     private data class UUIDResponse(val uuid: String)
 
     private object UUIDResponseDeserializer : ResponseDeserializable<UUIDResponse> {

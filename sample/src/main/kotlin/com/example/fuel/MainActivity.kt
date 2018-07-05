@@ -5,27 +5,20 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import awaitString
-import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.*
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.gson.responseObject
-import com.github.kittinunf.fuel.httpDelete
-import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.fuel.httpPost
-import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rx_object
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.mainAuxText
-import kotlinx.android.synthetic.main.activity_main.mainClearButton
-import kotlinx.android.synthetic.main.activity_main.mainGoButton
-import kotlinx.android.synthetic.main.activity_main.mainGoCoroutineButton
-import kotlinx.android.synthetic.main.activity_main.mainResultText
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.io.File
@@ -33,7 +26,9 @@ import java.io.Reader
 
 class MainActivity : AppCompatActivity() {
 
-    private val TAG = "Main"
+    private val TAG = MainActivity::class.java.simpleName
+
+    private val bag by lazy { CompositeDisposable() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +55,11 @@ class MainActivity : AppCompatActivity() {
             mainResultText.text = ""
             mainAuxText.text = ""
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        bag.clear()
     }
 
     private fun execute() {
@@ -234,13 +234,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpRxSupport() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+        val disposable = "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
                 .rx_object(Issue.Deserializer())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { result ->
                     Log.d(TAG, result.toString())
                 }
+        bag.add(disposable)
     }
 
     private fun httpLiveDataSupport() {
