@@ -18,7 +18,7 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testItCanAwaitByteArray() = runBlocking {
+    fun testItAwaitResponseByteArray() = runBlocking {
         Fuel.get("/ip").awaitResponse().third
                 .fold({ data ->
                     assertTrue(data.isNotEmpty())
@@ -28,28 +28,39 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testItAwaitDoesNotThrowException() = runBlocking {
+    fun testAwaitResponseDoesNotThrowException() = runBlocking {
         try {
             Fuel.get("/error/404").awaitResponse().third.fold({
                 fail("This should not be called")
             }, {
-
+                assertTrue(it.exception is HttpException)
             })
         } catch (exception: Exception) {
             fail("This test should fail as exception should be caught")
         }
     }
 
+    @Test
+    fun testAwaitStringResponseDoesNotThrowException() = runBlocking {
+        try {
+            Fuel.get("/not/found/address").awaitStringResponse().third.fold({
+                fail("This should not be called")
+            }, {
+                assertNotNull(it.exception is HttpException)
+            })
+        } catch (exception: Exception) {
+            fail("This test should fail as exception should be caught")
+        }
+    }
 
     @Test
-    fun testItCanAwaitForAnError() = runBlocking {
-        try {
-            Fuel.get("/not/found/address").awaitStringResponse()
-            fail("This test should fail due to status code 404")
-        } catch (exception: HttpException) {
-            assertNotNull(exception)
-            assertTrue(exception.message!!.contains("HTTP Exception 404"))
-        }
+    fun testAwaitForByteArrayResult() = runBlocking {
+        Fuel.get("/ip").awaitForByteArrayResult()
+                .fold({ data ->
+                    assertTrue(data.isNotEmpty())
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
     }
 
     @Test
@@ -69,6 +80,17 @@ class CoroutinesTest {
         Fuel.get("/uuid").awaitObjectResponse(UUIDResponseDeserializer).third
                 .fold({ data ->
                     assertTrue(data.uuid.isNotEmpty())
+                }, { error ->
+                    fail("This test should pass but got an error: ${error.message}")
+                })
+    }
+
+    @Test
+    fun testItCanAwaitStringResult() = runBlocking {
+        Fuel.get("/uuid").awaitForStringResult()
+                .fold({ data ->
+                    assertTrue(data.isNotEmpty())
+                    assertTrue(data.contains("uuid"))
                 }, { error ->
                     fail("This test should pass but got an error: ${error.message}")
                 })
@@ -100,7 +122,7 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitSafelyPassesObject() = runBlocking {
+    fun testAwaitForObjectResultPassesObject() = runBlocking {
         Fuel.get("/uuid").awaitForObjectResult(UUIDResponseDeserializer)
                 .fold({ data ->
                     assertTrue(data.uuid.isNotEmpty())
@@ -110,7 +132,7 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitSafelyCatchesError() = runBlocking {
+    fun testAwaitForObjectResultCatchesError() = runBlocking {
         try {
             Fuel.get("/error/404").awaitForObjectResult(UUIDResponseDeserializer)
                     .fold({ _ ->
@@ -124,7 +146,7 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitSafelyCatchesDeserializeError() = runBlocking {
+    fun testAwaitForObjectResultCatchesDeserializeError() = runBlocking {
         try {
             Fuel.get("/ip").awaitForObjectResult(UUIDResponseDeserializer)
                     .fold({ _ ->

@@ -19,6 +19,16 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
             }
         }
 
+private suspend fun <T : Any, U : Deserializable<T>> Request.awaitResult(
+        deserializable: U
+): Triple<Request, Response, Result<T, FuelError>> =
+        suspendCancellableCoroutine { continuation ->
+            continuation.invokeOnCancellation { cancel() }
+            response(deserializable) { request: Request, response: Response, result: Result<T, FuelError> ->
+                continuation.resume(Triple(request, response, result))
+            }
+        }
+
 /***
  *
  * Response functions all these return
@@ -28,11 +38,11 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
  * ***/
 
 suspend fun Request.awaitResponse(): Triple<Request, Response, Result<ByteArray, FuelError>> =
-        await(byteArrayDeserializer())
+        awaitResult(byteArrayDeserializer())
 
 suspend fun Request.awaitStringResponse(
         charset: Charset = Charsets.UTF_8
-): Triple<Request, Response, Result<String, FuelError>> = await(stringDeserializer(charset))
+): Triple<Request, Response, Result<String, FuelError>> = awaitResult(stringDeserializer(charset))
 
 
 /**
@@ -41,19 +51,22 @@ suspend fun Request.awaitStringResponse(
  * */
 suspend fun <U : Any> Request.awaitObjectResponse(
         deserializable: ResponseDeserializable<U>
-): Triple<Request, Response, Result<U, FuelError>> = await(deserializable)
-
+): Triple<Request, Response, Result<U, FuelError>> = awaitResult(deserializable)
 
 
 /***
- *
- * Response functions all these return a Type
- *
- * if there is an error these
+ *  @note errors thrown in deserialization will not be caught
+ *  @return ByteArray if no exceptions are thrown
  **/
-suspend fun Request.awaitForByteArray(): ByteArray = awaitResponse().third.get()
+@Throws
+suspend fun Request.awaitForByteArray(): ByteArray = await(byteArrayDeserializer()).third.get()
 
-suspend fun Request.awaitForString(charset: Charset = Charsets.UTF_8): String = awaitStringResponse(charset).third.get()
+/***
+ *  @note errors thrown in deserialization will not be caught
+ *  @return ByteArray if no exceptions are thrown
+ **/
+@Throws
+suspend fun Request.awaitForString(charset: Charset = Charsets.UTF_8): String = await(stringDeserializer(charset)).third.get()
 
 /**
  * This function will throw the an exception if an error is thrown either at the HTTP level
@@ -63,18 +76,19 @@ suspend fun Request.awaitForString(charset: Charset = Charsets.UTF_8): String = 
  *
  * @return Result object
  * */
+@Throws
 suspend fun <U : Any> Request.awaitForObject(deserializable: ResponseDeserializable<U>): U = await(deserializable).third.get()
-
 
 /***
  *
- * Response functions all these return a Result
- *
- * They will throw uncaught exceptions
+ * @return Result<ByteArray,FuelError>
  **/
-
 suspend fun Request.awaitForByteArrayResult(): Result<ByteArray, FuelError> = awaitResponse().third
 
+/***
+ *
+ * @return Result<String,FuelError>
+ **/
 suspend fun Request.awaitForStringResult(
         charset: Charset = Charsets.UTF_8
 ): Result<String, FuelError> = awaitStringResponse(charset).third
