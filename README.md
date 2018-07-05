@@ -692,7 +692,7 @@ Fuel.request(WeatherApi.weatherFor("london")).responseJson { request, response, 
         }
 ```
 
-## Coroutines Support
+### Coroutines Support
 
 Coroutines module provides extension functions to wrap a response inside a coroutine and handle its result. The coroutines-based API provides equivalent methods to the standard API (e.g: `responseString()` in coroutines is `awaitString()`).
 
