@@ -29,14 +29,13 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.awaitResult(
             }
         }
 
-/***
+/**
  *
  * Response functions all these return
  *
  * Triple<Request, Response, Result<T, FuelError>>
  *
- * ***/
-
+ */
 suspend fun Request.awaitResponse(): Triple<Request, Response, Result<ByteArray, FuelError>> =
         awaitResult(byteArrayDeserializer())
 
@@ -48,23 +47,25 @@ suspend fun Request.awaitStringResponse(
 /**
  * @note errors throws in deserialization will not be caught and returned as part of the fuel error
  *
- * */
+ */
 suspend fun <U : Any> Request.awaitObjectResponse(
         deserializable: ResponseDeserializable<U>
 ): Triple<Request, Response, Result<U, FuelError>> = awaitResult(deserializable)
 
 
-/***
+/**
  *  @note errors thrown in deserialization will not be caught
+ *
  *  @return ByteArray if no exceptions are thrown
- **/
+ */
 @Throws
 suspend fun Request.awaitForByteArray(): ByteArray = await(byteArrayDeserializer()).third.get()
 
-/***
+/**
  *  @note errors thrown in deserialization will not be caught
+ *
  *  @return ByteArray if no exceptions are thrown
- **/
+ */
 @Throws
 suspend fun Request.awaitForString(charset: Charset = Charsets.UTF_8): String = await(stringDeserializer(charset)).third.get()
 
@@ -75,20 +76,22 @@ suspend fun Request.awaitForString(charset: Charset = Charsets.UTF_8): String = 
  * @param deserializable
  *
  * @return Result object
- * */
+ */
 @Throws
 suspend fun <U : Any> Request.awaitForObject(deserializable: ResponseDeserializable<U>): U = await(deserializable).third.get()
 
-/***
+/**
  *
  * @return Result<ByteArray,FuelError>
- **/
+ */
 suspend fun Request.awaitForByteArrayResult(): Result<ByteArray, FuelError> = awaitResponse().third
 
-/***
+/**
+ *
+ * @param charset this is defaults to UTF-8
  *
  * @return Result<String,FuelError>
- **/
+ */
 suspend fun Request.awaitForStringResult(
         charset: Charset = Charsets.UTF_8
 ): Result<String, FuelError> = awaitStringResponse(charset).third
@@ -99,7 +102,7 @@ suspend fun Request.awaitForStringResult(
  * @param deserializable
  *
  * @return Result object
- * */
+ */
 suspend fun <U : Any> Request.awaitForObjectResult(
         deserializable: ResponseDeserializable<U>
 ): Result<U, FuelError> = try {
@@ -112,7 +115,6 @@ suspend fun <U : Any> Request.awaitForObjectResult(
     Result.Failure(fuelError)
 }
 
-
 @Deprecated("please use 'awaitForByteArray()'", ReplaceWith("awaitForByteArray()", "deserializable"))
 suspend fun Request.awaitResponseResult(): ByteArray = awaitForByteArray()
 
@@ -120,7 +122,6 @@ suspend fun Request.awaitResponseResult(): ByteArray = awaitForByteArray()
 suspend fun Request.awaitStringResult(
         charset: Charset = Charsets.UTF_8
 ): String = awaitForString(charset)
-
 
 @Deprecated("please use 'awaitForObject(deserializable)'", ReplaceWith("awaitForObject(deserializable)"))
 suspend fun <U : Any> Request.awaitObjectResult(
@@ -132,12 +133,10 @@ suspend fun <U : Any> Request.awaitSafelyObjectResult(
         deserializable: ResponseDeserializable<U>
 ): Result<U, FuelError> = awaitForObjectResult(deserializable)
 
-
 @Deprecated("please use 'awaitStringResponse()'", ReplaceWith("awaitStringResponse()"))
 suspend fun Request.awaitString(
         charset: Charset = Charsets.UTF_8
 ): Triple<Request, Response, Result<String, FuelError>> = awaitStringResponse(charset)
-
 
 @Deprecated("please use 'awaitObjectResponse()'", ReplaceWith("awaitObjectResponse(deserializable)"))
 suspend fun <U : Any> Request.awaitObject(
