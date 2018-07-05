@@ -700,7 +700,7 @@ Coroutines module provides extension functions to wrap a response inside a corou
 runBlocking {
     val (request, response, result) = Fuel.get("https://httpbin.org/ip").awaitString()
 
-result.fold({ data ->
+    result.fold({ data ->
         println(data) // "{"origin":"127.0.0.1"}"
     }, { error ->
         println("An error of type ${error.exception} happened: ${error.message}")
