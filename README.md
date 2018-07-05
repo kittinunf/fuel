@@ -692,6 +692,69 @@ Fuel.request(WeatherApi.weatherFor("london")).responseJson { request, response, 
         }
 ```
 
+## Coroutines Support
+
+Coroutines module provides extension functions to wrap a response inside a coroutine and handle its result. The coroutines-based API provides equivalent methods to the standard API (e.g: `responseString()` in coroutines is `awaitString()`).
+
+```kotlin
+runBlocking {
+    val (request, response, result) = Fuel.get("https://httpbin.org/ip").awaitString()
+
+result.fold({ data ->
+        println(data) // "{"origin":"127.0.0.1"}"
+    }, { error ->
+        println("An error of type ${error.exception} happened: ${error.message}")
+    })
+}
+```
+
+It also provides useful methods to handle the `Result` value directly. The difference is that they throw exception instead of returning it wrapped a `FuelError` instance.
+
+```kotlin
+runBlocking {
+    try {
+        println(Fuel.get("https://httpbin.org/ip").awaitStringResult()) // "{"origin":"127.0.0.1"}"
+    } catch(exception: HttpException) {
+        println("A network request exception was thrown: ${exception.message}")
+    }
+}
+```
+
+Handling objects other than `String` (`awaitString()`) or `ByteArray` (`awaitResponse()`) can be done using `awaitSafelyObjectResult` or `awaitObjectResult`.
+
+```kotlin
+data class Ip(val origin: String)
+
+object IpDeserializer : ResponseDeserializable<Ip> {
+    override fun deserialize(content: String) =
+        jacksonObjectMapper().readValue<Ip>(content)
+}
+```
+
+```kotlin
+runBlocking {
+    Fuel.get("https://httpbin.org/ip").awaitSafelyObjectResult(IpDeserializer)
+        .fold({ data ->
+            println(data.origin) // 127.0.0.1
+        }, { error ->
+            println("An error of type ${error.exception} happened: ${error.message}")
+        })
+}
+```
+
+```kotlin
+runBlocking {
+    try {
+        val data = Fuel.get("https://httpbin.org/ip").awaitObjectResult(IpDeserializer)
+        println(data.origin) // 127.0.0.1
+    } catch (exception: HttpException) {
+        println("A network request exception was thrown: ${exception.message}")
+    } catch (exception: JsonMappingException) {
+        println("A serialization/deserialization exception was thrown: ${exception.message}")
+    }
+}
+```
+
 ## Other libraries
 If you like Fuel, you might also like other libraries of mine;
 * [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
