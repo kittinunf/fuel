@@ -30,8 +30,7 @@ suspend fun Request.awaitString(
         replaceWith = ReplaceWith(
                 expression = ".awaitSafelyObjectResult"),
         level = DeprecationLevel.WARNING,
-        message = "This functions cannot handle exceptions properly which causes API inconsistency."
-)
+        message = "This function cannot handle exceptions properly which causes API inconsistency.")
 @Throws
 suspend fun <U : Any> Request.awaitObject(
         deserializable: ResponseDeserializable<U>
