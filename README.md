@@ -698,7 +698,7 @@ Coroutines module provides extension functions to wrap a response inside a corou
 
 ```kotlin
 runBlocking {
-    val (request, response, result) = Fuel.get("https://httpbin.org/ip").awaitString()
+val (request, response, result) = Fuel.get("https://httpbin.org/ip").awaitStringResult()
 
     result.fold({ data ->
         println(data) // "{"origin":"127.0.0.1"}"
@@ -713,14 +713,14 @@ It also provides useful methods to handle the `Result` value directly. The diffe
 ```kotlin
 runBlocking {
     try {
-        println(Fuel.get("https://httpbin.org/ip").awaitStringResult()) // "{"origin":"127.0.0.1"}"
+        println(Fuel.get("https://httpbin.org/ip").awaitString()) // "{"origin":"127.0.0.1"}"
     } catch(exception: HttpException) {
         println("A network request exception was thrown: ${exception.message}")
     }
 }
 ```
 
-Handling objects other than `String` (`awaitString()`) or `ByteArray` (`awaitResponse()`) can be done using `awaitSafelyObjectResult` or `awaitObjectResult`.
+Handling objects other than `String` (`awaitString()`) or `ByteArray` (`awaitResponse()`) can be done using `awaitObjectResult` 
 
 ```kotlin
 data class Ip(val origin: String)
@@ -733,7 +733,7 @@ object IpDeserializer : ResponseDeserializable<Ip> {
 
 ```kotlin
 runBlocking {
-    Fuel.get("https://httpbin.org/ip").awaitSafelyObjectResult(IpDeserializer)
+    Fuel.get("https://httpbin.org/ip").awaitObjectResult(IpDeserializer)
         .fold({ data ->
             println(data.origin) // 127.0.0.1
         }, { error ->
@@ -745,7 +745,7 @@ runBlocking {
 ```kotlin
 runBlocking {
     try {
-        val data = Fuel.get("https://httpbin.org/ip").awaitObjectResult(IpDeserializer)
+        val data = Fuel.get("https://httpbin.org/ip").awaitObject(IpDeserializer)
         println(data.origin) // 127.0.0.1
     } catch (exception: HttpException) {
         println("A network request exception was thrown: ${exception.message}")
