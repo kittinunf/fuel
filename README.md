@@ -720,7 +720,7 @@ runBlocking {
 }
 ```
 
-Handling objects other than `String` (`awaitString()`) or `ByteArray` (`awaitResponse()`) can be done using `awaitObjectResult` 
+Handling objects other than `String` (`awaitString()`) or `ByteArray` (`awaitByteArrayResponse()`) can be done using `awaitObjectResult`
 
 ```kotlin
 data class Ip(val origin: String)

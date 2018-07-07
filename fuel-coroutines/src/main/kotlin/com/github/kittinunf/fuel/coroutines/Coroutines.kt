@@ -13,7 +13,8 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
             continuation.resume(response(deserializable))
         }
 
-suspend fun Request.awaitResponse(): Triple<Request, Response, Result<ByteArray, FuelError>> =
+
+suspend fun Request.awaitByteArrayResponse(): Triple<Request, Response, Result<ByteArray, FuelError>> =
         await(byteArrayDeserializer())
 
 suspend fun Request.awaitStringResponse(
@@ -44,7 +45,7 @@ suspend fun Request.awaitString(
 ): String = await(stringDeserializer(charset)).third.get()
 
 /**
- * This function will throw the an exception if an error is thrown either at the HTTP level
+ * @note This function will throw the an exception if an error is thrown either at the HTTP level
  * or during deserialization
  *
  * @param deserializable
@@ -62,7 +63,7 @@ suspend fun <U : Any> Request.awaitObject(
  *
  * @return Result<ByteArray,FuelError>
  */
-suspend fun Request.awaitByteArrayResult(): Result<ByteArray, FuelError> = awaitResponse().third
+suspend fun Request.awaitByteArrayResult(): Result<ByteArray, FuelError> = awaitByteArrayResponse().third
 
 /**
  *
