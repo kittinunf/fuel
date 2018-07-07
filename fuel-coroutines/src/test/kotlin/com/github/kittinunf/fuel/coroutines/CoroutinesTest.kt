@@ -162,7 +162,7 @@ class CoroutinesTest {
 
     @Test
     fun testItCanAwaitResponseResult() = runBlocking {
-        assertTrue(Fuel.get("/uuid").awaitForByteArray().isNotEmpty())
+        assertTrue(Fuel.get("/uuid").awaitByteArray().isNotEmpty())
     }
 
     @Test
