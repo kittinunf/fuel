@@ -53,8 +53,9 @@ suspend fun <U : Any> Request.awaitObjectResponse(
 ): Triple<Request, Response, Result<U, FuelError>> = awaitResult(deserializable)
 
 
-/**
- *  @note errors thrown in deserialization will not be caught
+/***
+ *
+ * Response functions all these return a Type
  *
  *  @return ByteArray if no exceptions are thrown
  */
@@ -80,7 +81,9 @@ suspend fun Request.awaitForString(charset: Charset = Charsets.UTF_8): String = 
 @Throws
 suspend fun <U : Any> Request.awaitForObject(deserializable: ResponseDeserializable<U>): U = await(deserializable).third.get()
 
-/**
+/***
+ *
+ * Response functions all these return a Result
  *
  * @return Result<ByteArray,FuelError>
  */

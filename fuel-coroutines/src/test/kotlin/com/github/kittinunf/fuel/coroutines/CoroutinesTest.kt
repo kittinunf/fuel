@@ -28,6 +28,7 @@ class CoroutinesTest {
     }
 
     @Test
+
     fun testAwaitResponseDoesNotThrowException() = runBlocking {
         try {
             Fuel.get("/error/404").awaitResponse().third.fold({
@@ -63,6 +64,7 @@ class CoroutinesTest {
                 })
     }
 
+
     @Test
     fun testItCanAwaitString() = runBlocking {
         Fuel.get("/uuid").awaitStringResponse().third
@@ -73,7 +75,6 @@ class CoroutinesTest {
                     fail("This test should pass but got an error: ${error.message}")
                 })
     }
-
 
     @Test
     fun testItCanAwaitAnyObject() = runBlocking {
@@ -137,8 +138,8 @@ class CoroutinesTest {
             Fuel.get("/error/404").awaitForObjectResult(UUIDResponseDeserializer)
                     .fold({ _ ->
                         fail("This is an error case!")
-                    }, { _ ->
-                        assertTrue(true)
+                    }, { error ->
+                        assertTrue(error.exception is HttpException)
                     })
         } catch (e: Exception) {
             fail("this should have been caught")
@@ -167,3 +168,4 @@ class CoroutinesTest {
                 jacksonObjectMapper().readValue<UUIDResponse>(content)
     }
 }
+
