@@ -23,11 +23,11 @@ class CoroutinesTest {
     @Test
     fun testAwaitResponseReturnByteArray() = runBlocking {
         Fuel.get("/ip").awaitResponse().third
-                .fold({ data ->
-                    assertTrue(data.isNotEmpty())
-                }, { error ->
-                    fail("This test should pass but got an error: ${error.message}")
-                })
+            .fold({ data ->
+                assertTrue(data.isNotEmpty())
+            }, { error ->
+                fail("This test should pass but got an error: ${error.message}")
+            })
     }
 
     @Test
@@ -196,19 +196,6 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitObjectDueToDeserialization() = runBlocking {
-        try {
-            Fuel.get("/uuid").awaitStringResult().fold({
-                fail("This test should fail because uuid property should be a String.")
-            }, {
-                fail("When using awaitObject serialization/deserialization errors are thrown.")
-            })
-        } catch (exception: JsonMappingException) {
-            assertNotNull(exception)
-        }
-    }
-
-    @Test
     fun testAwaitStringResultSuccess() = runBlocking {
         try {
             val data = Fuel.get("/uuid").awaitString()
@@ -244,21 +231,10 @@ class CoroutinesTest {
             Fuel.get("/some/invalid/path").awaitObject(UUIDResponseDeserializer)
             fail("This test should raise an exception due to invalid URL")
         } catch (exception: Exception) {
-            assertNotNull(exception as? HttpException)
             assertTrue(exception.message.orEmpty().contains("404"))
         }
     }
-
-    @Test
-    fun testAwaitObjectResultExceptionDueToDeserialization() = runBlocking {
-        try {
-            Fuel.get("/uuid").awaitObject(UUIDResponseDeserializer)
-            fail("This test should fail because uuid property should be a String.")
-        } catch (exception: JsonMappingException) {
-            assertNotNull(exception)
-        }
-    }
-
+    
     @Test
     fun testItCanAwaitForStringResultCanThrowException() = runBlocking {
         try {
