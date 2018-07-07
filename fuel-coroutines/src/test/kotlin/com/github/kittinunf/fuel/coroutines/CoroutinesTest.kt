@@ -159,6 +159,19 @@ class CoroutinesTest {
         }
     }
 
+    fun test() = runBlocking {
+        try {
+            val data = Fuel.get("https://httpbin.org/ip").awaitObject(IpDeserializer)
+            println(data.origin) // 127.0.0.1
+        } catch (exception: Exception) {
+            when (exception){
+                is HttpException -> println("A network request exception was thrown: ${exception.message}")
+                is JsonMappingException -> println("A serialization/deserialization exception was thrown: ${exception.message}")
+                else -> println("An error [${exception.javaClass.simpleName}\"] was thrown")
+            }
+
+        }
+    }
     @Test
     fun testItCanAwaitForStringResultCanThrowException() = runBlocking {
         try {
