@@ -158,7 +158,7 @@ class CoroutinesTest {
             fail("This test should pass but got an exception: ${exception.message}")
         }
     }
-    
+
     @Test
     fun testItCanAwaitForStringResultCanThrowException() = runBlocking {
         try {
