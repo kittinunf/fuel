@@ -19,50 +19,23 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
             }
         }
 
-/***
- *
- * Response functions all these return
- *
- * Triple<Request, Response, Result<T, FuelError>>
- *
- * ***/
 
 suspend fun Request.awaitResponse(): Triple<Request, Response, Result<ByteArray, FuelError>> =
         await(byteArrayDeserializer())
 
-suspend fun Request.awaitStringResponse(
+suspend fun Request.awaitString(
         charset: Charset = Charsets.UTF_8
 ): Triple<Request, Response, Result<String, FuelError>> = await(stringDeserializer(charset))
 
-
-/**
- * @note errors throws in deserialization will not be caught and returned as part of the fuel error
- *
- * */
-suspend fun <U : Any> Request.awaitObjectResponse(
+suspend fun <U : Any> Request.awaitObject(
         deserializable: ResponseDeserializable<U>
 ): Triple<Request, Response, Result<U, FuelError>> = await(deserializable)
 
-@Deprecated("please use 'awaitStringResponse()'", ReplaceWith("awaitStringResponse()"))
-suspend fun Request.awaitString(
+suspend fun Request.awaitResponseResult(): ByteArray = awaitResponse().third.get()
+
+suspend fun Request.awaitStringResult(
         charset: Charset = Charsets.UTF_8
-): Triple<Request, Response, Result<String, FuelError>> = awaitStringResponse(charset)
-
-
-@Deprecated("please use 'awaitObjectResponse()'", ReplaceWith("awaitObjectResponse(deserializable)"))
-suspend fun <U : Any> Request.awaitObject(
-        deserializable: ResponseDeserializable<U>
-): Triple<Request, Response, Result<U, FuelError>> = awaitObjectResponse(deserializable)
-
-/***
- *
- * Response functions all these return a Type
- *
- * if there is an error these
- **/
-suspend fun Request.awaitForByteArray(): ByteArray = awaitResponse().third.get()
-
-suspend fun Request.awaitForString(charset: Charset = Charsets.UTF_8): String = awaitStringResponse(charset).third.get()
+): String = awaitString(charset).third.get()
 
 /**
  * This function will throw the an exception if an error is thrown either at the HTTP level
@@ -72,29 +45,9 @@ suspend fun Request.awaitForString(charset: Charset = Charsets.UTF_8): String = 
  *
  * @return Result object
  * */
-suspend fun <U : Any> Request.awaitForObject(deserializable: ResponseDeserializable<U>): U = await(deserializable).third.get()
-
-@Deprecated("please use 'awaitForByteArray()'", ReplaceWith("awaitForByteArray()", "deserializable"))
-suspend fun Request.awaitResponseResult(): ByteArray = awaitForByteArray()
-
-@Deprecated("please use 'awaitForString()'", ReplaceWith("awaitForString(charset)", "charset"))
-suspend fun Request.awaitStringResult(
-        charset: Charset = Charsets.UTF_8
-): String = awaitForString(charset)
-
-
-/***
- *
- * Response functions all these return a Result
- *
- * They will throw uncaught exceptions
- **/
-
-suspend fun Request.awaitForByteArrayResult(): Result<ByteArray, FuelError> = awaitResponse().third
-
-suspend fun Request.awaitForStringResult(
-        charset: Charset = Charsets.UTF_8
-): Result<String, FuelError> = awaitStringResponse(charset).third
+suspend fun <U : Any> Request.awaitObjectResult(
+        deserializable: ResponseDeserializable<U>
+): U = await(deserializable).third.get()
 
 /**
  * This function catches both server errors and Deserialization Errors
@@ -103,7 +56,7 @@ suspend fun Request.awaitForStringResult(
  *
  * @return Result object
  * */
-suspend fun <U : Any> Request.awaitForObjectResult(
+suspend fun <U : Any> Request.awaitSafelyObjectResult(
         deserializable: ResponseDeserializable<U>
 ): Result<U, FuelError> = try {
     await(deserializable).third
@@ -114,29 +67,4 @@ suspend fun <U : Any> Request.awaitForObjectResult(
     }
     Result.Failure(fuelError)
 }
-
-/**
- * This function will throw the an exception if an error is thrown either at the HTTP level
- * or during deserialization
- *
- * @param deserializable
- *
- * @return Result object
- * */
-@Deprecated("please use 'awaitForObject(deserializable)'", ReplaceWith("awaitForObject(deserializable)"))
-suspend fun <U : Any> Request.awaitObjectResult(
-        deserializable: ResponseDeserializable<U>
-): U = awaitForObject(deserializable)
-
-/**
- * This function catches both server errors and Deserialization Errors
- *
- * @param deserializable
- *
- * @return Result object
- * */
-@Deprecated("please use 'awaitForObjectResult(deserializable)'", ReplaceWith("awaitForObjectResult(deserializable)"))
-suspend fun <U : Any> Request.awaitSafelyObjectResult(
-        deserializable: ResponseDeserializable<U>
-): Result<U, FuelError> = awaitForObjectResult(deserializable)
 
