@@ -3,7 +3,7 @@ buildscript {
         publishVersion = '1.13.0'
 
         //dependencies version
-        kotlinVersion = '1.2.40'
+        kotlinVersion = '1.2.50'
         resultVersion = '1.4.0'
         rxjavaVersion = '2.1.12'
         archLifecycleVersion = "1.1.1"
@@ -21,17 +21,18 @@ buildscript {
         runnerVersion = '1.0.0'
         rulesVersion = '1.0.0'
         espressoVersion = '3.0.0'
-        kotlinCoroutinesVersion = '0.22.5'
+        kotlinCoroutinesVersion = '0.23.3'
         forgeVersion = '0.3.0'
     }
 
     repositories {
+        mavenCentral()
         jcenter()
         google()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath 'com.android.tools.build:gradle:3.3.0-alpha01'
         classpath 'com.dicedmelon.gradle:jacoco-android:0.1.2'
         classpath 'com.novoda:bintray-release:0.8.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
