@@ -5,6 +5,7 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import awaitString
+import awaitStringResponse
 import com.github.kittinunf.fuel.*
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
@@ -83,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun httpGetCoroutine() {
-        val (request, response, result) = Fuel.get("/get", listOf("userId" to "123")).awaitString()
+        val (request, response, result) = Fuel.get("/get", listOf("userId" to "123")).awaitStringResponse()
         Log.d(TAG, response.toString())
         Log.d(TAG, request.toString())
         update(result)
