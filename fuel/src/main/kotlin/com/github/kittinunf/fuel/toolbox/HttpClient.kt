@@ -17,9 +17,8 @@ import javax.net.ssl.HttpsURLConnection
 
 internal class HttpClient(private val proxy: Proxy? = null) : Client {
     override fun executeRequest(request: Request): Response {
-        val connection = establishConnection(request) as HttpURLConnection
-
         try {
+            val connection = establishConnection(request) as HttpURLConnection
             connection.apply {
                 connectTimeout = Fuel.testConfiguration.coerceTimeout(request.timeoutInMillisecond)
                 readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.timeoutReadInMillisecond)
