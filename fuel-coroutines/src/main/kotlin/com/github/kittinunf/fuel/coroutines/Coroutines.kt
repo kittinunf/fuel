@@ -110,3 +110,4 @@ suspend fun <U : Any> Request.awaitSafelyObjectResult(
 ): Result<U, FuelError> = this.awaitObjectResult(deserializable)
 
 
+
