@@ -19,6 +19,7 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
             continuation.resume(response(deserializable))
         }
 
+
 suspend fun Request.awaitByteArrayResponse(): Triple<Request, Response, Result<ByteArray, FuelError>> =
         await(byteArrayDeserializer())
 
@@ -107,5 +108,6 @@ suspend fun Request.awaitResponseResult(): ByteArray = awaitByteArray()
 suspend fun <U : Any> Request.awaitSafelyObjectResult(
         deserializable: ResponseDeserializable<U>
 ): Result<U, FuelError> = this.awaitObjectResult(deserializable)
+
 
 
