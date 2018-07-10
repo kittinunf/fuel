@@ -74,11 +74,9 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     return this
 }
 
-fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> = try {
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>>  {
     val response = taskRequest.call()
-    Triple(this, response,  Result.trying { deserializable.deserialize(response) })
-} catch (error: FuelError) {
-    Triple(this, error.response, Result.error(error))
+    return Triple(this, response,  Result.trying { deserializable.deserialize(response) })
 }
 
 fun<V : Any> Result.Companion.trying(f: () -> V): Result<V, FuelError> = try {
