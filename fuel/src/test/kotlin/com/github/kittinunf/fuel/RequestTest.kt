@@ -6,9 +6,11 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.*
+import org.hamcrest.MatcherAssert.assertThat
 import org.json.JSONObject
-import org.junit.Assert.*
 import org.junit.Test
 import java.net.HttpURLConnection
 import java.net.URL
