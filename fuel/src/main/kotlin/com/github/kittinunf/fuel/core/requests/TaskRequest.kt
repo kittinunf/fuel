@@ -19,5 +19,7 @@ internal open class TaskRequest(internal val request: Request) : Callable<Respon
             interruptCallback?.invoke(request)
         }
         throw error
+    } catch (exception:Exception){
+        throw  FuelError(exception)
     }
 }
