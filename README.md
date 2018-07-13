@@ -296,7 +296,7 @@ Fuel.get("http://httpbin.org/get", listOf("foo" to "foo", "bar" to "bar")).respo
 }
 
 Fuel.delete("http://httpbin.org/delete", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
-    //resolve to http://httpbin.org/get?foo=foo&bar=bar
+    //resolve to http://httpbin.org/delete?foo=foo&bar=bar
 }
 ```
 
