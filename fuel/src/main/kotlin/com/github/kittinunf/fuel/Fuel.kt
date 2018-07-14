@@ -129,7 +129,9 @@ class Fuel {
 
 @JvmOverloads
 fun String.httpGet(parameters: List<Pair<String, Any?>>? = null): Request = Fuel.get(this, parameters?.flatMap { pair ->
-    (pair.second as? Iterable<*>)?.let {
+    (pair.second as? Iterable<*> )?.let {
+        it.map { "${pair.first}[]" to it }.toList()
+    } ?: (pair.second as? Array<*> )?.let {
         it.map { "${pair.first}[]" to it }.toList()
     } ?: listOf(pair)
 })
