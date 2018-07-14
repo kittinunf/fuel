@@ -6,8 +6,11 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.*
-import org.junit.Assert.assertThat
+import org.hamcrest.MatcherAssert.assertThat
+import org.json.JSONObject
 import org.junit.Test
 import java.net.HttpURLConnection
 import java.net.URL
@@ -207,7 +210,7 @@ class RequestTest : BaseTestCase() {
             request = req
             response = res
 
-            val (d, err) = result
+            val (_, err) = result
             error = err
         }
 
@@ -701,7 +704,7 @@ class RequestTest : BaseTestCase() {
     }
 
     @Test
-    fun httpStringWithOutParams(){
+    fun httpStringWithOutParams() {
         val request = Request(Method.GET, "",
                 url = URL("http://httpbin.org/post"),
                 headers = mutableMapOf("Content-Type" to "text/html"),
@@ -713,7 +716,7 @@ class RequestTest : BaseTestCase() {
     }
 
     @Test
-    fun httpStringWithParams(){
+    fun httpStringWithParams() {
         val request = Request(Method.POST, "",
                 url = URL("http://httpbin.org/post"),
                 headers = mutableMapOf("Content-Type" to "text/html"),
@@ -724,6 +727,28 @@ class RequestTest : BaseTestCase() {
         assertThat(request.httpString(), startsWith("POST http"))
         assertThat(request.httpString(), containsString("Content-Type"))
         assertThat(request.httpString(), containsString("body"))
+    }
+
+    @Test
+    fun httpGetParameterArrayWillFormCorrectURL() {
+        val lionel = "Lionel Ritchie"
+        val list = arrayOf("once", "Twice", "Three", "Times", "Lady")
+        val params = listOf("foo" to list, "bar" to lionel)
+        val request = "http://httpbin.org/get".httpGet(params)
+        request.responseString().third.fold({
+            try {
+                val json = JSONObject(it)
+                assertEquals(json.getJSONObject("args").getString("bar"),lionel)
+                assertEquals(json.getJSONObject("args").getJSONArray("foo[]").map { it.toString() },
+                list.toList())
+            } catch (e: Exception){
+                e.printStackTrace()
+                fail("this should work")
+            }
+        }, {
+            it.printStackTrace()
+            fail("there should be no error here")
+        })
     }
 }
 

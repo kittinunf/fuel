@@ -300,6 +300,14 @@ Fuel.delete("http://httpbin.org/delete", listOf("foo" to "foo", "bar" to "bar"))
 }
 ```
 
+* Array support for GET requests
+
+``` Kotlin
+Fuel.get("http://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey"))).response { request, response, result -> {
+    //resolve to http://httpbin.org/get?foo=foo&dwarf[]=grumpy&dwarf[]=happy&dwarf[]=sleepy&dwarf[]=dopey
+}
+```
+
 * Support x-www-form-urlencoded for PUT & POST
 
 ``` Kotlin
