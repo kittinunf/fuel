@@ -319,7 +319,7 @@ class InterceptorTest : BaseTestCase() {
         val manager = FuelManager()
 
         val (_, _, result) = manager.request(Method.GET,
-                "http:httpbin.org/redirect-to",
+                "http://httpbin.org/redirect-to",
                 listOf("url" to "http://httpbin.org/get")
         ).responseString()
 
