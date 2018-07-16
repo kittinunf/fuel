@@ -2,7 +2,6 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.interceptors.RedirectException
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
@@ -321,8 +320,8 @@ class InterceptorTest : BaseTestCase() {
 
         val (_, _, result) = manager.request(Method.GET,
                 "http://httpbin.org/redirect-to",
-                listOf("url" to "http://httpbin.org/get", "status_code" to HttpURLConnection.HTTP_MOVED_PERM)
-        ).responseString()
+                listOf("url" to "http://httpbin.org/get", "status_code" to HttpURLConnection.HTTP_MOVED_PERM))
+                .responseString()
 
         val (data, error) = result
 
@@ -337,8 +336,8 @@ class InterceptorTest : BaseTestCase() {
 
         val (_, _, result) = manager.request(Method.GET,
                 "http://httpbin.org/redirect-to",
-                listOf("url" to "http://httpbin.org/get")
-        ).responseString()
+                listOf("url" to "http://httpbin.org/get"))
+                .responseString()
 
         val (data, error) = result
 
@@ -353,8 +352,8 @@ class InterceptorTest : BaseTestCase() {
 
         val (_, _, result) = manager.request(Method.GET,
                 "http://httpbin.org/redirect-to",
-                listOf("url" to "http://httpbin.org/get", "status_code" to HttpURLConnection.HTTP_SEE_OTHER)
-        ).responseString()
+                listOf("url" to "http://httpbin.org/get", "status_code" to HttpURLConnection.HTTP_SEE_OTHER))
+                .responseString()
 
         val (data, error) = result
 
@@ -369,8 +368,8 @@ class InterceptorTest : BaseTestCase() {
 
         val (_, _, result) = manager.request(Method.GET,
                 "http://httpbin.org/redirect-to",
-                listOf("url" to "http://httpbin.org/get", "status_code" to HttpURLConnection.HTTP_NOT_MODIFIED)
-        ).responseString()
+                listOf("url" to "http://httpbin.org/get", "status_code" to HttpURLConnection.HTTP_NOT_MODIFIED))
+                .responseString()
 
         val (data, error) = result
 
@@ -384,8 +383,8 @@ class InterceptorTest : BaseTestCase() {
         val manager = FuelManager()
 
         val (_, _, result) = manager.request(Method.GET,
-                "http://httpbin.org/redirect-to"
-        ).responseString()
+                "http://httpbin.org/redirect-to")
+                .responseString()
 
         val (data, error) = result
 
@@ -395,19 +394,19 @@ class InterceptorTest : BaseTestCase() {
     }
 
     @Test
-    fun testGetImpossibleRedirect() {
+    fun testGetWrongUrl() {
         val manager = FuelManager()
 
         val (_, _, result) = manager.request(Method.GET,
-                "http://httpbin.org/status/302"
-        ).responseString()
+                "http://httpbin.org/redirect-to",
+                listOf("url" to "http://ww"))
+                .responseString()
 
         val (data, error) = result
 
         assertThat(data, nullValue())
         assertThat(data, not(containsString("http://httpbin.org/get")))
         assertThat(error, notNullValue())
-        assertThat(error?.exception as RedirectException, isA(RedirectException::class.java))
     }
 }
  
