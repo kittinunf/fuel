@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.interceptors.RedirectException
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
@@ -391,6 +392,22 @@ class InterceptorTest : BaseTestCase() {
         assertThat(data, nullValue())
         assertThat(data, not(containsString("http://httpbin.org/get")))
         assertThat(error, notNullValue())
+    }
+
+    @Test
+    fun testGetImpossibleRedirect() {
+        val manager = FuelManager()
+
+        val (_, _, result) = manager.request(Method.GET,
+                "http://httpbin.org/status/302"
+        ).responseString()
+
+        val (data, error) = result
+
+        assertThat(data, nullValue())
+        assertThat(data, not(containsString("http://httpbin.org/get")))
+        assertThat(error, notNullValue())
+        assertThat(error?.exception as RedirectException, isA(RedirectException::class.java))
     }
 }
  
