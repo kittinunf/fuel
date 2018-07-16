@@ -315,7 +315,23 @@ class InterceptorTest : BaseTestCase() {
     }
 
     @Test
-    fun testGetRedirect() {
+    fun testGet301Redirect() {
+        val manager = FuelManager()
+
+        val (_, _, result) = manager.request(Method.GET,
+                "http://httpbin.org/redirect-to",
+                listOf("url" to "http://httpbin.org/get", "status_code" to HttpURLConnection.HTTP_MOVED_PERM)
+        ).responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(data, containsString("http://httpbin.org/get"))
+        assertThat(error, nullValue())
+    }
+
+    @Test
+    fun testGet302Redirect() {
         val manager = FuelManager()
 
         val (_, _, result) = manager.request(Method.GET,
@@ -326,8 +342,24 @@ class InterceptorTest : BaseTestCase() {
         val (data, error) = result
 
         assertThat(data, notNullValue())
+        assertThat(data, containsString("http://httpbin.org/get"))
         assertThat(error, nullValue())
     }
 
+    @Test
+    fun testGet303Redirect() {
+        val manager = FuelManager()
+
+        val (_, _, result) = manager.request(Method.GET,
+                "http://httpbin.org/redirect-to",
+                listOf("url" to "http://httpbin.org/get", "status_code" to HttpURLConnection.HTTP_SEE_OTHER)
+        ).responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(data, containsString("http://httpbin.org/get"))
+        assertThat(error, nullValue())
+    }
 }
  
