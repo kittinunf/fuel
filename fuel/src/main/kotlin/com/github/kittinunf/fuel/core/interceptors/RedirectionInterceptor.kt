@@ -31,7 +31,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                 if (response.statusCode in HttpsURLConnection.HTTP_MULT_CHOICE..HTTP_PERMANENT_REDIRECT) {
                     val redirectedUrl = response.headers["Location"] ?: response.headers["location"]
 
-                    if (redirectedUrl != null && !redirectedUrl.isNotEmpty()) {
+                    if (redirectedUrl != null && redirectedUrl.isNotEmpty()) {
                         val encoding = Encoding(httpMethod = newMethod,
                                 urlString =
                                 (if (URI(redirectedUrl.first()).isAbsolute) {
