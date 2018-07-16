@@ -32,12 +32,13 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                     val redirectedUrl = response.headers["Location"] ?: response.headers["location"]
 
                     if (redirectedUrl != null && redirectedUrl.isNotEmpty()) {
+                        val newUrl = redirectedUrl.first()
                         val encoding = Encoding(httpMethod = newMethod,
                                 urlString =
-                                (if (URI(redirectedUrl.first()).isAbsolute) {
-                                    URL(redirectedUrl[0]).toString()
+                                (if (URI(newUrl).isAbsolute) {
+                                    URL(newUrl).toString()
                                 } else {
-                                    URL(request.url, redirectedUrl.first())
+                                    URL(request.url, newUrl)
                                 }).toString())
 
                         // redirect

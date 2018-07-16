@@ -361,5 +361,21 @@ class InterceptorTest : BaseTestCase() {
         assertThat(data, containsString("http://httpbin.org/get"))
         assertThat(error, nullValue())
     }
+
+    @Test
+    fun testGetOthersRedirect() {
+        val manager = FuelManager()
+
+        val (_, _, result) = manager.request(Method.GET,
+                "http://httpbin.org/redirect-to",
+                listOf("url" to "http://httpbin.org/get", "status_code" to HttpURLConnection.HTTP_NOT_MODIFIED)
+        ).responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(data, containsString("http://httpbin.org/get"))
+        assertThat(error, nullValue())
+    }
 }
  
