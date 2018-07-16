@@ -304,14 +304,29 @@ class InterceptorTest : BaseTestCase() {
     fun failsIfRedirectedToResourceReturning404() {
         val manager = FuelManager()
         val (_, _, result) = manager.request(Method.GET,
-            "http://httpbin.org/redirect-to",
-            listOf("url" to "http://httpbin.org/status/404"))
-            .header(mapOf("User-Agent" to "Fuel"))
-            .response()
+                "http://httpbin.org/redirect-to",
+                listOf("url" to "http://httpbin.org/status/404"))
+                .header(mapOf("User-Agent" to "Fuel"))
+                .response()
         val (data, error) = result
 
         assertThat(error, notNullValue())
         assertThat(data, nullValue())
+    }
+
+    @Test
+    fun testGetRedirect() {
+        val manager = FuelManager()
+
+        val (_, _, result) = manager.request(Method.GET,
+                "http:httpbin.org/redirect-to",
+                listOf("url" to "http://httpbin.org/get")
+        ).responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(error, nullValue())
     }
 
 }
