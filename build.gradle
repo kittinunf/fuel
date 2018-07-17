@@ -3,7 +3,7 @@ buildscript {
         publishVersion = '1.14.0'
 
         //dependencies version
-        kotlinVersion = '1.2.50'
+        kotlinVersion = '1.2.51'
         resultVersion = '1.4.0'
         rxjavaVersion = '2.1.12'
         archLifecycleVersion = "1.1.1"
