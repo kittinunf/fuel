@@ -5,11 +5,10 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.newSingleThreadContext
 import kotlinx.coroutines.experimental.runBlocking
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 
 class CoroutinesTest {
@@ -203,11 +202,6 @@ class CoroutinesTest {
         } catch (exception: Exception) {
             assertTrue(exception.message.orEmpty().contains("404"))
         }
-    }
-
-    @Test
-    fun testScopePassedInIsTheOneUsed(){
-
     }
 
     private data class UUIDResponse(val uuid: String)
