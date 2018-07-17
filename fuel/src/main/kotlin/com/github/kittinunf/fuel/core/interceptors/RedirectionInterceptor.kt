@@ -10,7 +10,11 @@ import java.net.URI
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
-const val HTTP_PERMANENT_REDIRECT = 308
+private const val HTTP_PERMANENT_REDIRECT = 308
+
+private val redirectStatusWithGets = listOf(HttpsURLConnection.HTTP_MOVED_PERM,
+        HttpsURLConnection.HTTP_MOVED_TEMP,
+        HttpsURLConnection.HTTP_SEE_OTHER)
 
 class RedirectException : Exception("Redirection fail, not found URL to redirect to")
 
@@ -19,10 +23,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
             { request: Request, response: Response ->
 
                 val newMethod = when (response.statusCode) {
-                    HttpsURLConnection.HTTP_MOVED_PERM,
-                    HttpsURLConnection.HTTP_MOVED_TEMP,
-                    HttpsURLConnection.HTTP_SEE_OTHER ->
-                        Method.GET
+                    in redirectStatusWithGets -> Method.GET
                     else -> {
                         request.method
                     }
@@ -31,7 +32,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                 if (response.statusCode in HttpsURLConnection.HTTP_MULT_CHOICE..HTTP_PERMANENT_REDIRECT) {
                     val redirectedUrl = response.headers["Location"] ?: response.headers["location"]
 
-                    if (redirectedUrl != null && redirectedUrl.isNotEmpty()) {
+                    if (redirectedUrl?.isNotEmpty() == true) {
                         val newUrl = redirectedUrl.first()
                         val encoding = Encoding(httpMethod = newMethod,
                                 urlString =
