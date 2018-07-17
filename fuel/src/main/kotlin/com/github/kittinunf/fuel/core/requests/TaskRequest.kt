@@ -20,6 +20,6 @@ internal open class TaskRequest(internal val request: Request) : Callable<Respon
         }
         throw error
     } catch (exception: Exception) {
-        throw  FuelError(exception)
+        throw FuelError(exception)
     }
 }
