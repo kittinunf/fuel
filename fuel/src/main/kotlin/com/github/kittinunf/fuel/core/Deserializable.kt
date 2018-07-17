@@ -75,9 +75,10 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
 }
 
 fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
-    val response by lazy { taskRequest.call() }
+    var response : Response?  = null
     val result = Result.of<T, FuelError> {
-        deserializable.deserialize(response)
+        response = taskRequest.call()
+        deserializable.deserialize(response!!)
     }
-    return Triple(this, response, result)
+    return Triple(this, response ?: result.component2()?.response!!, result)
 }

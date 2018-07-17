@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.io.Reader
@@ -75,7 +76,7 @@ class RequestObjectTest : BaseTestCase() {
         assertThat(error, notNullValue())
         assertThat(data, nullValue())
 
-        assertThat(error?.exception as IllegalStateException, isA(IllegalStateException::class.java))
+        assertNotNull(error?.exception as? ClassCastException)
     }
 
 }
