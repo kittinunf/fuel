@@ -76,7 +76,7 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
 
 fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
     var response : Response?  = null
-    val result = Result.of<T,FuelError> {
+    val result = Result.ofCatching({ it as? FuelError ?: FuelError(it)})  {
         response = taskRequest.call()
         deserializable.deserialize(response!!)
     }
