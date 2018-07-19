@@ -70,7 +70,7 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
         }
     }
     submit(asyncRequest)
-    
+
     return this
 }
 
