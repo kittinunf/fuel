@@ -69,7 +69,6 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
             failure(this, response, error)
         }
     }
-
     submit(asyncRequest)
     return this
 }
