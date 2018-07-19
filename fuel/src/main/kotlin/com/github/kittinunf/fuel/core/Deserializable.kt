@@ -81,7 +81,6 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple
     }
     return Triple(this, response ?: result.component2()?.response!!, result)
 }
-
 fun <V : Any>Result.Companion.ofCatching(c : (exception:Exception) -> FuelError,f: () -> V): Result<V, FuelError> = try {
     Result.Success(f())
 } catch (ex: Exception) {
