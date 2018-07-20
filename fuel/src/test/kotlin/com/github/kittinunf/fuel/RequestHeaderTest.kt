@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -46,4 +47,13 @@ class RequestHeaderTest : BaseTestCase() {
         assertThat(string, containsString(headerValue))
     }
 
+    @Test
+    fun multipleHeadersByTheSameKeyWillBeCorrectlyFormatted(){
+        val request = manager.request(Method.GET, "/get")
+                .header("foo" to "bar","a" to "b", "cookie" to "val1=x", "cookie" to "val2=y","cookie" to "val3=z", "cookie" to "val4=j")
+
+        assertEquals("[ val1=x,val2=y,val3=z,val4=j ]",request.headers["cookie"] )
+        assertEquals("bar",request.headers["foo"] )
+        assertEquals("b",request.headers["a"] )
+    }
 }

@@ -34,10 +34,12 @@ class Request(
         var timeoutReadInMillisecond: Int) : Fuel.RequestConvertible {
 
     @Deprecated(replaceWith = ReplaceWith("method"), message = "http naming is deprecated, use 'method' instead")
-    val httpMethod get() = method
+    val httpMethod
+        get() = method
 
     @Deprecated(replaceWith = ReplaceWith("headers"), message = "http naming is deprecated, use 'headers' instead")
-    val httpHeaders get() = headers
+    val httpHeaders
+        get() = headers
 
     enum class Type {
         REQUEST,
@@ -90,10 +92,30 @@ class Request(
         return this
     }
 
+    /**
+     *  <p> Note that your value, will be converted to a String via the toString() </p>
+     *  <p> Please note that header of the same key are supported and headers with the same key
+     *  will be sent in the format of `key` : [ value,value,value ] </p>
+     * @param pairs This all the key value pair you wish to add to the headers
+     *
+     * @return the request supplied
+     *
+     * */
     fun header(vararg pairs: Pair<String, Any>?): Request {
         pairs.forEach {
-            if (it != null)
-                headers += Pair(it.first, it.second.toString())
+            if (it != null) {
+                if (!headers.containsKey(it.first)) {
+                    headers += Pair(it.first, it.second.toString())
+                } else {
+                    headers[it.first] = headers[it.first]?.let { value ->
+                        var str = value
+                        if (str[0] != '[') str = "[ $str"
+                        str = str.replace(" ]", "")
+                        str += ",${it.second} ]"
+                        str
+                    } ?: it.second.toString()
+                }
+            }
         }
         return this
     }
@@ -143,7 +165,8 @@ class Request(
     }
 
     fun blobs(blobs: (Request, URL) -> Iterable<Blob>): Request {
-        val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
+        val uploadTaskRequest = taskRequest as? UploadTaskRequest
+                ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
         uploadTaskRequest.sourceCallback = blobs
 
         return this
@@ -155,7 +178,8 @@ class Request(
     }
 
     fun dataParts(dataParts: (Request, URL) -> Iterable<DataPart>): Request {
-        val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
+        val uploadTaskRequest = taskRequest as? UploadTaskRequest
+                ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
         val parts = dataParts(request, request.url)
 
         mediaTypes.apply {
@@ -179,7 +203,8 @@ class Request(
         mediaTypes.clear()
         names.clear()
 
-        val uploadTaskRequest = taskRequest as? UploadTaskRequest ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
+        val uploadTaskRequest = taskRequest as? UploadTaskRequest
+                ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
         val files = sources(request, request.url)
 
         uploadTaskRequest.sourceCallback = { _, _ ->
@@ -203,7 +228,8 @@ class Request(
     }
 
     fun destination(destination: (Response, URL) -> File): Request {
-        val downloadTaskRequest = taskRequest as? DownloadTaskRequest ?: throw IllegalStateException("destination is only used with RequestType.DOWNLOAD")
+        val downloadTaskRequest = taskRequest as? DownloadTaskRequest
+                ?: throw IllegalStateException("destination is only used with RequestType.DOWNLOAD")
 
         downloadTaskRequest.destinationCallback = destination
         return this
@@ -243,8 +269,8 @@ class Request(
 
     fun httpString(): String = buildString {
         // url
-        val params = parameters.map { "${it.first}=${it.second}" }.joinToString(separator = "&", prefix = "?")
-        appendln("${method.value} ${url}${params}")
+        val params = parameters.joinToString(separator = "&", prefix = "?") { "${it.first}=${it.second}" }
+        appendln("${method.value} $url$params")
         appendln()
         // headers
         for ((key, value) in headers) {
