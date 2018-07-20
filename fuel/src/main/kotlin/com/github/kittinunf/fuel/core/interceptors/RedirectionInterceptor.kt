@@ -6,11 +6,10 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.isStatusRedirection
 import java.net.URI
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
-
-private const val HTTP_PERMANENT_REDIRECT = 308
 
 private val redirectStatusWithGets = listOf(HttpsURLConnection.HTTP_MOVED_PERM,
         HttpsURLConnection.HTTP_MOVED_TEMP,
@@ -29,7 +28,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                     }
                 }
 
-                if (response.statusCode in HttpsURLConnection.HTTP_MULT_CHOICE..HTTP_PERMANENT_REDIRECT) {
+                if (response.isStatusRedirection) {
                     val redirectedUrl = response.headers["Location"] ?: response.headers["location"]
 
                     if (redirectedUrl?.isNotEmpty() == true) {
