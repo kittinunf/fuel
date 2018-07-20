@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
@@ -408,5 +409,125 @@ class InterceptorTest : BaseTestCase() {
         assertThat(data, not(containsString("http://httpbin.org/get")))
         assertThat(error, notNullValue())
     }
+
+    @Test
+    fun testPost301Redirect() {
+        val manager = FuelManager()
+        val requests = mutableListOf<Request>()
+
+        manager.addRequestInterceptor { next: (Request) -> Request ->
+            { r: Request ->
+                requests.add(r)
+                next(r)
+            }
+        }
+
+        val (originalRequest, _, result) = manager.request(Method.POST,
+                "http://httpstat.us/301")
+                .responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(originalRequest.method, isEqualTo(Method.POST))
+        assertThat(requests[1].method, isEqualTo(Method.GET))
+    }
+
+    @Test
+    fun testPost302Redirect() {
+        val manager = FuelManager()
+        val requests = mutableListOf<Request>()
+
+        manager.addRequestInterceptor { next: (Request) -> Request ->
+            { r: Request ->
+                requests.add(r)
+                next(r)
+            }
+        }
+
+        val (originalRequest, _, result) = manager.request(Method.POST,
+                "http://httpstat.us/302")
+                .responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(originalRequest.method, isEqualTo(Method.POST))
+        assertThat(requests[1].method, isEqualTo(Method.GET))
+    }
+
+    @Test
+    fun testPost303Redirect() {
+        val manager = FuelManager()
+        val requests = mutableListOf<Request>()
+
+        manager.addRequestInterceptor { next: (Request) -> Request ->
+            { r: Request ->
+                requests.add(r)
+                next(r)
+            }
+        }
+
+        val (originalRequest, _, result) = manager.request(Method.POST,
+                "http://httpstat.us/303")
+                .responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(originalRequest.method, isEqualTo(Method.POST))
+        assertThat(requests[1].method, isEqualTo(Method.GET))
+    }
+
+    @Test
+    fun testPost307Redirect() {
+        val manager = FuelManager()
+        val requests = mutableListOf<Request>()
+
+        manager.addRequestInterceptor { next: (Request) -> Request ->
+            { r: Request ->
+                requests.add(r)
+                next(r)
+            }
+        }
+
+        val (originalRequest, _, result) = manager.request(Method.POST,
+                "http://httpstat.us/307")
+                .responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(originalRequest.method, isEqualTo(Method.POST))
+        assertThat(requests[1].method, isEqualTo(Method.POST))
+    }
+
+    @Test
+    fun testPost308Redirect() {
+        val manager = FuelManager()
+
+        val requests = mutableListOf<Request>()
+
+        manager.addRequestInterceptor { next: (Request) -> Request ->
+            { r: Request ->
+                requests.add(r)
+                next(r)
+            }
+        }
+
+        val (originalRequest, _, result) = manager.request(Method.POST,
+                "http://httpstat.us/308")
+                .responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(originalRequest.method, isEqualTo(Method.POST))
+        assertThat(requests[1].method, isEqualTo(Method.POST))
+    }
 }
- 
