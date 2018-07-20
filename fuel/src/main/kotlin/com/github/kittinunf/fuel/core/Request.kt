@@ -102,18 +102,14 @@ class Request(
      *
      * */
     fun header(vararg pairs: Pair<String, Any>?): Request {
-        pairs.forEach {
-            if (it != null) {
-                if (!headers.containsKey(it.first)) {
-                    headers += Pair(it.first, it.second.toString())
-                } else {
-                    headers[it.first] = headers[it.first]?.let { value ->
-                        var str = value
-                        if (str[0] != '[') str = "[ $str"
-                        str = str.replace(" ]", "")
-                        str += ",${it.second} ]"
-                        str
-                    } ?: it.second.toString()
+        pairs.filter { it != null }.map { it!! }.forEach {
+            if (!headers.containsKey(it.first)) {
+                headers += Pair(it.first, it.second.toString())
+            } else {
+                headers[it.first] = headers[it.first]!!.let { value ->
+                    var str = value
+                    if (str[0] != '[') str = "[ $str ]"
+                     str.replace(" ]", ",${it.second} ]")
                 }
             }
         }
@@ -124,10 +120,8 @@ class Request(
 
     internal fun header(pairs: Map<String, Any>?, replace: Boolean): Request {
         pairs?.forEach {
-            it.let {
-                if (!headers.containsKey(it.key) || replace) {
-                    headers += Pair(it.key, it.value.toString())
-                }
+            if (replace || !headers.containsKey(it.key) ) {
+                headers += Pair(it.key, it.value.toString())
             }
         }
         return this

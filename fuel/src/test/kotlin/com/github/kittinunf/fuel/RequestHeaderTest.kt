@@ -56,4 +56,13 @@ class RequestHeaderTest : BaseTestCase() {
         assertEquals("bar",request.headers["foo"] )
         assertEquals("b",request.headers["a"] )
     }
+
+    @Test
+    fun multipleHeadersByTheSameKeyWillShowLastUsingMap(){
+        val request = manager.request(Method.GET, "/get")
+                .header(mapOf("cookie" to "val1=x", "cookie" to "val2=y"),false)
+
+        assertEquals("val2=y",request.headers["cookie"] )
+    }
+
 }
