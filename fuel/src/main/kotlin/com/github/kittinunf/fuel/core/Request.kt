@@ -102,7 +102,7 @@ class Request(
      *
      * */
     fun header(vararg pairs: Pair<String, Any>?): Request {
-        pairs.filter { it != null }.map { it!! }.forEach {
+        pairs.filterNotNull().forEach {
             if (!headers.containsKey(it.first)) {
                 headers += Pair(it.first, it.second.toString())
             } else {
