@@ -2,6 +2,8 @@ package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.core.requests.AsyncTaskRequest
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.map
+import com.github.kittinunf.result.mapError
 import java.io.InputStream
 import java.io.Reader
 
@@ -54,12 +56,12 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     val asyncRequest = AsyncTaskRequest(taskRequest)
 
     asyncRequest.successCallback = { response ->
-        val deliverable = Result.of<T, FuelError> { deserializable.deserialize(response) }
+        val (_, _, result) = response(deserializable)
         callback {
-            deliverable.fold({
+            result.fold({
                 success(this, response, it)
             }, {
-                failure(this, response, FuelError(it))
+                failure(this, response, it)
             })
         }
     }
@@ -75,16 +77,22 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
 }
 
 fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
-    var response : Response?  = null
-    val result = Result.ofCatching({ it as? FuelError ?: FuelError(it)})  {
-        response = taskRequest.call()
-        deserializable.deserialize(response!!)
-    }
-    return Triple(this, response ?: result.component2()?.response!!, result)
+    var response: Response? = null
+    val result = Result.of<Response, Exception> { taskRequest.call() }
+            .map {
+                response = it
+                deserializable.deserialize(it)
+            }
+            .mapError {
+                (it as? FuelError)?.let { response = it.response }
+                FuelError(it)
+            }
+
+    return Triple(this, response ?: Response.error(), result)
 }
 
-fun <V : Any>Result.Companion.ofCatching(c : (exception:Exception) -> FuelError,f: () -> V): Result<V, FuelError> = try {
+fun <V : Any> Result.Companion.ofCatching(c: (exception: Exception) -> FuelError, f: () -> V): Result<V, FuelError> = try {
     Result.Success(f())
 } catch (ex: Exception) {
-    Result.Failure(c(ex) )
+    Result.Failure(c(ex))
 }
