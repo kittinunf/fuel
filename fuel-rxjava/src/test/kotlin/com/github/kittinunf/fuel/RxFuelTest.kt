@@ -129,7 +129,7 @@ class RxFuelTest {
         val (response, result) = Fuel.get("/user-agent")
                 .rx_responseObject(HttpBinMalformedDeserializer())
                 .test()
-                .apply {  awaitTerminalEvent() }
+                .apply { awaitTerminalEvent() }
                 .assertNoErrors()
                 .assertValueCount(1)
                 .assertComplete()
@@ -138,7 +138,6 @@ class RxFuelTest {
         assertThat(response, notNullValue())
         assertThat(result as Result.Failure, isA(Result.Failure::class.java))
         assertThat(result.error.exception as IllegalStateException, isA(IllegalStateException::class.java))
-
         assertThat(result.error.exception.message, isEqualTo("Malformed data"))
     }
 }

@@ -84,8 +84,12 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple
                 deserializable.deserialize(it)
             }
             .mapError {
-                (it as? FuelError)?.let { response = it.response }
-                FuelError(it)
+                if (it is FuelError) {
+                    response = it.response
+                    it
+                } else {
+                    FuelError(it)
+                }
             }
 
     return Triple(this, response ?: Response.error(), result)
