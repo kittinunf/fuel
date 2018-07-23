@@ -56,12 +56,12 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     val asyncRequest = AsyncTaskRequest(taskRequest)
 
     asyncRequest.successCallback = { response ->
-        val (_, _, result) = response(deserializable)
+        val deliverable = Result.of<T, Exception> { deserializable.deserialize(response) }
         callback {
-            result.fold({
+            deliverable.fold({
                 success(this, response, it)
             }, {
-                failure(this, response, it)
+                failure(this, response, FuelError(it))
             })
         }
     }
