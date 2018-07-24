@@ -1,7 +1,6 @@
 package com.github.kittinunf.fuel.core.interceptors
 
 import com.github.kittinunf.fuel.core.Encoding
-import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
@@ -44,13 +43,8 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                         // redirect
                         next(request, manager.request(encoding).response().second)
                     } else {
-                        // error
-                        val error = FuelError(
-                                exception = RedirectException(),
-                                errorData = response.data,
-                                response = response
-                        )
-                        throw error
+                        // there is no location detected, just passing along
+                        next(request, response)
                     }
                 } else {
                     next(request, response)
