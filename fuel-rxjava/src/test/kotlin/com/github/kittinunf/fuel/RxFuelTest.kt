@@ -8,8 +8,10 @@ import com.github.kittinunf.fuel.rx.rx_responseString
 import com.github.kittinunf.fuel.rx.rx_string
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.core.Is.isA
 import org.junit.Assert.assertThat
 import org.junit.Test
+import java.io.InputStream
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RxFuelTest {
@@ -87,9 +89,14 @@ class RxFuelTest {
 
     }
 
+    class HttpBinMalformedDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
+
+        override fun deserialize(inputStream: InputStream): HttpBinUserAgentModel? = throw IllegalStateException("Malformed data")
+    }
+
     @Test
     fun rxTestResponseObject() {
-        val (response, model) = Fuel.get("/user-agent")
+        val (response, result) = Fuel.get("/user-agent")
                 .rx_responseObject(HttpBinUserAgentModelDeserializer())
                 .test()
                 .apply { awaitTerminalEvent() }
@@ -99,12 +106,12 @@ class RxFuelTest {
                 .values()[0]
 
         assertThat(response, notNullValue())
-        assertThat(model, notNullValue())
+        assertThat(result, notNullValue())
     }
 
     @Test
     fun rxTestResponseObjectError() {
-        val (response, model) = Fuel.get("/useragent")
+        val (response, result) = Fuel.get("/useragent")
                 .rx_responseObject(HttpBinUserAgentModelDeserializer())
                 .test()
                 .apply { awaitTerminalEvent() }
@@ -112,8 +119,25 @@ class RxFuelTest {
                 .assertValueCount(1)
                 .assertComplete()
                 .values()[0]
+
         assertThat(response, notNullValue())
-        assert(model is Result.Failure)
+        assertThat(result as Result.Failure, isA(Result.Failure::class.java))
     }
 
+    @Test
+    fun rxTestResponseObjectMalformed() {
+        val (response, result) = Fuel.get("/user-agent")
+                .rx_responseObject(HttpBinMalformedDeserializer())
+                .test()
+                .apply { awaitTerminalEvent() }
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertComplete()
+                .values()[0]
+
+        assertThat(response, notNullValue())
+        assertThat(result as Result.Failure, isA(Result.Failure::class.java))
+        assertThat(result.error.exception as IllegalStateException, isA(IllegalStateException::class.java))
+        assertThat(result.error.exception.message, isEqualTo("Malformed data"))
+    }
 }
