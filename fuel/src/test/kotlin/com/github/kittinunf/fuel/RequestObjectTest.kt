@@ -1,6 +1,10 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseDeserializable
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -76,6 +80,22 @@ class RequestObjectTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         assertThat(error?.exception as IllegalStateException, isA(IllegalStateException::class.java))
+        assertThat(error?.exception?.message, equalTo("Malformed data"))
+    }
+
+    @Test
+    fun httpRequestObjectUserAgentInvalidSync() {
+        val (request, response, result) =
+                Fuel.get("user-agent").responseObject(HttpBinMalformedDeserializer())
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, notNullValue())
+        assertThat(data, nullValue())
+
+        assertThat(error?.exception as IllegalStateException, isA(IllegalStateException::class.java))
+        assertThat(error.exception.message, equalTo("Malformed data"))
     }
 
 }

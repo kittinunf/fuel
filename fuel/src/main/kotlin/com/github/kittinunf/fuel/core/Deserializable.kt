@@ -2,6 +2,8 @@ package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.core.requests.AsyncTaskRequest
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.map
+import com.github.kittinunf.result.mapError
 import java.io.InputStream
 import java.io.Reader
 
@@ -54,7 +56,7 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
     val asyncRequest = AsyncTaskRequest(taskRequest)
 
     asyncRequest.successCallback = { response ->
-        val deliverable = Result.of { deserializable.deserialize(response) }
+        val deliverable = Result.of<T, Exception> { deserializable.deserialize(response) }
         callback {
             deliverable.fold({
                 success(this, response, it)
@@ -69,14 +71,26 @@ private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
             failure(this, response, error)
         }
     }
-
     submit(asyncRequest)
+
     return this
 }
 
-fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> = try {
-    val response = taskRequest.call()
-    Triple(this, response, Result.Success(deserializable.deserialize(response)))
-} catch (error: FuelError) {
-    Triple(this, error.response, Result.error(error))
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
+    var response: Response? = null
+    val result = Result.of<Response, Exception> { taskRequest.call() }
+            .map {
+                response = it
+                deserializable.deserialize(it)
+            }
+            .mapError {
+                if (it is FuelError) {
+                    response = it.response
+                    it
+                } else {
+                    FuelError(it)
+                }
+            }
+
+    return Triple(this, response ?: Response.error(), result)
 }
