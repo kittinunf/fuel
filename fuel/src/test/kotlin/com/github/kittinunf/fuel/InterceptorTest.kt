@@ -550,20 +550,20 @@ class InterceptorTest : BaseTestCase() {
     }
 
     @Test
-    fun testHeaderIsPassingAlongWithRedirectionOnlySubPath() {
+    fun testHeaderIsPassingAlongWithRedirectionWithinSubPath() {
         val manager = FuelManager()
 
         val (_, _, result) = manager.request(Method.GET,
                 "http://httpbin.org/redirect-to",
                 listOf("url" to "/basic-auth/user/pass"))
                 .header("Foo" to "bar")
+                .authenticate("user", "pass")
                 .responseString()
 
         val (data, error) = result
 
+        println(error)
         assertThat(data, notNullValue())
-        assertThat(data, containsString("http://httpbin.org/get"))
-        assertThat(data, containsString("\"Foo\":\"bar"))
         assertThat(error, nullValue())
     }
 
