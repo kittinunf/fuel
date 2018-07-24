@@ -20,28 +20,33 @@ fun redirectResponseInterceptor(manager: FuelManager) =
         { next: (Request, Response) -> Response ->
             { request: Request, response: Response ->
 
-                val newMethod = when (response.statusCode) {
-                    in redirectStatusWithGets -> Method.GET
-                    else -> {
-                        request.method
-                    }
-                }
-
-                if (response.isStatusRedirection) {
+                if (response.isStatusRedirection && request.isAllowRedirect) {
                     val redirectedUrl = response.headers["Location"] ?: response.headers["location"]
+                    val newMethod = when (response.statusCode) {
+                        in redirectStatusWithGets -> Method.GET
+                        else -> {
+                            request.method
+                        }
+                    }
 
                     if (redirectedUrl?.isNotEmpty() == true) {
-                        val newUrl = redirectedUrl.first()
-                        val encoding = Encoding(httpMethod = newMethod,
-                                urlString =
-                                (if (URI(newUrl).isAbsolute) {
-                                    URL(newUrl).toString()
-                                } else {
-                                    URL(request.url, newUrl)
-                                }).toString())
+                        val redirectedUrlString = redirectedUrl.first()
+                        val newUrl = if (URI(redirectedUrlString).isAbsolute) {
+                            URL(redirectedUrlString)
+                        } else {
+                            URL(request.url, redirectedUrlString)
+                        }
+                        val newHeaders = request.headers.toMutableMap()
+
+                        val encoding = Encoding(httpMethod = newMethod, urlString = newUrl.toString())
+
+                        // check whether it is the same host or not
+                        if (newUrl.host != request.url.host) {
+                            newHeaders.remove("Authorization")
+                        }
 
                         // redirect
-                        next(request, manager.request(encoding).response().second)
+                        next(request, manager.request(encoding).header(newHeaders).response().second)
                     } else {
                         // there is no location detected, just passing along
                         next(request, response)
@@ -51,5 +56,3 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                 }
             }
         }
-
-

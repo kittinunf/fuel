@@ -530,4 +530,86 @@ class InterceptorTest : BaseTestCase() {
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.POST))
     }
+
+    @Test
+    fun testHeaderIsPassingAlongWithRedirection() {
+        val manager = FuelManager()
+
+        val (_, _, result) = manager.request(Method.GET,
+                "http://httpbin.org/redirect-to",
+                listOf("url" to "http://httpbin.org/get"))
+                .header("Foo" to "bar")
+                .responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(data, containsString("http://httpbin.org/get"))
+        assertThat(data, containsString("\"Foo\":\"bar"))
+        assertThat(error, nullValue())
+    }
+
+    @Test
+    fun testHeaderIsPassingAlongWithRedirectionOnlySubPath() {
+        val manager = FuelManager()
+
+        val (_, _, result) = manager.request(Method.GET,
+                "http://httpbin.org/redirect-to",
+                listOf("url" to "/basic-auth/user/pass"))
+                .header("Foo" to "bar")
+                .responseString()
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(data, containsString("http://httpbin.org/get"))
+        assertThat(data, containsString("\"Foo\":\"bar"))
+        assertThat(error, nullValue())
+    }
+
+    @Test
+    fun testHeaderAuthenticationWillBeRemoveIfRedirectToDifferentHost() {
+        val manager = FuelManager()
+
+        val requests = mutableListOf<Request>()
+
+        manager.addRequestInterceptor { next: (Request) -> Request ->
+            { r: Request ->
+                requests.add(r)
+                next(r)
+            }
+        }
+
+        val (_, _, result) = manager.request(Method.GET,
+                "http://httpbin.org/redirect-to",
+                listOf("url" to "http://httpstat.us"))
+                .authenticate("foo", "bar")
+                .header("Foo" to "bar")
+                .responseString()
+
+
+        val (data, error) = result
+
+        assertThat(data, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(requests[1].headers["Foo"], notNullValue())
+        assertThat(requests[1].headers["Authorization"], nullValue())
+    }
+
+    @Test
+    fun testDoNotAllowRedirect() {
+        val manager = FuelManager()
+
+        val (_, _, result) = manager.request(Method.GET,
+                "http://httpbin.org/redirect-to",
+                listOf("url" to "/get"))
+                .allowRedirect(false)
+                .responseString()
+
+        val (data, error) = result
+
+        // TODO: This is current based on the current behavior, however we need to fix this as it should handle 100 - 399 gracefully not httpException
+        assertThat(data, nullValue())
+        assertThat(error, notNullValue())
+    }
 }
