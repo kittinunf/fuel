@@ -14,6 +14,18 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
     private var bodyCallBack = fun(request: Request, outputStream: OutputStream?, totalLength: Long): Long {
         var contentLength = 0L
         outputStream.apply {
+            request.parameters.forEach { (name, data) ->
+                contentLength += write("--$boundary")
+                contentLength += writeln()
+                contentLength += write("Content-Disposition: form-data; name=\"$name\"")
+                contentLength += writeln()
+                contentLength += write("Content-Type: text/plain")
+                contentLength += writeln()
+                contentLength += writeln()
+                contentLength += write(data.toString())
+                contentLength += writeln()
+            }
+            
             val files = sourceCallback(request, request.url)
 
             files.forEachIndexed { i, (name, length, inputStream) ->
@@ -37,18 +49,6 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
                     }
                 }
                 contentLength += length
-                contentLength += writeln()
-            }
-
-            request.parameters.forEach { (name, data) ->
-                contentLength += write("--$boundary")
-                contentLength += writeln()
-                contentLength += write("Content-Disposition: form-data; name=\"$name\"")
-                contentLength += writeln()
-                contentLength += write("Content-Type: text/plain")
-                contentLength += writeln()
-                contentLength += writeln()
-                contentLength += write(data.toString())
                 contentLength += writeln()
             }
 

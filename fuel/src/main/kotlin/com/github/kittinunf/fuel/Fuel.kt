@@ -17,7 +17,8 @@ class Fuel {
     companion object {
         internal var testConfiguration = TestConfiguration(timeout = null, blocking = false)
 
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun testMode(configuration: TestConfiguration.() -> Unit = {}) {
             testConfiguration = TestConfiguration().apply(configuration)
         }
@@ -27,74 +28,90 @@ class Fuel {
 
         //convenience methods
         //get
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun get(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.GET, path, parameters)
 
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun get(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.GET, convertible, parameters)
 
         //post
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun post(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.POST, path, parameters)
 
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun post(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.POST, convertible, parameters)
 
         //put
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun put(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.PUT, path, parameters)
 
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun put(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.PUT, convertible, parameters)
 
         //patch
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun patch(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.PATCH, path, parameters)
 
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun patch(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.PATCH, convertible, parameters)
 
         //delete
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun delete(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.DELETE, path, parameters)
 
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun delete(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.DELETE, convertible, parameters)
 
         //download
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun download(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
                 FuelManager.instance.download(path, parameters)
 
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun download(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 download(convertible.path, parameters)
 
         //upload
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun upload(path: String, method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request =
                 FuelManager.instance.upload(path, method, parameters)
 
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun upload(convertible: PathStringConvertible, method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request =
                 upload(convertible.path, method, parameters)
 
         //head
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun head(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.HEAD, path, parameters)
 
-        @JvmStatic @JvmOverloads
+        @JvmStatic
+        @JvmOverloads
         fun head(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.HEAD, convertible, parameters)
 
@@ -107,13 +124,17 @@ class Fuel {
 
         @JvmStatic
         fun request(convertible: RequestConvertible): Request = FuelManager.instance.request(convertible)
-
     }
-
 }
 
 @JvmOverloads
-fun String.httpGet(parameters: List<Pair<String, Any?>>? = null): Request = Fuel.get(this, parameters)
+fun String.httpGet(parameters: List<Pair<String, Any?>>? = null): Request = Fuel.get(this, parameters?.flatMap { pair ->
+    (pair.second as? Iterable<*> )?.let {
+        it.map { "${pair.first}[]" to it }.toList()
+    } ?: (pair.second as? Array<*> )?.let {
+        it.map { "${pair.first}[]" to it }.toList()
+    } ?: listOf(pair)
+})
 
 @JvmOverloads
 fun Fuel.PathStringConvertible.httpGet(parameter: List<Pair<String, Any?>>? = null): Request = Fuel.get(this, parameter)
