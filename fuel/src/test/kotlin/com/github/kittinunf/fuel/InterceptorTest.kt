@@ -229,7 +229,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
-        assertThat(data, containsString("\"user-agent\":\"Fuel\""))
+        assertThat(data, containsString("\"user-agent\": \"Fuel\""))
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
