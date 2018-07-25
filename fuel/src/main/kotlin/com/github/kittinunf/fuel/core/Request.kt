@@ -102,14 +102,14 @@ class Request(
      *
      * */
     fun header(vararg pairs: Pair<String, Any>?): Request {
-        pairs.filterNotNull().forEach {
-            if (!headers.containsKey(it.first)) {
-                headers += Pair(it.first, it.second.toString())
+        pairs.filterNotNull().forEach { (key,value) ->
+            if (!headers.containsKey(key)) {
+                headers += Pair(key, value.toString())
             } else {
-                headers[it.first] = headers[it.first]!!.let { value ->
-                    var str = value
+                headers[key] =  headers.getValue(key).let {
+                    var str = it
                     if (str[0] != '[') str = "[ $str ]"
-                     str.replace(" ]", ",${it.second} ]")
+                     str.replace(" ]", "; $value ]")
                 }
             }
         }
