@@ -30,7 +30,7 @@ class Request(
         var name: String = "",
         val names: MutableList<String> = mutableListOf(),
         val mediaTypes: MutableList<String> = mutableListOf(),
-        var isAllowRedirect: Boolean = true,
+        var isAllowRedirects: Boolean = true,
         var timeoutInMillisecond: Int,
         var timeoutReadInMillisecond: Int) : Fuel.RequestConvertible {
 
@@ -215,8 +215,8 @@ class Request(
         return this
     }
 
-    fun allowRedirect(allowRedirect: Boolean): Request {
-        isAllowRedirect = allowRedirect
+    fun allowRedirects(allowRedirects: Boolean): Request {
+        isAllowRedirects = allowRedirects
         return this
     }
 

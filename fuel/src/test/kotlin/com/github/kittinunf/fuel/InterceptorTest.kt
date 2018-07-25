@@ -603,7 +603,7 @@ class InterceptorTest : BaseTestCase() {
         val (_, _, result) = manager.request(Method.GET,
                 "http://httpbin.org/redirect-to",
                 listOf("url" to "/get"))
-                .allowRedirect(false)
+                .allowRedirects(false)
                 .responseString()
 
         val (data, error) = result
