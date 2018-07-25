@@ -70,15 +70,15 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.kittinunf.fuel:fuel:<latest-version>' //for JVM
-    compile 'com.github.kittinunf.fuel:fuel-android:<latest-version>' //for Android
-    compile 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>' //for LiveData support
-    compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
-    compile 'com.github.kittinunf.fuel:fuel-coroutines:<latest-version>' //for Kotlin Coroutines support
-    compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>' //for Gson support
-    compile 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>' //for Jackson support
-    compile 'com.github.kittinunf.fuel:fuel-moshi:<latest-version>' //for Moshi support
-    compile 'com.github.kittinunf.fuel:fuel-forge:<latest-version>' //for Forge support
+    implementation 'com.github.kittinunf.fuel:fuel:<latest-version>' //for JVM
+    implementation 'com.github.kittinunf.fuel:fuel-android:<latest-version>' //for Android
+    implementation 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>' //for LiveData support
+    implementation 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>' //for RxJava support
+    implementation 'com.github.kittinunf.fuel:fuel-coroutines:<latest-version>' //for Kotlin Coroutines support
+    implementation 'com.github.kittinunf.fuel:fuel-gson:<latest-version>' //for Gson support
+    implementation 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>' //for Jackson support
+    implementation 'com.github.kittinunf.fuel:fuel-moshi:<latest-version>' //for Moshi support
+    implementation 'com.github.kittinunf.fuel:fuel-forge:<latest-version>' //for Forge support
 }
 ```
 
