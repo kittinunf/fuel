@@ -230,7 +230,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
-        assertThat(data, containsString("\"user-agent\":\"Fuel\""))
+        assertThat(data, containsString("\"user-agent\": \"Fuel\""))
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
@@ -545,7 +545,7 @@ class InterceptorTest : BaseTestCase() {
 
         assertThat(data, notNullValue())
         assertThat(data, containsString("http://httpbin.org/get"))
-        assertThat(data, containsString("\"Foo\":\"bar"))
+        assertThat(data, containsString("\"Foo\": \"bar"))
         assertThat(error, nullValue())
     }
 
