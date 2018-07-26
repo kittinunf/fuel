@@ -82,7 +82,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
         assertEquals(data is ByteArray,true)
-        assertEquals((data as ByteArray).size,read)
+        assertEquals((data as ByteArray).size.toLong(),read)
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
         val statusCode = HttpURLConnection.HTTP_OK
