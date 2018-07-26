@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.io.File
@@ -45,6 +46,45 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpDownloadWithProgressValidCaseResponse() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        var read = -1L
+        var total = -1L
+
+        val numberOfBytes = 1048576L
+        manager.download("/bytes/$numberOfBytes").destination { _, _ ->
+            val f = File.createTempFile(numberOfBytes.toString(), null)
+            println(f.absolutePath)
+            f
+        }.progress { readBytes, totalBytes ->
+            read = readBytes
+            total = totalBytes
+            println("read: $read, total: $total")
+        }.response { req, res, result ->
+            request = req
+            response = res
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+        assertEquals(data is ByteArray,true)
+        assertEquals((data as ByteArray).size,read)
+
+        assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
     }
