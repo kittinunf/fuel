@@ -76,3 +76,18 @@ class Response(
         fun error(): Response = Response(URL("http://."))
     }
 }
+
+val Response.isStatusInformational
+    get() = (statusCode / 100) == 1
+
+val Response.isSuccessful
+    get() = (statusCode / 100) == 2
+
+val Response.isStatusRedirection
+    get() = (statusCode / 100) == 3
+
+val Response.isClientError
+    get() = (statusCode / 100) == 4
+
+val Response.isServerError
+    get() = (statusCode / 100) == 5
