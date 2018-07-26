@@ -106,11 +106,7 @@ class Request(
             if (!headers.containsKey(key)) {
                 headers += Pair(key, value.toString())
             } else {
-                headers[key] =  headers.getValue(key).let {
-                    var str = it
-                    if (str[0] != '[') str = "[ $str ]"
-                     str.replace(" ]", "; $value ]")
-                }
+                headers[key] =  headers.getValue(key).let { "$it; $value" }
             }
         }
         return this

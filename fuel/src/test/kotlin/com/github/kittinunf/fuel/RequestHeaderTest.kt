@@ -52,7 +52,7 @@ class RequestHeaderTest : BaseTestCase() {
         manager.request(Method.GET, "/get")
                 .header("foo" to "bar","a" to "b", "cookie" to "val1=x", "cookie" to "val2=y","cookie" to "val3=z", "cookie" to "val4=j")
                 .responseObject (HttpBinHeadersDeserializer()).third.fold({
-            assertEquals("[ val1=x; val2=y; val3=z; val4=j ]",it.headers["Cookie"])
+            assertEquals("val1=x; val2=y; val3=z; val4=j",it.headers["Cookie"])
         },{
             fail()
         })
@@ -63,7 +63,7 @@ class RequestHeaderTest : BaseTestCase() {
         val request = manager.request(Method.GET, "/get")
                 .header("foo" to "bar","a" to "b", "cookie" to "val1=x", "cookie" to "val2=y","cookie" to "val3=z", "cookie" to "val4=j")
 
-        assertEquals("[ val1=x; val2=y; val3=z; val4=j ]",request.headers["cookie"] )
+        assertEquals("val1=x; val2=y; val3=z; val4=j",request.headers["cookie"] )
         assertEquals("bar",request.headers["foo"] )
         assertEquals("b",request.headers["a"] )
     }
