@@ -30,6 +30,7 @@ class Request(
         var name: String = "",
         val names: MutableList<String> = mutableListOf(),
         val mediaTypes: MutableList<String> = mutableListOf(),
+        var isAllowRedirects: Boolean = true,
         var timeoutInMillisecond: Int,
         var timeoutReadInMillisecond: Int) : Fuel.RequestConvertible {
 
@@ -45,7 +46,6 @@ class Request(
         UPLOAD
     }
 
-
     //body
     var bodyCallback: ((Request, OutputStream?, Long) -> Long)? = null
 
@@ -54,7 +54,6 @@ class Request(
     }.toByteArray()
 
     internal lateinit var client: Client
-
 
     //underlying task request
     internal val taskRequest: TaskRequest by lazy {
@@ -213,6 +212,11 @@ class Request(
         taskRequest.apply {
             interruptCallback = interrupt
         }
+        return this
+    }
+
+    fun allowRedirects(allowRedirects: Boolean): Request {
+        isAllowRedirects = allowRedirects
         return this
     }
 
