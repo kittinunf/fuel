@@ -95,8 +95,9 @@ class Request(
     /**
      *  <p> Note that your value, will be converted to a String via the toString() </p>
      *  <p> Please note that header of the same key are supported and headers with the same key
-     *  will be sent in the format of `key` : [ value,value,value ] </p>
-     * @param pairs This all the key value pair you wish to add to the headers
+     *  will be sent in the format of `key` : [ value; value; value ] </p>
+     *
+     * @param pairs This all the key value pairs you wish to add to the headers
      *
      * @return the request supplied
      *
@@ -116,6 +117,18 @@ class Request(
         return this
     }
 
+    /**
+     *  <p> Note that your value, will be converted to a String via the toString() </p>
+     *
+     *  <p> Please note that header of the same key are supported however as this function take a map
+     *  multiple keys are not supported via this function as values assigned to the same key will be overwritten
+     *  hence the last value that is written to that key will be the one used </p>
+     *
+     * @param pairs This all the key value pair you wish to add to the headers
+     *
+     * @return the request supplied
+     *
+     * */
     fun header(pairs: Map<String, Any>?): Request = header(pairs, true)
 
     internal fun header(pairs: Map<String, Any>?, replace: Boolean): Request {
