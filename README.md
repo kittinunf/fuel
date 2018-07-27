@@ -551,6 +551,13 @@ Fuel.get("/get").response { request, response, result ->
 FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
 ```
 
+* `Headers` can be add to a request via the methods `fun header(pairs: Map<String, Any>?): Request`
+ or `fun header(vararg pairs: Pair<String, Any>?)`. 
+ 
+ * The latter method does support multiple values for the same key however as 
+ `fun header(pairs: Map<String, Any>?): Request` takes a map this method can not support multiple
+  values for the same key as per the definition of the map.
+
 ``` Kotlin
 Fuel.get("/get").response { request, response, result ->
     //make request to https://httpbin.org/get with global device header (Device : Android)
