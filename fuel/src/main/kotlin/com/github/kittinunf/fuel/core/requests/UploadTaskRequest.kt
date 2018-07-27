@@ -25,7 +25,7 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 contentLength += write(data.toString())
                 contentLength += writeln()
             }
-            
+
             val files = sourceCallback(request, request.url)
 
             files.forEachIndexed { i, (name, length, inputStream) ->
@@ -43,9 +43,9 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 //input file data
                 if (outputStream != null) {
                     inputStream().use {
-                        it.copyTo(outputStream, BUFFER_SIZE) { writtenBytes ->
+                        it.copyTo(outputStream, BUFFER_SIZE, progress = { writtenBytes ->
                             progressCallback?.invoke(contentLength + writtenBytes, totalLength)
-                        }
+                        })
                     }
                 }
                 contentLength += length

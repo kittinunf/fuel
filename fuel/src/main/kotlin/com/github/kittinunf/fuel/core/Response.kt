@@ -5,6 +5,8 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 import java.net.URLConnection
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 class Response(
         val url: URL,
@@ -13,23 +15,30 @@ class Response(
         val headers: Map<String, List<String>> = emptyMap(),
         val contentLength: Long = 0L,
         val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
+
 ) {
     @Deprecated(replaceWith = ReplaceWith("contentLength"), message = "http naming is deprecated, use 'contentLength' instead")
-    val httpContentLength get() = contentLength
+    val httpContentLength
+        get() = contentLength
 
     @Deprecated(replaceWith = ReplaceWith("responseMessage"), message = "http naming is deprecated, use 'responseMessage' instead")
-    val httpResponseMessage get() = responseMessage
+    val httpResponseMessage
+        get() = responseMessage
 
     @Deprecated(replaceWith = ReplaceWith("statusCode"), message = "http naming is deprecated, use 'statusCode' instead")
-    val httpStatusCode get() = statusCode
+    val httpStatusCode
+        get() = statusCode
 
     @Deprecated(replaceWith = ReplaceWith("headers"), message = "http naming is deprecated, use 'headers' instead")
-    val httpResponseHeaders get() = headers
+    val httpResponseHeaders
+        get() = headers
 
-    val data: ByteArray by lazy {
+
+    var data: ByteArray by MutableLazy {
         try {
             dataStream.readBytes()
         } catch (ex: IOException) {  // If dataStream closed by deserializer
+            print("empty arry")
             ByteArray(0)
         }
     }
@@ -74,6 +83,36 @@ class Response(
 
     companion object {
         fun error(): Response = Response(URL("http://."))
+    }
+}
+
+class MutableLazy<T>(val init: () -> T) : ReadWriteProperty<Any?, T> {
+
+    private var value: Optional<T> = Optional.None()
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        if (value is Optional.None) {
+            value = Optional.Some(init())
+        }
+        return value.get()
+    }
+
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        this.value = Optional.Some(value)
+    }
+}
+
+sealed class Optional<out T> {
+
+    abstract fun get(): T
+
+    class Some<out T>(val value: T) : Optional<T>() {
+        override fun get() = value
+    }
+    class None<out T> : Optional<T>() {
+        override fun get(): T {
+            throw NoSuchElementException("Can't get object from Optional.None")
+        }
     }
 }
 
