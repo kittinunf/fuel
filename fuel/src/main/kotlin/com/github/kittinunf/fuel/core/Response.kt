@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.util.readWriteLazy
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -34,7 +35,7 @@ class Response(
         get() = headers
 
 
-    var data: ByteArray by MutableLazy {
+    var data: ByteArray by readWriteLazy {
         try {
             dataStream.readBytes()
         } catch (ex: IOException) {  // If dataStream closed by deserializer
@@ -83,36 +84,6 @@ class Response(
 
     companion object {
         fun error(): Response = Response(URL("http://."))
-    }
-}
-
-class MutableLazy<T>(val init: () -> T) : ReadWriteProperty<Any?, T> {
-
-    private var value: Optional<T> = Optional.None()
-
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        if (value is Optional.None) {
-            value = Optional.Some(init())
-        }
-        return value.get()
-    }
-
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        this.value = Optional.Some(value)
-    }
-}
-
-sealed class Optional<out T> {
-
-    abstract fun get(): T
-
-    class Some<out T>(val value: T) : Optional<T>() {
-        override fun get() = value
-    }
-    class None<out T> : Optional<T>() {
-        override fun get(): T {
-            throw NoSuchElementException("Can't get object from Optional.None")
-        }
     }
 }
 
