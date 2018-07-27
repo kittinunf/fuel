@@ -6,8 +6,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 import java.net.URLConnection
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 class Response(
         val url: URL,
@@ -34,12 +32,10 @@ class Response(
     val httpResponseHeaders
         get() = headers
 
-
     var data: ByteArray by readWriteLazy {
         try {
             dataStream.readBytes()
         } catch (ex: IOException) {  // If dataStream closed by deserializer
-            print("empty arry")
             ByteArray(0)
         }
     }
