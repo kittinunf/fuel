@@ -267,6 +267,7 @@ class Request(
         get() = this
 
     override fun toString(): String = buildString {
+        appendln("--> $url")
         appendln("\"Body : ${if (getHttpBody().isNotEmpty()) String(getHttpBody()) else "(empty)"}\"")
         appendln("\"Headers : (${headers.size})\"")
         for ((key, value) in headers) {
