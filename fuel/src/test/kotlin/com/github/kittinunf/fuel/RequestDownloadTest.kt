@@ -91,7 +91,7 @@ class RequestDownloadTest : BaseTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
     }
-    
+
     @Test
     fun httpDownloadWithProgressValidCase() {
         var request: Request? = null

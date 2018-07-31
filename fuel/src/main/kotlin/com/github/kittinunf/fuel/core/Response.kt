@@ -14,7 +14,6 @@ class Response(
         val headers: Map<String, List<String>> = emptyMap(),
         val contentLength: Long = 0L,
         val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
-
 ) {
     @Deprecated(replaceWith = ReplaceWith("contentLength"), message = "http naming is deprecated, use 'contentLength' instead")
     val httpContentLength
