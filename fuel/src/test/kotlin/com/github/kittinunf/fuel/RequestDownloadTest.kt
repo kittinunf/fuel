@@ -124,7 +124,6 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertThat(file.length(),isEqualTo(response?.data?.size?.toLong() ?: 0L))
         assertThat(file.length(),isEqualTo(numberOfBytes))
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
