@@ -91,7 +91,7 @@ class RequestDownloadTest : BaseTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
     }
-
+    
     @Test
     fun httpDownloadWithProgressValidCase() {
         var request: Request? = null
@@ -124,6 +124,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
+
         assertThat(file.length(),isEqualTo(response?.data?.size?.toLong() ?: 0L))
         assertThat(file.length(),isEqualTo(numberOfBytes))
 
@@ -172,7 +173,7 @@ class RequestDownloadTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        val numberOfBytes = 131072
+        val numberOfBytes = 131072L
         manager.download("/bytes/$numberOfBytes").destination { _, _ ->
             val dir = System.getProperty("user.dir")
             File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
