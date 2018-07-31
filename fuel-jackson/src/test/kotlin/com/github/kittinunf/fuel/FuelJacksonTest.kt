@@ -101,7 +101,8 @@ class FuelJacksonTest {
 
     @Test
     fun jacksonTestResponseSyncObject() {
-        val (_, res, result) = Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues/1").responseObject<IssueInfo>()
+        val (_, res, result) =
+                Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues/1").responseObject<IssueInfo>()
         assertThat(res, notNullValue())
         assertThat(result.get(), notNullValue())
         assertThat(result.get(), isA(IssueInfo::class.java))
