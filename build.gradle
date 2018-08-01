@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        publishVersion = '1.14.0'
+        publishVersion = '1.15.0'
 
         //dependencies version
         kotlinVersion = '1.2.51'
