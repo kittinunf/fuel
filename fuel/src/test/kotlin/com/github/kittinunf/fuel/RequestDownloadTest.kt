@@ -61,7 +61,7 @@ class RequestDownloadTest : BaseTestCase() {
         var read = -1L
         var total = -1L
 
-        val numberOfBytes = 19976L
+        val numberOfBytes = 1186L
         val file = File.createTempFile(numberOfBytes.toString(), null)
 
         manager.download("/bytes/$numberOfBytes").destination { _, _ ->
@@ -84,6 +84,7 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
         assertEquals(data is ByteArray,true)
+        assertEquals((data as ByteArray).size.toLong(),read)
         assertThat(file.length(),isEqualTo(numberOfBytes))
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
@@ -101,7 +102,7 @@ class RequestDownloadTest : BaseTestCase() {
         var read = -1L
         var total = -1L
 
-        val numberOfBytes = 41924L
+        val numberOfBytes = 45024L
         val file = File.createTempFile(numberOfBytes.toString(), null)
 
         manager.download("/bytes/$numberOfBytes").destination { _, _ ->
@@ -123,6 +124,8 @@ class RequestDownloadTest : BaseTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
+
+        assertThat(file.length(),isEqualTo(response?.data?.size?.toLong() ?: 0L))
         assertThat(file.length(),isEqualTo(numberOfBytes))
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))

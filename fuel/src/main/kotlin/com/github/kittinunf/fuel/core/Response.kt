@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.util.readWriteLazy
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -15,18 +16,22 @@ class Response(
         val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
 ) {
     @Deprecated(replaceWith = ReplaceWith("contentLength"), message = "http naming is deprecated, use 'contentLength' instead")
-    val httpContentLength get() = contentLength
+    val httpContentLength
+        get() = contentLength
 
     @Deprecated(replaceWith = ReplaceWith("responseMessage"), message = "http naming is deprecated, use 'responseMessage' instead")
-    val httpResponseMessage get() = responseMessage
+    val httpResponseMessage
+        get() = responseMessage
 
     @Deprecated(replaceWith = ReplaceWith("statusCode"), message = "http naming is deprecated, use 'statusCode' instead")
-    val httpStatusCode get() = statusCode
+    val httpStatusCode
+        get() = statusCode
 
     @Deprecated(replaceWith = ReplaceWith("headers"), message = "http naming is deprecated, use 'headers' instead")
-    val httpResponseHeaders get() = headers
+    val httpResponseHeaders
+        get() = headers
 
-    val data: ByteArray by lazy {
+    var data: ByteArray by readWriteLazy {
         try {
             dataStream.readBytes()
         } catch (ex: IOException) {  // If dataStream closed by deserializer
