@@ -5,11 +5,12 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import junit.framework.TestCase.assertTrue
+import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.*
-import org.junit.Assert.*
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.nio.charset.IllegalCharsetNameException
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestHandlerTest : BaseTestCase() {
@@ -54,7 +55,7 @@ class RequestHandlerTest : BaseTestCase() {
     fun httpGetRequestWithMalformedHeaders() {
         "/get".httpGet().header("sample" to "a\nb\nc").response().third.fold({ _ ->
             fail()
-        },{e ->
+        }, { e ->
             e.printStackTrace()
             assertTrue(e.exception is IllegalArgumentException)
         })
