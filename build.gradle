@@ -1,11 +1,11 @@
 buildscript {
     ext {
-        publishVersion = '1.14.0'
+        publishVersion = '1.15.0'
 
         //dependencies version
         kotlinVersion = '1.2.51'
         resultVersion = '1.5.0'
-        rxjavaVersion = '2.1.12'
+        rxjavaVersion = '2.1.13'
         archLifecycleVersion = "1.1.1"
 
         //android dependencies version
