@@ -6,9 +6,10 @@ import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.*
-import org.junit.Assert.assertThat
+import org.junit.Assert.*
 import org.junit.Test
 import java.net.HttpURLConnection
+import java.nio.charset.IllegalCharsetNameException
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestHandlerTest : BaseTestCase() {
@@ -47,6 +48,16 @@ class RequestHandlerTest : BaseTestCase() {
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(res?.statusCode, isEqualTo(statusCode))
+    }
+
+    @Test
+    fun httpGetRequestWithMalformedHeaders() {
+        "/get".httpGet().header("sample" to "a\nb\nc").response().third.fold({ _ ->
+            fail()
+        },{e ->
+            e.printStackTrace()
+            assertTrue(e.exception is IllegalArgumentException)
+        })
     }
 
     @Test
