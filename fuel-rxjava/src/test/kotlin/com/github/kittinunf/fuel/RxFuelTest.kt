@@ -2,12 +2,15 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.rx.rx_bytes
 import com.github.kittinunf.fuel.rx.rx_response
 import com.github.kittinunf.fuel.rx.rx_responseObject
 import com.github.kittinunf.fuel.rx.rx_responseString
 import com.github.kittinunf.fuel.rx.rx_string
 import com.github.kittinunf.result.Result
+import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.core.Is.isA
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -53,6 +56,23 @@ class RxFuelTest {
     }
 
     @Test
+    fun rxBytes() {
+        val data = Fuel.get("/bytes/555").rx_bytes()
+                .test()
+                .apply { awaitTerminalEvent() }
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertComplete()
+                .values()[0]
+
+        assertThat(data, notNullValue())
+        assertThat(data as Result.Success, isA(Result.Success::class.java))
+        val (value, error) = data
+        assertThat(value, notNullValue())
+        assertThat(error, nullValue())
+    }
+
+    @Test
     fun rxTestString() {
         val data = Fuel.get("/get").rx_string()
                 .test()
@@ -63,6 +83,10 @@ class RxFuelTest {
                 .values()[0]
 
         assertThat(data, notNullValue())
+        assertThat(data as Result.Success, isA(Result.Success::class.java))
+        val (value, error) = data
+        assertThat(value, notNullValue())
+        assertThat(error, nullValue())
     }
 
     @Test
@@ -74,7 +98,12 @@ class RxFuelTest {
                 .assertValueCount(1)
                 .assertComplete()
                 .values()[0]
-        assert(data is Result.Failure)
+
+        assertThat(data as Result.Failure, isA(Result.Failure::class.java))
+        val (value, error) = data
+        assertThat(value, nullValue())
+        assertThat(error, notNullValue())
+        assertThat(error?.exception?.message, containsString("404 NOT FOUND"))
     }
 
     //Model
