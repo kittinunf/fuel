@@ -2,6 +2,8 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.response
+import com.github.kittinunf.fuel.rx.rx
 import com.github.kittinunf.fuel.rx.rx_bytes
 import com.github.kittinunf.fuel.rx.rx_response
 import com.github.kittinunf.fuel.rx.rx_responseObject
@@ -136,6 +138,10 @@ class RxFuelTest {
 
         assertThat(response, notNullValue())
         assertThat(result, notNullValue())
+        assertThat(result as Result.Success, isA(Result.Success::class.java))
+        val (value, error) = result
+        assertThat(value, notNullValue())
+        assertThat(error, nullValue())
     }
 
     @Test
@@ -151,6 +157,9 @@ class RxFuelTest {
 
         assertThat(response, notNullValue())
         assertThat(result as Result.Failure, isA(Result.Failure::class.java))
+        val (value, error) = result
+        assertThat(value, nullValue())
+        assertThat(error, notNullValue())
     }
 
     @Test
@@ -168,5 +177,25 @@ class RxFuelTest {
         assertThat(result as Result.Failure, isA(Result.Failure::class.java))
         assertThat(result.error.exception as IllegalStateException, isA(IllegalStateException::class.java))
         assertThat(result.error.exception.message, isEqualTo("Malformed data"))
+    }
+
+    @Test
+    fun rxTestWrapper() {
+        val (request, response, result) =
+                Fuel.get("user-agent")
+                        .rx { response(HttpBinUserAgentModelDeserializer()) }
+                        .test()
+                        .apply { awaitTerminalEvent() }
+                        .assertNoErrors()
+                        .assertValueCount(1)
+                        .assertComplete()
+                        .values()[0]
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(result as Result.Success, isA(Result.Success::class.java))
+        val (value, error) = result
+        assertThat(value, notNullValue())
+        assertThat(error, nullValue())
     }
 }
