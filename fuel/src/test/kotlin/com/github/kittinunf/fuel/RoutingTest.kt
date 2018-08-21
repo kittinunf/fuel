@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.util.Base64
 import com.github.kittinunf.fuel.util.FuelRouting
 import org.hamcrest.CoreMatchers.*
 import org.json.JSONObject
@@ -25,6 +26,7 @@ class RoutingTest: BaseTestCase() {
         class GetTest : TestApi()
         class GetParamsTest(val name: String, val value: String) : TestApi()
         class PostBodyTest(val value: String) : TestApi()
+        class PostBinaryBodyTest(val value: String) : TestApi()
 
         override val method: Method
             get() {
@@ -32,6 +34,7 @@ class RoutingTest: BaseTestCase() {
                     is GetTest -> Method.GET
                     is GetParamsTest -> Method.GET
                     is PostBodyTest -> Method.POST
+                    is PostBinaryBodyTest -> Method.POST
                 }
             }
 
@@ -41,6 +44,7 @@ class RoutingTest: BaseTestCase() {
                     is GetTest -> "/get"
                     is GetParamsTest -> "/get"
                     is PostBodyTest -> "/post"
+                    is PostBinaryBodyTest -> "/post"
                 }
             }
 
@@ -48,6 +52,16 @@ class RoutingTest: BaseTestCase() {
             get() {
                 return when (this) {
                     is GetParamsTest -> listOf(this.name to this.value)
+                    else -> null
+                }
+            }
+
+        override val bytes: ByteArray?
+            get() {
+                return when (this) {
+                    is PostBinaryBodyTest -> {
+                        Base64.encode(this.value.toByteArray(), Base64.DEFAULT)
+                    }
                     else -> null
                 }
             }
@@ -68,6 +82,7 @@ class RoutingTest: BaseTestCase() {
             get() {
                 return when (this) {
                     is PostBodyTest -> mapOf("Content-Type" to "application/json")
+                    is PostBinaryBodyTest -> mapOf("Content-Type" to "application/octet-stream")
                     else -> null
                 }
             }
@@ -162,5 +177,38 @@ class RoutingTest: BaseTestCase() {
         assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString("42"))
+    }
+
+    @Test
+    fun httpRouterPostBinaryBody() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val paramValue = "42"
+
+        manager.request(TestApi.PostBinaryBodyTest(paramValue)).responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        val string = data as String
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+
+        val json = JSONObject(string)
+        val bytes = Base64.decode(json.optString("data"), Base64.DEFAULT)
+        assertThat(String(bytes), isEqualTo(paramValue))
     }
 }
