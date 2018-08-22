@@ -9,6 +9,7 @@ import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
+import org.json.JSONObject
 import org.junit.Test
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
@@ -126,5 +127,4 @@ class RequestHandlerTest : BaseTestCase() {
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
     }
-
 }
