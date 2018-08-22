@@ -447,8 +447,11 @@ class RequestTest : BaseTestCase() {
 
         val paramKey = "foo"
         val paramValue = "bar"
+        val bodyValue = "this is a delete body"
 
-        manager.request(Method.DELETE, "http://httpbin.org/delete", listOf(paramKey to paramValue)).responseString { req, res, result ->
+        manager.request(Method.DELETE, "http://httpbin.org/delete", listOf(paramKey to paramValue))
+                .body(bodyValue)
+                .responseString { req, res, result ->
             request = req
             response = res
 
@@ -468,6 +471,7 @@ class RequestTest : BaseTestCase() {
         assertThat(response?.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
+        assertThat(string, containsString(paramValue))
         assertThat(string, containsString(paramValue))
     }
 
