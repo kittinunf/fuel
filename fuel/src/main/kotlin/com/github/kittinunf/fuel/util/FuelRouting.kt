@@ -53,9 +53,9 @@ interface FuelRouting: Fuel.RequestConvertible {
                     urlString = path,
                     parameters = params
             )
-            bytes?.let {
+            body?.let {
                 encoder.request.body(it)
-            } ?: body?.let {
+            } ?: bytes?.let {
                 encoder.request.body(it)
             }
             // return the generated encoder with custom header injected
