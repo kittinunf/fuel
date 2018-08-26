@@ -361,7 +361,6 @@ class RequestTest : BaseTestCase() {
         }
         val string = data as String
 
-        println(string)
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
@@ -474,8 +473,7 @@ class RequestTest : BaseTestCase() {
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
-        println(string)
-
+       
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
         assertThat(string, containsString(bodyValue))

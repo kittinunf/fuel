@@ -137,7 +137,6 @@ class Request(
 
     fun body(body: ByteArray): Request {
         bodyCallback = { _, outputStream, _ ->
-            val test = String(body)
             outputStream?.write(body)
             body.size.toLong()
         }
