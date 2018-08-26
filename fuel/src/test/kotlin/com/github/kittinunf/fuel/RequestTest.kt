@@ -324,7 +324,7 @@ class RequestTest : BaseTestCase() {
         }
 
         val string = data as String
-
+        println(string)
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
@@ -346,9 +346,12 @@ class RequestTest : BaseTestCase() {
 
         val foo = "foo"
         val bar = "bar"
-        val body = "{ $foo : $bar }"
+        val body = JSONObject()
+        body.put(foo, bar)
 
-        manager.request(Method.POST, "http://httpbin.org/post").body(body).responseString { req, res, result ->
+        manager.request(Method.POST, "http://httpbin.org/post")
+                .body(body.toString().toByteArray())
+                .responseString { req, res, result ->
             request = req
             response = res
 
@@ -356,9 +359,9 @@ class RequestTest : BaseTestCase() {
             data = d
             error = err
         }
-
         val string = data as String
 
+        println(string)
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
@@ -447,10 +450,12 @@ class RequestTest : BaseTestCase() {
 
         val paramKey = "foo"
         val paramValue = "bar"
-        val bodyValue = "this is a delete body"
+        val bodyKey = "bodyKey"
+        val bodyValue = "bodyValue"
 
         manager.request(Method.DELETE, "http://httpbin.org/delete", listOf(paramKey to paramValue))
-                .body(bodyValue)
+                .body("{$bodyKey:$bodyValue}")
+                .header("content-type" to " text/json")
                 .responseString { req, res, result ->
             request = req
             response = res
@@ -469,10 +474,11 @@ class RequestTest : BaseTestCase() {
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
+        println(string)
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
-        assertThat(string, containsString(paramValue))
+        assertThat(string, containsString(bodyValue))
     }
 
     @Test
