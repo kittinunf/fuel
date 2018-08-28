@@ -473,7 +473,7 @@ class RequestTest : BaseTestCase() {
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
-       
+
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
         assertThat(string, containsString(bodyValue))
