@@ -498,7 +498,7 @@ class RequestTest : BaseTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        
+
         assertThat(response?.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
 
         assertThat(string, equalTo(""))
