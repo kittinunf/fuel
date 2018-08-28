@@ -145,6 +145,11 @@ class Request(
 
     fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
 
+    fun jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request {
+        header( "content-type" to "application/json")
+        return body(body,charset)
+    }
+
     fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
         val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
