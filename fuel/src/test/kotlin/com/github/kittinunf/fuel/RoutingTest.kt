@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.util.Base64
 import com.github.kittinunf.fuel.util.FuelRouting
 import org.hamcrest.CoreMatchers.*
 import org.json.JSONObject
@@ -25,6 +26,8 @@ class RoutingTest: BaseTestCase() {
         class GetTest : TestApi()
         class GetParamsTest(val name: String, val value: String) : TestApi()
         class PostBodyTest(val value: String) : TestApi()
+        class PostBinaryBodyTest(val value: String) : TestApi()
+        class PostEmptyBodyTest() : TestApi()
 
         override val method: Method
             get() {
@@ -32,6 +35,8 @@ class RoutingTest: BaseTestCase() {
                     is GetTest -> Method.GET
                     is GetParamsTest -> Method.GET
                     is PostBodyTest -> Method.POST
+                    is PostBinaryBodyTest -> Method.POST
+                    is PostEmptyBodyTest -> Method.POST
                 }
             }
 
@@ -41,6 +46,8 @@ class RoutingTest: BaseTestCase() {
                     is GetTest -> "/get"
                     is GetParamsTest -> "/get"
                     is PostBodyTest -> "/post"
+                    is PostBinaryBodyTest -> "/post"
+                    is PostEmptyBodyTest -> "/post"
                 }
             }
 
@@ -48,6 +55,18 @@ class RoutingTest: BaseTestCase() {
             get() {
                 return when (this) {
                     is GetParamsTest -> listOf(this.name to this.value)
+                    else -> null
+                }
+            }
+
+        override val bytes: ByteArray?
+            get() {
+                return when (this) {
+                    is PostBinaryBodyTest -> {
+                        val json = JSONObject()
+                        json.put("id", this.value)
+                        Base64.encode(json.toString().toByteArray(), Base64.DEFAULT)
+                    }
                     else -> null
                 }
             }
@@ -68,6 +87,8 @@ class RoutingTest: BaseTestCase() {
             get() {
                 return when (this) {
                     is PostBodyTest -> mapOf("Content-Type" to "application/json")
+                    is PostBinaryBodyTest -> mapOf("Content-Type" to "application/octet-stream")
+                    is PostEmptyBodyTest -> mapOf("Content-Type" to "application/json")
                     else -> null
                 }
             }
@@ -134,7 +155,7 @@ class RoutingTest: BaseTestCase() {
     }
 
     @Test
-    fun httpRouterGetBody() {
+    fun httpRouterPostBody() {
         var request: Request? = null
         var response: Response? = null
         var data: Any? = null
@@ -161,6 +182,72 @@ class RoutingTest: BaseTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
 
-        assertThat(string, containsString("42"))
+        val res = JSONObject(string)
+        assertThat(res.optString("data"), containsString(paramValue))
+        assertThat(res.optString("json"), containsString(paramValue))
+    }
+
+    @Test
+    fun httpRouterPostBinaryBody() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val paramValue = "42"
+
+        manager.request(TestApi.PostBinaryBodyTest(paramValue)).responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        val string = data as String
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+
+        val res = JSONObject(string)
+        val bytes = Base64.decode(res.optString("data"), Base64.DEFAULT)
+        assertThat(String(bytes), containsString(paramValue))
+        assertThat(res.optString("json"), not(containsString(paramValue)))
+    }
+
+    @Test
+    fun httpRouterPostEmptyBody() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(TestApi.PostEmptyBodyTest()).responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        val string = data as String
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+
+        val res = JSONObject(string)
+        assertThat(res.optString("data"), isEqualTo(""))
     }
 }
