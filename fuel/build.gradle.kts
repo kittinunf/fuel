@@ -36,15 +36,9 @@ configure<PublishExtension> {
     desc = "The easiest HTTP networking library in Kotlin/Android"
     groupId = "com.github.kittinunf.fuel"
     setLicences("MIT")
-    publishVersion = publishVersion
+    publishVersion = extra["publishVersion"].toString()
     uploadName = "Fuel-Android"
     website = "https://github.com/kittinunf/Fuel"
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xdisable-default-scripting-plugin")
-    }
 }
 
 tasks.withType<JacocoReport> {
