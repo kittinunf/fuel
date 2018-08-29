@@ -27,6 +27,10 @@ interface FuelRouting: Fuel.RequestConvertible {
      */
     val params: List<Pair<String, Any?>>?
     /**
+     * Body to handle binary type of request (e.g. application/octet-stream )
+     */
+    val bytes: ByteArray?
+    /**
      * Body to handle other type of request (e.g. application/json )
      */
     val body: String?
@@ -50,6 +54,8 @@ interface FuelRouting: Fuel.RequestConvertible {
                     parameters = params
             )
             body?.let {
+                encoder.request.body(it)
+            } ?: bytes?.let {
                 encoder.request.body(it)
             }
             // return the generated encoder with custom header injected
