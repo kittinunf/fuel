@@ -102,11 +102,11 @@ class Request(
      *
      * */
     fun header(vararg pairs: Pair<String, Any>?): Request {
-        pairs.filterNotNull().forEach { (key,value) ->
+        pairs.filterNotNull().forEach { (key, value) ->
             if (!headers.containsKey(key)) {
                 headers += Pair(key, value.toString())
             } else {
-                headers[key] =  headers.getValue(key).let { "$it; $value" }
+                headers[key] = headers.getValue(key).let { "$it; $value" }
             }
         }
         return this
@@ -128,7 +128,7 @@ class Request(
 
     internal fun header(pairs: Map<String, Any>?, replace: Boolean): Request {
         pairs?.forEach {
-            if (replace || !headers.containsKey(it.key) ) {
+            if (replace || !headers.containsKey(it.key)) {
                 headers += Pair(it.key, it.value.toString())
             }
         }
@@ -146,8 +146,8 @@ class Request(
     fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
 
     fun jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request {
-        header( "content-type" to "application/json")
-        return body(body,charset)
+        header("content-type" to "application/json")
+        return body(body, charset)
     }
 
     fun authenticate(username: String, password: String): Request {

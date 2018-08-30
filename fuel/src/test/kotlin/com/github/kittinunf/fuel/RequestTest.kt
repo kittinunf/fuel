@@ -361,7 +361,7 @@ class RequestTest : BaseTestCase() {
         }
 
         val string = data as String
-       
+
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
