@@ -220,7 +220,7 @@ Fuel.post("http://httpbin.org/post").response { request, response, result ->
 }
 
 //if you have body to post it manually
-Fuel.post("http://httpbin.org/post").body("{ \"foo\" : \"bar\" }").response { request, response, result ->
+Fuel.post("http://httpbin.org/post").jsonBody("{ \"foo\" : \"bar\" }").response { request, response, result ->
 }
 ```
 
