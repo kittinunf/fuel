@@ -1,15 +1,10 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Handler
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.*
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
-import org.json.JSONObject
 import org.junit.Test
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
