@@ -1,6 +1,10 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.*
