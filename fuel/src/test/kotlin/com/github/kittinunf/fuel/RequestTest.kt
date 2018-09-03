@@ -346,11 +346,12 @@ class RequestTest : BaseTestCase() {
 
         val foo = "foo"
         val bar = "bar"
-        val body = JSONObject()
-        body.put(foo, bar)
+
+        val body = "{ $foo : $bar }"
+        val correctBodyResponse = "\"data\": \"$body\""
 
         manager.request(Method.POST, "http://httpbin.org/post")
-                .body(body.toString().toByteArray())
+                .jsonBody(body)
                 .responseString { req, res, result ->
             request = req
             response = res
@@ -369,8 +370,7 @@ class RequestTest : BaseTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
 
-        assertThat(string, containsString(foo))
-        assertThat(string, containsString(bar))
+        assertThat(string, containsString(correctBodyResponse))
     }
 
     @Test
@@ -417,7 +417,7 @@ class RequestTest : BaseTestCase() {
         val paramValue = "bar2"
 
         // for some reason httpbin doesn't support underlying POST for PATCH endpoint
-        manager.request(Method.PATCH, "http://mockbin.org/request", listOf(paramKey to paramValue)).responseString { req, res, result ->
+        manager.request(Method.PATCH, "http://mockbin.org/request", listOf(paramKey to paramValue)).responseString{ req, res, result ->
             request = req
             response = res
 
@@ -505,8 +505,7 @@ class RequestTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
 
         assertThat(string, equalTo(""))
     }
@@ -537,8 +536,7 @@ class RequestTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
 
         assertThat(string, equalTo(""))
     }
@@ -566,8 +564,7 @@ class RequestTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
 
         assertThat(string, containsString("user-agent"))
     }
@@ -595,8 +592,7 @@ class RequestTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -625,8 +621,7 @@ class RequestTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response?.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -743,9 +738,9 @@ class RequestTest : BaseTestCase() {
         val list = arrayOf("once", "Twice", "Three", "Times", "Lady")
         val params = listOf("foo" to list, "bar" to lionel)
         val request = "http://httpbin.org/get".httpGet(params)
-        request.responseString().third.fold({
+        request.responseString().third.fold({ string ->
             try {
-                val json = JSONObject(it)
+                val json = JSONObject(string)
                 assertEquals(json.getJSONObject("args").getString("bar"),lionel)
                 assertEquals(json.getJSONObject("args").getJSONArray("foo[]").map { it.toString() },
                 list.toList())
