@@ -138,6 +138,7 @@ class FuelManager {
         request.callbackExecutor = callbackExecutor
         request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
         request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
+        return request
     }
 
     companion object {
