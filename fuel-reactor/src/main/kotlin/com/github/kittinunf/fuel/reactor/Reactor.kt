@@ -34,6 +34,9 @@ fun <T : Any> Request.monoOfResultUnFolded(mapper: Deserializable<T>): Mono<Resu
         sink.success(result)
     }
 
+fun Request.monoOfResultBytes(): Mono<Result<ByteArray, FuelError>> =
+    monoOfResultUnFolded(ByteArrayDeserializer())
+
 fun Request.monoOfResultString(charset: Charset = Charsets.UTF_8): Mono<Result<String, FuelError>> =
     monoOfResultUnFolded(StringDeserializer(charset))
 

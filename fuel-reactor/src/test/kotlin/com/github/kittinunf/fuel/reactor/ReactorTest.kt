@@ -101,6 +101,15 @@ class ReactorTest {
     }
 
     @Test
+    fun testResultBytes() {
+        Fuel.get("/bytes/10").monoOfResultBytes()
+            .map(Result<ByteArray, FuelError>::get)
+            .test()
+            .assertNext { assertTrue(it.size == 10) }
+            .verifyComplete()
+    }
+
+    @Test
     fun testResultString() {
         Fuel.get("/uuid").monoOfResultString()
             .map(Result<String, FuelError>::get)
