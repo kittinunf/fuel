@@ -12,7 +12,7 @@ fun <T : Any> Request.mono(mapper: Deserializable<T>): Mono<T> =
     Mono.create<T> { sink ->
         sink.onCancel(this::cancel)
         val (_, _, result) = response(mapper)
-        result.fold(sink::success, sink::error)
+        result.fold(sink::success, { sink.error(it.exception) })
     }
 
 fun Request.monoOfBytes(): Mono<ByteArray> =
@@ -20,3 +20,6 @@ fun Request.monoOfBytes(): Mono<ByteArray> =
 
 fun Request.monoOfString(charset: Charset = Charsets.UTF_8): Mono<String> =
     mono(StringDeserializer(charset))
+
+fun <T : Any> Request.monoOfObject(mapper: Deserializable<T>): Mono<T> =
+    mono(mapper)
