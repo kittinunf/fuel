@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.reactor
 
 import com.github.kittinunf.fuel.core.Deserializable
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.response
@@ -23,3 +24,10 @@ fun Request.monoOfString(charset: Charset = Charsets.UTF_8): Mono<String> =
 
 fun <T : Any> Request.monoOfObject(mapper: Deserializable<T>): Mono<T> =
     mono(mapper)
+
+fun Request.monoResponse(): Mono<Response> =
+    Mono.create<Response> { sink ->
+        sink.onCancel(this::cancel)
+        val (_, response, _) = response()
+        sink.success(response)
+    }

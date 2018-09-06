@@ -6,7 +6,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
 import org.junit.Test
@@ -85,5 +87,14 @@ class ReactorTest {
             .block()!!
 
         assertTrue(errorMessage.contains("value failed for JSON property address due to missing"))
+    }
+
+    @Test
+    fun streamResponse() {
+        Fuel.get("/status/404").monoResponse()
+            .map(Response::statusCode)
+            .test()
+            .assertNext { assertEquals(it, 404) }
+            .verifyComplete()
     }
 }
