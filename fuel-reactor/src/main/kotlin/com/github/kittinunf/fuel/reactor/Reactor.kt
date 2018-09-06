@@ -1,11 +1,13 @@
 package com.github.kittinunf.fuel.reactor
 
 import com.github.kittinunf.fuel.core.Deserializable
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.response
+import com.github.kittinunf.result.Result
 import reactor.core.publisher.Mono
 import java.nio.charset.Charset
 
@@ -24,6 +26,16 @@ fun Request.monoOfString(charset: Charset = Charsets.UTF_8): Mono<String> =
 
 fun <T : Any> Request.monoOfObject(mapper: Deserializable<T>): Mono<T> =
     monoOfResultFold(mapper)
+
+fun <T : Any> Request.monoOfResultUnFolded(mapper: Deserializable<T>): Mono<Result<T, FuelError>> =
+    Mono.create { sink ->
+        sink.onCancel(this::cancel)
+        val (_, _, result) = response(mapper)
+        sink.success(result)
+    }
+
+fun Request.monoOfResultString(charset: Charset = Charsets.UTF_8): Mono<Result<String, FuelError>> =
+    monoOfResultUnFolded(StringDeserializer(charset))
 
 fun Request.monoOfResponse(): Mono<Response> =
     Mono.create<Response> { sink ->

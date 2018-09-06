@@ -5,9 +5,11 @@ import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.result.Result
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
@@ -95,6 +97,15 @@ class ReactorTest {
             .map(Response::statusCode)
             .test()
             .assertNext { assertEquals(it, 404) }
+            .verifyComplete()
+    }
+
+    @Test
+    fun testResultString() {
+        Fuel.get("/uuid").monoOfResultString()
+            .map(Result<String, FuelError>::get)
+            .test()
+            .assertNext { assertTrue(it.isNotEmpty()) }
             .verifyComplete()
     }
 }
