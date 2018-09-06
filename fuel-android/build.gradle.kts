@@ -1,20 +1,26 @@
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
-import com.novoda.gradle.release.PublishExtension
 
-plugins { java }
+plugins {
+    id("com.android.library")
+    id("kotlin-android")
+    id("kotlin-android-extensions")
+}
 
-apply(plugin = "com.android.library")
-apply(plugin = "kotlin-android")
-apply(plugin = "com.novoda.bintray-release")
 apply(plugin = "jacoco-android")
 
+dependencies {
+    compile(project(":fuel"))
+    compile("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"]}")
+    testCompile("org.robolectric:robolectric:${extra["robolectricVersion"]}")
+}
+
 configure<BaseExtension> {
-    compileSdkVersion = extra["fuelCompileSdkVersion"].toString()
+    compileSdkVersion(extra["fuelCompileSdkVersion"] as Int)
 
     defaultConfig {
         minSdkVersion(14)
-        targetSdkVersion(extra["fuelCompileSdkVersion"].toString())
+        targetSdkVersion(extra["fuelCompileSdkVersion"] as Int)
         versionCode = 1
         versionName = extra["publishVersion"].toString()
     }
@@ -49,28 +55,4 @@ configure<JacocoAndroidUnitTestReportExtension> {
     csv.enabled(false)
     html.enabled(true)
     xml.enabled(true)
-}
-
-dependencies {
-    compile("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"]}")
-
-    compile(project(":fuel"))
-
-    testCompile("junit:junit:${extra["junitVersion"]}")
-    testCompile("org.robolectric:robolectric:${extra["robolectricVersion"]}")
-}
-
-configure<PublishExtension> {
-    artifactId = "fuel-android"
-    autoPublish = true
-    desc = "The easiest HTTP networking library in Kotlin/Android"
-    groupId = "com.github.kittinunf.fuel"
-    setLicences("MIT")
-    publishVersion = extra["publishVersion"].toString()
-    uploadName = "Fuel-Android"
-    website = "https://github.com/kittinunf/Fuel"
-}
-
-tasks.withType<Javadoc> {
-    enabled = false
 }
