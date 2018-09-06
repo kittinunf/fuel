@@ -10,3 +10,7 @@ dependencies {
     compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:${extra["kotlinCoroutinesVersion"]}")
     testCompile(project(":fuel-jackson"))
 }
+
+configure<KotlinJvmProjectExtension> {
+    experimental.coroutines = Coroutines.ENABLE
+}
