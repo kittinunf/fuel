@@ -27,7 +27,7 @@ fun Request.monoOfString(charset: Charset = Charsets.UTF_8): Mono<String> =
 fun <T : Any> Request.monoOfObject(mapper: Deserializable<T>): Mono<T> =
     monoOfResultFold(mapper)
 
-fun <T : Any> Request.monoOfResultUnFolded(mapper: Deserializable<T>): Mono<Result<T, FuelError>> =
+private fun <T : Any> Request.monoOfResultUnFolded(mapper: Deserializable<T>): Mono<Result<T, FuelError>> =
     Mono.create { sink ->
         sink.onCancel(this::cancel)
         val (_, _, result) = response(mapper)
@@ -39,6 +39,9 @@ fun Request.monoOfResultBytes(): Mono<Result<ByteArray, FuelError>> =
 
 fun Request.monoOfResultString(charset: Charset = Charsets.UTF_8): Mono<Result<String, FuelError>> =
     monoOfResultUnFolded(StringDeserializer(charset))
+
+fun <T : Any> Request.monoOfResultObject(mapper: Deserializable<T>): Mono<Result<T, FuelError>> =
+    monoOfResultUnFolded(mapper)
 
 fun Request.monoOfResponse(): Mono<Response> =
     Mono.create<Response> { sink ->

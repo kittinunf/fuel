@@ -117,4 +117,32 @@ class ReactorTest {
             .assertNext { assertTrue(it.isNotEmpty()) }
             .verifyComplete()
     }
+
+    @Test
+    fun testResultObjectSuccess() {
+        Fuel.get("/ip").monoOfResultObject(IpDeserializerSuccess)
+            .map(Result<Ip, FuelError>::get)
+            .map(Ip::origin)
+            .test()
+            .assertNext { assertTrue(it.isNotEmpty()) }
+            .verifyComplete()
+    }
+
+    @Test
+    fun testResultObjectFailureWrongType() {
+        Fuel.get("/ip").monoOfResultObject(IpLongDeserializer)
+            .map(Result<IpLong, FuelError>::component2)
+            .test()
+            .assertNext { assertTrue(it?.exception is InvalidFormatException) }
+            .verifyComplete()
+    }
+
+    @Test
+    fun testResultObjectFailureMissingProperty() {
+        Fuel.get("/ip").monoOfResultObject(IpAddressDeserializer)
+            .map(Result<IpAddress, FuelError>::component2)
+            .test()
+            .assertNext { assertTrue(it?.exception is MissingKotlinParameterException) }
+            .verifyComplete()
+    }
 }
