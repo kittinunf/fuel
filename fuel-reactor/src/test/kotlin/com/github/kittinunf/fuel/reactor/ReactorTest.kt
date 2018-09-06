@@ -25,4 +25,12 @@ class ReactorTest {
             .assertNext { assertTrue(it.size > 0) }
             .verifyComplete()
     }
+
+    @Test
+    fun streamString() {
+        Fuel.get("/uuid").monoOfString()
+            .test()
+            .assertNext { assertTrue(it.isNotEmpty()) }
+            .verifyComplete()
+    }
 }
