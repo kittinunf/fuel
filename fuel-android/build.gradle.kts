@@ -10,10 +10,10 @@ plugins {
 apply(plugin = "jacoco-android")
 
 dependencies {
-    compile(project(":fuel"))
-    compile("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"]}")
-    testCompile("org.robolectric:robolectric:${extra["robolectricVersion"]}")
-    testCompile("junit:junit:${extra["junitVersion"]}")
+    api(project(":fuel"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"]}")
+    testImplementation("org.robolectric:robolectric:${extra["robolectricVersion"]}")
+    testImplementation("junit:junit:${extra["junitVersion"]}")
 }
 
 configure<BaseExtension> {
