@@ -14,6 +14,7 @@ dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"]}")
     compile("android.arch.lifecycle:extensions:${extra["archLifecycleVersion"]}")
     testCompile("org.robolectric:robolectric:${extra["robolectricVersion"]}")
+    testCompile("junit:junit:${extra["junitVersion"]}")
 }
 
 configure<BaseExtension> {

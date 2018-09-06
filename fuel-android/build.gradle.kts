@@ -13,6 +13,7 @@ dependencies {
     compile(project(":fuel"))
     compile("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"]}")
     testCompile("org.robolectric:robolectric:${extra["robolectricVersion"]}")
+    testCompile("junit:junit:${extra["junitVersion"]}")
 }
 
 configure<BaseExtension> {
