@@ -16,8 +16,8 @@ buildscript {
     extra["rxjavaVersion"] = "2.1.13"
 
     // Android dependencies
-    extra["androidSupportVersion"] =  "27.1.1"
-    extra["fuelCompileSdkVersion"] =  27
+    extra["androidSupportVersion"] = "27.1.1"
+    extra["fuelCompileSdkVersion"] = 27
 
     // Testing dependencies
     extra["espressoVersion"] = "3.0.0"
