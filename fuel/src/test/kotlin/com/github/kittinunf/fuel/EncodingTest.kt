@@ -22,6 +22,18 @@ class EncodingTest : BaseTestCase() {
     }
 
     @Test
+    fun testEncodingWithBaseUrlStringWithLastSlash() {
+        val request = Encoding(
+                httpMethod = Method.GET,
+                baseUrlString = "http://www.example.com/",
+                urlString = "test",
+                parameters = listOf("a" to "b")
+        ).request
+
+        assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?a=b"))
+    }
+
+    @Test
     fun testEncodingWithNoParam() {
         val request = Encoding(
                 httpMethod = Method.GET,
