@@ -71,16 +71,7 @@ class FuelManager {
                 timeoutInMillisecond = timeoutInMillisecond,
                 timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request)
-
-        request.client = client
-        request.headers += baseHeaders.orEmpty()
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
+        return request(request)
     }
 
     fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request =
@@ -96,16 +87,7 @@ class FuelManager {
                 timeoutInMillisecond = timeoutInMillisecond,
                 timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request
-
-        request.client = client
-        request.headers += baseHeaders.orEmpty()
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
+        return request(request)
     }
 
     fun upload(path: String, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
@@ -118,30 +100,10 @@ class FuelManager {
                 timeoutInMillisecond = timeoutInMillisecond,
                 timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request
-
-        request.client = client
-        request.headers += baseHeaders.orEmpty()
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
+        return request(request)
     }
 
-    fun request(convertible: Fuel.RequestConvertible): Request {
-        val request = convertible.request
-        request.client = client
-        request.headers += baseHeaders.orEmpty()
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
-    }
+    fun request(convertible: Fuel.RequestConvertible): Request = request(convertible.request)
 
     fun addRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)) {
         requestInterceptors += interceptor
@@ -165,6 +127,18 @@ class FuelManager {
 
     fun removeAllResponseInterceptors() {
         responseInterceptors.clear()
+    }
+
+    private fun request(request: Request): Request {
+        request.client = client
+        request.headers += baseHeaders.orEmpty()
+        request.socketFactory = socketFactory
+        request.hostnameVerifier = hostnameVerifier
+        request.executor = createExecutor()
+        request.callbackExecutor = callbackExecutor
+        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
+        return request
     }
 
     companion object {
