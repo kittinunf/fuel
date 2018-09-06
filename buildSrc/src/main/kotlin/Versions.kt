@@ -14,6 +14,7 @@ object Versions {
     val jacksonVersion = "2.9.6"
     val kotlinCoroutinesVersion = "0.23.3"
     val moshiVersion = "1.5.0"
+    val reactorVersion = "3.2.0.M4"
     val rxjavaVersion = "2.1.13"
     val rxandroidVersion = "2.1.0"
 
