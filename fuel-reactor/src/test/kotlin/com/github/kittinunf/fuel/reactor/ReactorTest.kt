@@ -91,7 +91,7 @@ class ReactorTest {
 
     @Test
     fun streamResponse() {
-        Fuel.get("/status/404").monoResponse()
+        Fuel.get("/status/404").monoOfResponse()
             .map(Response::statusCode)
             .test()
             .assertNext { assertEquals(it, 404) }

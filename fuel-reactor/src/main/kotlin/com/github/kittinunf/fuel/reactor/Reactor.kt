@@ -9,7 +9,7 @@ import com.github.kittinunf.fuel.core.response
 import reactor.core.publisher.Mono
 import java.nio.charset.Charset
 
-fun <T : Any> Request.mono(mapper: Deserializable<T>): Mono<T> =
+private fun <T : Any> Request.monoOfResultFold(mapper: Deserializable<T>): Mono<T> =
     Mono.create<T> { sink ->
         sink.onCancel(this::cancel)
         val (_, _, result) = response(mapper)
@@ -17,15 +17,15 @@ fun <T : Any> Request.mono(mapper: Deserializable<T>): Mono<T> =
     }
 
 fun Request.monoOfBytes(): Mono<ByteArray> =
-    mono(ByteArrayDeserializer())
+    monoOfResultFold(ByteArrayDeserializer())
 
 fun Request.monoOfString(charset: Charset = Charsets.UTF_8): Mono<String> =
-    mono(StringDeserializer(charset))
+    monoOfResultFold(StringDeserializer(charset))
 
 fun <T : Any> Request.monoOfObject(mapper: Deserializable<T>): Mono<T> =
-    mono(mapper)
+    monoOfResultFold(mapper)
 
-fun Request.monoResponse(): Mono<Response> =
+fun Request.monoOfResponse(): Mono<Response> =
     Mono.create<Response> { sink ->
         sink.onCancel(this::cancel)
         val (_, response, _) = response()
