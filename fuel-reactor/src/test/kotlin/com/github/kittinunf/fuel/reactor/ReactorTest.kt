@@ -17,6 +17,8 @@ import org.junit.Test
 import reactor.core.publisher.Mono
 import reactor.core.publisher.onErrorResume
 import reactor.test.test
+import java.time.Duration
+import java.util.concurrent.atomic.AtomicBoolean
 
 class ReactorTest {
 
@@ -71,7 +73,7 @@ class ReactorTest {
         Fuel.get("/ip").monoOfObject(IpLongDeserializer)
             .map(IpLong::origin)
             .test()
-            .expectError(InvalidFormatException::class.java)
+            .expectErrorMatches { (it as FuelError).exception is InvalidFormatException }
             .verify()
     }
 
@@ -85,7 +87,10 @@ class ReactorTest {
     fun streamObjectFailureMissingProperty() {
         val errorMessage = Fuel.get("/ip").monoOfObject(IpAddressDeserializer)
             .map(IpAddress::address)
-            .onErrorResume(MissingKotlinParameterException::class, { Mono.just(it.message!!) })
+            .onErrorResume(FuelError::class, {
+                assertTrue(it.exception is MissingKotlinParameterException)
+                Mono.just(it.message.orEmpty())
+            })
             .block()!!
 
         assertTrue(errorMessage.contains("value failed for JSON property address due to missing"))

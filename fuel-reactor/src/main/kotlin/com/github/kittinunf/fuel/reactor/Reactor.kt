@@ -15,7 +15,7 @@ private fun <T : Any> Request.monoOfResultFold(mapper: Deserializable<T>): Mono<
     Mono.create<T> { sink ->
         sink.onCancel(this::cancel)
         val (_, _, result) = response(mapper)
-        result.fold(sink::success, { sink.error(it.exception) })
+        result.fold(sink::success, sink::error)
     }
 
 fun Request.monoOfBytes(): Mono<ByteArray> =

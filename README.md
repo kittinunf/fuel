@@ -812,7 +812,7 @@ runBlocking {
 
 ### Project Reactor
 
-The Reactor module API provides functions starting with the prefix `monoOf` to handle instances of `Response`, `Result<T, FuelError>` and values directly (`String`, `ByteArray`, `Any`).
+The Reactor module API provides functions starting with the prefix `monoOf` to handle instances of `Response`, `Result<T, FuelError>` and values directly (`String`, `ByteArray`, `Any`). All functions expose exceptions as `FuelError` instance.
 
 **Data handling example**
 
