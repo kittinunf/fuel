@@ -17,8 +17,6 @@ import org.junit.Test
 import reactor.core.publisher.Mono
 import reactor.core.publisher.onErrorResume
 import reactor.test.test
-import java.time.Duration
-import java.util.concurrent.atomic.AtomicBoolean
 
 class ReactorTest {
 
