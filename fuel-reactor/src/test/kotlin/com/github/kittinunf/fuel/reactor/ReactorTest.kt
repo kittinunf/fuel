@@ -30,7 +30,7 @@ class ReactorTest {
     }
 
     @Test
-    fun streamBytes() {
+    fun testBytes() {
         Fuel.get("/ip").monoOfBytes()
             .test()
             .assertNext { assertTrue(it.size > 0) }
@@ -38,21 +38,15 @@ class ReactorTest {
     }
 
     @Test
-    fun streamString() {
+    fun testString() {
         Fuel.get("/uuid").monoOfString()
             .test()
             .assertNext { assertTrue(it.isNotEmpty()) }
             .verifyComplete()
     }
 
-    private data class Ip(val origin: String)
-
-    private object IpDeserializerSuccess : ResponseDeserializable<Ip> {
-        override fun deserialize(content: String) = jacksonObjectMapper().readValue<Ip>(content)
-    }
-
     @Test
-    fun streamObjectSuccess() {
+    fun testObjectSuccess() {
         Fuel.get("/ip").monoOfObject(IpDeserializerSuccess)
             .map(Ip::origin)
             .test()
@@ -60,14 +54,8 @@ class ReactorTest {
             .verifyComplete()
     }
 
-    private data class IpLong(val origin: Long)
-
-    private object IpLongDeserializer : ResponseDeserializable<IpLong> {
-        override fun deserialize(content: String) = jacksonObjectMapper().readValue<IpLong>(content)
-    }
-
     @Test
-    fun streamObjectFailureWrongType() {
+    fun testObjectFailureWrongType() {
         Fuel.get("/ip").monoOfObject(IpLongDeserializer)
             .map(IpLong::origin)
             .test()
@@ -75,14 +63,8 @@ class ReactorTest {
             .verify()
     }
 
-    private data class IpAddress(val address: String)
-
-    private object IpAddressDeserializer : ResponseDeserializable<IpAddress> {
-        override fun deserialize(content: String) = jacksonObjectMapper().readValue<IpAddress>(content)
-    }
-
     @Test
-    fun streamObjectFailureMissingProperty() {
+    fun testObjectFailureMissingProperty() {
         val errorMessage = Fuel.get("/ip").monoOfObject(IpAddressDeserializer)
             .map(IpAddress::address)
             .onErrorResume(FuelError::class, {
@@ -95,7 +77,7 @@ class ReactorTest {
     }
 
     @Test
-    fun streamResponse() {
+    fun testResponse() {
         Fuel.get("/status/404").monoOfResponse()
             .map(Response::statusCode)
             .test()
@@ -148,4 +130,23 @@ class ReactorTest {
             .assertNext { assertTrue(it?.exception is MissingKotlinParameterException) }
             .verifyComplete()
     }
+
+    private data class IpLong(val origin: Long)
+
+    private object IpLongDeserializer : ResponseDeserializable<IpLong> {
+        override fun deserialize(content: String) = jacksonObjectMapper().readValue<IpLong>(content)
+    }
+
+    private data class IpAddress(val address: String)
+
+    private object IpAddressDeserializer : ResponseDeserializable<IpAddress> {
+        override fun deserialize(content: String) = jacksonObjectMapper().readValue<IpAddress>(content)
+    }
+
+    private data class Ip(val origin: String)
+
+    private object IpDeserializerSuccess : ResponseDeserializable<Ip> {
+        override fun deserialize(content: String) = jacksonObjectMapper().readValue<Ip>(content)
+    }
+
 }
