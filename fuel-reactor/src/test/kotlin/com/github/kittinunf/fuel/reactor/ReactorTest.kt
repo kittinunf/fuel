@@ -148,5 +148,4 @@ class ReactorTest {
     private object IpDeserializerSuccess : ResponseDeserializable<Ip> {
         override fun deserialize(content: String) = jacksonObjectMapper().readValue<Ip>(content)
     }
-
 }
