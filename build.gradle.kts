@@ -1,3 +1,4 @@
+import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
 import com.jfrog.bintray.gradle.BintrayExtension
 import com.novoda.gradle.release.PublishExtension
@@ -31,11 +32,11 @@ allprojects {
 }
 
 val androidModules = listOf("fuel-android", "fuel-livedata")
-val sampleModules = listOf("sample", "sample-java")
+val androidSampleModules = listOf("sample", "sample-java")
 
 subprojects {
     val isAndroidModule = project.name in androidModules
-    val isSample = project.name in sampleModules
+    val isSample = project.name in androidSampleModules
     val isJvmModule = !isAndroidModule && !isSample
 
     if (isJvmModule) {
@@ -70,6 +71,55 @@ subprojects {
                 xml.isEnabled = true
                 csv.isEnabled = false
             }
+        }
+    }
+
+    if (isAndroidModule) {
+        apply(plugin = "com.android.library")
+        apply(plugin = "kotlin-android")
+        apply(plugin = "kotlin-android-extensions")
+        apply(plugin = "jacoco-android")
+
+        configure<BaseExtension> {
+            compileSdkVersion(Versions.fuelCompileSdkVersion)
+
+            defaultConfig {
+                minSdkVersion(Versions.fuelMinSdkVersion)
+                targetSdkVersion(Versions.fuelCompileSdkVersion)
+                versionCode = 1
+                versionName = Versions.publishVersion
+            }
+
+            sourceSets {
+                getByName("main").java.srcDirs("src/main/kotlin")
+                getByName("test").java.srcDirs("src/test/kotlin")
+            }
+
+            compileOptions {
+                setSourceCompatibility(JavaVersion.VERSION_1_6)
+                setTargetCompatibility(JavaVersion.VERSION_1_6)
+            }
+
+            buildTypes {
+                getByName("release") {
+                    isMinifyEnabled = false
+                    consumerProguardFiles("proguard-rules.pro")
+                }
+            }
+
+            lintOptions {
+                isAbortOnError = false
+            }
+
+            testOptions {
+                unitTests.isReturnDefaultValues = true
+            }
+        }
+
+        configure<JacocoAndroidUnitTestReportExtension> {
+            csv.enabled(false)
+            html.enabled(true)
+            xml.enabled(true)
         }
     }
 

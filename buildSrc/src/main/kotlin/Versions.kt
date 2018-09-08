@@ -8,7 +8,7 @@ object Versions {
     val jsonVersion = "20170516"
 
     // Modules dependencies
-    val archLifecycleVersion = "1.1.1"
+    val androidArchVersion = "1.1.1"
     val forgeVersion = "0.3.0"
     val gsonVersion = "2.8.2"
     val jacksonVersion = "2.9.6"
