@@ -7,7 +7,7 @@ plugins { java }
 
 dependencies {
     compile(project(":fuel"))
-    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:${extra["kotlinCoroutinesVersion"]}")
+    compile(Dependencies.kotlinCoroutinesJvm)
     testCompile(project(":fuel-jackson"))
 }
 

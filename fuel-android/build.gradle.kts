@@ -11,19 +11,19 @@ apply(plugin = "jacoco-android")
 
 dependencies {
     api(project(":fuel"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"]}")
-    testImplementation("org.robolectric:robolectric:${extra["robolectricVersion"]}")
-    testImplementation("junit:junit:${extra["junitVersion"]}")
+    implementation(Dependencies.kotlinStdlib)
+    testImplementation(Dependencies.robolectric)
+    testImplementation(Dependencies.junit)
 }
 
 configure<BaseExtension> {
-    compileSdkVersion(extra["fuelCompileSdkVersion"] as Int)
+    compileSdkVersion(Versions.fuelCompileSdkVersion)
 
     defaultConfig {
-        minSdkVersion(14)
-        targetSdkVersion(extra["fuelCompileSdkVersion"] as Int)
+        minSdkVersion(Versions.fuelMinSdkVersion)
+        targetSdkVersion(Versions.fuelCompileSdkVersion)
         versionCode = 1
-        versionName = extra["publishVersion"].toString()
+        versionName = Versions.publishVersion
     }
 
     sourceSets {

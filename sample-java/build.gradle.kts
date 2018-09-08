@@ -5,17 +5,17 @@ plugins {
 }
 
 dependencies {
-    implementation("com.android.support:appcompat-v7:${extra["androidSupportVersion"]}")
+    implementation(Dependencies.androidAppCompat)
     api(project(":fuel-android"))
 }
 
 configure<BaseExtension> {
-    compileSdkVersion(extra["fuelCompileSdkVersion"] as Int)
+    compileSdkVersion(Versions.fuelCompileSdkVersion)
 
     defaultConfig {
         applicationId = "com.example.java.fuel"
-        minSdkVersion(16)
-        targetSdkVersion(extra["fuelCompileSdkVersion"] as Int)
+        minSdkVersion(Versions.fuelMinSdkVersion)
+        targetSdkVersion(Versions.fuelCompileSdkVersion)
         versionCode = 1
         versionName = "1.0"
     }

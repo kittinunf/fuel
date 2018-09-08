@@ -6,8 +6,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
-    apply(from = "versions.gradle.kts")
-
     repositories {
         mavenCentral()
         jcenter()
@@ -18,15 +16,13 @@ buildscript {
         classpath("com.android.tools.build:gradle:3.1.3")
         classpath("com.dicedmelon.gradle:jacoco-android:0.1.3")
         classpath("com.novoda:bintray-release:0.8.0")
-        classpath(kotlin("gradle-plugin", version = "${extra["kotlinVersion"]}"))
+        classpath(kotlin("gradle-plugin", version = Versions.kotlinVersion))
     }
 }
 
 plugins { java }
 
 allprojects {
-    apply(from = rootProject.projectDir.resolve("versions.gradle.kts"))
-
     repositories {
         mavenCentral()
         jcenter()
@@ -45,8 +41,8 @@ subprojects {
         apply(plugin = "jacoco")
 
         dependencies {
-            compile("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"]}")
-            testCompile("junit:junit:${extra["junitVersion"]}")
+            compile(Dependencies.kotlinStdlib)
+            testCompile(Dependencies.junit)
         }
 
         configure<JavaPluginConvention> {
@@ -83,7 +79,7 @@ subprojects {
             desc = "The easiest HTTP networking library in Kotlin/Android"
             groupId = "com.github.kittinunf.fuel"
             setLicences("MIT")
-            publishVersion = extra["publishVersion"].toString()
+            publishVersion = Versions.publishVersion
             uploadName = "Fuel-Android"
             website = "https://github.com/kittinunf/Fuel"
         }

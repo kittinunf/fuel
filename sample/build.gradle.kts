@@ -9,11 +9,10 @@ plugins {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"]}")
-
-    implementation("com.android.support:appcompat-v7:${extra["androidSupportVersion"]}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${extra["kotlinCoroutinesVersion"]}")
-    implementation("io.reactivex.rxjava2:rxandroid:2.0.2")
+    implementation(Dependencies.kotlinStdlib)
+    implementation(Dependencies.androidAppCompat)
+    implementation(Dependencies.kotlinCoroutinesAndroid)
+    implementation(Dependencies.rxJavaAndroid)
 
     api(project(":fuel-rxjava"))
     api(project(":fuel-android"))
@@ -21,20 +20,20 @@ dependencies {
     api(project(":fuel-gson"))
     api(project(":fuel-coroutines"))
 
-    androidTestImplementation("com.android.support:support-annotations:${extra["androidSupportVersion"]}")
-    androidTestImplementation("com.android.support.test:runner:${extra["runnerVersion"]}")
-    androidTestImplementation("com.android.support.test:rules:${extra["rulesVersion"]}")
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:${extra["espressoVersion"]}")
-    androidTestImplementation("com.android.support.test.espresso:espresso-intents:${extra["espressoVersion"]}")
+    androidTestImplementation(Dependencies.androidAnnotation)
+    androidTestImplementation(Dependencies.androidTestRunner)
+    androidTestImplementation(Dependencies.androidTestRules)
+    androidTestImplementation(Dependencies.androidEspressoCore)
+    androidTestImplementation(Dependencies.androidEspressoIntents)
 }
 
 configure<BaseExtension> {
-    compileSdkVersion(extra["fuelCompileSdkVersion"] as Int)
+    compileSdkVersion(Versions.fuelCompileSdkVersion)
 
     defaultConfig {
         applicationId = "com.example.fuel"
-        minSdkVersion(16)
-        targetSdkVersion(extra["fuelCompileSdkVersion"] as Int)
+        minSdkVersion(Versions.fuelMinSdkVersion)
+        targetSdkVersion(Versions.fuelCompileSdkVersion)
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
