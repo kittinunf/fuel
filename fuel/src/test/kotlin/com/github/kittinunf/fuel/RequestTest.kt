@@ -742,8 +742,7 @@ class RequestTest : BaseTestCase() {
             try {
                 val json = JSONObject(string)
                 assertEquals(json.getJSONObject("args").getString("bar"), lionel)
-                assertEquals(json.getJSONObject("args").getJSONArray("foo[]").map { it.toString() },
-                        list.toList())
+                assertEquals(json.getJSONObject("args").getJSONArray("foo[]").map { it.toString() }, list.toList())
             } catch (e: Exception) {
                 e.printStackTrace()
                 fail("this should work")
