@@ -30,9 +30,12 @@ allprojects {
     }
 }
 
+val androidModules = listOf("fuel-android", "fuel-livedata")
+val sampleModules = listOf("sample", "sample-java")
+
 subprojects {
-    val isAndroidModule = project.name == "fuel-android" || project.name == "fuel-livedata"
-    val isSample = project.name.contains("sample")
+    val isAndroidModule = project.name in androidModules
+    val isSample = project.name in sampleModules
     val isJvmModule = !isAndroidModule && !isSample
 
     if (isJvmModule) {
