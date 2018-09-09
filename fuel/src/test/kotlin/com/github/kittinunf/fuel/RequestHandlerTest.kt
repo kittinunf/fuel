@@ -126,5 +126,4 @@ class RequestHandlerTest : BaseTestCase() {
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
     }
-
 }
