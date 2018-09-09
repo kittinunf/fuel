@@ -14,9 +14,9 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:3.1.3")
-        classpath("com.dicedmelon.gradle:jacoco-android:0.1.3")
-        classpath("com.novoda:bintray-release:0.8.0")
+        classpath(Plugins.android)
+        classpath(Plugins.jacocoAndroid)
+        classpath(Plugins.bintray)
         classpath(kotlin("gradle-plugin", version = Versions.kotlinVersion))
     }
 }
