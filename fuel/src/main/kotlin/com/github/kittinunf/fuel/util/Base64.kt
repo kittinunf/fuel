@@ -19,13 +19,13 @@ fun ByteArray.encodeBase64(): ByteArray {
     var padding = 0
     var position = 0
     while (position < this.size) {
-        var b = this[position].toInt() and 0xFF shl 16 and 0xFFFFFF
-        if (position + 1 < this.size) b = b or (this[position + 1].toInt() and 0xFF shl 8) else padding++
-        if (position + 2 < this.size) b = b or (this[position + 2].toInt() and 0xFF) else padding++
+        var byte = this[position].toInt() and 0xFF shl 16 and 0xFFFFFF
+        byte = if (position + 1 < this.size) byte or (this[position + 1].toInt() and 0xFF shl 8) else padding++
+        if (position + 2 < this.size) byte = byte or (this[position + 2].toInt() and 0xFF) else padding++
         for (i in 0 until 4 - padding) {
-            val c = b and 0xFC0000 shr 18
+            val c = byte and 0xFC0000 shr 18
             output.write(table[c].toInt())
-            b = b shl 6
+            byte = byte shl 6
         }
         position += 3
     }
@@ -69,8 +69,8 @@ fun ByteArray.decodeBase64(): ByteArray {
             count++
         }
         while (count > 0) {
-            val c = b and 0xFF0000 shr 16
-            output.write(c.toChar().toInt())
+            val character = b and 0xFF0000 shr 16
+            output.write(character.toChar().toInt())
             b = b shl 8
             count--
         }
