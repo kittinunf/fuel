@@ -618,14 +618,16 @@ class InterceptorTest : BaseTestCase() {
     @Test
     fun testRemoveAllRequestInterceptors() {
         val manager = FuelManager()
-        val (request, response, _) = manager.request(Method.GET,
+        val (request, response, result) = manager.request(Method.GET,
                 "http://httpbin.org/status/418").response()
 
-        //val (data, error) = result
+        val (data, error) = result
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
-        //assertThat(error, nullValue())
-        //assertThat(data, notNullValue())
+        assertThat(error, notNullValue())
+        assertThat(data, nullValue())
+
+        assertThat(response.statusCode, isEqualTo(418))
 
         manager.removeAllRequestInterceptors()
     }
