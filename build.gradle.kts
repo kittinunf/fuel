@@ -40,9 +40,11 @@ subprojects {
     val isJvmModule = !isAndroidModule && !isSample
 
     if (isJvmModule) {
-        apply(plugin = "java")
-        apply(plugin = "kotlin")
-        apply(plugin = "jacoco")
+        apply {
+            plugin("java")
+            plugin("kotlin")
+            plugin("jacoco")
+        }
 
         dependencies {
             compile(Dependencies.kotlinStdlib)
@@ -75,10 +77,12 @@ subprojects {
     }
 
     if (isAndroidModule) {
-        apply(plugin = "com.android.library")
-        apply(plugin = "kotlin-android")
-        apply(plugin = "kotlin-android-extensions")
-        apply(plugin = "jacoco-android")
+        apply {
+            plugin("com.android.library")
+            plugin("kotlin-android")
+            plugin("kotlin-android-extensions")
+            plugin("jacoco-android")
+        }
 
         configure<BaseExtension> {
             compileSdkVersion(Versions.fuelCompileSdkVersion)
@@ -124,7 +128,9 @@ subprojects {
     }
 
     if (!isSample) {
-        apply(plugin = "com.novoda.bintray-release")
+        apply {
+            plugin("com.novoda.bintray-release")
+        }
 
         configure<PublishExtension> {
             artifactId = project.name
