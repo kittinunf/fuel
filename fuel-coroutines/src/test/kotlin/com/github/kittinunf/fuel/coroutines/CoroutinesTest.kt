@@ -23,7 +23,7 @@ class CoroutinesTest {
     @Test
     fun testAwaitResponseSuccess() = runBlocking {
         try {
-            Fuel.get("/ip").awaitByteArrayResponse().third.fold({ data ->
+            Fuel.get("/ip").asyncByteArrayResponse().await().third.fold({ data ->
                 assertTrue(data.isNotEmpty())
             }, { error ->
                 fail("This test should pass but got an error: ${error.message}")
@@ -36,7 +36,7 @@ class CoroutinesTest {
     @Test
     fun testAwaitResponseErrorDueToNetwork() = runBlocking {
         try {
-            Fuel.get("/invalid/url").awaitByteArrayResponse().third.fold({
+            Fuel.get("/invalid/url").asyncByteArrayResponse().await().third.fold({
                 fail("This test should fail due to HTTP status code.")
             }, { error ->
                 assertTrue(error.exception is HttpException)
@@ -50,7 +50,7 @@ class CoroutinesTest {
     @Test
     fun testAwaitStringResponseSuccess() = runBlocking {
         try {
-            Fuel.get("/uuid").awaitStringResponse().third.fold({ data ->
+            Fuel.get("/uuid").asyncStringResponse().await().third.fold({ data ->
                 assertTrue(data.isNotEmpty())
                 assertTrue(data.contains("uuid"))
             }, { error ->
@@ -63,7 +63,7 @@ class CoroutinesTest {
 
     @Test
     fun testAwaitObjectResponse() = runBlocking {
-        Fuel.get("/uuid").awaitObjectResponse(UUIDResponseDeserializer).third.fold({ data ->
+        Fuel.get("/uuid").asyncObjectResponse(UUIDResponseDeserializer).await().third.fold({ data ->
             assertTrue(data.uuid.isNotEmpty())
         }, { error ->
             fail("This test should pass but got an error: ${error.message}")
@@ -73,7 +73,7 @@ class CoroutinesTest {
     @Test
     fun testAwaitStringResponseDoesNotThrowException() = runBlocking {
         try {
-            Fuel.get("/not/found/address").awaitStringResponse().third.fold({
+            Fuel.get("/not/found/address").asyncStringResponse().await().third.fold({
                 fail("This should not be called")
             }, {
 

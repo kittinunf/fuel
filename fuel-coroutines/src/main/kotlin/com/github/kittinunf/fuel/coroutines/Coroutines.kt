@@ -7,9 +7,7 @@ import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.suspendCancellableCoroutine
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.experimental.*
 import java.nio.charset.Charset
 import kotlin.coroutines.experimental.CoroutineContext
 
@@ -23,21 +21,42 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
             }
         }
 
-
 suspend fun Request.awaitByteArrayResponse(
         scope: CoroutineContext = CommonPool
-): Triple<Request, Response, Result<ByteArray, FuelError>> =
-        await(byteArrayDeserializer(), scope)
+): Triple<Request, Response, Result<ByteArray, FuelError>> = await(byteArrayDeserializer(), scope)
+
+suspend fun Request.asyncByteArrayResponse(
+        scope: CoroutineContext = CommonPool
+): Deferred<Triple<Request, Response, Result<ByteArray, FuelError>>> =
+        async {
+            await(byteArrayDeserializer(), scope)
+        }
 
 suspend fun Request.awaitStringResponse(
         charset: Charset = Charsets.UTF_8,
         scope: CoroutineContext = CommonPool
 ): Triple<Request, Response, Result<String, FuelError>> = await(stringDeserializer(charset), scope)
 
+suspend fun Request.asyncStringResponse(
+        charset: Charset = Charsets.UTF_8,
+        scope: CoroutineContext = CommonPool
+): Deferred<Triple<Request, Response, Result<String, FuelError>>> =
+        async {
+            await(stringDeserializer(charset), scope)
+        }
+
 suspend fun <U : Any> Request.awaitObjectResponse(
         deserializable: ResponseDeserializable<U>,
         scope: CoroutineContext = CommonPool
 ): Triple<Request, Response, Result<U, FuelError>> = await(deserializable, scope)
+
+suspend fun <U : Any> Request.asyncObjectResponse(
+        deserializable: ResponseDeserializable<U>,
+        scope: CoroutineContext = CommonPool
+): Deferred<Triple<Request, Response, Result<U, FuelError>>> =
+        async {
+            await(deserializable, scope)
+        }
 
 /***
  * 
