@@ -43,6 +43,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        manager.removeRequestInterceptor(loggingRequestInterceptor())
     }
 
     @Test
@@ -59,6 +60,7 @@ class InterceptorTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        manager.removeResponseInterceptor { loggingResponseInterceptor() }
     }
 
     @Test
@@ -611,5 +613,22 @@ class InterceptorTest : BaseTestCase() {
         // TODO: This is current based on the current behavior, however we need to fix this as it should handle 100 - 399 gracefully not httpException
         assertThat(data, nullValue())
         assertThat(error, notNullValue())
+    }
+
+    @Test
+    fun testRemoveAllRequestInterceptors() {
+        val manager = FuelManager()
+        val (request, response, result) = manager.request(Method.GET,
+                "http://httpbin.org/status/418").response()
+
+        val (data, error) = result
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, notNullValue())
+        assertThat(data, nullValue())
+
+        assertThat(response.statusCode, isEqualTo(418))
+
+        manager.removeAllRequestInterceptors()
     }
 }
