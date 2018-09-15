@@ -25,21 +25,12 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
             }
         }
 
-suspend fun Request.awaitByteArrayResponse(
-        scope: CoroutineContext = CommonPool
-): Triple<Request, Response, Result<ByteArray, FuelError>> = await(byteArrayDeserializer(), scope)
-
 suspend fun Request.asyncByteArrayResponse(
         scope: CoroutineContext = CommonPool
 ): Deferred<Triple<Request, Response, Result<ByteArray, FuelError>>> =
         async {
             await(byteArrayDeserializer(), scope)
         }
-
-suspend fun Request.awaitStringResponse(
-        charset: Charset = Charsets.UTF_8,
-        scope: CoroutineContext = CommonPool
-): Triple<Request, Response, Result<String, FuelError>> = await(stringDeserializer(charset), scope)
 
 suspend fun Request.asyncStringResponse(
         charset: Charset = Charsets.UTF_8,
@@ -49,11 +40,6 @@ suspend fun Request.asyncStringResponse(
             await(stringDeserializer(charset), scope)
         }
 
-suspend fun <U : Any> Request.awaitObjectResponse(
-        deserializable: ResponseDeserializable<U>,
-        scope: CoroutineContext = CommonPool
-): Triple<Request, Response, Result<U, FuelError>> = await(deserializable, scope)
-
 suspend fun <U : Any> Request.asyncObjectResponse(
         deserializable: ResponseDeserializable<U>,
         scope: CoroutineContext = CommonPool
@@ -62,13 +48,19 @@ suspend fun <U : Any> Request.asyncObjectResponse(
             await(deserializable, scope)
         }
 
+@Deprecated("please use 'asyncObjectResponse()'", ReplaceWith("asyncObjectResponse()"))
+suspend fun <U : Any> Request.awaitObjectResponse(
+        deserializable: ResponseDeserializable<U>,
+        scope: CoroutineContext = CommonPool
+): Triple<Request, Response, Result<U, FuelError>> = await(deserializable, scope)
+
 /***
  * 
  *  @param scope : This is the coroutine context you want the call to be made on, the defaut is CommonPool
  *
  *  @return ByteArray if no exceptions are thrown
  */
-@Throws
+@Deprecated("please use 'asyncByteArrayResponse()", ReplaceWith("asyncByteArrayResponse()"))
 suspend fun Request.awaitByteArray(
         scope: CoroutineContext = CommonPool
 ): ByteArray = await(byteArrayDeserializer(), scope).third.get()
@@ -81,11 +73,17 @@ suspend fun Request.awaitByteArray(
  *
  *  @return ByteArray if no exceptions are thrown
  */
-@Throws
+@Deprecated("please use 'asyncStringResponse()", ReplaceWith("asyncStringResponse()"))
 suspend fun Request.awaitString(
         charset: Charset = Charsets.UTF_8,
         scope: CoroutineContext = CommonPool
 ): String = await(stringDeserializer(charset), scope).third.get()
+
+@Deprecated("please use 'asyncStringResponse()", ReplaceWith("asyncStringResponse()"))
+suspend fun Request.awaitStringResponse(
+        charset: Charset = Charsets.UTF_8,
+        scope: CoroutineContext = CommonPool
+): Triple<Request, Response, Result<String, FuelError>> = await(stringDeserializer(charset), scope)
 
 /**
  * @note This function will throw the an exception if an error is thrown either at the HTTP level
@@ -96,11 +94,16 @@ suspend fun Request.awaitString(
  *
  * @return Result object
  */
-@Throws
+@Deprecated("please use 'asyncObjectResponse()'", ReplaceWith("asyncObjectResponse()"))
 suspend fun <U : Any> Request.awaitObject(
         deserializable: ResponseDeserializable<U>,
         scope: CoroutineContext = CommonPool
 ): U = await(deserializable, scope).third.get()
+
+@Deprecated("please use 'asyncByteArrayResponse()", ReplaceWith("asyncByteArrayResponse()"))
+suspend fun Request.awaitByteArrayResponse(
+        scope: CoroutineContext = CommonPool
+): Triple<Request, Response, Result<ByteArray, FuelError>> = await(byteArrayDeserializer(), scope)
 
 /***
  * Response functions all these return a Result
@@ -109,6 +112,7 @@ suspend fun <U : Any> Request.awaitObject(
  *
  * @return Result<ByteArray,FuelError>
  */
+@Deprecated("please use 'asyncByteArrayResponse()", ReplaceWith("asyncByteArrayResponse()"))
 suspend fun Request.awaitByteArrayResult(
         scope: CoroutineContext = CommonPool
 ): Result<ByteArray, FuelError> = awaitByteArrayResponse(scope).third
@@ -120,11 +124,11 @@ suspend fun Request.awaitByteArrayResult(
  *
  * @return Result<String,FuelError>
  */
+@Deprecated("please use 'asyncStringResponse()'", ReplaceWith("asyncStringResponse()"))
 suspend fun Request.awaitStringResult(
         charset: Charset = Charsets.UTF_8,
         scope: CoroutineContext = CommonPool
 ): Result<String, FuelError> = awaitStringResponse(charset, scope).third
-
 
 /**
  * This function catches both server errors and Deserialization Errors
@@ -134,6 +138,7 @@ suspend fun Request.awaitStringResult(
  *
  * @return Result object
  */
+@Deprecated("please use 'asyncObjectResponse()'", ReplaceWith("asyncObjectResponse()"))
 suspend fun <U : Any> Request.awaitObjectResult(
         deserializable: ResponseDeserializable<U>,
         scope: CoroutineContext = CommonPool
@@ -146,14 +151,3 @@ suspend fun <U : Any> Request.awaitObjectResult(
     }
     Result.Failure(fuelError)
 }
-
-@Deprecated("please use 'awaitByteArray()'", ReplaceWith("awaitByteArray()", "deserializable"))
-suspend fun Request.awaitResponseResult(): ByteArray = awaitByteArray()
-
-@Deprecated("please use 'awaitObjectResult(deserializable)'", ReplaceWith("awaitObjectResult(deserializable)"))
-suspend fun <U : Any> Request.awaitSafelyObjectResult(
-        deserializable: ResponseDeserializable<U>
-): Result<U, FuelError> = this.awaitObjectResult(deserializable)
-
-
-
