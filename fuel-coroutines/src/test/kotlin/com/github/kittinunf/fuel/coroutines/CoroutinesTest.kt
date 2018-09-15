@@ -23,7 +23,7 @@ class CoroutinesTest {
     @Test
     fun testAwaitResponseSuccess() = runBlocking {
         try {
-            Fuel.get("/ip").asyncByteArrayResponse().await().third.fold({ data ->
+            Fuel.get("/ip").awaitByteArrayResponse().third.fold({ data ->
                 assertTrue(data.isNotEmpty())
             }, { error ->
                 fail("This test should pass but got an error: ${error.message}")
@@ -34,9 +34,22 @@ class CoroutinesTest {
     }
 
     @Test
+    fun testAsyncResponseSuccess() = runBlocking {
+        try {
+            Fuel.get("/ip").asyncByteArrayResponse().await().third.fold({ data ->
+                assertTrue(data.isNotEmpty())
+            }, { error ->
+                fail("This test should pass but got an error: ${error.message}")
+            })
+        } catch (exception: Exception) {
+            fail("When using asyncByteArrayResponse errors should be folded instead of thrown.")
+        }
+    }
+
+    @Test
     fun testAwaitResponseErrorDueToNetwork() = runBlocking {
         try {
-            Fuel.get("/invalid/url").asyncByteArrayResponse().await().third.fold({
+            Fuel.get("/invalid/url").awaitByteArrayResponse().third.fold({
                 fail("This test should fail due to HTTP status code.")
             }, { error ->
                 assertTrue(error.exception is HttpException)
@@ -48,7 +61,35 @@ class CoroutinesTest {
     }
 
     @Test
+    fun testAsyncResponseErrorDueToNetwork() = runBlocking {
+        try {
+            Fuel.get("/invalid/url").asyncByteArrayResponse().await().third.fold({
+                fail("This test should fail due to HTTP status code.")
+            }, { error ->
+                assertTrue(error.exception is HttpException)
+                assertTrue(error.message!!.contains("HTTP Exception 404"))
+            })
+        } catch (exception: HttpException) {
+            fail("When using asyncByteArrayResponse errors should be folded instead of thrown.")
+        }
+    }
+
+    @Test
     fun testAwaitStringResponseSuccess() = runBlocking {
+        try {
+            Fuel.get("/uuid").awaitStringResponse().third.fold({ data ->
+                assertTrue(data.isNotEmpty())
+                assertTrue(data.contains("uuid"))
+            }, { error ->
+                fail("This test should pass but got an error: ${error.message}")
+            })
+        } catch (exception: Exception) {
+            fail("When using awaitStringResponse errors should be folded instead of thrown.")
+        }
+    }
+
+    @Test
+    fun testAsyncStringResponseSuccess() = runBlocking {
         try {
             Fuel.get("/uuid").asyncStringResponse().await().third.fold({ data ->
                 assertTrue(data.isNotEmpty())
@@ -57,12 +98,21 @@ class CoroutinesTest {
                 fail("This test should pass but got an error: ${error.message}")
             })
         } catch (exception: Exception) {
-            fail("When using awaitString errors should be folded instead of thrown.")
+            fail("When using asyncStringResponse errors should be folded instead of thrown.")
         }
     }
 
     @Test
     fun testAwaitObjectResponse() = runBlocking {
+        Fuel.get("/uuid").awaitObjectResponse(UUIDResponseDeserializer).third.fold({ data ->
+            assertTrue(data.uuid.isNotEmpty())
+        }, { error ->
+            fail("This test should pass but got an error: ${error.message}")
+        })
+    }
+
+    @Test
+    fun testAsyncObjectResponse() = runBlocking {
         Fuel.get("/uuid").asyncObjectResponse(UUIDResponseDeserializer).await().third.fold({ data ->
             assertTrue(data.uuid.isNotEmpty())
         }, { error ->
@@ -72,6 +122,19 @@ class CoroutinesTest {
 
     @Test
     fun testAwaitStringResponseDoesNotThrowException() = runBlocking {
+        try {
+            Fuel.get("/not/found/address").awaitStringResponse().third.fold({
+                fail("This should not be called")
+            }, {
+
+            })
+        } catch (exception: Exception) {
+            fail("This test should fail as exception should be caught")
+        }
+    }
+
+    @Test
+    fun testAsyncStringResponseDoesNotThrowException() = runBlocking {
         try {
             Fuel.get("/not/found/address").asyncStringResponse().await().third.fold({
                 fail("This should not be called")
