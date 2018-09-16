@@ -32,7 +32,7 @@ class Encoding(val httpMethod: Method,
             }
             requestType == Request.Type.UPLOAD -> {
                 val boundary = System.currentTimeMillis().toString(16)
-                headerPairs += "Content-Type" to "multipart/form-data; boundary=" + boundary
+                headerPairs += "Content-Type" to "multipart/form-data; boundary=$boundary"
             }
             else -> {
                 headerPairs += "Content-Type" to "application/x-www-form-urlencoded"

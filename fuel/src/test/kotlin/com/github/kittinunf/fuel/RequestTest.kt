@@ -352,14 +352,13 @@ class RequestTest : BaseTestCase() {
         manager.request(Method.POST, "http://httpbin.org/post")
                 .jsonBody(body)
                 .responseString { req, res, result ->
-            request = req
-            response = res
+                    request = req
+                    response = res
 
-            val (d, err) = result
-            data = d
-            error = err
-        }
-
+                    val (d, err) = result
+                    data = d
+                    error = err
+                }
         val string = data as String
 
         assertThat(request, notNullValue())
@@ -417,7 +416,7 @@ class RequestTest : BaseTestCase() {
         val paramValue = "bar2"
 
         // for some reason httpbin doesn't support underlying POST for PATCH endpoint
-        manager.request(Method.PATCH, "http://mockbin.org/request", listOf(paramKey to paramValue)).responseString{ req, res, result ->
+        manager.request(Method.PATCH, "http://mockbin.org/request", listOf(paramKey to paramValue)).responseString { req, res, result ->
             request = req
             response = res
 
@@ -449,15 +448,21 @@ class RequestTest : BaseTestCase() {
 
         val paramKey = "foo"
         val paramValue = "bar"
+        val foo = "foo"
+        val bar = "bar"
+        val body = "{ $foo : $bar }"
+        val correctBodyResponse = "\"data\": \"$body\""
 
-        manager.request(Method.DELETE, "http://httpbin.org/delete", listOf(paramKey to paramValue)).responseString { req, res, result ->
-            request = req
-            response = res
+        manager.request(Method.DELETE, "http://httpbin.org/delete", listOf(paramKey to paramValue))
+                .jsonBody(body)
+                .responseString { req, res, result ->
+                    request = req
+                    response = res
 
-            val (d, err) = result
-            data = d
-            error = err
-        }
+                    val (d, err) = result
+                    data = d
+                    error = err
+                }
 
         val string = data as String
 
@@ -471,6 +476,7 @@ class RequestTest : BaseTestCase() {
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
+        assertThat(string, containsString(correctBodyResponse))
     }
 
     @Test
@@ -735,10 +741,9 @@ class RequestTest : BaseTestCase() {
         request.responseString().third.fold({ string ->
             try {
                 val json = JSONObject(string)
-                assertEquals(json.getJSONObject("args").getString("bar"),lionel)
-                assertEquals(json.getJSONObject("args").getJSONArray("foo[]").map { it.toString() },
-                list.toList())
-            } catch (e: Exception){
+                assertEquals(json.getJSONObject("args").getString("bar"), lionel)
+                assertEquals(json.getJSONObject("args").getJSONArray("foo[]").map { it.toString() }, list.toList())
+            } catch (e: Exception) {
                 e.printStackTrace()
                 fail("this should work")
             }
