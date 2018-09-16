@@ -5,8 +5,9 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.util.Base64
 import com.github.kittinunf.fuel.util.FuelRouting
+import com.github.kittinunf.fuel.util.decodeBase64
+import com.github.kittinunf.fuel.util.encodeBase64ToByteArray
 import org.hamcrest.CoreMatchers.*
 import org.json.JSONObject
 import org.junit.Assert.assertThat
@@ -27,7 +28,7 @@ class RoutingTest: BaseTestCase() {
         class GetParamsTest(val name: String, val value: String) : TestApi()
         class PostBodyTest(val value: String) : TestApi()
         class PostBinaryBodyTest(val value: String) : TestApi()
-        class PostEmptyBodyTest() : TestApi()
+        class PostEmptyBodyTest : TestApi()
 
         override val method: Method
             get() {
@@ -65,7 +66,7 @@ class RoutingTest: BaseTestCase() {
                     is PostBinaryBodyTest -> {
                         val json = JSONObject()
                         json.put("id", this.value)
-                        Base64.encode(json.toString().toByteArray(), Base64.DEFAULT)
+                        json.toString().encodeBase64ToByteArray()
                     }
                     else -> null
                 }
@@ -216,8 +217,8 @@ class RoutingTest: BaseTestCase() {
         assertThat(response?.statusCode, isEqualTo(statusCode))
 
         val res = JSONObject(string)
-        val bytes = Base64.decode(res.optString("data"), Base64.DEFAULT)
-        assertThat(String(bytes), containsString(paramValue))
+        val bytes = res.optString("data").decodeBase64()
+        assertThat(bytes, containsString(paramValue))
         assertThat(res.optString("json"), not(containsString(paramValue)))
     }
 
