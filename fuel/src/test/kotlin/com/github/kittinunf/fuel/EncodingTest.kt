@@ -26,7 +26,7 @@ class EncodingTest : BaseTestCase() {
         val request = Encoding(
                 httpMethod = Method.GET,
                 baseUrlString = "http://www.example.com/",
-                urlString = "test",
+                urlString = "/test",
                 parameters = listOf("a" to "b")
         ).request
 
