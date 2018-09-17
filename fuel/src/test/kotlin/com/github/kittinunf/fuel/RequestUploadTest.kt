@@ -269,7 +269,7 @@ class RequestUploadTest : MockHttpTestCase() {
         assertThat(string, containsString("coolblob"))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
