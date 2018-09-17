@@ -6,13 +6,14 @@ package com.github.kittinunf.fuel.util
 
 import java.lang.System.arraycopy
 
-fun ByteArray.encodeBase64Url(): ByteArray = encodeBase64(map = BASE64_URL_SAFE)
+fun ByteArray.encodeBase64(): ByteArray = encodeBase64ToArray()
+fun ByteArray.encodeBase64Url(): ByteArray = encodeBase64ToArray(map = BASE64_URL_SAFE)
 fun String.encodeBase64ToString(): String = String(toByteArray().encodeBase64())
 fun String.encodeBase64UrlToString(): String = String(toByteArray().encodeBase64Url())
 
 fun String.decodeBase64(): String? = decodeBase64ToArray()?.let { String(it) }
 
-internal val BASE64 = byteArrayOf(
+private val BASE64 = byteArrayOf(
         'A'.toByte(), 'B'.toByte(), 'C'.toByte(), 'D'.toByte(), 'E'.toByte(), 'F'.toByte(),
         'G'.toByte(), 'H'.toByte(), 'I'.toByte(), 'J'.toByte(), 'K'.toByte(), 'L'.toByte(),
         'M'.toByte(), 'N'.toByte(), 'O'.toByte(), 'P'.toByte(), 'Q'.toByte(), 'R'.toByte(),
@@ -24,7 +25,7 @@ internal val BASE64 = byteArrayOf(
         'w'.toByte(), 'x'.toByte(), 'y'.toByte(), 'z'.toByte(), '0'.toByte(), '1'.toByte(),
         '2'.toByte(), '3'.toByte(), '4'.toByte(), '5'.toByte(), '6'.toByte(), '7'.toByte(),
         '8'.toByte(), '9'.toByte(), '+'.toByte(), '/'.toByte())
-internal val BASE64_URL_SAFE = byteArrayOf(
+private val BASE64_URL_SAFE = byteArrayOf(
         'A'.toByte(), 'B'.toByte(), 'C'.toByte(), 'D'.toByte(), 'E'.toByte(), 'F'.toByte(),
         'G'.toByte(), 'H'.toByte(), 'I'.toByte(), 'J'.toByte(), 'K'.toByte(), 'L'.toByte(),
         'M'.toByte(), 'N'.toByte(), 'O'.toByte(), 'P'.toByte(), 'Q'.toByte(), 'R'.toByte(),
@@ -37,7 +38,7 @@ internal val BASE64_URL_SAFE = byteArrayOf(
         '2'.toByte(), '3'.toByte(), '4'.toByte(), '5'.toByte(), '6'.toByte(), '7'.toByte(),
         '8'.toByte(), '9'.toByte(), '-'.toByte(), '_'.toByte())
 
-fun ByteArray.encodeBase64(map: ByteArray = BASE64): ByteArray {
+private fun ByteArray.encodeBase64ToArray(map: ByteArray = BASE64): ByteArray {
     val length = (size + 2) / 3 * 4
     val out = ByteArray(length)
     var index = 0
@@ -72,7 +73,7 @@ fun ByteArray.encodeBase64(map: ByteArray = BASE64): ByteArray {
     return out
 }
 
-internal fun String.decodeBase64ToArray(): ByteArray? {
+private fun String.decodeBase64ToArray(): ByteArray? {
     // Ignore trailing '=' padding and whitespace from the input.
     var limit = length
     while (limit > 0) {
