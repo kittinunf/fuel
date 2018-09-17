@@ -1,9 +1,6 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.Encoding
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.util.Base64
 import com.google.common.net.MediaType
 import junit.framework.TestCase.assertEquals
@@ -24,6 +21,7 @@ class RequestTest : MockHttpTestCase() {
 
     class PathStringConvertibleImpl(url: String) : Fuel.PathStringConvertible {
         override val path = url
+
     }
 
     class RequestConvertibleImpl(val method: Method, private val url: String) : Fuel.RequestConvertible {
@@ -31,9 +29,9 @@ class RequestTest : MockHttpTestCase() {
 
         private fun createRequest(): Request {
             val encoder = Encoding(
-                    httpMethod = method,
-                    urlString = url,
-                    parameters = listOf("foo" to "bar")
+                httpMethod = method,
+                urlString = url,
+                parameters = listOf("foo" to "bar")
             )
             return encoder.request
         }
@@ -417,6 +415,42 @@ class RequestTest : MockHttpTestCase() {
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
 
         assertThat(string, equalTo(""))
+    }
+
+    @Test
+    fun httpOptionsRequest() {
+        mockChain(
+            request = mockRequest().withMethod(Method.OPTIONS.value).withPath("/options"),
+            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_OK)
+        )
+
+        val (request, response, result) = manager.request(Method.OPTIONS, mockPath("options")).responseString()
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+    }
+
+    @Test
+    fun httpTraceRequest() {
+        mockChain(
+            request = mockRequest().withMethod(Method.TRACE.value).withPath("/trace"),
+            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_OK)
+        )
+
+        val (request, response, result) = manager.request(Method.TRACE, mockPath("trace")).responseString()
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
