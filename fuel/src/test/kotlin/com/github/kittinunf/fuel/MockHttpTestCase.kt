@@ -11,11 +11,11 @@ import org.mockserver.model.HttpResponse
 import org.mockserver.model.HttpResponse.response
 import org.mockserver.model.HttpTemplate
 import org.mockserver.model.HttpTemplate.template
-import kotlin.text.Typography.times
 
+@Suppress("MemberVisibilityCanBePrivate")
 abstract class MockHttpTestCase : BaseTestCase() {
 
-    private var mockServer: ClientAndServer? = null
+    private lateinit var mockServer: ClientAndServer
 
     @Before
     fun setup(){
@@ -26,7 +26,7 @@ abstract class MockHttpTestCase : BaseTestCase() {
 
     @After
     fun tearDown(){
-        mockServer!!.stop()
+        mockServer.stop()
     }
 
     /**
@@ -38,9 +38,7 @@ abstract class MockHttpTestCase : BaseTestCase() {
      *
      * @return [ClientAndServer]
      */
-    protected fun mockServer(): ClientAndServer {
-        return this.mockServer!!
-    }
+    protected fun mockServer(): ClientAndServer = this.mockServer
 
     /**
      * Convenience method to request a request to its expected response
@@ -66,14 +64,21 @@ abstract class MockHttpTestCase : BaseTestCase() {
      * @param times [Times] times this can occur, defaults to once
      * @param server [ClientAndServer] the server to register on
      */
-    protected fun mockChain(request: HttpRequest, response: HttpResponse, times: Times = Times.once(), server: ClientAndServer = mockServer()) {
+    protected fun mockChain(
+            request: HttpRequest, response: HttpResponse,
+            times: Times = Times.once(),
+            server: ClientAndServer = mockServer()) {
         server.`when`(request, times).respond(response)
     }
 
     /**
      * @see mockChain(HttpRequest, HttpResponse, Times, ClientAndServer)
      */
-    protected fun mockChain(request: HttpRequest, response: HttpTemplate, times: Times = Times.once(), server: ClientAndServer = mockServer()) {
+    protected fun mockChain(
+            request: HttpRequest,
+            response: HttpTemplate,
+            times: Times = Times.once(),
+            server: ClientAndServer = mockServer()) {
         server.`when`(request, times).respond(response)
     }
 
@@ -89,9 +94,7 @@ abstract class MockHttpTestCase : BaseTestCase() {
      *
      * @return [HttpRequest]
      */
-    protected fun mockRequest(): HttpRequest {
-        return request()
-    }
+    protected fun mockRequest(): HttpRequest = request()
 
     /**
      * Creates a new mock response.
@@ -99,9 +102,7 @@ abstract class MockHttpTestCase : BaseTestCase() {
      * This method is introduced to keep the import out of test cases and to make it easy to replace
      *   the library for mocking responses.
      */
-    protected fun mockResponse(): HttpResponse {
-        return response()
-    }
+    protected fun mockResponse(): HttpResponse = response()
 
     /**
      * Creates a new mock response template.
@@ -112,9 +113,7 @@ abstract class MockHttpTestCase : BaseTestCase() {
      * This method is introduced to keep the import out of test cases and to make it easy to replace
      *   the library for mocking requests.
      */
-    protected fun mockResponseTemplate(): HttpTemplate {
-        return template(HttpTemplate.TemplateType.JAVASCRIPT)
-    }
+    protected fun mockResponseTemplate(): HttpTemplate = template(HttpTemplate.TemplateType.JAVASCRIPT)
 
     /**
      * Creates a mock response that reflects what is coming in via the REFLECT_TEMPLATE template
@@ -124,10 +123,7 @@ abstract class MockHttpTestCase : BaseTestCase() {
      * This method is introduced to keep the import out of test cases and to make it easy to replace
      *   the library for mocking requests.
      */
-    protected fun mockReflect(): HttpTemplate {
-        return mockResponseTemplate()
-            .withTemplate(REFLECT_TEMPLATE)
-    }
+    protected fun mockReflect(): HttpTemplate = mockResponseTemplate().withTemplate(REFLECT_TEMPLATE)
 
     /**
      * Generates the full path for a request to the given path
@@ -135,9 +131,7 @@ abstract class MockHttpTestCase : BaseTestCase() {
      * @param path [String] the relative path
      * @return [String] the full path
      */
-    protected fun mockPath(path: String): String {
-        return "http://localhost:${mockServer().localPort}/$path"
-    }
+    protected fun mockPath(path: String): String =  "http://localhost:${mockServer().localPort}/$path"
 
     companion object {
         const val REFLECT_TEMPLATE = """
