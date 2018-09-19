@@ -18,14 +18,14 @@ abstract class MockHttpTestCase : BaseTestCase() {
     private lateinit var mockServer: ClientAndServer
 
     @Before
-    fun setup(){
+    fun setup() {
         // This is not placed in a @BeforeClass / @BeforeAll so that the tests may have parallel
         // execution. When there is no port given as first argument, it will grab a free port
         this.mockServer = startClientAndServer()
     }
 
     @After
-    fun tearDown(){
+    fun tearDown() {
         mockServer.stop()
     }
 
