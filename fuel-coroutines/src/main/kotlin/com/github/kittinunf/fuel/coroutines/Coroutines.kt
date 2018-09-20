@@ -1,26 +1,18 @@
-import com.github.kittinunf.fuel.core.Deserializable
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.core.Request.Companion.byteArrayDeserializer
 import com.github.kittinunf.fuel.core.Request.Companion.stringDeserializer
-import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.suspendCancellableCoroutine
 import kotlinx.coroutines.experimental.withContext
 import java.nio.charset.Charset
 import kotlin.coroutines.experimental.CoroutineContext
+
 
 private suspend fun <T : Any, U : Deserializable<T>> Request.await(
         deserializable: U, scope: CoroutineContext
 ): Triple<Request, Response, Result<T, FuelError>> =
         withContext(scope) {
-            suspendCancellableCoroutine<Triple<Request, Response, Result<T, FuelError>>> { continuation ->
-                continuation.invokeOnCancellation { cancel() }
-                continuation.resume(response(deserializable))
-            }
+            awaitResponse(deserializable)
         }
 
 
@@ -40,7 +32,7 @@ suspend fun <U : Any> Request.awaitObjectResponse(
 ): Triple<Request, Response, Result<U, FuelError>> = await(deserializable, scope)
 
 /***
- * 
+ *
  *  @param scope : This is the coroutine context you want the call to be made on, the defaut is CommonPool
  *
  *  @return ByteArray if no exceptions are thrown

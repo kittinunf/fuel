@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Response
+import kotlin.coroutines.experimental.suspendCoroutine
 
 internal class AsyncTaskRequest(private val task: TaskRequest) : TaskRequest(task.request) {
     var successCallback: ((Response) -> Unit)? = null
@@ -22,4 +23,8 @@ internal class AsyncTaskRequest(private val task: TaskRequest) : TaskRequest(tas
     }
 
     private fun errorResponse() = Response(request.url)
+}
+
+internal class SuspendingRequest(private val task: TaskRequest) : TaskRequest(task.request) {
+   override suspend fun awaitCall():Response = task.awaitCall()
 }
