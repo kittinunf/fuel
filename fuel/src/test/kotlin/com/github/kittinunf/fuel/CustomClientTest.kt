@@ -20,6 +20,11 @@ class CustomClientTest : BaseTestCase() {
                         url = request.url,
                         dataStream = mockJson.inputStream(),
                         statusCode = 200)
+
+                override suspend fun awaitRequest(request: Request) = Response(
+                        url = request.url,
+                        dataStream = mockJson.inputStream(),
+                        statusCode = 200)
             }
         }
     }

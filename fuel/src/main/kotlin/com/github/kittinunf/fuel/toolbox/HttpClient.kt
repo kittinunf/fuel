@@ -111,7 +111,7 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
                     }
             ))
         } catch (exception: Exception) {
-            continuation.resumeWithException( FuelError(exception, ByteArray(0), Response(request.url)))
+            continuation.resumeWithException(FuelError(exception, ByteArray(0), Response(request.url)))
         } finally {
             //As per Android documentation, a connection that is not explicitly disconnected
             //will be pooled and reused!  So, don't close it as we need inputStream later!

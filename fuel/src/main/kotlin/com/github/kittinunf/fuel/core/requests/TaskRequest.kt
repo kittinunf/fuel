@@ -3,9 +3,10 @@ package com.github.kittinunf.fuel.core.requests
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.mapError
 import java.io.InterruptedIOException
 import java.util.concurrent.Callable
-import kotlin.coroutines.experimental.suspendCoroutine
 
 internal open class TaskRequest(internal val request: Request) : Callable<Response> {
     var interruptCallback: ((Request) -> Unit)? = null
@@ -24,23 +25,17 @@ internal open class TaskRequest(internal val request: Request) : Callable<Respon
         throw FuelError(exception)
     }
 
-    open suspend fun awaitCall(): Response = suspendCoroutine { continuation ->
-        try {
-            val modifiedRequest = request.requestInterceptor?.invoke(request) ?: request
-            var response = request.client.executeRequest(modifiedRequest)
-
-            response = request.responseInterceptor?.invoke(modifiedRequest, response)
-                    ?: response
-            continuation.resume(response)
-        } catch (error: FuelError) {
+    open suspend fun awaitResult(): Result<Response, FuelError> {
+        val modifiedRequest = request.requestInterceptor?.invoke(request) ?: request
+        val response = request.client.awaitRequest(modifiedRequest)
+        return Result.of<Response, FuelError> {
+            request.responseInterceptor?.invoke(modifiedRequest, response) ?: response
+        }.mapError { e ->
+            val error = e as? FuelError ?: FuelError(e)
             if (error.exception as? InterruptedIOException != null) {
                 interruptCallback?.invoke(request)
             }
-            continuation.resumeWithException(error)
-        } catch (exception: Exception) {
-            continuation.resumeWithException(FuelError(exception))
+            error
         }
     }
-
-
 }

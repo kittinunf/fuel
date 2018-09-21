@@ -4,6 +4,7 @@ import com.jfrog.bintray.gradle.BintrayExtension
 import com.novoda.gradle.release.PublishExtension
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -49,6 +50,10 @@ subprojects {
         dependencies {
             compile(Dependencies.kotlinStdlib)
             testCompile(Dependencies.junit)
+        }
+
+        configure<KotlinJvmProjectExtension> {
+            experimental.coroutines = Coroutines.ENABLE
         }
 
         configure<JavaPluginConvention> {

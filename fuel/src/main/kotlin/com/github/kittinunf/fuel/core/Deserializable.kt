@@ -97,17 +97,7 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple
 }
 
 suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
-
-    var response: Response? = SuspendingRequest(taskRequest).awaitCall()
-
-    val result = Result.of(response?.let { deserializable.deserialize(it) }).mapError {
-        if (it is FuelError) {
-            response = it.response
-            it
-        } else {
-            FuelError(it)
-        }
-    }
-    return Triple(this, response ?: Response.error(), result)
-
+    val r = SuspendingRequest(taskRequest).awaitResult()
+    return Triple(this, r.component1()
+            ?: Response.error(), r.map { deserializable.deserialize(it) })
 }
