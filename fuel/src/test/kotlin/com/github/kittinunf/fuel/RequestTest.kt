@@ -26,10 +26,7 @@ class RequestTest : BaseTestCase() {
 
     enum class HttpsBin(relativePath: String) : Fuel.PathStringConvertible {
         USER_AGENT("user-agent"),
-        POST("post"),
-        PUT("put"),
-        PATCH("patch"),
-        DELETE("delete");
+        ANYTHING("anything");
 
         override val path = "https://httpbin.org/$relativePath"
     }
@@ -539,6 +536,65 @@ class RequestTest : BaseTestCase() {
         assertThat(response?.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
 
         assertThat(string, equalTo(""))
+    }
+
+    @Test
+    fun httpOptionsRequest() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.OPTIONS, HttpsBin.ANYTHING).responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        val string = data as String
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response?.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+
+        assertThat(string, equalTo(""))
+    }
+
+    @Test
+    fun httpTraceRequest() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        manager.request(Method.TRACE, HttpsBin.ANYTHING).responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val result = JSONObject(data as String)
+
+        assertThat(response?.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+
+        assertThat(result.get("headers"), notNullValue())
+        assertEquals(result.get("method"), "TRACE")
+        assertThat(result.get("origin"), notNullValue())
+        assertThat(result.get("url"), notNullValue())
     }
 
     @Test
