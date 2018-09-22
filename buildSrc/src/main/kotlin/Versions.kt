@@ -28,4 +28,5 @@ object Versions {
     const val robolectricVersion = "3.8"
     const val rulesVersion = "1.0.0"
     const val runnerVersion = "1.0.0"
+    const val mockServerVersion = "5.4.1"
 }

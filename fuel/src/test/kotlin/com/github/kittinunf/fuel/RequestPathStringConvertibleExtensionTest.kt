@@ -1,9 +1,6 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.Method
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -11,43 +8,21 @@ import java.io.File
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
-    init {
-        FuelManager.instance.basePath = "https://httpbin.org"
+class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
+    class PathStringConvertibleImpl(url: String) : Fuel.PathStringConvertible {
+        override val path = url
     }
 
-    enum class HttpsBin(relativePath: String) : Fuel.PathStringConvertible {
-        COOKIES("cookies"),
-        POST("post"),
-        PUT("put"),
-        DELETE("delete"),
-        DOWNLOAD("bytes/123456"),
-        UPLOAD("post");
-
-        override val path = "/$relativePath"
-    }
-
-    enum class MockBin(path: String) : Fuel.PathStringConvertible {
-        PATH("");
-
-        override val path = "https://mockbin.org/request/$path"
-    }
 
     @Test
     fun httpGetRequestWithSharedInstance() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/http-get"),
+            response = mockReflect()
+        )
 
-        HttpsBin.COOKIES.httpGet().responseString { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-get")).httpGet().responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -55,26 +30,18 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpPostRequestWithSharedInstance() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.POST.value).withPath("/http-post"),
+            response = mockReflect()
+        )
 
-        HttpsBin.POST.httpPost().responseString { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
-
-        val string = data as String
+        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-post")).httpPost().responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -82,28 +49,20 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
-        assertThat(string, containsString("https"))
+        assertThat(data, containsString("http-post"))
     }
 
     @Test
     fun httpPutRequestWithSharedInstance() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.PUT.value).withPath("/http-put"),
+            response = mockReflect()
+        )
 
-        HttpsBin.PUT.httpPut().responseString { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
-
-        val string = data as String
+        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-put")).httpPut().responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -111,28 +70,25 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
-        assertThat(string, containsString("https"))
+        assertThat(data, containsString("http-put"))
     }
 
     @Test
     fun httpPatchRequestWithSharedInstance() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.PATCH.value).withPath("/http-patch"),
+            response = mockReflect()
+        )
 
-        MockBin.PATH.httpPatch().responseString { req, res, result ->
-            request = req
-            response = res
+        mockChain(
+            request = mockRequest().withMethod(Method.POST.value).withHeader("X-HTTP-Method-Override", Method.PATCH.value).withPath("/http-patch"),
+            response = mockReflect()
+        )
 
-            val (d, err) = result
-            data = d
-            error = err
-        }
-
-        val string = data as String
+        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-patch")).httpPatch().responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -140,28 +96,20 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
-        assertThat(string, containsString("https"))
+        assertThat(data, containsString("http-patch"))
     }
 
     @Test
     fun httpDeleteRequestWithSharedInstance() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.DELETE.value).withPath("/http-delete"),
+            response = mockReflect()
+        )
 
-        HttpsBin.DELETE.httpDelete().responseString { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
-
-        val string = data as String
+        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-delete")).httpDelete().responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -169,30 +117,24 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
-        assertThat(string, containsString("https"))
+        assertThat(data, containsString("http-delete"))
     }
 
     @Test
     fun httpUploadRequestWithSharedInstance() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.POST.value).withPath("/http-upload"),
+            response = mockReflect()
+        )
 
-        HttpsBin.UPLOAD.httpUpload().source { _, _ ->
+        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-upload")).httpUpload().source { _, _ ->
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        }.responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -200,26 +142,20 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpDownloadRequestWithSharedInstance() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/http-download"),
+            response = mockReflect()
+        )
 
-        HttpsBin.DOWNLOAD.httpDownload().destination { _, _ ->
+        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-download")).httpDownload().destination { _, _ ->
             File.createTempFile("123456", null)
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        }.responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -227,7 +163,7 @@ class RequestPathStringConvertibleExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
 }
