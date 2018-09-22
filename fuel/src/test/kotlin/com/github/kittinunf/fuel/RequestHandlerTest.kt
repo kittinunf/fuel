@@ -2,9 +2,10 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Handler
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.*
@@ -13,10 +14,9 @@ import org.junit.Test
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestHandlerTest : BaseTestCase() {
+class RequestHandlerTest : MockHttpTestCase() {
 
     init {
-        FuelManager.instance.basePath = "https://httpbin.org"
         FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
         FuelManager.instance.baseParams = listOf("key" to "value")
     }
@@ -26,10 +26,14 @@ class RequestHandlerTest : BaseTestCase() {
         var req: Request? = null
         var res: Response? = null
         var data: Any? = null
-        var err: FuelError? = null
+        val err: FuelError? = null
 
-        "/get".httpGet().response(object : Handler<ByteArray> {
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/http-get"),
+            response = mockReflect()
+        )
 
+        mockPath("http-get").httpGet().response(object : Handler<ByteArray> {
             override fun success(request: Request, response: Response, value: ByteArray) {
                 req = request
                 res = response
@@ -37,9 +41,8 @@ class RequestHandlerTest : BaseTestCase() {
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
-                err = error
+                fail("Expected to not hit failure path")
             }
-
         })
 
         assertThat(req, notNullValue())
@@ -53,7 +56,12 @@ class RequestHandlerTest : BaseTestCase() {
 
     @Test
     fun httpGetRequestWithMalformedHeaders() {
-        "/get".httpGet().header("sample" to "a\nb\nc").response().third.fold({ _ ->
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/http-get"),
+            response = mockReflect()
+        )
+
+        mockPath("http-get").httpGet().header("sample" to "a\nb\nc").response().third.fold({ _ ->
             fail()
         }, { e ->
             e.printStackTrace()
@@ -65,13 +73,18 @@ class RequestHandlerTest : BaseTestCase() {
     fun httpGetRequestInvalid() {
         var req: Request? = null
         var res: Response? = null
-        var data: Any? = null
+        val data: Any? = null
         var err: FuelError? = null
 
-        "/g".httpGet().response(object : Handler<ByteArray> {
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/not-found"),
+            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        )
+
+        mockPath("not-found").httpGet().response(object : Handler<ByteArray> {
 
             override fun success(request: Request, response: Response, value: ByteArray) {
-                data = value
+                fail("Expected not to hit success path")
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
@@ -96,12 +109,17 @@ class RequestHandlerTest : BaseTestCase() {
         var req: Request? = null
         var res: Response? = null
         var data: Any? = null
-        var err: FuelError? = null
+        val err: FuelError? = null
 
         val paramKey = "foo"
         val paramValue = "bar"
 
-        "/post".httpPost(listOf(paramKey to paramValue)).responseString(object : Handler<String> {
+        mockChain(
+            request = mockRequest().withMethod(Method.POST.value).withPath("/http-post"),
+            response = mockReflect()
+        )
+
+        mockPath("http-post").httpPost(listOf(paramKey to paramValue)).responseString(object : Handler<String> {
             override fun success(request: Request, response: Response, value: String) {
                 req = request
                 res = response
@@ -109,7 +127,7 @@ class RequestHandlerTest : BaseTestCase() {
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
-                err = error
+                fail("Expected not to hit failure path")
             }
         })
 

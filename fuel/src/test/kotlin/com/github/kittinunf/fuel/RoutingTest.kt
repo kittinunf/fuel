@@ -1,10 +1,7 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.util.Base64
 import com.github.kittinunf.fuel.util.FuelRouting
 import org.hamcrest.CoreMatchers.*
@@ -14,20 +11,16 @@ import org.junit.Test
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-/**
- * Created by matteocrippa on 8/19/17.
- */
-class RoutingTest: BaseTestCase() {
+class RoutingTest: MockHttpTestCase() {
     private val manager: FuelManager by lazy { FuelManager() }
-    sealed class TestApi: FuelRouting {
+    sealed class TestApi(private val host: String): FuelRouting {
+        override val basePath = this.host
 
-        override val basePath = "https://httpbin.org/"
-
-        class GetTest : TestApi()
-        class GetParamsTest(val name: String, val value: String) : TestApi()
-        class PostBodyTest(val value: String) : TestApi()
-        class PostBinaryBodyTest(val value: String) : TestApi()
-        class PostEmptyBodyTest() : TestApi()
+        class GetTest(host: String) : TestApi(host)
+        class GetParamsTest(host: String, val name: String, val value: String) : TestApi(host)
+        class PostBodyTest(host: String, val value: String) : TestApi(host)
+        class PostBinaryBodyTest(host: String, val value: String) : TestApi(host)
+        class PostEmptyBodyTest(host: String) : TestApi(host)
 
         override val method: Method
             get() {
@@ -97,19 +90,13 @@ class RoutingTest: BaseTestCase() {
 
     @Test
     fun httpRouterGet() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value),
+            response = mockReflect()
+        )
 
-        manager.request(TestApi.GetTest()).responseString { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = manager.request(TestApi.GetTest(mockPath(""))).responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -117,28 +104,21 @@ class RoutingTest: BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpRouterGetParams() {
-
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value),
+            response = mockReflect()
+        )
 
         val paramKey = "foo"
         val paramValue = "bar"
 
-        manager.request(TestApi.GetParamsTest(name = paramKey, value = paramValue)).responseString { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = manager.request(TestApi.GetParamsTest(host = mockPath(""), name = paramKey, value = paramValue)).responseString()
+        val (data, error) = result
 
         val string = data as String
 
@@ -148,7 +128,7 @@ class RoutingTest: BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -156,23 +136,17 @@ class RoutingTest: BaseTestCase() {
 
     @Test
     fun httpRouterPostBody() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.POST.value),
+            response = mockReflect()
+        )
 
         val paramValue = "42"
 
-        manager.request(TestApi.PostBodyTest(paramValue)).responseString { req, res, result ->
-            request = req
-            response = res
+        val (request, response, result) = manager.request(TestApi.PostBodyTest(mockPath(""), paramValue)).responseString()
+        val (data, error) = result
 
-            val (d, err) = result
-            data = d
-            error = err
-        }
-
-        val string = data as String
+        val string = JSONObject(data).getJSONObject("body").getString("string")
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -180,32 +154,25 @@ class RoutingTest: BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         val res = JSONObject(string)
-        assertThat(res.optString("data"), containsString(paramValue))
-        assertThat(res.optString("json"), containsString(paramValue))
+        assertThat(res.getString("id"), isEqualTo(paramValue))
     }
 
     @Test
     fun httpRouterPostBinaryBody() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
-
+        mockChain(
+            request = mockRequest().withMethod(Method.POST.value),
+            response = mockReflect()
+        )
         val paramValue = "42"
 
-        manager.request(TestApi.PostBinaryBodyTest(paramValue)).responseString { req, res, result ->
-            request = req
-            response = res
+        val (request, response, result) = manager.request(TestApi.PostBinaryBodyTest(mockPath(""), paramValue)).responseString()
+        val (data, error) = result
 
-            val (d, err) = result
-            data = d
-            error = err
-        }
-
-        val string = data as String
+        // Binary data is encoded in base64 by mock server
+        val string = String(Base64.decode(JSONObject(data).getJSONObject("body").getString("base64Bytes"), Base64.DEFAULT))
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -213,29 +180,21 @@ class RoutingTest: BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
-        val res = JSONObject(string)
-        val bytes = Base64.decode(res.optString("data"), Base64.DEFAULT)
+        val bytes = Base64.decode(string, Base64.DEFAULT)
         assertThat(String(bytes), containsString(paramValue))
-        assertThat(res.optString("json"), not(containsString(paramValue)))
     }
 
     @Test
     fun httpRouterPostEmptyBody() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.POST.value),
+            response = mockReflect()
+        )
 
-        manager.request(TestApi.PostEmptyBodyTest()).responseString { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = manager.request(TestApi.PostEmptyBodyTest(mockPath(""))).responseString()
+        val (data, error) = result
 
         val string = data as String
 
@@ -245,7 +204,7 @@ class RoutingTest: BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         val res = JSONObject(string)
         assertThat(res.optString("data"), isEqualTo(""))
