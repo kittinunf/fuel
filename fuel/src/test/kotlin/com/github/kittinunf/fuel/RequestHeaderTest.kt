@@ -1,38 +1,30 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.FuelManager
 import org.hamcrest.CoreMatchers.*
-import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestHeaderTest : BaseTestCase() {
-    private val manager: FuelManager by lazy {
-        FuelManager().apply {
-            basePath = "http://httpbin.org"
-        }
-    }
-
+class RequestHeaderTest : MockHttpTestCase() {
     @Test
     fun httpRequestHeader() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        val manager = FuelManager()
+
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/get"),
+            response = mockReflect()
+        )
 
         val headerKey = "Custom"
         val headerValue = "foobar"
 
-        manager.request(Method.GET, "/get").header(headerKey to headerValue).response { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = manager.request(Method.GET, mockPath("get"))
+                .header(headerKey to headerValue).response()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -40,7 +32,7 @@ class RequestHeaderTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
 
         val string = String(data as ByteArray)
         assertThat(string, containsString(headerKey))
@@ -49,18 +41,24 @@ class RequestHeaderTest : BaseTestCase() {
 
     @Test
     fun httpRequestHeaderWithDuplicateValuesForCookieKey() {
-        manager.request(Method.GET, "/get")
+        val manager = FuelManager()
+
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/get"),
+            response = mockReflect()
+        )
+
+        val (_, response, _) = manager.request(Method.GET, mockPath("get"))
                 .header("foo" to "bar","a" to "b", "cookie" to "val1=x", "cookie" to "val2=y","cookie" to "val3=z", "cookie" to "val4=j")
-                .responseObject (HttpBinHeadersDeserializer()).third.fold({
-            assertEquals("val1=x; val2=y; val3=z; val4=j",it.headers["Cookie"])
-        },{
-            fail()
-        })
+                .responseString()
+
+        assertEquals("val1=x; val2=y; val3=z; val4=j", response.headers["Cookie"]?.firstOrNull())
     }
 
     @Test
     fun multipleHeadersByTheSameKeyWillBeCorrectlyFormatted(){
-        val request = manager.request(Method.GET, "/get")
+        val manager = FuelManager()
+        val request = manager.request(Method.GET, mockPath("get"))
                 .header("foo" to "bar","a" to "b", "cookie" to "val1=x", "cookie" to "val2=y","cookie" to "val3=z", "cookie" to "val4=j")
 
         assertEquals("val1=x; val2=y; val3=z; val4=j",request.headers["cookie"] )
@@ -70,25 +68,10 @@ class RequestHeaderTest : BaseTestCase() {
 
     @Test
     fun multipleHeadersByTheSameKeyWillShowLastUsingMap(){
-        val request = manager.request(Method.GET, "/get")
+        val manager = FuelManager()
+        val request = manager.request(Method.GET, mockPath("get"))
                 .header(mapOf("cookie" to "val1=x", "cookie" to "val2=y"),false)
 
         assertEquals("val2=y",request.headers["cookie"] )
-    }
-
-    //Model
-    data class HttpBinHeadersModel(var headers: Map<String, String> = mutableMapOf())
-
-    class HttpBinHeadersDeserializer : ResponseDeserializable<HttpBinHeadersModel> {
-
-        override fun deserialize(content: String): HttpBinHeadersModel {
-            val json = JSONObject(content)
-            val headers = json.getJSONObject("headers")
-            val results = headers.keys().asSequence().associate { Pair(it, headers.getString(it)) }
-            val model = HttpBinHeadersModel()
-            model.headers = results
-            return model
-        }
-
     }
 }

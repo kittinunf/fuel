@@ -28,4 +28,5 @@ object Versions {
     val robolectricVersion = "3.8"
     val rulesVersion = "1.0.0"
     val runnerVersion = "1.0.0"
+    val mockServerVersion = "5.4.1"
 }
