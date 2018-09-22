@@ -56,7 +56,8 @@ class Response(
     }
 
     internal fun guessContentType(headers: Map<String, List<String>>): String {
-        val contentTypeFromHeaders = headers["Content-Type"]?.first()
+        // TODO: use case insensitive map
+        val contentTypeFromHeaders = (headers["Content-Type"] ?: headers["content-type"])?.first()
         if (contentTypeFromHeaders is String && !contentTypeFromHeaders.isNullOrEmpty()) {
             return contentTypeFromHeaders
         }

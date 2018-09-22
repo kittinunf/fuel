@@ -1,78 +1,52 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.*
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.io.Reader
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestObjectTest : BaseTestCase() {
+class RequestObjectTest : MockHttpTestCase() {
 
-    init {
-        FuelManager.instance.basePath = "http://httpbin.org"
-    }
+    data class ReflectMockModel(var userAgent: String = "") {
+        class Deserializer: ResponseDeserializable<ReflectMockModel> {
+            override fun deserialize(content: String): ReflectMockModel = ReflectMockModel(content)
+        }
 
-    //Model
-    data class HttpBinUserAgentModel(var userAgent: String = "")
-
-    //Deserializer
-    class HttpBinUserAgentModelDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
-
-        override fun deserialize(content: String): HttpBinUserAgentModel = HttpBinUserAgentModel(content)
-
-    }
-
-    class HttpBinMalformedDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
-
-        override fun deserialize(reader: Reader): HttpBinUserAgentModel = throw IllegalStateException("Malformed data")
-
+        class MalformedDeserializer: ResponseDeserializable<ReflectMockModel> {
+            override fun deserialize(reader: Reader): ReflectMockModel = throw IllegalStateException("Malformed data")
+        }
     }
 
     @Test
     fun httpRequestObjectUserAgentValidTest() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/user-agent"),
+            response = mockReflect()
+        )
 
-        Fuel.get("user-agent").responseObject(HttpBinUserAgentModelDeserializer()) { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = Fuel.get(mockPath("user-agent")).responseObject(ReflectMockModel.Deserializer())
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(data as HttpBinUserAgentModel, isA(HttpBinUserAgentModel::class.java))
-        assertThat((data as HttpBinUserAgentModel).userAgent, isEqualTo(not("")))
+        assertThat(data as ReflectMockModel, isA(ReflectMockModel::class.java))
+        assertThat(data.userAgent, isEqualTo(not("")))
     }
 
     @Test
     fun httpRequestObjectUserAgentInvalidTest() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/user-agent"),
+            response = mockReflect()
+        )
 
-        Fuel.get("user-agent").responseObject(HttpBinMalformedDeserializer()) { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = Fuel.get(mockPath("user-agent")).responseObject(ReflectMockModel.MalformedDeserializer())
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -80,13 +54,17 @@ class RequestObjectTest : BaseTestCase() {
         assertThat(data, nullValue())
 
         assertThat(error?.exception as IllegalStateException, isA(IllegalStateException::class.java))
-        assertThat(error?.exception?.message, equalTo("Malformed data"))
+        assertThat(error.exception.message, equalTo("Malformed data"))
     }
 
     @Test
     fun httpRequestObjectUserAgentInvalidSync() {
-        val (request, response, result) =
-                Fuel.get("user-agent").responseObject(HttpBinMalformedDeserializer())
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/user-agent"),
+            response = mockReflect()
+        )
+
+        val (request, response, result) = Fuel.get(mockPath("user-agent")).responseObject(ReflectMockModel.MalformedDeserializer())
         val (data, error) = result
 
         assertThat(request, notNullValue())
