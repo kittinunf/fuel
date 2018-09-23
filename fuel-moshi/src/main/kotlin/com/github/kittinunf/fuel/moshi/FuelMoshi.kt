@@ -20,3 +20,8 @@ inline fun <reified T : Any> moshiDeserializerOf() = object : ResponseDeserializ
                     .adapter(T::class.java)
                     .fromJson(content)
 }
+
+inline fun <reified T : Any> moshiDeserializerOf(adapter: JsonAdapter<T>) = object : ResponseDeserializable<T> {
+    override fun deserialize(content: String): T? =
+            adapter.fromJson(content)
+}
