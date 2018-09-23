@@ -8,18 +8,17 @@ import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 import com.squareup.moshi.Moshi
-import kotlin.reflect.KClass
 
 inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) =
-        response(moshiDeserializerOf(T::class), handler)
+        response(moshiDeserializerOf(T::class.java), handler)
 
-inline fun <reified T : Any> Request.responseObject(handler: Handler<T>) = response(moshiDeserializerOf(T::class), handler)
+inline fun <reified T : Any> Request.responseObject(handler: Handler<T>) = response(moshiDeserializerOf(T::class.java), handler)
 
-inline fun <reified T : Any> Request.responseObject() = response(moshiDeserializerOf(T::class))
+inline fun <reified T : Any> Request.responseObject() = response(moshiDeserializerOf(T::class.java))
 
-fun <T : Any> moshiDeserializerOf(kClass: KClass<T>) = object : ResponseDeserializable<T> {
+fun <T : Any> moshiDeserializerOf(clazz: Class<T>) = object : ResponseDeserializable<T> {
     override fun deserialize(content: String): T? = Moshi.Builder()
                 .build()
-                .adapter(kClass.java)
+                .adapter(clazz)
                 .fromJson(content)
 }
