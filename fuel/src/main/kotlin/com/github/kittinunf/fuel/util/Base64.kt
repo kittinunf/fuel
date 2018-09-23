@@ -11,7 +11,8 @@ fun ByteArray.encodeBase64Url(): ByteArray = encodeBase64ToArray(map = BASE64_UR
 fun String.encodeBase64ToString(): String = String(toByteArray().encodeBase64())
 fun String.encodeBase64UrlToString(): String = String(toByteArray().encodeBase64Url())
 
-fun String.decodeBase64(): String? = decodeBase64ToArray()?.let { String(it) }
+fun String.decodeBase64(): ByteArray? = decodeBase64ToArray()?.let { it }
+fun String.decodeBase64ToString(): String? = decodeBase64ToArray()?.let { String(it) }
 
 private val BASE64 = byteArrayOf(
         'A'.toByte(), 'B'.toByte(), 'C'.toByte(), 'D'.toByte(), 'E'.toByte(), 'F'.toByte(),

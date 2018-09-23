@@ -6,7 +6,7 @@ import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
 import com.github.kittinunf.fuel.core.requests.TaskRequest
 import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
-import com.github.kittinunf.fuel.util.encodeBase64
+import com.github.kittinunf.fuel.util.encodeBase64ToString
 import com.github.kittinunf.result.Result
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -152,7 +152,7 @@ class Request(
 
     fun authenticate(username: String, password: String): Request {
         val auth = "$username:$password"
-        val encodedAuth = auth.toByteArray().encodeBase64()
+        val encodedAuth = auth.encodeBase64ToString()
         return header("Authorization" to "Basic $encodedAuth")
     }
 

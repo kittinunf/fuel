@@ -2,10 +2,8 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.util.FuelRouting
-import com.github.kittinunf.fuel.util.decodeBase64
+import com.github.kittinunf.fuel.util.decodeBase64ToString
 import com.github.kittinunf.fuel.util.encodeBase64
 import org.hamcrest.CoreMatchers.*
 import org.json.JSONObject
@@ -175,7 +173,7 @@ class RoutingTest: MockHttpTestCase() {
         val (data, error) = result
 
         // Binary data is encoded in base64 by mock server
-        val string = JSONObject(data).getJSONObject("body").getString("base64Bytes").decodeBase64()
+        val string = JSONObject(data).getJSONObject("body").getString("base64Bytes").decodeBase64ToString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -183,8 +181,10 @@ class RoutingTest: MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode)
-        assertThat(string, containsString(paramValue)
+        assertThat(response.statusCode, isEqualTo(statusCode))
+
+        val bytes = string!!.decodeBase64ToString()
+        assertThat(bytes, containsString(paramValue))
     }
 
     @Test

@@ -2,7 +2,7 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.util.Base64
+import com.github.kittinunf.fuel.util.encodeBase64ToString
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
@@ -18,11 +18,11 @@ class RequestAuthenticationTest : MockHttpTestCase() {
     fun httpBasicAuthenticationWithInvalidCase() {
         val manager = FuelManager()
         val auth = "$user:$password"
-        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
+        val encodedAuth = auth.encodeBase64ToString()
 
         val correctRequest = mockRequest()
                 .withMethod(Method.GET.value)
-                .withHeader("Authorization", "Basic ${String(encodedAuth)}")
+                .withHeader("Authorization", "Basic $encodedAuth")
                 .withPath("/authenticate")
 
         val incorrectRequest = mockRequest()
@@ -54,11 +54,11 @@ class RequestAuthenticationTest : MockHttpTestCase() {
     fun httpBasicAuthenticationWithValidCase() {
         val manager = FuelManager()
         val auth = "$user:$password"
-        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
+        val encodedAuth = auth.encodeBase64ToString()
 
         val correctRequest = mockRequest()
                 .withMethod(Method.GET.value)
-                .withHeader("Authorization", "Basic ${String(encodedAuth)}")
+                .withHeader("Authorization", "Basic $encodedAuth")
                 .withPath("/authenticate")
 
         val incorrectRequest = mockRequest()
