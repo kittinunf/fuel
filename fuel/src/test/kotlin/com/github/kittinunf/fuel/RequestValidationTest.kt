@@ -1,112 +1,106 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.getAs
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
 import org.junit.Test
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestValidationTest : BaseTestCase() {
-    private val manager: FuelManager by lazy {
-        FuelManager().apply {
-            basePath = "http://httpbin.org"
-        }
-    }
-
+class RequestValidationTest : MockHttpTestCase() {
     @Test
     fun httpValidationWithDefaultCase() {
-        val preDefinedStatusCode = 418
-
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
-
-        //this validate (200..299) which should fail with 418
-        manager.request(Method.GET, "/status/$preDefinedStatusCode").response { req, res, result ->
-            request = req
-            response = res
-
-            val (d, err) = result
-            data = d
-            error = err
+        // Register all valid
+        for (status in (200..299)) {
+            mockChain(
+                request = mockRequest().withMethod(Method.GET.value).withPath("/$status"),
+                response = mockResponse().withStatusCode(status)
+            )
         }
+
+        // Register teapot
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/418"),
+            response = mockResponse().withStatusCode(418)
+        )
+
+
+        // Test defaults
+        for (status in (200..299)) {
+            val (request, response, result) = FuelManager().request(Method.GET, mockPath("$status")).response()
+            val (_, error) = result
+
+            assertThat(request, notNullValue())
+            assertThat(response, notNullValue())
+            assertThat(error, nullValue())
+
+            assertThat(response.statusCode, isEqualTo(status))
+        }
+
+        // Test invalid
+        val (request, response, result) = FuelManager().request(Method.GET, mockPath("418")).response()
+        val (_, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, notNullValue())
-        assertThat(error?.errorData, notNullValue())
-        assertThat(data, nullValue())
+        assertThat(error!!.errorData, notNullValue())
 
-        assertThat(response?.statusCode, isEqualTo(preDefinedStatusCode))
+        assertThat(response.statusCode, isEqualTo(418))
     }
 
     @Test
     fun httpValidationWithCustomValidCase() {
         val preDefinedStatusCode = 203
 
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        val manager = FuelManager()
 
         manager.removeAllResponseInterceptors()
         manager.addResponseInterceptor(validatorResponseInterceptor(200..202))
 
-        //this validate (200..202) which should fail with 203
-        manager.request(Method.GET, "/status/$preDefinedStatusCode").responseString { req, res, result ->
-            request = req
-            response = res
+        // Response to ANY GET request, with a 203 which should have been okay, but it's not with
+        // the custom valid case
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value),
+            response = mockResponse().withStatusCode(203)
+        )
 
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        //this validate (200..202) which should fail with 203
+        val (request, response, result) = manager.request(Method.GET, mockPath("any")).responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, notNullValue())
         assertThat(data, nullValue())
 
-        assertThat(response?.statusCode, isEqualTo(preDefinedStatusCode))
+        assertThat(response.statusCode, isEqualTo(preDefinedStatusCode))
     }
 
     @Test
     fun httpValidationWithCustomInvalidCase() {
         val preDefinedStatusCode = 418
-
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        val manager = FuelManager()
 
         manager.removeAllResponseInterceptors()
         manager.addResponseInterceptor(validatorResponseInterceptor(400..419))
 
-        manager.request(Method.GET, "/status/$preDefinedStatusCode").response { req, res, result ->
-            request = req
-            response = res
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value),
+            response = mockResponse().withStatusCode(preDefinedStatusCode)
+        )
 
-            when (result) {
-                is Result.Failure -> {
-                    error = result.getAs()
-                }
-                is Result.Success -> {
-                    data = result.getAs()
-                }
-            }
-        }
+        val (request, response, result) = manager.request(Method.GET, mockPath("status/$preDefinedStatusCode")).response()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response?.statusCode, isEqualTo(preDefinedStatusCode))
+        assertThat(response.statusCode, isEqualTo(preDefinedStatusCode))
     }
 
 }

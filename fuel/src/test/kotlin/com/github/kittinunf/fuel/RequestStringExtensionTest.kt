@@ -1,10 +1,7 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
@@ -13,27 +10,21 @@ import java.io.File
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestStringExtensionTest : BaseTestCase() {
+class RequestStringExtensionTest : MockHttpTestCase() {
     init {
-        FuelManager.instance.basePath = "https://httpbin.org"
         FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
         FuelManager.instance.baseParams = listOf("key" to "value")
     }
 
     @Test
     fun httpGet() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/http-get"),
+            response = mockReflect()
+        )
 
-        "/get".httpGet().responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = mockPath("http-get").httpGet().responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -41,23 +32,18 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpPost() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.POST.value).withPath("/http-post"),
+            response = mockReflect()
+        )
 
-        "/post".httpPost().responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = mockPath("http-post").httpPost().responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -65,23 +51,18 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpPut() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.PUT.value).withPath("/http-put"),
+            response = mockReflect()
+        )
 
-        "/put".httpPut().responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = mockPath("http-put").httpPut().responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -89,23 +70,23 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpPatch() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.PATCH.value).withPath("/http-patch"),
+            response = mockReflect()
+        )
 
-        "https://mockbin.org/request".httpPatch().responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        mockChain(
+            request = mockRequest().withMethod(Method.POST.value).withHeader("X-HTTP-Method-Override", Method.PATCH.value).withPath("/http-patch"),
+            response = mockReflect()
+        )
+
+        val (request, response, result) = mockPath("http-patch").httpPatch().responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -113,23 +94,18 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpDelete() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.DELETE.value).withPath("/http-delete"),
+            response = mockReflect()
+        )
 
-        "/delete".httpDelete().responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = mockPath("http-delete").httpDelete().responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -137,29 +113,20 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpDownload() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.GET.value).withPath("/http-download"),
+            response = mockReflect()
+        )
 
-        val numberOfBytes = 32768L
-
-        "/bytes/$numberOfBytes".httpDownload().destination { _, _ ->
-            val f = File.createTempFile(numberOfBytes.toString(), null)
-            println(f.absolutePath)
-            f
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        val (request, response, result) = mockPath("http-download").httpDownload().destination { _, _ ->
+            File.createTempFile("http-download.dl", null)
+        }.responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -167,27 +134,22 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpUploadWithPut() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.PUT.value).withPath("/http-upload"),
+            response = mockReflect()
+        )
 
-        "/put".httpUpload(Method.PUT).source { _, _ ->
+        val (request, response, result) = mockPath("http-upload").httpUpload(Method.PUT).source { _, _ ->
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        }.responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -195,27 +157,22 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpUploadWithPost() {
-        var request: Request? = null
-        var response: Response? = null
-        var data: Any? = null
-        var error: FuelError? = null
+        mockChain(
+            request = mockRequest().withMethod(Method.POST.value).withPath("/http-upload"),
+            response = mockReflect()
+        )
 
-        "/post".httpUpload().source { _, _ ->
+        val (request, response, result) = mockPath("http-upload").httpUpload().source { _, _ ->
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
-        }.responseString { req, res, result ->
-            request = req
-            response = res
-            val (d, err) = result
-            data = d
-            error = err
-        }
+        }.responseString()
+        val (data, error) = result
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -223,7 +180,25 @@ class RequestStringExtensionTest : BaseTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response?.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
+    @Test
+    fun httpHead() {
+        mockChain(
+            request = mockRequest().withMethod(Method.HEAD.value).withPath("/http-head"),
+            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_OK)
+        )
+
+        val (request, response, result) = mockPath("http-head").httpHead().responseString()
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response.statusCode, isEqualTo(statusCode))
+    }
 }
