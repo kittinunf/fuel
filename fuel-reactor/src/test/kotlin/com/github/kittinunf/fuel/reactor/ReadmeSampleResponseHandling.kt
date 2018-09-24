@@ -8,9 +8,9 @@ import com.github.kittinunf.fuel.core.isSuccessful
 fun main(args: Array<String>) {
     FuelManager.instance.basePath = "https://httpbin.org"
 
-    Fuel.get("/status/404").monoOfResponse()
+    Fuel.get("/status/404").monoResponse()
         .filter(Response::isSuccessful)
-        .switchIfEmpty(Fuel.get("/status/200").monoOfResponse())
+        .switchIfEmpty(Fuel.get("/status/200").monoResponse())
         .map(Response::statusCode)
         .subscribe(::println)
 }

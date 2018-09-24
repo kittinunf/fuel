@@ -812,14 +812,14 @@ runBlocking {
 
 ### Project Reactor
 
-The Reactor module API provides functions starting with the prefix `monoOf` to handle instances of `Response`, `Result<T, FuelError>` and values directly (`String`, `ByteArray`, `Any`). All functions expose exceptions as `FuelError` instance.
+The Reactor module API provides functions starting with the prefix `mono` to handle instances of `Response`, `Result<T, FuelError>` and values directly (`String`, `ByteArray`, `Any`). All functions expose exceptions as `FuelError` instance.
 
 **Data handling example**
 
 ```kotlin
 Fuel.get("https://icanhazdadjoke.com")
     .header("Accept" to "text/plain")
-    .monoOfString()
+    .monoString()
     .subscribe(::println)
 ```
 
@@ -833,7 +833,7 @@ object GuestMapper : ResponseDeserializable<Guest> {
         jacksonObjectMapper().readValue<Guest>(content)
 }
 
-Fuel.get("/guestName").monoOfResultObject(GuestMapper)
+Fuel.get("/guestName").monoResultObject(GuestMapper)
     .map(Result<Guest, FuelError>::get)
     .map { (name) -> "Welcome to the party, $name!" }
     .onErrorReturn("I'm sorry, your name is not on the list.")
@@ -845,9 +845,9 @@ Fuel.get("/guestName").monoOfResultObject(GuestMapper)
 ```kotlin
 FuelManager.instance.basePath = "https://httpbin.org"
 
-Fuel.get("/status/404").monoOfResponse()
+Fuel.get("/status/404").monoResponse()
     .filter(Response::isSuccessful)
-    .switchIfEmpty(Fuel.get("/status/200").monoOfResponse())
+    .switchIfEmpty(Fuel.get("/status/200").monoResponse())
     .map(Response::statusCode)
     .subscribe(::println)
 ```

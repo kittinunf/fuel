@@ -15,7 +15,7 @@ object GuestMapper : ResponseDeserializable<Guest> {
 }
 
 fun main(args: Array<String>) {
-    Fuel.get("/guestName").monoOfResultObject(GuestMapper)
+    Fuel.get("/guestName").monoResultObject(GuestMapper)
         .map(Result<Guest, FuelError>::get)
         .map { (name) -> "Welcome to the party, $name!" }
         .onErrorReturn("I'm sorry, your name is not on the list.")

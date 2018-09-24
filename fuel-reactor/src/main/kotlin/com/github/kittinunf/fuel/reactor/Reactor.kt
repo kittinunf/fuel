@@ -12,45 +12,45 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
 import java.nio.charset.Charset
 
-private fun <T : Any> Request.monoOfResult(block: Request.(MonoSink<T>) -> Unit): Mono<T> =
+private fun <T : Any> Request.monoResult(block: Request.(MonoSink<T>) -> Unit): Mono<T> =
     Mono.create<T> { sink ->
         sink.onCancel(this::cancel)
         block(sink)
     }
 
-private fun <T : Any> Request.monoOfResultFold(mapper: Deserializable<T>): Mono<T> =
-    monoOfResult { sink ->
+private fun <T : Any> Request.monoResultFold(mapper: Deserializable<T>): Mono<T> =
+    monoResult { sink ->
         response(mapper) { _, _, result ->
             result.fold(sink::success, sink::error)
         }
     }
 
-fun Request.monoOfBytes(): Mono<ByteArray> =
-    monoOfResultFold(ByteArrayDeserializer())
+fun Request.monoBytes(): Mono<ByteArray> =
+    monoResultFold(ByteArrayDeserializer())
 
-fun Request.monoOfString(charset: Charset = Charsets.UTF_8): Mono<String> =
-    monoOfResultFold(StringDeserializer(charset))
+fun Request.monoString(charset: Charset = Charsets.UTF_8): Mono<String> =
+    monoResultFold(StringDeserializer(charset))
 
-fun <T : Any> Request.monoOfObject(mapper: Deserializable<T>): Mono<T> =
-    monoOfResultFold(mapper)
+fun <T : Any> Request.monoObject(mapper: Deserializable<T>): Mono<T> =
+    monoResultFold(mapper)
 
-private fun <T : Any> Request.monoOfResultUnFolded(mapper: Deserializable<T>): Mono<Result<T, FuelError>> =
-    monoOfResult { sink ->
+private fun <T : Any> Request.monoResultUnFolded(mapper: Deserializable<T>): Mono<Result<T, FuelError>> =
+    monoResult { sink ->
         response(mapper) { _, _, result ->
             sink.success(result)
         }
     }
 
-fun Request.monoOfResultBytes(): Mono<Result<ByteArray, FuelError>> =
-    monoOfResultUnFolded(ByteArrayDeserializer())
+fun Request.monoResultBytes(): Mono<Result<ByteArray, FuelError>> =
+    monoResultUnFolded(ByteArrayDeserializer())
 
-fun Request.monoOfResultString(charset: Charset = Charsets.UTF_8): Mono<Result<String, FuelError>> =
-    monoOfResultUnFolded(StringDeserializer(charset))
+fun Request.monoResultString(charset: Charset = Charsets.UTF_8): Mono<Result<String, FuelError>> =
+    monoResultUnFolded(StringDeserializer(charset))
 
-fun <T : Any> Request.monoOfResultObject(mapper: Deserializable<T>): Mono<Result<T, FuelError>> =
-    monoOfResultUnFolded(mapper)
+fun <T : Any> Request.monoResultObject(mapper: Deserializable<T>): Mono<Result<T, FuelError>> =
+    monoResultUnFolded(mapper)
 
-fun Request.monoOfResponse(): Mono<Response> =
-    monoOfResult { sink ->
+fun Request.monoResponse(): Mono<Response> =
+    monoResult { sink ->
         response { _, res, _ -> sink.success(res) }
     }

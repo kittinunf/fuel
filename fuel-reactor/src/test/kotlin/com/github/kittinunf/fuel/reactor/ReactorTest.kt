@@ -31,7 +31,7 @@ class ReactorTest {
 
     @Test
     fun testBytes() {
-        Fuel.get("/ip").monoOfBytes()
+        Fuel.get("/ip").monoBytes()
             .test()
             .assertNext { assertTrue(it.size > 0) }
             .verifyComplete()
@@ -39,7 +39,7 @@ class ReactorTest {
 
     @Test
     fun testString() {
-        Fuel.get("/uuid").monoOfString()
+        Fuel.get("/uuid").monoString()
             .test()
             .assertNext { assertTrue(it.isNotEmpty()) }
             .verifyComplete()
@@ -47,7 +47,7 @@ class ReactorTest {
 
     @Test
     fun testObjectSuccess() {
-        Fuel.get("/ip").monoOfObject(IpDeserializerSuccess)
+        Fuel.get("/ip").monoObject(IpDeserializerSuccess)
             .map(Ip::origin)
             .test()
             .assertNext { assertTrue(it.isNotEmpty()) }
@@ -56,7 +56,7 @@ class ReactorTest {
 
     @Test
     fun testObjectFailureWrongType() {
-        Fuel.get("/ip").monoOfObject(IpLongDeserializer)
+        Fuel.get("/ip").monoObject(IpLongDeserializer)
             .map(IpLong::origin)
             .test()
             .expectErrorMatches { (it as FuelError).exception is InvalidFormatException }
@@ -65,7 +65,7 @@ class ReactorTest {
 
     @Test
     fun testObjectFailureMissingProperty() {
-        val errorMessage = Fuel.get("/ip").monoOfObject(IpAddressDeserializer)
+        val errorMessage = Fuel.get("/ip").monoObject(IpAddressDeserializer)
             .map(IpAddress::address)
             .onErrorResume(FuelError::class, {
                 assertTrue(it.exception is MissingKotlinParameterException)
@@ -78,7 +78,7 @@ class ReactorTest {
 
     @Test
     fun testResponse() {
-        Fuel.get("/status/404").monoOfResponse()
+        Fuel.get("/status/404").monoResponse()
             .map(Response::statusCode)
             .test()
             .assertNext { assertEquals(it, 404) }
@@ -87,7 +87,7 @@ class ReactorTest {
 
     @Test
     fun testResultBytes() {
-        Fuel.get("/bytes/10").monoOfResultBytes()
+        Fuel.get("/bytes/10").monoResultBytes()
             .map(Result<ByteArray, FuelError>::get)
             .test()
             .assertNext { assertTrue(it.size == 10) }
@@ -96,7 +96,7 @@ class ReactorTest {
 
     @Test
     fun testResultString() {
-        Fuel.get("/uuid").monoOfResultString()
+        Fuel.get("/uuid").monoResultString()
             .map(Result<String, FuelError>::get)
             .test()
             .assertNext { assertTrue(it.isNotEmpty()) }
@@ -105,7 +105,7 @@ class ReactorTest {
 
     @Test
     fun testResultObjectSuccess() {
-        Fuel.get("/ip").monoOfResultObject(IpDeserializerSuccess)
+        Fuel.get("/ip").monoResultObject(IpDeserializerSuccess)
             .map(Result<Ip, FuelError>::get)
             .map(Ip::origin)
             .test()
@@ -115,7 +115,7 @@ class ReactorTest {
 
     @Test
     fun testResultObjectFailureWrongType() {
-        Fuel.get("/ip").monoOfResultObject(IpLongDeserializer)
+        Fuel.get("/ip").monoResultObject(IpLongDeserializer)
             .map(Result<IpLong, FuelError>::component2)
             .test()
             .assertNext { assertTrue(it?.exception is InvalidFormatException) }
@@ -124,7 +124,7 @@ class ReactorTest {
 
     @Test
     fun testResultObjectFailureMissingProperty() {
-        Fuel.get("/ip").monoOfResultObject(IpAddressDeserializer)
+        Fuel.get("/ip").monoResultObject(IpAddressDeserializer)
             .map(Result<IpAddress, FuelError>::component2)
             .test()
             .assertNext { assertTrue(it?.exception is MissingKotlinParameterException) }
