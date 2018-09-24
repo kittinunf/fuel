@@ -9,13 +9,20 @@ import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 import reactor.core.publisher.Mono
+import reactor.core.publisher.MonoSink
 import java.nio.charset.Charset
 
-private fun <T : Any> Request.monoOfResultFold(mapper: Deserializable<T>): Mono<T> =
+private fun <T : Any> Request.monoOfResult(block: Request.(MonoSink<T>) -> Unit): Mono<T> =
     Mono.create<T> { sink ->
         sink.onCancel(this::cancel)
-        val (_, _, result) = response(mapper)
-        result.fold(sink::success, sink::error)
+        block(sink)
+    }
+
+private fun <T : Any> Request.monoOfResultFold(mapper: Deserializable<T>): Mono<T> =
+    monoOfResult { sink ->
+        response(mapper) { _, _, result ->
+            result.fold(sink::success, sink::error)
+        }
     }
 
 fun Request.monoOfBytes(): Mono<ByteArray> =
@@ -28,10 +35,10 @@ fun <T : Any> Request.monoOfObject(mapper: Deserializable<T>): Mono<T> =
     monoOfResultFold(mapper)
 
 private fun <T : Any> Request.monoOfResultUnFolded(mapper: Deserializable<T>): Mono<Result<T, FuelError>> =
-    Mono.create { sink ->
-        sink.onCancel(this::cancel)
-        val (_, _, result) = response(mapper)
-        sink.success(result)
+    monoOfResult { sink ->
+        response(mapper) { _, _, result ->
+            sink.success(result)
+        }
     }
 
 fun Request.monoOfResultBytes(): Mono<Result<ByteArray, FuelError>> =
@@ -44,8 +51,6 @@ fun <T : Any> Request.monoOfResultObject(mapper: Deserializable<T>): Mono<Result
     monoOfResultUnFolded(mapper)
 
 fun Request.monoOfResponse(): Mono<Response> =
-    Mono.create<Response> { sink ->
-        sink.onCancel(this::cancel)
-        val (_, response, _) = response()
-        sink.success(response)
+    monoOfResult { sink ->
+        response { _, res, _ -> sink.success(res) }
     }
