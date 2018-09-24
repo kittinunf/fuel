@@ -19,46 +19,7 @@ import kotlin.coroutines.experimental.suspendCoroutine
 internal class HttpClient(private val proxy: Proxy? = null) : Client {
     override fun executeRequest(request: Request): Response {
         try {
-            val connection = establishConnection(request) as HttpURLConnection
-            connection.apply {
-                connectTimeout = Fuel.testConfiguration.coerceTimeout(request.timeoutInMillisecond)
-                readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.timeoutReadInMillisecond)
-                doInput = true
-                useCaches = false
-                requestMethod = if (request.method == Method.PATCH) Method.POST.value else request.method.value
-                instanceFollowRedirects = false
-
-                for ((key, value) in request.headers) {
-                    setRequestProperty(key, value)
-                }
-
-                if (request.method == Method.PATCH) {
-                    setRequestProperty("X-HTTP-Method-Override", "PATCH")
-                }
-
-                setDoOutput(connection, request.method)
-                setBodyIfDoOutput(connection, request)
-            }
-
-            val contentEncoding = connection.contentEncoding ?: ""
-
-            return Response(
-                    url = request.url,
-                    headers = connection.headerFields.filterKeys { it != null },
-                    contentLength = connection.contentLength.toLong(),
-                    statusCode = connection.responseCode,
-                    responseMessage = connection.responseMessage.orEmpty(),
-                    dataStream = try {
-                        val stream = connection.errorStream ?: connection.inputStream
-                        if (contentEncoding.compareTo("gzip", true) == 0) GZIPInputStream(stream) else stream
-                    } catch (exception: IOException) {
-                        try {
-                            connection.errorStream ?: connection.inputStream?.close()
-                        } catch (exception: IOException) {
-                        }
-                        ByteArrayInputStream(ByteArray(0))
-                    }
-            )
+          return  doRequest(request)
         } catch (exception: Exception) {
             throw FuelError(exception, ByteArray(0), Response(request.url))
         } finally {
@@ -70,53 +31,54 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
 
     override suspend fun awaitRequest(request: Request): Response = suspendCoroutine { continuation ->
         try {
-            val connection = establishConnection(request) as HttpURLConnection
-            connection.apply {
-                connectTimeout = Fuel.testConfiguration.coerceTimeout(request.timeoutInMillisecond)
-                readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.timeoutReadInMillisecond)
-                doInput = true
-                useCaches = false
-                requestMethod = if (request.method == Method.PATCH) Method.POST.value else request.method.value
-                instanceFollowRedirects = false
-
-                for ((key, value) in request.headers) {
-                    setRequestProperty(key, value)
-                }
-
-                if (request.method == Method.PATCH) {
-                    setRequestProperty("X-HTTP-Method-Override", "PATCH")
-                }
-
-                setDoOutput(connection, request.method)
-                setBodyIfDoOutput(connection, request)
-            }
-
-            val contentEncoding = connection.contentEncoding ?: ""
-
-            continuation.resume(Response(
-                    url = request.url,
-                    headers = connection.headerFields.filterKeys { it != null },
-                    contentLength = connection.contentLength.toLong(),
-                    statusCode = connection.responseCode,
-                    responseMessage = connection.responseMessage.orEmpty(),
-                    dataStream = try {
-                        val stream = connection.errorStream ?: connection.inputStream
-                        if (contentEncoding.compareTo("gzip", true) == 0) GZIPInputStream(stream) else stream
-                    } catch (exception: IOException) {
-                        try {
-                            connection.errorStream ?: connection.inputStream?.close()
-                        } catch (exception: IOException) {
-                        }
-                        ByteArrayInputStream(ByteArray(0))
-                    }
-            ))
+            continuation.resume(doRequest(request))
         } catch (exception: Exception) {
             continuation.resumeWithException(FuelError(exception, ByteArray(0), Response(request.url)))
-        } finally {
-            //As per Android documentation, a connection that is not explicitly disconnected
-            //will be pooled and reused!  So, don't close it as we need inputStream later!
-            //connection.disconnect()
         }
+    }
+
+    @Throws
+    private fun doRequest(request: Request): Response {
+        val connection = establishConnection(request) as HttpURLConnection
+        connection.apply {
+            connectTimeout = Fuel.testConfiguration.coerceTimeout(request.timeoutInMillisecond)
+            readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.timeoutReadInMillisecond)
+            doInput = true
+            useCaches = false
+            requestMethod = if (request.method == Method.PATCH) Method.POST.value else request.method.value
+            instanceFollowRedirects = false
+
+            for ((key, value) in request.headers) {
+                setRequestProperty(key, value)
+            }
+
+            if (request.method == Method.PATCH) {
+                setRequestProperty("X-HTTP-Method-Override", "PATCH")
+            }
+
+            setDoOutput(connection, request.method)
+            setBodyIfDoOutput(connection, request)
+        }
+
+        val contentEncoding = connection.contentEncoding ?: ""
+
+        return Response(
+                url = request.url,
+                headers = connection.headerFields.filterKeys { it != null },
+                contentLength = connection.contentLength.toLong(),
+                statusCode = connection.responseCode,
+                responseMessage = connection.responseMessage.orEmpty(),
+                dataStream = try {
+                    val stream = connection.errorStream ?: connection.inputStream
+                    if (contentEncoding.compareTo("gzip", true) == 0) GZIPInputStream(stream) else stream
+                } catch (exception: IOException) {
+                    try {
+                        connection.errorStream ?: connection.inputStream?.close()
+                    } catch (exception: IOException) {
+                    }
+                    ByteArrayInputStream(ByteArray(0))
+                }
+        )
     }
 
 
