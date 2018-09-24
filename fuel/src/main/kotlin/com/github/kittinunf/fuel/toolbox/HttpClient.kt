@@ -74,13 +74,11 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
                 } catch (exception: IOException) {
                     try {
                         connection.errorStream ?: connection.inputStream?.close()
-                    } catch (exception: IOException) {
-                    }
+                    } catch (exception: IOException) { }
                     ByteArrayInputStream(ByteArray(0))
                 }
         )
     }
-
 
     private fun establishConnection(request: Request): URLConnection {
         val urlConnection = if (proxy != null) request.url.openConnection(proxy) else request.url.openConnection()
