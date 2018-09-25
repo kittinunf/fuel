@@ -31,6 +31,7 @@ class Base64Test {
 
     @Test
     fun ignoreUnnecessaryPadding() {
+        assertEquals(null, "\\fgfgff\\".decodeBase64ToString())
         assertEquals("", "====".decodeBase64ToString())
         assertEquals("\u0000\u0000\u0000", "AAAA====".decodeBase64ToString())
     }
@@ -43,6 +44,7 @@ class Base64Test {
         assertEquals("What's to be scared about? It's just a little hiccup in the power...",
                 ("V2hhdCdzIHRvIGJlIHNjYXJlZCBhYm91dD8gSXQncyBqdXN0IGEgbGl0dGxlIGhpY2" +
                         "N1cCBpbiB0aGUgcG93ZXIuLi4=").decodeBase64ToString())
+        assertEquals("How many lines of code are there>", "SG93IG1hbnkgbGluZXMgb2YgY29kZSBhcmUgdGhlcmU+".decodeBase64ToString())
     }
 
     @Test

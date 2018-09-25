@@ -14,30 +14,10 @@ fun String.encodeBase64UrlToString(): String = String(toByteArray().encodeBase64
 fun String.decodeBase64(): ByteArray? = decodeBase64ToArray()?.let { it }
 fun String.decodeBase64ToString(): String? = decodeBase64ToArray()?.let { String(it) }
 
-private val BASE64 = byteArrayOf(
-        'A'.toByte(), 'B'.toByte(), 'C'.toByte(), 'D'.toByte(), 'E'.toByte(), 'F'.toByte(),
-        'G'.toByte(), 'H'.toByte(), 'I'.toByte(), 'J'.toByte(), 'K'.toByte(), 'L'.toByte(),
-        'M'.toByte(), 'N'.toByte(), 'O'.toByte(), 'P'.toByte(), 'Q'.toByte(), 'R'.toByte(),
-        'S'.toByte(), 'T'.toByte(), 'U'.toByte(), 'V'.toByte(), 'W'.toByte(), 'X'.toByte(),
-        'Y'.toByte(), 'Z'.toByte(), 'a'.toByte(), 'b'.toByte(), 'c'.toByte(), 'd'.toByte(),
-        'e'.toByte(), 'f'.toByte(), 'g'.toByte(), 'h'.toByte(), 'i'.toByte(), 'j'.toByte(),
-        'k'.toByte(), 'l'.toByte(), 'm'.toByte(), 'n'.toByte(), 'o'.toByte(), 'p'.toByte(),
-        'q'.toByte(), 'r'.toByte(), 's'.toByte(), 't'.toByte(), 'u'.toByte(), 'v'.toByte(),
-        'w'.toByte(), 'x'.toByte(), 'y'.toByte(), 'z'.toByte(), '0'.toByte(), '1'.toByte(),
-        '2'.toByte(), '3'.toByte(), '4'.toByte(), '5'.toByte(), '6'.toByte(), '7'.toByte(),
-        '8'.toByte(), '9'.toByte(), '+'.toByte(), '/'.toByte())
-private val BASE64_URL_SAFE = byteArrayOf(
-        'A'.toByte(), 'B'.toByte(), 'C'.toByte(), 'D'.toByte(), 'E'.toByte(), 'F'.toByte(),
-        'G'.toByte(), 'H'.toByte(), 'I'.toByte(), 'J'.toByte(), 'K'.toByte(), 'L'.toByte(),
-        'M'.toByte(), 'N'.toByte(), 'O'.toByte(), 'P'.toByte(), 'Q'.toByte(), 'R'.toByte(),
-        'S'.toByte(), 'T'.toByte(), 'U'.toByte(), 'V'.toByte(), 'W'.toByte(), 'X'.toByte(),
-        'Y'.toByte(), 'Z'.toByte(), 'a'.toByte(), 'b'.toByte(), 'c'.toByte(), 'd'.toByte(),
-        'e'.toByte(), 'f'.toByte(), 'g'.toByte(), 'h'.toByte(), 'i'.toByte(), 'j'.toByte(),
-        'k'.toByte(), 'l'.toByte(), 'm'.toByte(), 'n'.toByte(), 'o'.toByte(), 'p'.toByte(),
-        'q'.toByte(), 'r'.toByte(), 's'.toByte(), 't'.toByte(), 'u'.toByte(), 'v'.toByte(),
-        'w'.toByte(), 'x'.toByte(), 'y'.toByte(), 'z'.toByte(), '0'.toByte(), '1'.toByte(),
-        '2'.toByte(), '3'.toByte(), '4'.toByte(), '5'.toByte(), '6'.toByte(), '7'.toByte(),
-        '8'.toByte(), '9'.toByte(), '-'.toByte(), '_'.toByte())
+private val regular = listOf(('A'..'Z'), ('a'..'z'), ('0'..'9'), listOf('+', '/'))
+private val urlSafe = listOf(('A'..'Z'), ('a'..'z'), ('0'..'9'), listOf('-', '_'))
+private val BASE64 = regular.flatten().map { it.toByte() }.toByteArray()
+private val BASE64_URL_SAFE = urlSafe.flatten().map { it.toByte() }.toByteArray()
 
 private fun ByteArray.encodeBase64ToArray(map: ByteArray = BASE64): ByteArray {
     val length = (size + 2) / 3 * 4
