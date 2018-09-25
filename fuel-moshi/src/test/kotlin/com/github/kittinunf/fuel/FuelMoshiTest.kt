@@ -29,7 +29,7 @@ class FuelMoshiTest {
     @Test
     fun moshiTestResponseObject() {
         Fuel.get("/user-agent")
-                .responseObject(moshiDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
+                .responseObject(moshiDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
                     assertThat(result.component1(), notNullValue())
                     assertThat(result.component2(), notNullValue())
                 }
@@ -38,7 +38,7 @@ class FuelMoshiTest {
     @Test
     fun moshiTestResponseObjectError() {
         Fuel.get("/useragent")
-                .responseObject(moshiDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
+                .responseObject(moshiDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
                     assertThat(result.component1(), notNullValue())
                     assertThat(result.component2(), instanceOf(Result.Failure::class.java))
                 }
