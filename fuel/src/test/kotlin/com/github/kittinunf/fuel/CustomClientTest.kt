@@ -25,7 +25,7 @@ class CustomClientTest : BaseTestCase() {
     }
 
     @Test
-    fun httpRequestWithmock.response() {
+    fun httpRequestWithMockedResponse() {
         val (request, response, data) =
                 manager.request(Method.GET, "http://foo.bar").response()
         assertThat(request, notNullValue())
