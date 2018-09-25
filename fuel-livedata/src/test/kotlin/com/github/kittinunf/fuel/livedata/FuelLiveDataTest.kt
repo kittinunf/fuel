@@ -35,7 +35,6 @@ class FuelLiveDataTest {
         this.mock.tearDown()
     }
 
-
     @Test
     fun liveDataTestResponse() {
         mock.chain(

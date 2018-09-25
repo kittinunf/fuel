@@ -48,98 +48,98 @@ class FuelJacksonTest {
     @Test
     fun jacksonTestResponseObject() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
-                    assertThat(result.component1(), instanceOf(HttpBinUserAgentModel::class.java))
-                    assertThat(result.component1()?.userAgent, not(""))
-                    assertThat(result.component2(), instanceOf(FuelError::class.java))
-                }
+            .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
+                assertThat(result.component1(), instanceOf(HttpBinUserAgentModel::class.java))
+                assertThat(result.component1()?.userAgent, not(""))
+                assertThat(result.component2(), instanceOf(FuelError::class.java))
+            }
     }
 
     @Test
     fun jacksonTestResponseObjectError() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
-                }
+            .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
+                assertThat(result.component1(), notNullValue())
+                assertThat(result.component2(), instanceOf(Result.Failure::class.java))
+            }
     }
 
     @Test
     fun jacksonTestResponseDeserializerObject() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject<HttpBinUserAgentModel> { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), notNullValue())
-                }
+            .responseObject<HttpBinUserAgentModel> { _, _, result ->
+                assertThat(result.component1(), notNullValue())
+                assertThat(result.component2(), notNullValue())
+            }
     }
 
     @Test
     fun jacksonTestResponseDeserializerObjectError() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject<HttpBinUserAgentModel> { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
-                }
+            .responseObject<HttpBinUserAgentModel> { _, _, result ->
+                assertThat(result.component1(), notNullValue())
+                assertThat(result.component2(), instanceOf(Result.Failure::class.java))
+            }
     }
 
     @Test
     fun jacksonTestResponseHandlerObject() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(object : Handler<HttpBinUserAgentModel> {
-                    override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                        assertThat(value, notNullValue())
-                    }
+            .responseObject(object : Handler<HttpBinUserAgentModel> {
+                override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
+                    assertThat(value, notNullValue())
+                }
 
-                    override fun failure(request: Request, response: Response, error: FuelError) {
-                        assertThat(error, notNullValue())
-                    }
+                override fun failure(request: Request, response: Response, error: FuelError) {
+                    assertThat(error, notNullValue())
+                }
 
-                })
+            })
     }
 
     @Test
     fun jacksonTestResponseHandlerObjectError() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(object : Handler<HttpBinUserAgentModel> {
-                    override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                        assertThat(value, notNullValue())
-                    }
+            .responseObject(object : Handler<HttpBinUserAgentModel> {
+                override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
+                    assertThat(value, notNullValue())
+                }
 
-                    override fun failure(request: Request, response: Response, error: FuelError) {
-                        assertThat(error, instanceOf(Result.Failure::class.java))
-                    }
+                override fun failure(request: Request, response: Response, error: FuelError) {
+                    assertThat(error, instanceOf(Result.Failure::class.java))
+                }
 
-                })
+            })
     }
 
     @Test
@@ -151,8 +151,7 @@ class FuelJacksonTest {
             ).withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        val (_, res, result) =
-                Fuel.get(mock.path("issues/1")).responseObject<IssueInfo>()
+        val (_, res, result) = Fuel.get(mock.path("issues/1")).responseObject<IssueInfo>()
         assertThat(res, notNullValue())
         assertThat(result.get(), notNullValue())
         assertThat(result.get(), isA(IssueInfo::class.java))
@@ -162,8 +161,8 @@ class FuelJacksonTest {
     @Test
     fun jacksonTestResponseSyncObjectError() {
         mock.chain(
-                request = mock.request().withPath("/issues/1"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/issues/1"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
         val (_, res, result) = Fuel.get(mock.path("issues/1")).responseObject<IssueInfo>()
         assertThat(res, notNullValue())
@@ -179,13 +178,12 @@ class FuelJacksonTest {
     @Test
     fun testProcessingGenericList() {
         mock.chain(
-                request = mock.request().withPath("/issues"),
-                response = mock.response().withBody("[ " +
-                        "{ \"id\": 1, \"title\": \"issue 1\", \"number\": null }, " +
-                        "{ \"id\": 2, \"title\": \"issue 2\", \"number\": 32 }, " +
-                        " ]").withStatusCode(HttpURLConnection.HTTP_OK)
+            request = mock.request().withPath("/issues"),
+            response = mock.response().withBody("[ " +
+                    "{ \"id\": 1, \"title\": \"issue 1\", \"number\": null }, " +
+                    "{ \"id\": 2, \"title\": \"issue 2\", \"number\": 32 }, " +
+                    " ]").withStatusCode(HttpURLConnection.HTTP_OK)
         )
-
 
         Fuel.get(mock.path("issues")).responseObject<List<IssueInfo>> { _, _, result ->
             val issues = result.get()
