@@ -15,7 +15,6 @@ class RequestAndroidSyncTest : BaseTestCase() {
 
     init {
         FuelManager.instance.apply {
-            basePath = "http://httpbin.org"
             baseHeaders = mapOf("foo" to "bar")
             baseParams = listOf("key" to "value")
         }
@@ -23,7 +22,12 @@ class RequestAndroidSyncTest : BaseTestCase() {
 
     @Test
     fun httpSyncRequestStringTest() {
-        val (request, response, result) = "/get".httpGet(listOf("hello" to "world")).responseString()
+        mock.chain(
+            request = mock.request().withPath("/get"),
+            response = mock.reflect()
+        )
+
+        val (request, response, result) = mock.path("get").httpGet(listOf("hello" to "world")).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -37,7 +41,12 @@ class RequestAndroidSyncTest : BaseTestCase() {
 
     @Test
     fun httpSyncRequestJsonTest() {
-        val (request, response, result) = "/get".httpGet(listOf("hello" to "world")).responseJson()
+        mock.chain(
+            request = mock.request().withPath("/get"),
+            response = mock.reflect()
+        )
+
+        val (request, response, result) = mock.path("get").httpGet(listOf("hello" to "world")).responseJson()
         val (data, error) = result
 
         assertThat(request, notNullValue())
