@@ -37,11 +37,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/Fuel/get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/Fuel/get"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.get(mockPath("Fuel/get")).responseString()
+        val (request, response, result) = Fuel.get(mock.path("Fuel/get")).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -64,11 +64,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpPostRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/Fuel/post"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/Fuel/post"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.post(mockPath("Fuel/post")).responseString()
+        val (request, response, result) = Fuel.post(mock.path("Fuel/post")).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -91,11 +91,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpPutRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.PUT.value).withPath("/Fuel/put"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PUT.value).withPath("/Fuel/put"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.put(mockPath("Fuel/put")).responseString()
+        val (request, response, result) = Fuel.put(mock.path("Fuel/put")).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -118,11 +118,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpDeleteRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.DELETE.value).withPath("/Fuel/delete"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.DELETE.value).withPath("/Fuel/delete"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.delete(mockPath("Fuel/delete")).responseString()
+        val (request, response, result) = Fuel.delete(mock.path("Fuel/delete")).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -145,11 +145,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithPathStringConvertibleAndSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/Fuel/get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/Fuel/get"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.get(PathStringConvertibleImpl(mockPath("Fuel/get"))).responseString()
+        val (request, response, result) = Fuel.get(PathStringConvertibleImpl(mock.path("Fuel/get"))).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -167,11 +167,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpPostRequestWithPathStringConvertibleAndSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/Fuel/post"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/Fuel/post"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.post(PathStringConvertibleImpl(mockPath("Fuel/post"))).responseString()
+        val (request, response, result) = Fuel.post(PathStringConvertibleImpl(mock.path("Fuel/post"))).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -189,11 +189,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpPutRequestWithPathStringConvertibleAndSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.PUT.value).withPath("/Fuel/put"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PUT.value).withPath("/Fuel/put"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.put(PathStringConvertibleImpl(mockPath("Fuel/put"))).responseString()
+        val (request, response, result) = Fuel.put(PathStringConvertibleImpl(mock.path("Fuel/put"))).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -211,11 +211,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpDeleteRequestWithPathStringConvertibleAndSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.DELETE.value).withPath("/Fuel/delete"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.DELETE.value).withPath("/Fuel/delete"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.delete(PathStringConvertibleImpl(mockPath("Fuel/delete"))).responseString()
+        val (request, response, result) = Fuel.delete(PathStringConvertibleImpl(mock.path("Fuel/delete"))).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -233,11 +233,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithRequestConvertibleAndSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/Fuel/get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/Fuel/get"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.request(RequestConvertibleImpl(Method.GET, mockPath("Fuel/get"))).responseString()
+        val (request, response, result) = Fuel.request(RequestConvertibleImpl(Method.GET, mock.path("Fuel/get"))).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -251,11 +251,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpPostRequestWithRequestConvertibleAndSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/Fuel/post"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/Fuel/post"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.request(RequestConvertibleImpl(Method.POST, mockPath("Fuel/post"))).responseString()
+        val (request, response, result) = Fuel.request(RequestConvertibleImpl(Method.POST, mock.path("Fuel/post"))).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -269,11 +269,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpPutRequestWithRequestConvertibleAndSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.PUT.value).withPath("/Fuel/put"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PUT.value).withPath("/Fuel/put"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.request(RequestConvertibleImpl(Method.PUT, mockPath("Fuel/put"))).responseString()
+        val (request, response, result) = Fuel.request(RequestConvertibleImpl(Method.PUT, mock.path("Fuel/put"))).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -287,11 +287,11 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpDeleteRequestWithRequestConvertibleAndSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.DELETE.value).withPath("/Fuel/delete"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.DELETE.value).withPath("/Fuel/delete"),
+            response = mock.reflect()
         )
-        val (request, response, result) = Fuel.request(RequestConvertibleImpl(Method.DELETE, mockPath("Fuel/delete"))).responseString()
+        val (request, response, result) = Fuel.request(RequestConvertibleImpl(Method.DELETE, mock.path("Fuel/delete"))).responseString()
         val (data, error) = result
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -304,15 +304,15 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpUploadWithProgressValidCase() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/Fuel/upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/Fuel/upload"),
+            response = mock.reflect()
         )
 
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = Fuel.upload(mockPath("Fuel/upload")).source { _, _ ->
+        val (request, response, result) = Fuel.upload(mock.path("Fuel/upload")).source { _, _ ->
             val dir = System.getProperty("user.dir")
             File(dir, "src/test/assets/lorem_ipsum_long.tmp")
         }.progress { readBytes, totalBytes ->
@@ -335,15 +335,15 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
     @Test
     fun httpDownloadWithProgressValidCase() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/Fuel/download"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/Fuel/download"),
+            response = mock.reflect()
         )
 
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = Fuel.download(mockPath("Fuel/download"))
+        val (request, response, result) = Fuel.download(mock.path("Fuel/download"))
             .destination { _, _ ->
                 File.createTempFile("download.dl", null)
             }.progress { readBytes, totalBytes ->

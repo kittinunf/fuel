@@ -16,12 +16,12 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/http-get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/http-get"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-get")).httpGet().responseString()
+        val (request, response, result) = PathStringConvertibleImpl(mock.path("http-get")).httpGet().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -35,12 +35,12 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpPostRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/http-post"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/http-post"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-post")).httpPost().responseString()
+        val (request, response, result) = PathStringConvertibleImpl(mock.path("http-post")).httpPost().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -56,12 +56,12 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpPutRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.PUT.value).withPath("/http-put"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PUT.value).withPath("/http-put"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-put")).httpPut().responseString()
+        val (request, response, result) = PathStringConvertibleImpl(mock.path("http-put")).httpPut().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -77,17 +77,17 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpPatchRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.PATCH.value).withPath("/http-patch"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PATCH.value).withPath("/http-patch"),
+            response = mock.reflect()
         )
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withHeader("X-HTTP-Method-Override", Method.PATCH.value).withPath("/http-patch"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withHeader("X-HTTP-Method-Override", Method.PATCH.value).withPath("/http-patch"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-patch")).httpPatch().responseString()
+        val (request, response, result) = PathStringConvertibleImpl(mock.path("http-patch")).httpPatch().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -103,12 +103,12 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpDeleteRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.DELETE.value).withPath("/http-delete"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.DELETE.value).withPath("/http-delete"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-delete")).httpDelete().responseString()
+        val (request, response, result) = PathStringConvertibleImpl(mock.path("http-delete")).httpDelete().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -124,12 +124,12 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpUploadRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/http-upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/http-upload"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-upload")).httpUpload().source { _, _ ->
+        val (request, response, result) = PathStringConvertibleImpl(mock.path("http-upload")).httpUpload().source { _, _ ->
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
@@ -147,12 +147,12 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpDownloadRequestWithSharedInstance() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/http-download"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/http-download"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = PathStringConvertibleImpl(mockPath("http-download")).httpDownload().destination { _, _ ->
+        val (request, response, result) = PathStringConvertibleImpl(mock.path("http-download")).httpDownload().destination { _, _ ->
             File.createTempFile("123456", null)
         }.responseString()
         val (data, error) = result

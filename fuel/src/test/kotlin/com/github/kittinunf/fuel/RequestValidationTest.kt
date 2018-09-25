@@ -14,22 +14,22 @@ class RequestValidationTest : MockHttpTestCase() {
     fun httpValidationWithDefaultCase() {
         // Register all valid
         for (status in (200..299)) {
-            mockChain(
-                request = mockRequest().withMethod(Method.GET.value).withPath("/$status"),
-                response = mockResponse().withStatusCode(status)
+            mock.chain(
+                request = mock.request().withMethod(Method.GET.value).withPath("/$status"),
+                response = mock.response().withStatusCode(status)
             )
         }
 
         // Register teapot
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/418"),
-            response = mockResponse().withStatusCode(418)
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/418"),
+            response = mock.response().withStatusCode(418)
         )
 
 
         // Test defaults
         for (status in (200..299)) {
-            val (request, response, result) = FuelManager().request(Method.GET, mockPath("$status")).response()
+            val (request, response, result) = FuelManager().request(Method.GET, mock.path("$status")).response()
             val (_, error) = result
 
             assertThat(request, notNullValue())
@@ -40,7 +40,7 @@ class RequestValidationTest : MockHttpTestCase() {
         }
 
         // Test invalid
-        val (request, response, result) = FuelManager().request(Method.GET, mockPath("418")).response()
+        val (request, response, result) = FuelManager().request(Method.GET, mock.path("418")).response()
         val (_, error) = result
 
         assertThat(request, notNullValue())
@@ -62,13 +62,13 @@ class RequestValidationTest : MockHttpTestCase() {
 
         // Response to ANY GET request, with a 203 which should have been okay, but it's not with
         // the custom valid case
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value),
-            response = mockResponse().withStatusCode(203)
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value),
+            response = mock.response().withStatusCode(203)
         )
 
         //this validate (200..202) which should fail with 203
-        val (request, response, result) = manager.request(Method.GET, mockPath("any")).responseString()
+        val (request, response, result) = manager.request(Method.GET, mock.path("any")).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -87,12 +87,12 @@ class RequestValidationTest : MockHttpTestCase() {
         manager.removeAllResponseInterceptors()
         manager.addResponseInterceptor(validatorResponseInterceptor(400..419))
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value),
-            response = mockResponse().withStatusCode(preDefinedStatusCode)
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value),
+            response = mock.response().withStatusCode(preDefinedStatusCode)
         )
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("status/$preDefinedStatusCode")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("status/$preDefinedStatusCode")).response()
         val (data, error) = result
 
         assertThat(request, notNullValue())

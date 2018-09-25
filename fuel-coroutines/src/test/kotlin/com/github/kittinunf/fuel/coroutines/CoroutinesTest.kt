@@ -1,6 +1,4 @@
 import com.fasterxml.jackson.databind.JsonMappingException
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HttpException
@@ -207,8 +205,7 @@ class CoroutinesTest {
     private data class UUIDResponse(val uuid: String)
 
     private object UUIDResponseDeserializer : ResponseDeserializable<UUIDResponse> {
-        override fun deserialize(content: String) =
-                jacksonObjectMapper().readValue<UUIDResponse>(content)
+        override fun deserialize(content: String) = UUIDResponse(content)
     }
 }
 
