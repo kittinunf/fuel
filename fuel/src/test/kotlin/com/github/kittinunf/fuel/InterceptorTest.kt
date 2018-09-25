@@ -7,19 +7,15 @@ import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
-import com.github.kittinunf.fuel.util.Base64
-import org.bouncycastle.cms.RecipientId.password
+import com.github.kittinunf.fuel.util.encodeBase64ToString
 import org.hamcrest.CoreMatchers.*
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.mockserver.model.Header.header
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.net.HttpURLConnection
-import java.nio.charset.Charset
 import java.util.*
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
@@ -873,12 +869,12 @@ class InterceptorTest : MockHttpTestCase() {
         val username = "user"
         val password = "pass"
         val auth = "$username:$password"
-        val encodedAuth = Base64.encode(auth.toByteArray(), Base64.NO_WRAP)
+        val encodedAuth = auth.encodeBase64ToString()
 
         val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/basic-auth/user/pass")
-                .withHeader("Authorization", "Basic ${String(encodedAuth)}")
+                .withHeader("Authorization", "Basic $encodedAuth")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
