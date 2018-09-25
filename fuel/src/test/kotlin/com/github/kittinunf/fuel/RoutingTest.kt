@@ -2,8 +2,9 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.util.Base64
 import com.github.kittinunf.fuel.util.FuelRouting
+import com.github.kittinunf.fuel.util.decodeBase64ToString
+import com.github.kittinunf.fuel.util.encodeBase64
 import org.hamcrest.CoreMatchers.*
 import org.json.JSONObject
 import org.junit.Assert.assertThat
@@ -58,7 +59,7 @@ class RoutingTest: MockHttpTestCase() {
                     is PostBinaryBodyTest -> {
                         val json = JSONObject()
                         json.put("id", this.value)
-                        Base64.encode(json.toString().toByteArray(), Base64.DEFAULT)
+                        json.toString().toByteArray().encodeBase64()
                     }
                     else -> null
                 }
@@ -172,7 +173,7 @@ class RoutingTest: MockHttpTestCase() {
         val (data, error) = result
 
         // Binary data is encoded in base64 by mock server
-        val string = String(Base64.decode(JSONObject(data).getJSONObject("body").getString("base64Bytes"), Base64.DEFAULT))
+        val string = JSONObject(data).getJSONObject("body").getString("base64Bytes").decodeBase64ToString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -182,8 +183,8 @@ class RoutingTest: MockHttpTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response.statusCode, isEqualTo(statusCode))
 
-        val bytes = Base64.decode(string, Base64.DEFAULT)
-        assertThat(String(bytes), containsString(paramValue))
+        val bytes = string!!.decodeBase64ToString()
+        assertThat(bytes, containsString(paramValue))
     }
 
     @Test
