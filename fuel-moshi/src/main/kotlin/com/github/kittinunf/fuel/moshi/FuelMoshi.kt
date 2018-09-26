@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.result.Result
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.JsonAdapter
 
 inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) =
         response(moshiDeserializerOf(), handler)

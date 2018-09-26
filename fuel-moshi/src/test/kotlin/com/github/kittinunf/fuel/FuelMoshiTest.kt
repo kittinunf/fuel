@@ -105,6 +105,17 @@ class FuelMoshiTest {
         assertThat(triple.third.component2(), instanceOf(FuelError::class.java))
     }
 
+    @Test
+    fun moshiTestResponseObjectError() {
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        val adapter = moshi.adapter(HttpBinUserAgentModel::class.java)
+        Fuel.get("/useragent")
+                .responseObject(moshiDeserializerOf(adapter)) { _, _, result ->
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
+                }
+    }
+
     data class IssueInfo(val id: Int, val title: String, val number: Int)
 
     /**
