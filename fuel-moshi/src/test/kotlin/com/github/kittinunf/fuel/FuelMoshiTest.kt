@@ -13,6 +13,8 @@ import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 class FuelMoshiTest {
 
@@ -106,7 +108,7 @@ class FuelMoshiTest {
     }
 
     @Test
-    fun moshiTestResponseObjectError() {
+    fun moshiTestResponseObjectErrorWithGivenAdapter() {
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val adapter = moshi.adapter(HttpBinUserAgentModel::class.java)
         Fuel.get("/useragent")
