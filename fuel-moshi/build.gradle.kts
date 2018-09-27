@@ -1,6 +1,8 @@
-plugins { java }
+plugins {
+	kotlin("jvm")
+}
 
 dependencies {
-    compile(project(":fuel"))
-    compile(Dependencies.moshi)
+    implementation(project(":fuel"))
+    implementation(Dependencies.moshi)
 }
