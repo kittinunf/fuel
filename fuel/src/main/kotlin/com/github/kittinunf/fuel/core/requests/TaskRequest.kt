@@ -24,19 +24,4 @@ internal open class TaskRequest(internal val request: Request) : Callable<Respon
     } catch (exception: Exception) {
         throw FuelError(exception)
     }
-
-    open suspend fun awaitResult(): Result<Response, FuelError> {
-        return try {
-            val modifiedRequest = request.requestInterceptor?.invoke(request) ?: request
-            var response = request.client.awaitRequest(modifiedRequest)
-            response = request.responseInterceptor?.invoke(modifiedRequest, response) ?: response
-            Result.of(response).mapError { it as? FuelError ?: FuelError(it) }
-        } catch (e: Exception) {
-            val error = e as? FuelError ?: FuelError(e)
-            if (error.exception as? InterruptedIOException != null) {
-                interruptCallback?.invoke(request)
-            }
-            Result.error(error)
-        }
-    }
 }
