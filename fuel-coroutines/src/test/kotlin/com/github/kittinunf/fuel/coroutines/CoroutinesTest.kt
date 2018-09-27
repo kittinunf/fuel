@@ -8,6 +8,7 @@ import com.github.kittinunf.fuel.core.ResponseDeserializable
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
+import java.lang.ClassCastException
 
 class CoroutinesTest {
 
@@ -134,7 +135,7 @@ class CoroutinesTest {
                 fail("This is an error case!")
             }, { error ->
                 assertNotNull(error)
-                assertTrue(error.exception is JsonMappingException)
+                assertTrue(error.exception is ClassCastException)
             })
         } catch (exception: Exception) {
             fail("When using awaitSafelyObjectResult errors should be folded instead of thrown.")
