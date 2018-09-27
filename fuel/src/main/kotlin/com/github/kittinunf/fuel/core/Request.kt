@@ -80,9 +80,6 @@ class Request(
     internal var requestInterceptor: ((Request) -> Request)? = null
     internal var responseInterceptor: ((Request, Response) -> Response)? = null
 
-    internal var suspendRequestInterceptor: (suspend (Request) -> Request)? = null
-    internal var suspendResponseInterceptor: (suspend (Request, Response) -> Response)? = null
-
     //interfaces
     fun timeout(timeout: Int): Request {
         timeoutInMillisecond = timeout

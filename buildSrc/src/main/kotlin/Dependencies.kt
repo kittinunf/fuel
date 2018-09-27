@@ -17,7 +17,6 @@ object Dependencies {
     val mockServer = "org.mock-server:mockserver-netty:${Versions.mockServerVersion}"
     val moshi = "com.squareup.moshi:moshi:${Versions.moshiVersion}"
     val result = "com.github.kittinunf.result:result:${Versions.resultVersion}"
-    val resultCoroutines = "com.github.kittinunf.result:result-coroutines:${Versions.resultVersion}"
     val robolectric = "org.robolectric:robolectric:${Versions.robolectricVersion}"
     val rxJavaAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxandroidVersion}"
     val rxJavaJvm = "io.reactivex.rxjava2:rxjava:${Versions.rxjavaVersion}"

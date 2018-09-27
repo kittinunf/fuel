@@ -1,11 +1,11 @@
 package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.Client
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.core.Client
-import com.github.kittinunf.fuel.core.FuelError
 import java.io.BufferedOutputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -19,7 +19,7 @@ import kotlin.coroutines.experimental.suspendCoroutine
 internal class HttpClient(private val proxy: Proxy? = null) : Client {
     override fun executeRequest(request: Request): Response {
         try {
-          return  doRequest(request)
+            return doRequest(request)
         } catch (exception: Exception) {
             throw FuelError(exception, ByteArray(0), Response(request.url))
         } finally {
@@ -33,7 +33,8 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
         try {
             continuation.resume(doRequest(request))
         } catch (exception: Exception) {
-            continuation.resumeWithException(FuelError(exception, ByteArray(0), Response(request.url)))
+            continuation.resumeWithException(exception as? FuelError
+                    ?: FuelError(exception, ByteArray(0), Response(request.url)))
         }
     }
 
@@ -74,7 +75,8 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
                 } catch (exception: IOException) {
                     try {
                         connection.errorStream ?: connection.inputStream?.close()
-                    } catch (exception: IOException) { }
+                    } catch (exception: IOException) {
+                    }
                     ByteArrayInputStream(ByteArray(0))
                 }
         )
