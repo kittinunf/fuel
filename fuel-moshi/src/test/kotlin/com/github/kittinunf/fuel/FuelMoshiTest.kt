@@ -14,7 +14,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.squareup.moshi.KotlinJsonAdapterFactory
 
 class FuelMoshiTest {
 
