@@ -6,9 +6,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import kotlinx.coroutines.experimental.runBlocking
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
+import org.junit.Assert.*
 import org.junit.Test
 
 class CoroutinesTest {
@@ -98,7 +96,7 @@ class CoroutinesTest {
             Fuel.get("/not/found/address").awaitStringResult().fold({
                 fail("This test should fail due to HTTP status code.")
             }, { error ->
-                assertTrue(error.exception is HttpException)
+                assertNotNull(error.exception as? HttpException)
                 assertTrue(error.message.orEmpty().contains("HTTP Exception 404"))
             })
         } catch (exception: HttpException) {
@@ -134,7 +132,6 @@ class CoroutinesTest {
         try {
             Fuel.get("/ip").awaitObjectResult(UUIDResponseDeserializer).fold({ _ ->
                 fail("This is an error case!")
-
             }, { error ->
                 assertNotNull(error)
                 assertTrue(error.exception is JsonMappingException)

@@ -8,6 +8,7 @@ import com.github.kittinunf.fuel.core.awaitResponse
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.result.Result
 import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.CoroutineExceptionHandler
 import kotlinx.coroutines.experimental.withContext
 import java.nio.charset.Charset
 import kotlin.coroutines.experimental.CoroutineContext
@@ -16,7 +17,7 @@ import kotlin.coroutines.experimental.CoroutineContext
 private suspend fun <T : Any, U : Deserializable<T>> Request.await(
         deserializable: U, scope: CoroutineContext
 ): Triple<Request, Response, Result<T, FuelError>> =
-        withContext(scope) {
+        withContext(scope ){
             awaitResponse(deserializable)
         }
 

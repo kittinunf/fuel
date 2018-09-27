@@ -26,6 +26,3 @@ internal class AsyncTaskRequest(private val task: TaskRequest) : TaskRequest(tas
     private fun errorResponse() = Response(request.url)
 }
 
-internal class SuspendingRequest(private val task: TaskRequest) : TaskRequest(task.request) {
-    override suspend fun awaitResult(): Result<Response, FuelError> = task.awaitResult()
-}
