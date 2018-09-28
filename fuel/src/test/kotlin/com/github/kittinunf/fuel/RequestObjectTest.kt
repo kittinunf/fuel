@@ -21,12 +21,12 @@ class RequestObjectTest : MockHttpTestCase() {
 
     @Test
     fun httpRequestObjectUserAgentValidTest() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/user-agent"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/user-agent"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = Fuel.get(mockPath("user-agent")).responseObject(ReflectMockModel.Deserializer())
+        val (request, response, result) = Fuel.get(mock.path("user-agent")).responseObject(ReflectMockModel.Deserializer())
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -40,12 +40,12 @@ class RequestObjectTest : MockHttpTestCase() {
 
     @Test
     fun httpRequestObjectUserAgentInvalidTest() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/user-agent"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/user-agent"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = Fuel.get(mockPath("user-agent")).responseObject(ReflectMockModel.MalformedDeserializer())
+        val (request, response, result) = Fuel.get(mock.path("user-agent")).responseObject(ReflectMockModel.MalformedDeserializer())
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -59,12 +59,12 @@ class RequestObjectTest : MockHttpTestCase() {
 
     @Test
     fun httpRequestObjectUserAgentInvalidSync() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/user-agent"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/user-agent"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = Fuel.get(mockPath("user-agent")).responseObject(ReflectMockModel.MalformedDeserializer())
+        val (request, response, result) = Fuel.get(mock.path("user-agent")).responseObject(ReflectMockModel.MalformedDeserializer())
         val (data, error) = result
 
         assertThat(request, notNullValue())

@@ -4,4 +4,5 @@ dependencies {
     implementation(Dependencies.androidArchExtensions)
     testImplementation(Dependencies.robolectric)
     testImplementation(Dependencies.junit)
+    testCompile(Dependencies.mockServer)
 }

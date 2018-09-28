@@ -1,6 +1,5 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.fuel.rx.rx
@@ -14,24 +13,45 @@ import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.core.Is.isA
+import org.junit.After
 import org.junit.Assert.assertThat
+import org.junit.Before
 import org.junit.Test
 import java.io.InputStream
+import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RxFuelTest {
 
     init {
-        FuelManager.instance.basePath = "https://httpbin.org"
-
         Fuel.testMode {
             timeout = 15000
         }
     }
 
+    private lateinit var mock: MockHelper
+
+    @Before
+    fun setup() {
+        this.mock = MockHelper()
+        this.mock.setup()
+    }
+
+    @After
+    fun tearDown() {
+        this.mock.tearDown()
+    }
+
+
     @Test
     fun rxTestResponse() {
-        val (response, data) = Fuel.get("/get").rx_response()
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        val (response, data) = Fuel.get(mock.path("user-agent"))
+                .rx_response()
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -45,7 +65,12 @@ class RxFuelTest {
 
     @Test
     fun rxTestResponseString() {
-        val (response, data) = Fuel.get("/get").rx_responseString()
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        val (response, data) = Fuel.get(mock.path("user-agent")).rx_responseString()
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -59,7 +84,12 @@ class RxFuelTest {
 
     @Test
     fun rxBytes() {
-        val data = Fuel.get("/bytes/555").rx_bytes()
+        mock.chain(
+            request = mock.request().withPath("/bytes"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(ByteArray(555) { 0 })
+        )
+
+        val data = Fuel.get(mock.path("bytes")).rx_bytes()
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -76,7 +106,12 @@ class RxFuelTest {
 
     @Test
     fun rxTestString() {
-        val data = Fuel.get("/get").rx_string()
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        val data = Fuel.get(mock.path("user-agent")).rx_string()
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -93,7 +128,11 @@ class RxFuelTest {
 
     @Test
     fun rxTestStringError() {
-        val data = Fuel.get("/gt").rx_string()
+        mock.chain(
+            request = mock.request().withPath("/error"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        )
+        val data = Fuel.get(mock.path("error")).rx_string()
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -105,7 +144,7 @@ class RxFuelTest {
         val (value, error) = data
         assertThat(value, nullValue())
         assertThat(error, notNullValue())
-        assertThat(error?.exception?.message, containsString("404 NOT FOUND"))
+        assertThat(error?.exception?.message, containsString("404 Not Found"))
     }
 
     //Model
@@ -127,7 +166,12 @@ class RxFuelTest {
 
     @Test
     fun rxTestResponseObject() {
-        val (response, result) = Fuel.get("/user-agent")
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        val (response, result) = Fuel.get(mock.path("user-agent"))
                 .rx_responseObject(HttpBinUserAgentModelDeserializer())
                 .test()
                 .apply { awaitTerminalEvent() }
@@ -146,7 +190,12 @@ class RxFuelTest {
 
     @Test
     fun rxTestResponseObjectError() {
-        val (response, result) = Fuel.get("/useragent")
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        )
+
+        val (response, result) = Fuel.get(mock.path("user-agent"))
                 .rx_responseObject(HttpBinUserAgentModelDeserializer())
                 .test()
                 .apply { awaitTerminalEvent() }
@@ -164,7 +213,12 @@ class RxFuelTest {
 
     @Test
     fun rxTestResponseObjectMalformed() {
-        val (response, result) = Fuel.get("/user-agent")
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        val (response, result) = Fuel.get(mock.path("user-agent"))
                 .rx_responseObject(HttpBinMalformedDeserializer())
                 .test()
                 .apply { awaitTerminalEvent() }
@@ -181,8 +235,13 @@ class RxFuelTest {
 
     @Test
     fun rxTestWrapper() {
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
         val (request, response, result) =
-                Fuel.get("user-agent")
+                Fuel.get(mock.path("user-agent"))
                         .rx { response(HttpBinUserAgentModelDeserializer()) }
                         .test()
                         .apply { awaitTerminalEvent() }

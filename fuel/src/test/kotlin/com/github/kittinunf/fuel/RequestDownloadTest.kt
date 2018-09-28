@@ -25,12 +25,12 @@ class RequestDownloadTest : MockHttpTestCase() {
         val bytes = ByteArray(numberOfBytes)
         Random().nextBytes(bytes)
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mockResponse().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
         )
 
-        val (request, response, result) = manager.download(mockPath("bytes")).destination { _, _ ->
+        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
             println(file.absolutePath)
             file
         }.response()
@@ -56,15 +56,15 @@ class RequestDownloadTest : MockHttpTestCase() {
         val bytes = ByteArray(numberOfBytes)
         Random().nextBytes(bytes)
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mockResponse().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
         )
 
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = manager.download(mockPath("bytes")).destination { _, _ ->
+        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
             println(file.absolutePath)
             file
         }.progress { readBytes, totalBytes ->
@@ -96,15 +96,15 @@ class RequestDownloadTest : MockHttpTestCase() {
         val bytes = ByteArray(numberOfBytes)
         Random().nextBytes(bytes)
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mockResponse().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
         )
 
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = manager.download(mockPath("bytes")).destination { _, _ ->
+        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
             println(file.absolutePath)
             file
         }.progress { readBytes, totalBytes ->
@@ -134,12 +134,12 @@ class RequestDownloadTest : MockHttpTestCase() {
         val numberOfBytes = 131072
         val file = File.createTempFile(numberOfBytes.toString(), null)
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        val (request, response, result) = manager.download(mockPath("bytes")).destination { _, _ ->
+        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
             println(file.absolutePath)
             file
         }.progress { _, _ ->
@@ -161,12 +161,12 @@ class RequestDownloadTest : MockHttpTestCase() {
     fun httpDownloadWithProgressInvalidFileCase() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.download(mockPath("bytes")).destination { _, _ ->
+        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
             val dir = System.getProperty("user.dir")
             File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
         }.progress { _, _ ->
@@ -193,9 +193,9 @@ class RequestDownloadTest : MockHttpTestCase() {
         val bytes = ByteArray(numberOfBytes)
         Random().nextBytes(bytes)
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mockResponse()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.response()
                         .withDelay(TimeUnit.SECONDS, 3)
                         .withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
         )
@@ -204,7 +204,7 @@ class RequestDownloadTest : MockHttpTestCase() {
         var total = -1L
         var lastPercent = 0L
 
-        val (request, response, result) = manager.download(mockPath("bytes")).destination { _, _ ->
+        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
             println(file.absolutePath)
             file
         }.progress { readBytes, totalBytes ->
