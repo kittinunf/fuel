@@ -40,14 +40,14 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testWithNoInterceptor() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
             .withMethod(Method.GET.value)
             .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        val (request, response, result) = manager.request(Method.GET, mockPath("get")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("get")).response()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -63,16 +63,16 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testWithLoggingRequestInterceptor() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
         val manager = FuelManager()
         manager.addRequestInterceptor(loggingRequestInterceptor())
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("get")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("get")).response()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -89,16 +89,16 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testWithLoggingResponseInterceptor() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
         val manager = FuelManager()
         manager.addResponseInterceptor { loggingResponseInterceptor() }
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("get")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("get")).response()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -120,14 +120,14 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testWithResponseToString() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        val (request, response, result) = manager.request(Method.GET, mockPath("get")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("get")).response()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -145,11 +145,11 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testWithMultipleInterceptors() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
         val manager = FuelManager()
 
@@ -168,7 +168,7 @@ class InterceptorTest : MockHttpTestCase() {
             addRequestInterceptor(customLoggingInterceptor())
         }
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("get")).header(mapOf("User-Agent" to "Fuel")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("get")).header(mapOf("User-Agent" to "Fuel")).response()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -184,11 +184,11 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testWithBreakingChainInterceptor() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
         val manager = FuelManager()
 
@@ -218,7 +218,7 @@ class InterceptorTest : MockHttpTestCase() {
         }
 
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("get")).header(mapOf("User-Agent" to "Fuel")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("get")).header(mapOf("User-Agent" to "Fuel")).response()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -233,23 +233,23 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testWithRedirectInterceptor() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("redirected"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("redirected"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val redirectedRequest = mockRequest()
+        val redirectedRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirected")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = redirectedRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = redirectedRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        val (request, response, result) = manager.request(Method.GET, mockPath("redirect")).header(mapOf("User-Agent" to "Fuel")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).response()
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -262,21 +262,21 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testWithoutDefaultRedirectionInterceptor() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("redirected"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("redirected"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        mockChain(request = firstRequest, response = firstResponse)
+        mock.chain(request = firstRequest, response = firstResponse)
 
         val manager = FuelManager()
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
         manager.removeAllResponseInterceptors()
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("redirect")).header(mapOf("User-Agent" to "Fuel")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).response()
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -289,25 +289,25 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testWithRedirectInterceptorRelative() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("redirected"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("redirected"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val redirectedRequest = mockRequest()
+        val redirectedRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirected")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = redirectedRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = redirectedRequest, response = mock.reflect())
 
         val manager = FuelManager()
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("redirect")).header(mapOf("User-Agent" to "Fuel")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).response()
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -320,27 +320,27 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testWithRedirectInterceptorPreservesBaseHeaders() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
+        val firstResponse = mock.response()
                 .withHeader("Location", "/redirected")
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val redirectedRequest = mockRequest()
+        val redirectedRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirected")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = redirectedRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = redirectedRequest, response = mock.reflect())
 
         val manager = FuelManager()
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
         manager.baseHeaders = mapOf("User-Agent" to "Fuel")
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("redirect")).header(mapOf("User-Agent" to "Fuel")).responseString(Charsets.UTF_8)
+        val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).responseString(Charsets.UTF_8)
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -353,34 +353,34 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testNestedRedirectWithRedirectInterceptor() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("intermediary"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("intermediary"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/intermediary")
 
-        val secondResponse = mockResponse()
-                .withHeader("Location", mockPath("redirected"))
+        val secondResponse = mock.response()
+                .withHeader("Location", mock.path("redirected"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val redirectedRequest = mockRequest()
+        val redirectedRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirected")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = secondResponse)
-        mockChain(request = redirectedRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = secondResponse)
+        mock.chain(request = redirectedRequest, response = mock.reflect())
 
         val manager = FuelManager()
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("redirect")).header(mapOf("User-Agent" to "Fuel")).responseString(Charsets.UTF_8)
+        val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).responseString(Charsets.UTF_8)
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -393,20 +393,20 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testHttpExceptionWithValidatorInterceptor() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/invalid")
 
-        val firstResponse = mockResponse()
+        val firstResponse = mock.response()
                 .withStatusCode(418) // I'm a teapot
 
-        mockChain(request = firstRequest, response = firstResponse)
+        mock.chain(request = firstRequest, response = firstResponse)
 
         val manager = FuelManager()
         manager.addResponseInterceptor(validatorResponseInterceptor(200..299))
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("invalid")).responseString(Charsets.UTF_8)
+        val (request, response, result) = manager.request(Method.GET, mock.path("invalid")).responseString(Charsets.UTF_8)
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -419,19 +419,19 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testHttpExceptionWithRemoveInterceptors() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/invalid")
 
-        val firstResponse = mockResponse()
+        val firstResponse = mock.response()
                 .withStatusCode(418) // I'm a teapot
 
-        mockChain(request = firstRequest, response = firstResponse)
+        mock.chain(request = firstRequest, response = firstResponse)
 
         val manager = FuelManager()
         manager.removeAllResponseInterceptors()
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("invalid")).responseString(Charsets.UTF_8)
+        val (request, response, result) = manager.request(Method.GET, mock.path("invalid")).responseString(Charsets.UTF_8)
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -444,17 +444,17 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun failsIfRequestedResourceReturns404() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/not-found")
 
-        val firstResponse = mockResponse()
+        val firstResponse = mock.response()
                 .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
 
-        mockChain(request = firstRequest, response = firstResponse)
+        mock.chain(request = firstRequest, response = firstResponse)
 
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mockPath("not-found")).response()
+        val (_, _, result) = manager.request(Method.GET, mock.path("not-found")).response()
         val (data, error) = result
 
         assertThat(error, notNullValue())
@@ -463,26 +463,26 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun failsIfRedirectedToResourceReturning404() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("not-found"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("not-found"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/not-found")
 
-        val secondResponse = mockResponse()
+        val secondResponse = mock.response()
                 .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = secondResponse)
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = secondResponse)
 
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mockPath("redirect")).response()
+        val (_, _, result) = manager.request(Method.GET, mock.path("redirect")).response()
 
         val (data, error) = result
 
@@ -494,23 +494,23 @@ class InterceptorTest : MockHttpTestCase() {
     fun testGet301Redirect() {
         val testValidator = "state:${Random().nextDouble()}"
 
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("get?validate=$testValidator"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("get?validate=$testValidator"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_PERM)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mockPath("redirect")).responseString()
+        val (_, _, result) = manager.request(Method.GET, mock.path("redirect")).responseString()
         val (data, error) = result
 
         assertThat(data, notNullValue())
@@ -522,23 +522,23 @@ class InterceptorTest : MockHttpTestCase() {
     fun testGet302Redirect() {
         val testValidator = "state:${Random().nextDouble()}"
 
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("get?validate=$testValidator"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("get?validate=$testValidator"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mockPath("redirect")).responseString()
+        val (_, _, result) = manager.request(Method.GET, mock.path("redirect")).responseString()
         val (data, error) = result
 
         assertThat(data, notNullValue())
@@ -550,23 +550,23 @@ class InterceptorTest : MockHttpTestCase() {
     fun testGet303Redirect() {
         val testValidator = "state:${Random().nextDouble()}"
 
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("get?validate=$testValidator"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("get?validate=$testValidator"))
                 .withStatusCode(HttpURLConnection.HTTP_SEE_OTHER)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mockPath("redirect")).responseString()
+        val (_, _, result) = manager.request(Method.GET, mock.path("redirect")).responseString()
         val (data, error) = result
 
         assertThat(data, notNullValue())
@@ -576,16 +576,16 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testGetNotModified() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/not-modified")
 
-        val firstResponse = mockResponse()
+        val firstResponse = mock.response()
                 .withStatusCode(HttpURLConnection.HTTP_NOT_MODIFIED)
 
-        mockChain(request = firstRequest, response = firstResponse)
+        mock.chain(request = firstRequest, response = firstResponse)
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mockPath("not-modified")).responseString()
+        val (_, _, result) = manager.request(Method.GET, mock.path("not-modified")).responseString()
         val (data, error) = result
 
         // TODO: Not Modified should not be an error
@@ -595,22 +595,22 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testGetRedirectNoUrl() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
+        val firstResponse = mock.response()
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mockPath("redirect")).responseString()
+        val (_, _, result) = manager.request(Method.GET, mock.path("redirect")).responseString()
         val (data, error) = result
 
         assertThat(data, nullValue())
@@ -619,26 +619,26 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testGetWrongUrl() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("not-found"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("not-found"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/not-found")
 
-        val secondResponse = mockResponse()
+        val secondResponse = mock.response()
                 .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = secondResponse)
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = secondResponse)
 
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mockPath("redirect")).responseString()
+        val (_, _, result) = manager.request(Method.GET, mock.path("redirect")).responseString()
         val (data, error) = result
 
         assertThat(data, nullValue())
@@ -647,20 +647,20 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testPost301Redirect() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("get"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("get"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_PERM)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
         val requests = mutableListOf<Request>()
@@ -672,7 +672,7 @@ class InterceptorTest : MockHttpTestCase() {
             }
         }
 
-        val (originalRequest, _, result) = manager.request(Method.POST, mockPath("redirect")).responseString()
+        val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
         assertThat(data, notNullValue())
@@ -683,20 +683,20 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testPost302Redirect() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("get"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("get"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
         val requests = mutableListOf<Request>()
@@ -708,7 +708,7 @@ class InterceptorTest : MockHttpTestCase() {
             }
         }
 
-        val (originalRequest, _, result) = manager.request(Method.POST, mockPath("redirect")).responseString()
+        val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
         assertThat(data, notNullValue())
@@ -719,20 +719,20 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testPost303Redirect() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("get"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("get"))
                 .withStatusCode(HttpURLConnection.HTTP_SEE_OTHER)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
         val requests = mutableListOf<Request>()
@@ -744,7 +744,7 @@ class InterceptorTest : MockHttpTestCase() {
             }
         }
 
-        val (originalRequest, _, result) = manager.request(Method.POST, mockPath("redirect")).responseString()
+        val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
         assertThat(data, notNullValue())
@@ -755,20 +755,20 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testPost307Redirect() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("post"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("post"))
                 .withStatusCode(307)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/post")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
         val requests = mutableListOf<Request>()
@@ -780,7 +780,7 @@ class InterceptorTest : MockHttpTestCase() {
             }
         }
 
-        val (originalRequest, _, result) = manager.request(Method.POST, mockPath("redirect")).responseString()
+        val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
         assertThat(data, notNullValue())
@@ -791,20 +791,20 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testPost308Redirect() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("post"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("post"))
                 .withStatusCode(308)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/post")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
         val requests = mutableListOf<Request>()
@@ -816,7 +816,7 @@ class InterceptorTest : MockHttpTestCase() {
             }
         }
 
-        val (originalRequest, _, result) = manager.request(Method.POST, mockPath("redirect")).responseString()
+        val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
         assertThat(data, notNullValue())
@@ -829,23 +829,23 @@ class InterceptorTest : MockHttpTestCase() {
     fun testHeaderIsPassingAlongWithRedirection() {
         val testValidator = "state:${Random().nextDouble()}"
 
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("get?validate=$testValidator"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("get?validate=$testValidator"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mockPath("redirect"))
+        val (_, _, result) = manager.request(Method.GET, mock.path("redirect"))
                 .header("Foo" to "bar")
                 .responseString()
         val (data, error) = result
@@ -858,12 +858,12 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testHeaderIsPassingAlongWithRedirectionWithinSubPath() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("basic-auth/user/pass"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("basic-auth/user/pass"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val username = "user"
@@ -871,17 +871,17 @@ class InterceptorTest : MockHttpTestCase() {
         val auth = "$username:$password"
         val encodedAuth = auth.encodeBase64ToString()
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/basic-auth/user/pass")
                 .withHeader("Authorization", "Basic $encodedAuth")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
 
-        val (_, _, result) = manager.request(Method.GET, mockPath("redirect"))
+        val (_, _, result) = manager.request(Method.GET, mock.path("redirect"))
                 .header("Foo" to "bar")
                 .authenticate(username, password)
                 .responseString()
@@ -893,23 +893,23 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testHeaderAuthenticationWillBeRemoveIfRedirectToDifferentHost() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("basic-auth/user/pass").replace("localhost", "127.0.0.1"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("basic-auth/user/pass").replace("localhost", "127.0.0.1"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val username = "user"
         val password = "pass"
 
-        val secondRequest = mockRequest()
+        val secondRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/basic-auth/user/pass")
 
-        mockChain(request = firstRequest, response = firstResponse)
-        mockChain(request = secondRequest, response = mockReflect())
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
 
         val manager = FuelManager()
 
@@ -922,7 +922,7 @@ class InterceptorTest : MockHttpTestCase() {
             }
         }
 
-        val (_, _, result) = manager.request(Method.GET, mockPath("redirect"))
+        val (_, _, result) = manager.request(Method.GET, mock.path("redirect"))
                 .header("Foo" to "bar")
                 .authenticate(username, password)
                 .responseString()
@@ -937,18 +937,18 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testDoNotAllowRedirect() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/redirect")
 
-        val firstResponse = mockResponse()
-                .withHeader("Location", mockPath("get"))
+        val firstResponse = mock.response()
+                .withHeader("Location", mock.path("get"))
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
-        mockChain(request = firstRequest, response = firstResponse)
+        mock.chain(request = firstRequest, response = firstResponse)
 
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mockPath("redirect"))
+        val (_, _, result) = manager.request(Method.GET, mock.path("redirect"))
                 .allowRedirects(false)
                 .responseString()
 
@@ -961,19 +961,19 @@ class InterceptorTest : MockHttpTestCase() {
 
     @Test
     fun testRemoveAllRequestInterceptors() {
-        val firstRequest = mockRequest()
+        val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/teapot")
 
-        val firstResponse = mockResponse()
+        val firstResponse = mock.response()
                 .withStatusCode(418)
 
-        mockChain(request = firstRequest, response = firstResponse)
+        mock.chain(request = firstRequest, response = firstResponse)
 
         val manager = FuelManager()
         manager.removeAllRequestInterceptors()
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("teapot")).responseString()
+        val (request, response, result) = manager.request(Method.GET, mock.path("teapot")).responseString()
 
         val (data, error) = result
         assertThat(request, notNullValue())

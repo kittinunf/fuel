@@ -28,12 +28,12 @@ class RequestHandlerTest : MockHttpTestCase() {
         var data: Any? = null
         val err: FuelError? = null
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/http-get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/http-get"),
+            response = mock.reflect()
         )
 
-        mockPath("http-get").httpGet().response(object : Handler<ByteArray> {
+        mock.path("http-get").httpGet().response(object : Handler<ByteArray> {
             override fun success(request: Request, response: Response, value: ByteArray) {
                 req = request
                 res = response
@@ -56,12 +56,12 @@ class RequestHandlerTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithMalformedHeaders() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/http-get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/http-get"),
+            response = mock.reflect()
         )
 
-        mockPath("http-get").httpGet().header("sample" to "a\nb\nc").response().third.fold({ _ ->
+        mock.path("http-get").httpGet().header("sample" to "a\nb\nc").response().third.fold({ _ ->
             fail()
         }, { e ->
             e.printStackTrace()
@@ -76,12 +76,12 @@ class RequestHandlerTest : MockHttpTestCase() {
         val data: Any? = null
         var err: FuelError? = null
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/not-found"),
-            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/not-found"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        mockPath("not-found").httpGet().response(object : Handler<ByteArray> {
+        mock.path("not-found").httpGet().response(object : Handler<ByteArray> {
 
             override fun success(request: Request, response: Response, value: ByteArray) {
                 fail("Expected not to hit success path")
@@ -114,12 +114,12 @@ class RequestHandlerTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/http-post"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/http-post"),
+            response = mock.reflect()
         )
 
-        mockPath("http-post").httpPost(listOf(paramKey to paramValue)).responseString(object : Handler<String> {
+        mock.path("http-post").httpPost(listOf(paramKey to paramValue)).responseString(object : Handler<String> {
             override fun success(request: Request, response: Response, value: String) {
                 req = request
                 res = response

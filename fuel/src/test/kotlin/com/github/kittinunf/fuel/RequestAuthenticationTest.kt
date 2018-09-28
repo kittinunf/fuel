@@ -20,23 +20,23 @@ class RequestAuthenticationTest : MockHttpTestCase() {
         val auth = "$user:$password"
         val encodedAuth = auth.encodeBase64ToString()
 
-        val correctRequest = mockRequest()
+        val correctRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withHeader("Authorization", "Basic $encodedAuth")
                 .withPath("/authenticate")
 
-        val incorrectRequest = mockRequest()
+        val incorrectRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withHeader("Authorization")
                 .withPath("/authenticate")
 
-        val correctResponse = mockReflect()
-        val incorrectResponse = mockResponse().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED)
+        val correctResponse = mock.reflect()
+        val incorrectResponse = mock.response().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED)
 
-        mockChain(request = correctRequest, response = correctResponse)
-        mockChain(request = incorrectRequest, response = incorrectResponse)
+        mock.chain(request = correctRequest, response = correctResponse)
+        mock.chain(request = incorrectRequest, response = incorrectResponse)
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("authenticate"))
+        val (request, response, result) = manager.request(Method.GET, mock.path("authenticate"))
                 .authenticate("invalid", "authentication")
                 .response()
         val (data, error) = result
@@ -56,23 +56,23 @@ class RequestAuthenticationTest : MockHttpTestCase() {
         val auth = "$user:$password"
         val encodedAuth = auth.encodeBase64ToString()
 
-        val correctRequest = mockRequest()
+        val correctRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withHeader("Authorization", "Basic $encodedAuth")
                 .withPath("/authenticate")
 
-        val incorrectRequest = mockRequest()
+        val incorrectRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withHeader("Authorization")
                 .withPath("/authenticate")
 
-        val correctResponse = mockReflect()
-        val incorrectResponse = mockResponse().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED)
+        val correctResponse = mock.reflect()
+        val incorrectResponse = mock.response().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED)
 
-        mockChain(request = correctRequest, response = correctResponse)
-        mockChain(request = incorrectRequest, response = incorrectResponse)
+        mock.chain(request = correctRequest, response = correctResponse)
+        mock.chain(request = incorrectRequest, response = incorrectResponse)
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("authenticate"))
+        val (request, response, result) = manager.request(Method.GET, mock.path("authenticate"))
                 .authenticate(user, password)
                 .response()
         val (data, error) = result
