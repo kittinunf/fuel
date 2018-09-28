@@ -14,15 +14,15 @@ class RequestHeaderTest : MockHttpTestCase() {
     fun httpRequestHeader() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/get"),
+            response = mock.reflect()
         )
 
         val headerKey = "Custom"
         val headerValue = "foobar"
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("get"))
+        val (request, response, result) = manager.request(Method.GET, mock.path("get"))
                 .header(headerKey to headerValue).response()
         val (data, error) = result
 
@@ -43,12 +43,12 @@ class RequestHeaderTest : MockHttpTestCase() {
     fun httpRequestHeaderWithDuplicateValuesForCookieKey() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/get"),
+            response = mock.reflect()
         )
 
-        val (_, response, _) = manager.request(Method.GET, mockPath("get"))
+        val (_, response, _) = manager.request(Method.GET, mock.path("get"))
                 .header("foo" to "bar","a" to "b", "cookie" to "val1=x", "cookie" to "val2=y","cookie" to "val3=z", "cookie" to "val4=j")
                 .responseString()
 
@@ -58,7 +58,7 @@ class RequestHeaderTest : MockHttpTestCase() {
     @Test
     fun multipleHeadersByTheSameKeyWillBeCorrectlyFormatted(){
         val manager = FuelManager()
-        val request = manager.request(Method.GET, mockPath("get"))
+        val request = manager.request(Method.GET, mock.path("get"))
                 .header("foo" to "bar","a" to "b", "cookie" to "val1=x", "cookie" to "val2=y","cookie" to "val3=z", "cookie" to "val4=j")
 
         assertEquals("val1=x; val2=y; val3=z; val4=j",request.headers["cookie"] )
@@ -69,7 +69,7 @@ class RequestHeaderTest : MockHttpTestCase() {
     @Test
     fun multipleHeadersByTheSameKeyWillShowLastUsingMap(){
         val manager = FuelManager()
-        val request = manager.request(Method.GET, mockPath("get"))
+        val request = manager.request(Method.GET, mock.path("get"))
                 .header(mapOf("cookie" to "val1=x", "cookie" to "val2=y"),false)
 
         assertEquals("val2=y",request.headers["cookie"] )
