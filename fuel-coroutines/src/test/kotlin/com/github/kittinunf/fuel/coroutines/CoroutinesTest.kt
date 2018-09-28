@@ -201,7 +201,7 @@ class CoroutinesTest {
                 fail("This is an error case!")
             }, { error ->
                 assertNotNull(error)
-                assertTrue(error.exception is ClassCastException)
+                assertTrue(error.exception is UUIDResponseDeserializer.NoValidFormat)
             })
         } catch (exception: Exception) {
             fail("When using awaitSafelyObjectResult errors should be folded instead of thrown.")
