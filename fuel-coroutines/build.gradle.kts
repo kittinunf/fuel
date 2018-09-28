@@ -8,7 +8,7 @@ plugins { java }
 dependencies {
     compile(project(":fuel"))
     compile(Dependencies.kotlinCoroutinesJvm)
-    testCompile(project(":fuel-jackson"))
+    testCompile(Dependencies.mockServer)
 }
 
 configure<KotlinJvmProjectExtension> {

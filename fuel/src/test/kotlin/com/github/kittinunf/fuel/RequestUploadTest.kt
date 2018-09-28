@@ -25,12 +25,12 @@ class RequestUploadTest : MockHttpTestCase() {
     fun httpUploadWithPostCase() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mockPath("upload")).source { _, _ ->
+        val (request, response, result) = manager.upload(mock.path("upload")).source { _, _ ->
                     File(currentDir, "lorem_ipsum_short.tmp")
                 }.responseString()
         val (data, error) = result
@@ -48,12 +48,12 @@ class RequestUploadTest : MockHttpTestCase() {
     fun httpUploadWithPostAndParamsCase() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mockPath("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
                 .source { _, _ ->
                     File(currentDir, "lorem_ipsum_short.tmp")
                 }
@@ -75,12 +75,12 @@ class RequestUploadTest : MockHttpTestCase() {
     fun httpUploadWithPutCase() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.PUT.value).withPath("/upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PUT.value).withPath("/upload"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mockPath("upload"), Method.PUT)
+        val (request, response, result) = manager.upload(mock.path("upload"), Method.PUT)
                 .source { _, _ -> File(currentDir, "lorem_ipsum_long.tmp")
                 }.responseString()
         val (data, error) = result
@@ -98,15 +98,15 @@ class RequestUploadTest : MockHttpTestCase() {
     fun httpUploadWithProgressValidCase() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
         )
 
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = manager.upload(mockPath("upload")).source { _, _ ->
+        val (request, response, result) = manager.upload(mock.path("upload")).source { _, _ ->
                     File(currentDir, "lorem_ipsum_long.tmp")
                 }.progress { readBytes, totalBytes ->
                     read = readBytes
@@ -130,12 +130,12 @@ class RequestUploadTest : MockHttpTestCase() {
     fun httpUploadWithProgressInvalidEndPointCase() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/nope"),
-            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/nope"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        val (request, response, result) = manager.upload(mockPath("nope")).source { _, _ ->
+        val (request, response, result) = manager.upload(mock.path("nope")).source { _, _ ->
                     File(currentDir, "lorem_ipsum_short.tmp")
                 }.progress { _, _ ->
 
@@ -156,12 +156,12 @@ class RequestUploadTest : MockHttpTestCase() {
     fun httpUploadWithProgressInvalidFileCase() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mockPath("upload")).source { _, _ ->
+        val (request, response, result) = manager.upload(mock.path("upload")).source { _, _ ->
                     File(currentDir, "not_found_file.tmp")
                 }.progress { _, _ ->
 
@@ -183,12 +183,12 @@ class RequestUploadTest : MockHttpTestCase() {
     fun httpUploadWithMultipleFiles() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mockPath("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
                 .sources { _, _ ->
                     listOf(File(currentDir, "lorem_ipsum_short.tmp"),
                             File(currentDir, "lorem_ipsum_long.tmp"))
@@ -214,12 +214,12 @@ class RequestUploadTest : MockHttpTestCase() {
     fun httpUploadWithMultipleDataParts() {
         val manager = FuelManager()
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mockPath("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
                 .dataParts { _, _ ->
                     listOf(
                             DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg"),
@@ -247,12 +247,12 @@ class RequestUploadTest : MockHttpTestCase() {
         val file = File(currentDir, "lorem_ipsum_short.tmp")
         val manager = FuelManager()
 
-        mockChain(
-                request = mockRequest().withMethod(Method.POST.value).withPath("/upload"),
-                response = mockReflect()
+        mock.chain(
+                request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+                response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mockPath("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
                 .blob { r, _ ->
                     r.name = "coolblob"
                     Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name)
@@ -276,12 +276,12 @@ class RequestUploadTest : MockHttpTestCase() {
     fun httpUploadWithSpecifiedBoundary() {
         val manager = FuelManager()
 
-        mockChain(
-                request = mockRequest().withMethod(Method.POST.value).withPath("/upload"),
-                response = mockReflect()
+        mock.chain(
+                request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+                response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mockPath("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
                 .source { r, _ ->
                     r.header(Pair("Content-Type", "multipart/form-data; boundary=160f77ec3eff"))
                     File(currentDir, "lorem_ipsum_short.tmp")
@@ -305,12 +305,12 @@ class RequestUploadTest : MockHttpTestCase() {
     fun httpUploadWithEmptyBoundary() {
         val manager = FuelManager()
 
-        mockChain(
-                request = mockRequest().withMethod(Method.POST.value).withPath("/upload"),
-                response = mockReflect()
+        mock.chain(
+                request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+                response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mockPath("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
                 .source { _, _ ->
                     File(currentDir, "lorem_ipsum_short.tmp")
                 }

@@ -38,12 +38,12 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun testResponseURLShouldSameWithRequestURL() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/request"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/request"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("request")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("request")).response()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -58,12 +58,12 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithDataResponse() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/request"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/request"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("request")).response()
+        val (request, response, result) = manager.request(Method.GET, mock.path("request")).response()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -77,12 +77,12 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithStringResponse() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/request"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/request"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("request")).responseString()
+        val (request, response, result) = manager.request(Method.GET, mock.path("request")).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -98,16 +98,16 @@ class RequestTest : MockHttpTestCase() {
     fun httpGetRequestWithImageResponse() {
         val decodedImage = "iVBORwKGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAClEQVQYV2NgYAAAAAMAAWgmWQAAAAASUVORK5CYII=".decodeBase64()
 
-        val httpResponse = mockResponse()
+        val httpResponse = mock.response()
                 .withHeader("Content-Type", "image/png")
                 .withBody(BinaryBody(decodedImage))
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/image"),
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/image"),
             response = httpResponse
         )
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("image")).responseString()
+        val (request, response, result) = manager.request(Method.GET, mock.path("image")).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -126,12 +126,12 @@ class RequestTest : MockHttpTestCase() {
         val bytes = ByteArray(555)
         Random().nextBytes(bytes)
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mockResponse().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
         )
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("bytes")).responseString()
+        val (request, response, result) = manager.request(Method.GET, mock.path("bytes")).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -150,12 +150,12 @@ class RequestTest : MockHttpTestCase() {
         val bytes = ByteArray(555)
         Random().nextBytes(bytes)
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mockResponse().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
         )
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("bytes")).responseString()
+        val (request, response, result) = manager.request(Method.GET, mock.path("bytes")).responseString()
         val (_, error) = result
 
         assertThat(request, notNullValue())
@@ -170,12 +170,12 @@ class RequestTest : MockHttpTestCase() {
         val bytes = ByteArray(555)
         Random().nextBytes(bytes)
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mockResponse().withBody(BinaryBody(bytes, null)).withHeader("Content-Type", "")
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.response().withBody(BinaryBody(bytes, null)).withHeader("Content-Type", "")
         )
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("bytes")).responseString()
+        val (request, response, result) = manager.request(Method.GET, mock.path("bytes")).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -192,16 +192,16 @@ class RequestTest : MockHttpTestCase() {
     fun testGuessContentTypeWithNoHeaders() {
         val decodedImage = Base64.decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=", Base64.DEFAULT)
 
-        val httpResponse = mockResponse()
+        val httpResponse = mock.response()
                 .withHeader("Content-Type", "")
                 .withBody(BinaryBody(decodedImage))
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/image"),
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/image"),
             response = httpResponse
         )
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("image")).responseString()
+        val (request, response, result) = manager.request(Method.GET, mock.path("image")).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -218,12 +218,12 @@ class RequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/get"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.GET, mockPath("get"), listOf(paramKey to paramValue)).responseString()
+        val (request, response, result) = manager.request(Method.GET, mock.path("get"), listOf(paramKey to paramValue)).responseString()
         val (data, error) = result
         val string = data as String
 
@@ -244,12 +244,12 @@ class RequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/post"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/post"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.POST, mockPath("post"), listOf(paramKey to paramValue)).responseString()
+        val (request, response, result) = manager.request(Method.POST, mock.path("post"), listOf(paramKey to paramValue)).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -276,12 +276,12 @@ class RequestTest : MockHttpTestCase() {
         //  therefore the outer body here is the ey and the inner string is the actual body
         val correctBodyResponse = "\"body\":{\"type\":\"STRING\",\"string\":\"$body\",\"contentType\":\"text/plain; charset=utf-8\"}"
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/post"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/post"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.POST, mockPath("post"))
+        val (request, response, result) = manager.request(Method.POST, mock.path("post"))
                 .jsonBody(body)
                 .responseString()
         val (data, error) = result
@@ -304,12 +304,12 @@ class RequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        mockChain(
-            request = mockRequest().withMethod(Method.PUT.value).withPath("/put"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PUT.value).withPath("/put"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.PUT, mockPath("put"), listOf(paramKey to paramValue)).responseString()
+        val (request, response, result) = manager.request(Method.PUT, mock.path("put"), listOf(paramKey to paramValue)).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -331,17 +331,17 @@ class RequestTest : MockHttpTestCase() {
         val paramKey = "foo2"
         val paramValue = "bar2"
 
-        mockChain(
-            request = mockRequest().withMethod(Method.PATCH.value).withPath("/patch"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PATCH.value).withPath("/patch"),
+            response = mock.reflect()
         )
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withHeader("X-HTTP-Method-Override", Method.PATCH.value).withPath("/patch"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withHeader("X-HTTP-Method-Override", Method.PATCH.value).withPath("/patch"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.PATCH, mockPath("patch"), listOf(paramKey to paramValue)).responseString()
+        val (request, response, result) = manager.request(Method.PATCH, mock.path("patch"), listOf(paramKey to paramValue)).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -367,12 +367,12 @@ class RequestTest : MockHttpTestCase() {
         val body = "{ $foo : $bar }"
         val correctBodyResponse = "\"body\":{\"type\":\"STRING\",\"string\":\"$body\",\"contentType\":\"text/plain; charset=utf-8\"}"
 
-        mockChain(
-            request = mockRequest().withMethod(Method.DELETE.value).withPath("/delete"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.DELETE.value).withPath("/delete"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.DELETE, mockPath("delete"), listOf(paramKey to paramValue))
+        val (request, response, result) = manager.request(Method.DELETE, mock.path("delete"), listOf(paramKey to paramValue))
                 .jsonBody(body)
                 .responseString()
         val (data, error) = result
@@ -397,12 +397,12 @@ class RequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        mockChain(
-            request = mockRequest().withMethod(Method.HEAD.value).withPath("/head"),
-            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_OK)
+        mock.chain(
+            request = mock.request().withMethod(Method.HEAD.value).withPath("/head"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        val (request, response, result) = manager.request(Method.HEAD, mockPath("head"), listOf(paramKey to paramValue)).responseString()
+        val (request, response, result) = manager.request(Method.HEAD, mock.path("head"), listOf(paramKey to paramValue)).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -419,12 +419,12 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpOptionsRequest() {
-        mockChain(
-            request = mockRequest().withMethod(Method.OPTIONS.value).withPath("/options"),
-            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_OK)
+        mock.chain(
+            request = mock.request().withMethod(Method.OPTIONS.value).withPath("/options"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        val (request, response, result) = manager.request(Method.OPTIONS, mockPath("options")).responseString()
+        val (request, response, result) = manager.request(Method.OPTIONS, mock.path("options")).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -437,12 +437,12 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpTraceRequest() {
-        mockChain(
-            request = mockRequest().withMethod(Method.TRACE.value).withPath("/trace"),
-            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_OK)
+        mock.chain(
+            request = mock.request().withMethod(Method.TRACE.value).withPath("/trace"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        val (request, response, result) = manager.request(Method.TRACE, mockPath("trace")).responseString()
+        val (request, response, result) = manager.request(Method.TRACE, mock.path("trace")).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -455,12 +455,12 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestUserAgentWithPathStringConvertible() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/user-agent"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/user-agent"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.GET, PathStringConvertibleImpl(mockPath("user-agent"))).responseString()
+        val (request, response, result) = manager.request(Method.GET, PathStringConvertibleImpl(mock.path("user-agent"))).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -477,12 +477,12 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithRequestConvertible() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/get"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(RequestConvertibleImpl(Method.GET, mockPath("get"))).responseString()
+        val (request, response, result) = manager.request(RequestConvertibleImpl(Method.GET, mock.path("get"))).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -498,18 +498,18 @@ class RequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        mockChain(
-            request = mockRequest().withMethod(Method.PATCH.value).withPath("/patch"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PATCH.value).withPath("/patch"),
+            response = mock.reflect()
         )
 
         // HttpUrlConnection doesn't support patch
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withHeader("X-HTTP-Method-Override", Method.PATCH.value).withPath("/patch"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withHeader("X-HTTP-Method-Override", Method.PATCH.value).withPath("/patch"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.PATCH, PathStringConvertibleImpl(mockPath("patch")), listOf(paramKey to paramValue)).responseString()
+        val (request, response, result) = manager.request(Method.PATCH, PathStringConvertibleImpl(mock.path("patch")), listOf(paramKey to paramValue)).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -525,12 +525,12 @@ class RequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "xxx"
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/post"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/post"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(Method.POST, mockPath("post"), listOf(paramKey to paramValue)).responseString()
+        val (request, response, result) = manager.request(Method.POST, mock.path("post"), listOf(paramKey to paramValue)).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -561,13 +561,13 @@ class RequestTest : MockHttpTestCase() {
             val bytes = ByteArray(1024 * 1024)
             Random().nextBytes(bytes)
 
-            mockChain(
-                request = mockRequest().withMethod(Method.GET.value).withPath("/bytes"),
-                response = mockResponse().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+            mock.chain(
+                request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+                response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
             )
 
             val file = File.createTempFile(bytes.toString(), null)
-            val requestPrimed = manager.download(mockPath("bytes")).destination { _, _ -> file }
+            val requestPrimed = manager.download(mock.path("bytes")).destination { _, _ -> file }
 
             requestPrimed.progress { _, _ ->
                 requestPrimed.cancel()
@@ -656,12 +656,12 @@ class RequestTest : MockHttpTestCase() {
         val list = arrayOf("once", "Twice", "Three", "Times", "Lady")
         val params = listOf("foo" to list, "bar" to lionel)
 
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/get"),
+            response = mock.reflect()
         )
 
-        val (response, error) = mockPath("get").httpGet(params).responseString().third
+        val (response, error) = mock.path("get").httpGet(params).responseString().third
         val json = JSONObject(response)
         val query = json.getJSONObject("query")
 

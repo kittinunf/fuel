@@ -34,13 +34,13 @@ class BlockingRequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithDataResponse() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
             .withMethod(Method.GET.value)
             .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(Method.GET, mockPath("get")).response()
+        val (request, response, data) = manager.request(Method.GET, mock.path("get")).response()
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(data.get(), notNullValue())
@@ -51,13 +51,13 @@ class BlockingRequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithStringResponse() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(Method.GET, mockPath("get")).responseString()
+        val (request, response, data) = manager.request(Method.GET, mock.path("get")).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -72,14 +72,14 @@ class BlockingRequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
             .withMethod(Method.GET.value)
             .withPath("/get")
                 .withQueryStringParameter(paramKey, paramValue)
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(Method.GET, mockPath("get"), listOf(paramKey to paramValue)).responseString()
+        val (request, response, data) = manager.request(Method.GET, mock.path("get"), listOf(paramKey to paramValue)).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -97,14 +97,14 @@ class BlockingRequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/post")
                 .withBody("$paramKey=$paramValue")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(Method.POST, mockPath("post"), listOf(paramKey to paramValue)).responseString()
+        val (request, response, data) = manager.request(Method.POST, mock.path("post"), listOf(paramKey to paramValue)).responseString()
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(data.get(), notNullValue())
@@ -122,13 +122,13 @@ class BlockingRequestTest : MockHttpTestCase() {
         val bar = "bar"
         val body = "{ $foo : $bar }"
 
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/post")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(Method.POST, mockPath("post")).body(body).responseString()
+        val (request, response, data) = manager.request(Method.POST, mock.path("post")).body(body).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -146,14 +146,14 @@ class BlockingRequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.PUT.value)
                 .withPath("/put")
                 .withBody("$paramKey=$paramValue")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(Method.PUT, mockPath("put"), listOf(paramKey to paramValue)).responseString()
+        val (request, response, data) = manager.request(Method.PUT, mock.path("put"), listOf(paramKey to paramValue)).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -171,14 +171,14 @@ class BlockingRequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "bar"
 
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.DELETE.value)
                 .withPath("/delete")
                 .withQueryStringParameter(paramKey, paramValue)
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(Method.DELETE, mockPath("delete"), listOf(paramKey to paramValue)).responseString()
+        val (request, response, data) = manager.request(Method.DELETE, mock.path("delete"), listOf(paramKey to paramValue)).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -193,13 +193,13 @@ class BlockingRequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithPathStringConvertible() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/path-string")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(Method.GET, PathStringConvertibleImpl(mockPath("path-string"))).responseString()
+        val (request, response, data) = manager.request(Method.GET, PathStringConvertibleImpl(mock.path("path-string"))).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -213,13 +213,13 @@ class BlockingRequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithRequestConvertible() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(RequestConvertibleImpl(Method.GET, mockPath("get"))).responseString()
+        val (request, response, data) = manager.request(RequestConvertibleImpl(Method.GET, mock.path("get"))).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -234,13 +234,13 @@ class BlockingRequestTest : MockHttpTestCase() {
         val paramKey = "foo"
         val paramValue = "xxx"
 
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(Method.GET, PathStringConvertibleImpl(mockPath("get")), listOf(paramKey to paramValue)).responseString()
+        val (request, response, data) = manager.request(Method.GET, PathStringConvertibleImpl(mock.path("get")), listOf(paramKey to paramValue)).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -259,13 +259,13 @@ class BlockingRequestTest : MockHttpTestCase() {
         val headerValue = "application/json"
         manager.baseHeaders = mapOf(headerKey to headerValue)
 
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("/get")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
-        val (request, response, data) = manager.request(Method.GET, mockPath("get"), listOf("email" to "foo@bar.com")).responseString()
+        val (request, response, data) = manager.request(Method.GET, mock.path("get"), listOf("email" to "foo@bar.com")).responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -279,14 +279,14 @@ class BlockingRequestTest : MockHttpTestCase() {
 
     @Test
     fun httpUploadRequestWithParameters() {
-        val httpRequest = mockRequest()
+        val httpRequest = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/upload")
 
-        mockChain(request = httpRequest, response = mockReflect())
+        mock.chain(request = httpRequest, response = mock.reflect())
 
         val (request, response, data) =
-                manager.upload(mockPath("upload"), param = listOf("foo" to "bar", "foo1" to "bar1"))
+                manager.upload(mock.path("upload"), param = listOf("foo" to "bar", "foo1" to "bar1"))
                         .source { _, _ ->
                             val dir = System.getProperty("user.dir")
                             val currentDir = File(dir, "src/test/assets")

@@ -7,17 +7,31 @@ import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers
 import org.json.JSONException
+import org.junit.After
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
+import java.net.HttpURLConnection
 
 class FuelForgeTest {
 
     init {
-        FuelManager.instance.basePath = "https://httpbin.org"
-
         Fuel.testMode {
             timeout = 15000
         }
+    }
+
+    private lateinit var mock: MockHelper
+
+    @Before
+    fun setup() {
+        this.mock = MockHelper()
+        this.mock.setup()
+    }
+
+    @After
+    fun tearDown() {
+        this.mock.tearDown()
     }
 
     data class HttpBinUserAgentModel(var userAgent: String = "", var status: String = "")
@@ -38,7 +52,12 @@ class FuelForgeTest {
 
     @Test
     fun forgeTestResponseObject() {
-        Fuel.get("/user-agent")
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("user-agent"))
                 .responseObject(httpBinUserDeserializer) { _, _, result ->
                     Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
                     Assert.assertThat(result.component2(), CoreMatchers.notNullValue())
@@ -47,7 +66,12 @@ class FuelForgeTest {
 
     @Test
     fun forgeTestResponseObjectError() {
-        Fuel.get("/useragent")
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_BAD_REQUEST)
+        )
+
+        Fuel.get(mock.path("user-agent"))
                 .responseObject(httpBinUserDeserializer) { _, _, result ->
                     Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
                     Assert.assertThat(result.component2(), CoreMatchers.instanceOf(Result.Failure::class.java))
@@ -56,7 +80,12 @@ class FuelForgeTest {
 
     @Test
     fun forgeTestResponseDeserializerObject() {
-        Fuel.get("/user-agent")
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("user-agent"))
                 .responseObject(httpBinUserDeserializer) { _, _, result ->
                     Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
                     Assert.assertThat(result.component2(), CoreMatchers.notNullValue())
@@ -65,7 +94,12 @@ class FuelForgeTest {
 
     @Test
     fun forgeTestResponseDeserializerObjectError() {
-        Fuel.get("/useragent")
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        )
+
+        Fuel.get(mock.path("user-agent"))
                 .responseObject(httpBinUserDeserializer) { _, _, result ->
                     Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
                     Assert.assertThat(result.component2(), CoreMatchers.instanceOf(Result.Failure::class.java))
@@ -74,7 +108,12 @@ class FuelForgeTest {
 
     @Test
     fun forgeTestResponseHandlerObject() {
-        Fuel.get("/user-agent")
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("user-agent"))
                 .responseObject(httpBinUserDeserializer, object : Handler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                         Assert.assertThat(value, CoreMatchers.notNullValue())
@@ -89,7 +128,15 @@ class FuelForgeTest {
 
     @Test
     fun forgeTestResponseHandlerObjects() {
-        Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues")
+        mock.chain(
+            request = mock.request().withPath("/issues"),
+            response = mock.response().withBody("[ " +
+                "{ \"id\": 1, \"title\": \"issue 1\", \"number\": null }, " +
+                "{ \"id\": 2, \"title\": \"issue 2\", \"number\": 32 }, " +
+            " ]").withStatusCode(HttpURLConnection.HTTP_OK)
+        )
+
+        Fuel.get(mock.path("issues"))
                 .responseObjects(issueInfoDeserializer, object : Handler<List<IssueInfo>> {
                     override fun success(request: Request, response: Response, value: List<IssueInfo>) {
                         Assert.assertThat(value, CoreMatchers.notNullValue())
@@ -105,7 +152,12 @@ class FuelForgeTest {
 
     @Test
     fun forgeTestResponseHandlerObjectError() {
-        Fuel.get("/useragent")
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_BAD_REQUEST)
+        )
+
+        Fuel.get(mock.path("user-agent"))
                 .responseObject(httpBinUserDeserializer, object : Handler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                         Assert.assertThat(value, CoreMatchers.notNullValue())
@@ -120,7 +172,12 @@ class FuelForgeTest {
 
     @Test
     fun forgeTestResponseObjectWithNoHandler() {
-        val result = Fuel.get("/useragent").responseObject(httpBinUserDeserializer)
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_BAD_REQUEST)
+        )
+
+        val result = Fuel.get(mock.path("user-agent")).responseObject(httpBinUserDeserializer)
         Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
         Assert.assertThat(result.component2(), CoreMatchers.notNullValue())
         Assert.assertThat(result.component3(), CoreMatchers.notNullValue())
@@ -128,7 +185,15 @@ class FuelForgeTest {
 
     @Test
     fun forgeTestResponseObjectsWithNoHandler() {
-        val result = Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseObjects(issueInfoDeserializer)
+        mock.chain(
+            request = mock.request().withPath("/issues"),
+            response = mock.response().withBody("[ " +
+                    "{ \"id\": 1, \"title\": \"issue 1\", \"number\": null }, " +
+                    "{ \"id\": 2, \"title\": \"issue 2\", \"number\": 32 }, " +
+                    " ]").withStatusCode(HttpURLConnection.HTTP_OK)
+        )
+
+        val result = Fuel.get(mock.path("issues")).responseObjects(issueInfoDeserializer)
         Assert.assertThat(result.component1(), CoreMatchers.notNullValue())
         Assert.assertThat(result.component2(), CoreMatchers.notNullValue())
         Assert.assertThat(result.component3(), CoreMatchers.notNullValue())
@@ -137,7 +202,15 @@ class FuelForgeTest {
 
     @Test
     fun forgeTestProcessingGenericList() {
-        Fuel.get("https://api.github.com/repos/kittinunf/Fuel/issues").responseObjects(issueInfoDeserializer) { _, _, result ->
+        mock.chain(
+            request = mock.request().withPath("/issues"),
+            response = mock.response().withBody("[ " +
+                    "{ \"id\": 1, \"title\": \"issue 1\", \"number\": null }, " +
+                    "{ \"id\": 2, \"title\": \"issue 2\", \"number\": 32 }, " +
+                    " ]").withStatusCode(HttpURLConnection.HTTP_OK)
+        )
+
+        Fuel.get(mock.path("issues")).responseObjects(issueInfoDeserializer) { _, _, result ->
             val issues = result.get()
             Assert.assertNotEquals(issues.size, 0)
             Assert.assertThat(issues[0], CoreMatchers.isA(IssueInfo::class.java))
