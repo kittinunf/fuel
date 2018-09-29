@@ -61,7 +61,12 @@ class Encoding(val httpMethod: Method,
             //give precedence to local path
             URL(path)
         } catch (e: MalformedURLException) {
-            URL(baseUrlString + if (path.startsWith('/') or path.isEmpty()) path else "/$path")
+            var base = baseUrlString ?: ""
+            if (base.endsWith('/')) {
+                // remove last slash
+                base = base.substring(0, base.count() - 1)
+            }
+            URL(base + if (path.startsWith('/') or path.isEmpty()) path else "/$path")
         }
         val uri = try {
             url.toURI()
