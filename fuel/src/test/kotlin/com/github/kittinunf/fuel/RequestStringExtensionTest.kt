@@ -18,12 +18,12 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpGet() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/http-get"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/http-get"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = mockPath("http-get").httpGet().responseString()
+        val (request, response, result) = mock.path("http-get").httpGet().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -37,12 +37,12 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpPost() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/http-post"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/http-post"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = mockPath("http-post").httpPost().responseString()
+        val (request, response, result) = mock.path("http-post").httpPost().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -56,12 +56,12 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpPut() {
-        mockChain(
-            request = mockRequest().withMethod(Method.PUT.value).withPath("/http-put"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PUT.value).withPath("/http-put"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = mockPath("http-put").httpPut().responseString()
+        val (request, response, result) = mock.path("http-put").httpPut().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -75,17 +75,17 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpPatch() {
-        mockChain(
-            request = mockRequest().withMethod(Method.PATCH.value).withPath("/http-patch"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PATCH.value).withPath("/http-patch"),
+            response = mock.reflect()
         )
 
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withHeader("X-HTTP-Method-Override", Method.PATCH.value).withPath("/http-patch"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withHeader("X-HTTP-Method-Override", Method.PATCH.value).withPath("/http-patch"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = mockPath("http-patch").httpPatch().responseString()
+        val (request, response, result) = mock.path("http-patch").httpPatch().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -99,12 +99,12 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpDelete() {
-        mockChain(
-            request = mockRequest().withMethod(Method.DELETE.value).withPath("/http-delete"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.DELETE.value).withPath("/http-delete"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = mockPath("http-delete").httpDelete().responseString()
+        val (request, response, result) = mock.path("http-delete").httpDelete().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -118,12 +118,12 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpDownload() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value).withPath("/http-download"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/http-download"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = mockPath("http-download").httpDownload().destination { _, _ ->
+        val (request, response, result) = mock.path("http-download").httpDownload().destination { _, _ ->
             File.createTempFile("http-download.dl", null)
         }.responseString()
         val (data, error) = result
@@ -139,12 +139,12 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpUploadWithPut() {
-        mockChain(
-            request = mockRequest().withMethod(Method.PUT.value).withPath("/http-upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.PUT.value).withPath("/http-upload"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = mockPath("http-upload").httpUpload(Method.PUT).source { _, _ ->
+        val (request, response, result) = mock.path("http-upload").httpUpload(Method.PUT).source { _, _ ->
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
@@ -162,12 +162,12 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpUploadWithPost() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value).withPath("/http-upload"),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/http-upload"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = mockPath("http-upload").httpUpload().source { _, _ ->
+        val (request, response, result) = mock.path("http-upload").httpUpload().source { _, _ ->
             val dir = System.getProperty("user.dir")
             val currentDir = File(dir, "src/test/assets")
             File(currentDir, "lorem_ipsum_long.tmp")
@@ -185,12 +185,12 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
     @Test
     fun httpHead() {
-        mockChain(
-            request = mockRequest().withMethod(Method.HEAD.value).withPath("/http-head"),
-            response = mockResponse().withStatusCode(HttpURLConnection.HTTP_OK)
+        mock.chain(
+            request = mock.request().withMethod(Method.HEAD.value).withPath("/http-head"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        val (request, response, result) = mockPath("http-head").httpHead().responseString()
+        val (request, response, result) = mock.path("http-head").httpHead().responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())

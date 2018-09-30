@@ -2,8 +2,9 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.util.Base64
 import com.github.kittinunf.fuel.util.FuelRouting
+import com.github.kittinunf.fuel.util.decodeBase64ToString
+import com.github.kittinunf.fuel.util.encodeBase64
 import org.hamcrest.CoreMatchers.*
 import org.json.JSONObject
 import org.junit.Assert.assertThat
@@ -58,7 +59,7 @@ class RoutingTest: MockHttpTestCase() {
                     is PostBinaryBodyTest -> {
                         val json = JSONObject()
                         json.put("id", this.value)
-                        Base64.encode(json.toString().toByteArray(), Base64.DEFAULT)
+                        json.toString().toByteArray().encodeBase64()
                     }
                     else -> null
                 }
@@ -90,12 +91,12 @@ class RoutingTest: MockHttpTestCase() {
 
     @Test
     fun httpRouterGet() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(TestApi.GetTest(mockPath(""))).responseString()
+        val (request, response, result) = manager.request(TestApi.GetTest(mock.path(""))).responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -109,15 +110,15 @@ class RoutingTest: MockHttpTestCase() {
 
     @Test
     fun httpRouterGetParams() {
-        mockChain(
-            request = mockRequest().withMethod(Method.GET.value),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value),
+            response = mock.reflect()
         )
 
         val paramKey = "foo"
         val paramValue = "bar"
 
-        val (request, response, result) = manager.request(TestApi.GetParamsTest(host = mockPath(""), name = paramKey, value = paramValue)).responseString()
+        val (request, response, result) = manager.request(TestApi.GetParamsTest(host = mock.path(""), name = paramKey, value = paramValue)).responseString()
         val (data, error) = result
 
         val string = data as String
@@ -136,14 +137,14 @@ class RoutingTest: MockHttpTestCase() {
 
     @Test
     fun httpRouterPostBody() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value),
+            response = mock.reflect()
         )
 
         val paramValue = "42"
 
-        val (request, response, result) = manager.request(TestApi.PostBodyTest(mockPath(""), paramValue)).responseString()
+        val (request, response, result) = manager.request(TestApi.PostBodyTest(mock.path(""), paramValue)).responseString()
         val (data, error) = result
 
         val string = JSONObject(data).getJSONObject("body").getString("string")
@@ -162,17 +163,17 @@ class RoutingTest: MockHttpTestCase() {
 
     @Test
     fun httpRouterPostBinaryBody() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value),
+            response = mock.reflect()
         )
         val paramValue = "42"
 
-        val (request, response, result) = manager.request(TestApi.PostBinaryBodyTest(mockPath(""), paramValue)).responseString()
+        val (request, response, result) = manager.request(TestApi.PostBinaryBodyTest(mock.path(""), paramValue)).responseString()
         val (data, error) = result
 
         // Binary data is encoded in base64 by mock server
-        val string = String(Base64.decode(JSONObject(data).getJSONObject("body").getString("base64Bytes"), Base64.DEFAULT))
+        val string = JSONObject(data).getJSONObject("body").getString("base64Bytes").decodeBase64ToString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -182,18 +183,18 @@ class RoutingTest: MockHttpTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response.statusCode, isEqualTo(statusCode))
 
-        val bytes = Base64.decode(string, Base64.DEFAULT)
-        assertThat(String(bytes), containsString(paramValue))
+        val bytes = string!!.decodeBase64ToString()
+        assertThat(bytes, containsString(paramValue))
     }
 
     @Test
     fun httpRouterPostEmptyBody() {
-        mockChain(
-            request = mockRequest().withMethod(Method.POST.value),
-            response = mockReflect()
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = manager.request(TestApi.PostEmptyBodyTest(mockPath(""))).responseString()
+        val (request, response, result) = manager.request(TestApi.PostEmptyBodyTest(mock.path(""))).responseString()
         val (data, error) = result
 
         val string = data as String

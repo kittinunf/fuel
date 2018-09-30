@@ -15,7 +15,7 @@ object Dependencies {
     val kotlinCoroutinesJvm = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutinesVersion}"
     val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlinVersion}"
     val mockServer = "org.mock-server:mockserver-netty:${Versions.mockServerVersion}"
-    val moshi = "com.squareup.moshi:moshi-kotlin:${Versions.moshiVersion}"
+    val moshi = "com.squareup.moshi:moshi:${Versions.moshiVersion}"
     val result = "com.github.kittinunf.result:result:${Versions.resultVersion}"
     val robolectric = "org.robolectric:robolectric:${Versions.robolectricVersion}"
     val reactorCore = "io.projectreactor:reactor-core:${Versions.reactorVersion}"

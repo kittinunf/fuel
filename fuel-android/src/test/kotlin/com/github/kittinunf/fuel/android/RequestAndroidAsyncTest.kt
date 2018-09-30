@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.android
 
+import android.util.JsonReader
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.core.Json
 import com.github.kittinunf.fuel.android.extension.responseJson
@@ -14,6 +15,7 @@ import org.json.JSONObject
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
+import java.io.StringReader
 import java.net.HttpURLConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
@@ -23,7 +25,6 @@ class RequestAndroidAsyncTest : BaseTestCase() {
 
     init {
         FuelManager.instance.apply {
-            basePath = "http://httpbin.org"
             baseHeaders = mapOf("foo" to "bar")
             baseParams = listOf("key" to "value")
             callbackExecutor = Executor(Runnable::run)
@@ -31,18 +32,40 @@ class RequestAndroidAsyncTest : BaseTestCase() {
     }
 
     //Model
-    data class HttpBinHeadersModel(var headers: Map<String, String> = mutableMapOf())
+    data class HttpBinHeadersModel(var headers: Map<String, List<String>> = mutableMapOf())
 
     //Deserializer
     class HttpBinHeadersDeserializer : ResponseDeserializable<HttpBinHeadersModel> {
 
         override fun deserialize(content: String): HttpBinHeadersModel {
-            val json = JSONObject(content)
-            val headers = json.getJSONObject("headers")
-            val results = headers.keys().asSequence().associate { Pair(it, headers.getString(it)) }
             val model = HttpBinHeadersModel()
-            model.headers = results
+            val reader = JsonReader(StringReader(content))
+            reader.beginObject()
+            while(reader.hasNext()) {
+                when(reader.nextName()) {
+                    "headers" -> model.headers = deserializeHeaders(reader)
+                    else -> reader.skipValue()
+                }
+            }
+            reader.endObject()
             return model
+        }
+
+        private fun deserializeHeaders(reader: JsonReader): Map<String, List<String>> {
+            val result = HashMap<String, List<String>>()
+            reader.beginObject()
+            while (reader.hasNext()) {
+                val name = reader.nextName()
+                val values = mutableListOf<String>()
+                reader.beginArray()
+                while (reader.hasNext()) {
+                    values.add(reader.nextString())
+                }
+                reader.endArray()
+                result[name] = values
+            }
+            reader.endObject()
+            return result
         }
 
     }
@@ -59,7 +82,12 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.get("/user-agent").responseString { req, res, result ->
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("user-agent")).responseString { req, res, result ->
             val (d, e) = result
             data = d
             error = e
@@ -89,7 +117,12 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.get("/user-agent").responseJson { req, res, result ->
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("user-agent")).responseJson { req, res, result ->
             val (d, e) = result
             data = d
             error = e
@@ -106,6 +139,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
+
         assertThat(data as Json, isA(Json::class.java))
         assertThat((data as Json).obj(), isA(JSONObject::class.java))
 
@@ -120,7 +154,12 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         var data: Any? = null
         var err: FuelError? = null
 
-        Fuel.get("/user-agent").responseJson(object : Handler<Json> {
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("user-agent")).responseJson(object : Handler<Json> {
             override fun success(request: Request, response: Response, value: Json) {
                 req = request
                 res = response
@@ -131,6 +170,8 @@ class RequestAndroidAsyncTest : BaseTestCase() {
 
             override fun failure(request: Request, response: Response, error: FuelError) {
                 err = error
+
+                lock.countDown()
             }
         })
 
@@ -154,7 +195,12 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         var data: Any? = null
         var error: FuelError? = null
 
-        Fuel.get("/404").responseJson { req, res, result ->
+        mock.chain(
+            request = mock.request().withPath("/404"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        )
+
+        Fuel.get(mock.path("404")).responseJson { req, res, result ->
             val (d, e) = result
             data = d
             error = e
@@ -183,9 +229,16 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         var data: Any? = null
         var err: FuelError? = null
 
-        Fuel.get("/404").responseJson(object : Handler<Json> {
+        mock.chain(
+            request = mock.request().withPath("/404"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        )
+
+        Fuel.get(mock.path("404")).responseJson(object : Handler<Json> {
             override fun success(request: Request, response: Response, value: Json) {
                 data = value
+
+                lock.countDown()
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
@@ -212,10 +265,15 @@ class RequestAndroidAsyncTest : BaseTestCase() {
     fun httpGetRequestObject() {
         var request: Request? = null
         var response: Response? = null
-        var data: Any? = null
+        var data: HttpBinHeadersModel? = null
         var error: FuelError? = null
 
-        Fuel.get("/headers").responseObject(HttpBinHeadersDeserializer()) { req, res, result ->
+        mock.chain(
+            request = mock.request().withPath("/headers"),
+            response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("headers")).responseObject(HttpBinHeadersDeserializer()) { req, res, result ->
             val (d, e) = result
             request = req
             response = res
@@ -231,8 +289,8 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertThat(data as HttpBinHeadersModel, isA(HttpBinHeadersModel::class.java))
-        assertThat((data as HttpBinHeadersModel).headers.isNotEmpty(), isEqualTo(true))
+        assertThat(data!!.headers.isNotEmpty(), isEqualTo(true))
+        assertThat(data!!.headers["foo"]?.firstOrNull(), isEqualTo("bar"))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
@@ -242,10 +300,15 @@ class RequestAndroidAsyncTest : BaseTestCase() {
     fun httpGetRequestHandlerObject() {
         var req: Request? = null
         var res: Response? = null
-        var data: Any? = null
+        var data: HttpBinHeadersModel? = null
         var err: FuelError? = null
 
-        Fuel.get("/headers").responseObject(HttpBinHeadersDeserializer(), object : Handler<HttpBinHeadersModel> {
+        mock.chain(
+            request = mock.request().withPath("/headers"),
+            response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("headers")).responseObject(HttpBinHeadersDeserializer(), object : Handler<HttpBinHeadersModel> {
 
             override fun success(request: Request, response: Response, value: HttpBinHeadersModel) {
                 req = request
@@ -257,6 +320,8 @@ class RequestAndroidAsyncTest : BaseTestCase() {
 
             override fun failure(request: Request, response: Response, error: FuelError) {
                 err = error
+
+                lock.countDown()
             }
 
         })
@@ -267,8 +332,8 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(res, notNullValue())
         assertThat(err, nullValue())
         assertThat(data, notNullValue())
-        assertThat(data as HttpBinHeadersModel, isA(HttpBinHeadersModel::class.java))
-        assertThat((data as HttpBinHeadersModel).headers.isNotEmpty(), isEqualTo(true))
+        assertThat(data!!.headers.isNotEmpty(), isEqualTo(true))
+        assertThat(data!!.headers["foo"]?.firstOrNull(), isEqualTo("bar"))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(res?.statusCode, isEqualTo(statusCode))
