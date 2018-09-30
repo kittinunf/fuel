@@ -14,7 +14,7 @@ class MockHelper {
     fun setup() {
         // This is not placed in a @BeforeClass / @BeforeAll so that the tests may have parallel
         // execution. When there is no port given as first argument, it will grab a free port
-        this.mockServer = ClientAndServer.startClientAndServer()
+        mockServer = ClientAndServer.startClientAndServer()
     }
 
     fun tearDown() {
@@ -30,7 +30,7 @@ class MockHelper {
      *
      * @return [ClientAndServer]
      */
-    fun server(): ClientAndServer = this.mockServer
+    fun server(): ClientAndServer = mockServer
 
     /**
      * Convenience method to request a request to its expected response
@@ -100,7 +100,7 @@ class MockHelper {
      * Creates a new mock response template.
      *
      * @see REFLECT_TEMPLATE
-     * @see mock.reflect
+     * @see [mock.reflect()]
      *
      * This method is introduced to keep the import out of test cases and to make it easy to replace
      *   the library for mocking requests.

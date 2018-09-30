@@ -1,3 +1,5 @@
+package com.github.kittinunf.fuel.coroutines
+
 import com.github.kittinunf.fuel.core.Deserializable
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
