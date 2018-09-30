@@ -46,8 +46,8 @@ subprojects {
             plugin("jacoco")
         }
 
-        jacoco {
-        	toolVersion = "0.8.2"
+        configure<JacocoPluginExtension> {
+            toolVersion = "0.8.2"
         }
 
         dependencies {
