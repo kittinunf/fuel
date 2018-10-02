@@ -985,13 +985,12 @@ class InterceptorTest : MockHttpTestCase() {
     }
 
     @Test
-    fun testWithEmptyLocationHeader() {
+    fun testWithNoLocationHeader() {
         val firstRequest = mock.request()
                 .withMethod(Method.GET.value)
                 .withPath("")
 
         val firstResponse = mock.response()
-                .withHeader("Location", "")
                 .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val redirectedRequest = mock.request()
