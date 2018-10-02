@@ -29,4 +29,5 @@ object Versions {
     const val rulesVersion = "1.0.0"
     const val runnerVersion = "1.0.0"
     const val mockServerVersion = "5.4.1"
+    const val jacocoVersion = "0.8.2"
 }
