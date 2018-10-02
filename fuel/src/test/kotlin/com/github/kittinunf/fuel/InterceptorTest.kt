@@ -1007,9 +1007,9 @@ class InterceptorTest : MockHttpTestCase() {
         val (data, error) = result
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
+        assertThat(error, notNullValue())
+        assertThat(data, nullValue())
 
-        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_MOVED_TEMP))
     }
 }
