@@ -27,7 +27,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                         }
                     }
 
-                    if (redirectedUrl?.isNotEmpty() == true) {
+                    if (redirectedUrl?.isEmpty() == false) {
                         val redirectedUrlString = redirectedUrl.first()
                         val newUrl = if (URI(redirectedUrlString).isAbsolute) {
                             URL(redirectedUrlString)
