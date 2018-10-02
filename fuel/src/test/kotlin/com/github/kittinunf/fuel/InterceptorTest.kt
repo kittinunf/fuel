@@ -983,4 +983,33 @@ class InterceptorTest : MockHttpTestCase() {
 
         assertThat(response.statusCode, isEqualTo(418))
     }
+
+    @Test
+    fun testWithEmptyLocationHeader() {
+        val firstRequest = mock.request()
+                .withMethod(Method.GET.value)
+                .withPath("")
+
+        val firstResponse = mock.response()
+                .withHeader("Location", "")
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+
+        val redirectedRequest = mock.request()
+                .withMethod(Method.GET.value)
+                .withPath("")
+
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = redirectedRequest, response = mock.reflect())
+
+        val manager = FuelManager()
+        val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).response()
+
+        val (data, error) = result
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+    }
 }

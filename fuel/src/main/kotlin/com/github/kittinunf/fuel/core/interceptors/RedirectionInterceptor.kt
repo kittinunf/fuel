@@ -14,8 +14,6 @@ private val redirectStatusWithGets = listOf(HttpsURLConnection.HTTP_MOVED_PERM,
         HttpsURLConnection.HTTP_MOVED_TEMP,
         HttpsURLConnection.HTTP_SEE_OTHER)
 
-class RedirectException : Exception("Redirection fail, not found URL to redirect to")
-
 fun redirectResponseInterceptor(manager: FuelManager) =
         { next: (Request, Response) -> Response ->
             { request: Request, response: Response ->
