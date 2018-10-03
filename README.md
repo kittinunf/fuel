@@ -46,6 +46,10 @@ The easiest HTTP networking library for Kotlin/Android.
 
 * [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) - Kotlin Coroutines - Library support for Kotlin coroutines
 
+### Dependency - fuel-kotlinx-serialization
+
+* [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization) - Kotlinx Serialization - Kotlin cross-platform / multi-format serialization
+
 ### Dependency - fuel-gson
 
 * [Gson](https://github.com/google/gson) - Gson - A Java serialization/deserialization library to convert Java Objects into JSON and back

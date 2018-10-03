@@ -33,8 +33,6 @@ inline fun <reified T : Any> Request.responseObject(
     json: JSON = defaultJSON
 ) = response(kotlinxDeserializerOf<T>(loader, json))
 
-inline fun <reified T : Any> Request.responseObject() = response(kotlinxDeserializerOf<T>())
-
 inline fun <reified T : Any> kotlinxDeserializerOf(loader: KSerialLoader<T> = T::class.serializer(), json: JSON = defaultJSON) = object : ResponseDeserializable<T> {
     override fun deserialize(content: String): T? {
         return try {
@@ -43,19 +41,18 @@ inline fun <reified T : Any> kotlinxDeserializerOf(loader: KSerialLoader<T> = T:
             throw FuelError(e)
         }
     }
-//
-//    override fun deserialize(reader: Reader): T? {
-//        return deserialize(reader.readText())
-//    }
-//
-//    override fun deserialize(bytes: ByteArray): T? {
-//        return deserialize(String(bytes))
-//    }
-//
-//    override fun deserialize(inputStream: InputStream): T? {
-//        return deserialize(inputStream.bufferedReader())
-////        inputStream.bufferedReader().use {
-////            return deserialize(it)
-////        }
-//    }
+
+    override fun deserialize(reader: Reader): T? {
+        return deserialize(reader.readText())
+    }
+
+    override fun deserialize(bytes: ByteArray): T? {
+        return deserialize(String(bytes))
+    }
+
+    override fun deserialize(inputStream: InputStream): T? {
+        inputStream.bufferedReader().use {
+            return deserialize(it)
+        }
+    }
 }
