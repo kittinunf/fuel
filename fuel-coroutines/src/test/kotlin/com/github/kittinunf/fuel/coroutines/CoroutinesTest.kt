@@ -3,9 +3,9 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.coroutines.MockHelper
+import junit.framework.Assert.*
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.After
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
