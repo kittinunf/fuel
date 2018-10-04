@@ -1,12 +1,14 @@
-import com.fasterxml.jackson.databind.JsonMappingException
+package com.github.kittinunf.fuel.coroutines
+
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.coroutines.MockHelper
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -15,7 +17,7 @@ import java.util.regex.Pattern
 
 class CoroutinesTest {
 
-    val uuidRegex = Pattern.compile("^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-4[A-Fa-f0-9]{3}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$")
+    private val uuidRegex = Pattern.compile("^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-4[A-Fa-f0-9]{3}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$")
 
     init {
         Fuel.testMode {
@@ -23,28 +25,29 @@ class CoroutinesTest {
         }
     }
 
-    private lateinit var mock: MockHelper
+    lateinit var mock: MockHelper
 
     @Before
     fun setup() {
-        this.mock = MockHelper()
-        this.mock.setup()
+        mock = MockHelper().apply {
+            setup()
+        }
     }
 
     @After
     fun tearDown() {
-        this.mock.tearDown()
+        mock.tearDown()
     }
 
     @Test
-    fun testAwaitResponseSuccess() = runBlocking {
+    fun testAsyncResponseSuccess() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.reflect()
         )
 
         try {
-            Fuel.get(mock.path("ip")).awaitByteArrayResponse().third.fold({ data ->
+            Fuel.get(mock.path("ip")).asyncByteArrayResponse().await().third.fold({ data ->
                 assertTrue(data.isNotEmpty())
             }, { error ->
                 fail("This test should pass but got an error: ${error.message}")
@@ -55,14 +58,14 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitResponseErrorDueToNetwork() = runBlocking {
+    fun testAsyncResponseErrorDueToNetwork() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/invalid/url"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         try {
-            Fuel.get(mock.path("invalid/url")).awaitByteArrayResponse().third.fold({
+            Fuel.get(mock.path("invalid/url")).asyncByteArrayResponse().await().third.fold({
                 fail("This test should fail due to HTTP status code.")
             }, { error ->
                 assertTrue(error.exception is HttpException)
@@ -74,32 +77,32 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitStringResponseSuccess() = runBlocking {
+    fun testAsyncStringResponseSuccess() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/uuid"),
             response = mock.reflect()
         )
 
         try {
-            Fuel.get(mock.path("uuid")).awaitStringResponse().third.fold({ data ->
+            Fuel.get(mock.path("uuid")).asyncStringResponse().await().third.fold({ data ->
                 assertTrue(data.isNotEmpty())
                 assertTrue(data.contains("uuid"))
             }, { error ->
                 fail("This test should pass but got an error: ${error.message}")
             })
         } catch (exception: Exception) {
-            fail("When using awaitString errors should be folded instead of thrown.")
+            fail("When using awaitStringResponse errors should be folded instead of thrown.")
         }
     }
 
     @Test
-    fun testAwaitObjectResponse() = runBlocking {
+    fun testAsyncObjectResponse() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/uuid"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
-        Fuel.get(mock.path("uuid")).awaitObjectResponse(UUIDResponseDeserializer).third.fold({ data ->
+        Fuel.get(mock.path("uuid")).asyncObjectResponse(UUIDResponseDeserializer).await().third.fold({ data ->
             assertTrue(data.uuid.isNotEmpty())
         }, { error ->
             fail("This test should pass but got an error: ${error.message}")
@@ -107,14 +110,14 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitStringResponseDoesNotThrowException() = runBlocking {
+    fun testAsyncStringResponseDoesNotThrowException() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/not/found/address"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
         
         try {
-            Fuel.get(mock.path("not/found/address")).awaitStringResponse().third.fold({
+            Fuel.get(mock.path("not/found/address")).asyncStringResponse().await().third.fold({
                 fail("This should not be called")
             }, {
 
@@ -125,13 +128,13 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitForByteArrayResult() = runBlocking {
+    fun testAsyncForByteArrayResult() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.reflect()
         )
 
-        Fuel.get(mock.path("ip")).awaitByteArrayResult().fold({ data ->
+        Fuel.get(mock.path("ip")).asyncByteArrayResponse().await().third.fold({ data ->
             assertTrue(data.isNotEmpty())
         }, { error ->
             fail("This test should pass but got an error: ${error.message}")
@@ -139,14 +142,14 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitStringResultErrorDueToNetwork() = runBlocking {
+    fun testAsyncStringResultErrorDueToNetwork() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/not/found/address"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
         
         try {
-            Fuel.get(mock.path("not/found/address")).awaitStringResult().fold({
+            Fuel.get(mock.path("not/found/address")).asyncStringResponse().await().third.fold({
                 fail("This test should fail due to HTTP status code.")
             }, { error ->
                 assertTrue(error.exception is HttpException)
@@ -158,13 +161,13 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testItCanAwaitStringResult() = runBlocking {
+    fun testItCanAsyncStringResult() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/uuid"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
-        Fuel.get(mock.path("uuid")).awaitStringResult().fold({ data ->
+        Fuel.get(mock.path("uuid")).asyncStringResponse().await().third.fold({ data ->
             assertTrue(data.isNotEmpty())
             assertTrue(data + ":" + uuidRegex.toRegex().toString(), uuidRegex.matcher(data).find())
         }, { error ->
@@ -173,14 +176,14 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitForObjectResultCatchesError() = runBlocking {
+    fun testAsyncForObjectResultCatchesError() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/error/404"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
         
         try {
-            Fuel.get(mock.path("error/404")).awaitObjectResult(UUIDResponseDeserializer).fold({ _ ->
+            Fuel.get(mock.path("error/404")).asyncObjectResponse(UUIDResponseDeserializer).await().third.fold({ _ ->
                 fail("This is an error case!")
             }, { error ->
                 assertTrue(error.exception is HttpException)
@@ -191,14 +194,14 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitForObjectResultCatchesDeserializeError() = runBlocking {
+    fun testAsyncForObjectResultCatchesDeserializeError() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.response().withBody(ByteArray(1) { 2 })
         )
 
         try {
-            Fuel.get(mock.path("ip")).awaitObjectResult(UUIDResponseDeserializer).fold({ _ ->
+            Fuel.get(mock.path("ip")).asyncObjectResponse(UUIDResponseDeserializer).await().third.fold({ _ ->
                 fail("This is an error case!")
 
             }, { error ->
@@ -211,24 +214,24 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testItCanAwaitByteArray() = runBlocking {
+    fun testItCanAsyncByteArray() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/uuid"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
-        assertTrue(Fuel.get(mock.path("uuid")).awaitByteArray().isNotEmpty())
+        assertTrue(Fuel.get(mock.path("uuid")).asyncByteArrayResponse().await().third.get().isNotEmpty())
     }
 
     @Test
-    fun testAwaitResponseResultSuccess() = runBlocking {
+    fun testAsyncResponseResultSuccess() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/uuid"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
         try {
-            val data = Fuel.get(mock.path("uuid")).awaitByteArray()
+            val data = Fuel.get(mock.path("uuid")).asyncByteArrayResponse().await().third.get()
             assertTrue(data.isNotEmpty())
         } catch (exception: Exception) {
             fail("This test should pass but got an exception: ${exception.message}")
@@ -236,14 +239,14 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testItCanAwaitForStringResultCanThrowException() = runBlocking {
+    fun testItCanAsyncForStringResultCanThrowException() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/error/404"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
         
         try {
-            Fuel.get(mock.path("error/404")).awaitString()
+            Fuel.get(mock.path("error/404")).asyncStringResponse().await().third.get()
             fail("This test should fail due to status code 404")
         } catch (exception: Exception) {
             assertNotNull(exception)
@@ -251,14 +254,14 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitStringResultSuccess() = runBlocking {
+    fun testAsyncStringResultSuccess() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/uuid"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
         try {
-            val data = Fuel.get(mock.path("uuid")).awaitString()
+            val data = Fuel.get(mock.path("uuid")).asyncStringResponse().await().third.get()
             assertTrue(uuidRegex.matcher(data).find())
         } catch (exception: Exception) {
             fail("This test should pass but got an exception: ${exception.message}")
@@ -266,24 +269,25 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testItCanAwaitForObject() = runBlocking {
+    fun testItCanAsyncForObject() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/uuid"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
-        assertTrue(Fuel.get(mock.path("uuid")).awaitObject(UUIDResponseDeserializer).uuid.isNotEmpty())
+        val uuidResponseDeserializable = Fuel.get(mock.path("uuid")).asyncObjectResponse(UUIDResponseDeserializer)
+        assertTrue(uuidResponseDeserializable.await().third.get().uuid.isNotEmpty())
     }
 
     @Test
-    fun testAwaitObjectResultSuccess() = runBlocking {
+    fun testAsyncObjectResultSuccess() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/uuid"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
         try {
-            val data = Fuel.get(mock.path("uuid")).awaitObject(UUIDResponseDeserializer)
+            val data = Fuel.get(mock.path("uuid")).asyncObjectResponse(UUIDResponseDeserializer).await().third.get()
             assertTrue(data.uuid.isNotEmpty())
         } catch (exception: Exception) {
             fail("This test should pass but got an exception: ${exception.message}")
@@ -291,14 +295,14 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitObjectResultExceptionDueToNetwork() = runBlocking {
+    fun testAsyncObjectResultExceptionDueToNetwork() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/some/invalid/path"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
         
         try {
-            Fuel.get(mock.path("some/invalid/path")).awaitObject(UUIDResponseDeserializer)
+            Fuel.get(mock.path("some/invalid/path")).asyncObjectResponse(UUIDResponseDeserializer).await().third.get()
             fail("This test should raise an exception due to invalid URL")
         } catch (exception: Exception) {
             assertTrue(exception.message.orEmpty().contains("404"))
@@ -311,13 +315,12 @@ class CoroutinesTest {
 
         class NoValidFormat(m: String = "Not a UUID"): Exception(m)
 
-        override fun deserialize(content: String): UUIDResponse {
+        override fun deserialize(content: String): UUIDResponse? {
             if (content.contains("=") || !content.contains("-")) {
                 throw FuelError(NoValidFormat())
             }
             return UUIDResponse(content)
         }
     }
-
 }
 
