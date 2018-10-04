@@ -4,7 +4,6 @@ import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.coroutines.MockHelper
 import junit.framework.Assert.*
-import kotlinx.coroutines.experimental.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -36,7 +35,7 @@ class CoroutinesTest {
     }
 
     @Test
-    fun testAwaitResponseSuccess() = runBlocking {
+    fun testAwaitResponseSuccess() = runBlocking  {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.reflect()

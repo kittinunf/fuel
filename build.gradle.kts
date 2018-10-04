@@ -12,13 +12,14 @@ buildscript {
         mavenCentral()
         jcenter()
         google()
+        maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
     }
 
     dependencies {
         classpath(Plugins.android)
         classpath(Plugins.jacocoAndroid)
         classpath(Plugins.bintray)
-        classpath(kotlin("gradle-plugin", version = Versions.kotlinVersion))
+        classpath(Plugins.kotlin)
     }
 }
 
@@ -29,6 +30,7 @@ allprojects {
         mavenCentral()
         jcenter()
         google()
+        maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
     }
 }
 
@@ -56,10 +58,6 @@ subprojects {
             testCompile(Dependencies.junit)
         }
 
-        configure<KotlinJvmProjectExtension> {
-            experimental.coroutines = Coroutines.ENABLE
-        }
-
         configure<JavaPluginConvention> {
             sourceCompatibility = JavaVersion.VERSION_1_6
             targetCompatibility = JavaVersion.VERSION_1_6
@@ -67,12 +65,6 @@ subprojects {
             sourceSets {
                 getByName("main").java.srcDirs("src/main/kotlin")
                 getByName("test").java.srcDirs("src/main/kotlin")
-            }
-        }
-
-        tasks.withType<KotlinCompile> {
-            kotlinOptions {
-                freeCompilerArgs = listOf("-Xdisable-default-scripting-plugin")
             }
         }
 

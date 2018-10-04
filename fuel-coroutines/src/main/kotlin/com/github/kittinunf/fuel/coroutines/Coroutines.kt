@@ -7,9 +7,6 @@ import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.awaitResponse
 import com.github.kittinunf.result.Result
-import kotlinx.coroutines.experimental.Dispatchers
-import kotlinx.coroutines.experimental.async
-import kotlin.coroutines.experimental.Dispatchers
 import java.nio.charset.Charset
 import kotlin.coroutines.CoroutineContext
 
@@ -17,24 +14,24 @@ import kotlin.coroutines.CoroutineContext
 private suspend fun <T : Any, U : Deserializable<T>> Request.await(
         deserializable: U, scope: CoroutineContext
 ): Triple<Request, Response, Result<T, FuelError>> =
-        async(scope) {
+        withContext(scope) {
             awaitResponse(deserializable)
-        }.await()
+        }
 
 
 suspend fun Request.awaitByteArrayResponse(
-        scope: CoroutineContext = Dispatchers.Default
+        scope: CoroutineContext = CommonPool
 ): Triple<Request, Response, Result<ByteArray, FuelError>> =
         await(byteArrayDeserializer(), scope)
 
 suspend fun Request.awaitStringResponse(
         charset: Charset = Charsets.UTF_8,
-        scope: CoroutineContext = Dispatchers.Default
+        scope: CoroutineContext = CommonPool
 ): Triple<Request, Response, Result<String, FuelError>> = await(stringDeserializer(charset), scope)
 
 suspend fun <U : Any> Request.awaitObjectResponse(
         deserializable: ResponseDeserializable<U>,
-        scope: CoroutineContext = Dispatchers.Default
+        scope: CoroutineContext = CommonPool
 ): Triple<Request, Response, Result<U, FuelError>> = await(deserializable, scope)
 
 /***
@@ -45,7 +42,7 @@ suspend fun <U : Any> Request.awaitObjectResponse(
  */
 @Throws
 suspend fun Request.awaitByteArray(
-        scope: CoroutineContext = Dispatchers.Default
+        scope: CoroutineContext = CommonPool
 ): ByteArray = await(byteArrayDeserializer(), scope).third.get()
 
 /**
@@ -59,7 +56,7 @@ suspend fun Request.awaitByteArray(
 @Throws
 suspend fun Request.awaitString(
         charset: Charset = Charsets.UTF_8,
-        scope: CoroutineContext = Dispatchers.Default
+        scope: CoroutineContext = CommonPool
 ): String = await(stringDeserializer(charset), scope).third.get()
 
 /**
@@ -74,7 +71,7 @@ suspend fun Request.awaitString(
 @Throws
 suspend fun <U : Any> Request.awaitObject(
         deserializable: ResponseDeserializable<U>,
-        scope: CoroutineContext = Dispatchers.Default
+        scope: CoroutineContext = CommonPool
 ): U = await(deserializable, scope).third.get()
 
 /***
@@ -85,7 +82,7 @@ suspend fun <U : Any> Request.awaitObject(
  * @return Result<ByteArray,FuelError>
  */
 suspend fun Request.awaitByteArrayResult(
-        scope: CoroutineContext = Dispatchers.Default
+        scope: CoroutineContext = CommonPool
 ): Result<ByteArray, FuelError> = awaitByteArrayResponse(scope).third
 
 /**
@@ -97,7 +94,7 @@ suspend fun Request.awaitByteArrayResult(
  */
 suspend fun Request.awaitStringResult(
         charset: Charset = Charsets.UTF_8,
-        scope: CoroutineContext = Dispatchers.Default
+        scope: CoroutineContext = CommonPool
 ): Result<String, FuelError> = awaitStringResponse(charset, scope).third
 
 
@@ -111,7 +108,7 @@ suspend fun Request.awaitStringResult(
  */
 suspend fun <U : Any> Request.awaitObjectResult(
         deserializable: ResponseDeserializable<U>,
-        scope: CoroutineContext = Dispatchers.Default
+        scope: CoroutineContext = CommonPool
 ): Result<U, FuelError> = try {
     await(deserializable, scope).third
 } catch (e: Exception) {
