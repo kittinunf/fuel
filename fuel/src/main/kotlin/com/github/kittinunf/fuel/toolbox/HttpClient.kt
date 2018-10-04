@@ -115,5 +115,3 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
         Method.DELETE, Method.POST, Method.PUT, Method.PATCH -> connection.doOutput = true
     }
 }
-
-
