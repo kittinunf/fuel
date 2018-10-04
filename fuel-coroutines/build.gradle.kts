@@ -8,5 +8,6 @@ plugins { java
 
 dependencies {
     compile(project(":fuel"))
+    compile(Dependencies.kotlinCoroutinesJvm)
     testCompile(Dependencies.mockServer)
 }

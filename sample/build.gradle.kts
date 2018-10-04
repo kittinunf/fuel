@@ -57,10 +57,6 @@ configure<BaseExtension> {
     }
 }
 
-configure<KotlinProjectExtension> {
-    experimental.coroutines = Coroutines.ENABLE
-}
-
 configurations.all {
     resolutionStrategy.eachDependency {
         if (requested.group == "android.arch.lifecycle") {
