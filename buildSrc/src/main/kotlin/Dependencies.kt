@@ -18,6 +18,8 @@ object Dependencies {
     val moshi = "com.squareup.moshi:moshi:${Versions.moshiVersion}"
     val result = "com.github.kittinunf.result:result:${Versions.resultVersion}"
     val robolectric = "org.robolectric:robolectric:${Versions.robolectricVersion}"
+    val reactorCore = "io.projectreactor:reactor-core:${Versions.reactorVersion}"
+    val reactorTest = "io.projectreactor:reactor-test:${Versions.reactorVersion}"
     val rxJavaAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxandroidVersion}"
     val rxJavaJvm = "io.reactivex.rxjava2:rxjava:${Versions.rxjavaVersion}"
 }
