@@ -10,6 +10,7 @@ import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import java.nio.charset.Charset
 import java.net.HttpURLConnection
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -198,7 +199,7 @@ class CoroutinesTest {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
-        Fuel.get(mock.path("uuid")).awaitStringResult(threadPoolDispatcher).fold({ data ->
+        Fuel.get(mock.path("uuid")).awaitStringResult(Charset.US-ASCII, threadPoolDispatcher).fold({ data ->
             assertTrue(data.isNotEmpty())
             assertTrue(data + ":" + uuidRegex.toRegex().toString(), uuidRegex.matcher(data).find())
         }, { error ->
