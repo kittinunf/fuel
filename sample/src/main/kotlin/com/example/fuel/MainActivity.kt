@@ -10,6 +10,8 @@ import com.github.kittinunf.fuel.*
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.coroutines.awaitString
+import com,github.kittinunf.fuel.coroutines.awaitStringResponse
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rx_object
