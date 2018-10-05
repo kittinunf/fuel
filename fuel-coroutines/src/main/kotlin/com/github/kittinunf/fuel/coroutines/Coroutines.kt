@@ -1,3 +1,5 @@
+package com.github.kittinunf.fuel.coroutines
+
 import com.github.kittinunf.fuel.core.Deserializable
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
@@ -41,7 +43,7 @@ suspend fun <U : Any> Request.awaitObjectResponse(
 
 /***
  * 
- *  @param scope : This is the coroutine context you want the call to be made on, the defaut is CommonPool
+ *  @param scope : This is the coroutine context you want the call to be made on, the default is CommonPool
  *
  *  @return ByteArray if no exceptions are thrown
  */
@@ -54,7 +56,7 @@ suspend fun Request.awaitByteArray(
  *  @note errors thrown in deserialization will not be caught
  *
  *  @param charset this is defaults to UTF-8
- *  @param scope : This is the coroutine context you want the call to be made on, the defaut is CommonPool
+ *  @param scope : This is the coroutine context you want the call to be made on, the default is CommonPool
  *
  *  @return ByteArray if no exceptions are thrown
  */
@@ -69,7 +71,7 @@ suspend fun Request.awaitString(
  * or during deserialization
  *
  * @param deserializable
- * @param scope : This is the coroutine context you want the call to be made on, the defaut is CommonPool
+ * @param scope : This is the coroutine context you want the call to be made on, the default is CommonPool
  *
  * @return Result object
  */
@@ -82,7 +84,7 @@ suspend fun <U : Any> Request.awaitObject(
 /***
  * Response functions all these return a Result
  *
- * @param scope : This is the coroutine context you want the call to be made on, the defaut is CommonPool
+ * @param scope : This is the coroutine context you want the call to be made on, the default is CommonPool
  *
  * @return Result<ByteArray,FuelError>
  */
@@ -107,7 +109,7 @@ suspend fun Request.awaitStringResult(
  * This function catches both server errors and Deserialization Errors
  *
  * @param deserializable
- * @param scope : This is the coroutine context you want the call to be made on, the defaut is CommonPool
+ * @param scope : This is the coroutine context you want the call to be made on, the default is CommonPool
  *
  * @return Result object
  */
@@ -130,7 +132,4 @@ suspend fun Request.awaitResponseResult(): ByteArray = awaitByteArray()
 @Deprecated("please use 'awaitObjectResult(deserializable)'", ReplaceWith("awaitObjectResult(deserializable)"))
 suspend fun <U : Any> Request.awaitSafelyObjectResult(
         deserializable: ResponseDeserializable<U>
-): Result<U, FuelError> = this.awaitObjectResult(deserializable)
-
-
-
+): Result<U, FuelError> = awaitObjectResult(deserializable)

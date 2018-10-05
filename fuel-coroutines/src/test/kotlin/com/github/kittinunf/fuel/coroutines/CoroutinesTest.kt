@@ -1,21 +1,24 @@
-import com.fasterxml.jackson.databind.JsonMappingException
+package com.github.kittinunf.fuel.coroutines
+
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.coroutines.MockHelper
+import kotlinx.coroutines.experimental.asCoroutineDispatcher
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import java.nio.charset.Charset
 import java.net.HttpURLConnection
 import java.util.UUID
+import java.util.concurrent.Executors
 import java.util.regex.Pattern
 
 class CoroutinesTest {
 
-    val uuidRegex = Pattern.compile("^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-4[A-Fa-f0-9]{3}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$")
+    private val uuidRegex = Pattern.compile("^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-4[A-Fa-f0-9]{3}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$")
 
     init {
         Fuel.testMode {
@@ -25,15 +28,18 @@ class CoroutinesTest {
 
     private lateinit var mock: MockHelper
 
+    private val threadPool = Executors.newSingleThreadExecutor()!!
+    private val threadPoolDispatcher = threadPool.asCoroutineDispatcher()
+
     @Before
     fun setup() {
-        this.mock = MockHelper()
-        this.mock.setup()
+        mock = MockHelper().apply { setup() }
     }
 
     @After
     fun tearDown() {
-        this.mock.tearDown()
+        threadPool.shutdown()
+        mock.tearDown()
     }
 
     @Test
@@ -139,6 +145,20 @@ class CoroutinesTest {
     }
 
     @Test
+    fun testAwaitForByteArrayResultWithDifferentContext() = runBlocking {
+        mock.chain(
+            request = mock.request().withPath("/ip"),
+            response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("ip")).awaitByteArrayResult(threadPoolDispatcher).fold({ data ->
+            assertTrue(data.isNotEmpty())
+        }, { error ->
+            fail("This test should pass but got an error: ${error.message}")
+        })
+    }
+
+    @Test
     fun testAwaitStringResultErrorDueToNetwork() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/not/found/address"),
@@ -165,6 +185,21 @@ class CoroutinesTest {
         )
 
         Fuel.get(mock.path("uuid")).awaitStringResult().fold({ data ->
+            assertTrue(data.isNotEmpty())
+            assertTrue(data + ":" + uuidRegex.toRegex().toString(), uuidRegex.matcher(data).find())
+        }, { error ->
+            fail("This test should pass but got an error: ${error.message}")
+        })
+    }
+
+    @Test
+    fun testItCanAwaitStringResultWithDifferentContext() = runBlocking {
+        mock.chain(
+            request = mock.request().withPath("/uuid"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
+        )
+
+        Fuel.get(mock.path("uuid")).awaitStringResult(Charset.US_ASCII, threadPoolDispatcher).fold({ data ->
             assertTrue(data.isNotEmpty())
             assertTrue(data + ":" + uuidRegex.toRegex().toString(), uuidRegex.matcher(data).find())
         }, { error ->
@@ -289,6 +324,22 @@ class CoroutinesTest {
             fail("This test should pass but got an exception: ${exception.message}")
         }
     }
+
+    @Test
+    fun testAwaitObjectResultSuccessWithDifferentContext() = runBlocking {
+        mock.chain(
+                request = mock.request().withPath("/uuid"),
+                response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
+        )
+
+        try {
+            val data = Fuel.get(mock.path("uuid")).awaitObject(UUIDResponseDeserializer, threadPoolDispatcher)
+            assertTrue(data.uuid.isNotEmpty())
+        } catch (exception: Exception) {
+            fail("This test should pass but got an exception: ${exception.message}")
+        }
+    }
+
 
     @Test
     fun testAwaitObjectResultExceptionDueToNetwork() = runBlocking {
