@@ -30,7 +30,7 @@ Answer the following questions:
 
 - **How does it address the issue?**
 
-  Describe, at a high level, what was done to affect change. "Introduce a red/black tree to increase search speed" or "Remove <troublesome depedency X>, which was causing <specific description of issue introduced by dependency>" are good examples. If your change is obvious, you may be able to omit addressing this question.
+  Describe, at a high level, what was done to affect change. "Introduce a red/black tree to increase search speed" or "Remove <troublesome dependency X>, which was causing <specific description of issue introduced by dependency>" are good examples. If your change is obvious, you may be able to omit addressing this question.
 
 - **What side effects does this change have?**
 
