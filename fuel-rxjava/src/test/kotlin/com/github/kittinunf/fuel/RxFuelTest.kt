@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.fuel.rx.rx
 import com.github.kittinunf.fuel.rx.rx_bytes
+import com.github.kittinunf.fuel.rx.rx_object
 import com.github.kittinunf.fuel.rx.rx_response
 import com.github.kittinunf.fuel.rx.rx_responseObject
 import com.github.kittinunf.fuel.rx.rx_responseString
@@ -152,15 +153,10 @@ class RxFuelTest {
 
     //Deserializer
     class HttpBinUserAgentModelDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
-
-        override fun deserialize(content: String): HttpBinUserAgentModel {
-            return HttpBinUserAgentModel(content)
-        }
-
+        override fun deserialize(content: String): HttpBinUserAgentModel? = HttpBinUserAgentModel(content)
     }
 
     class HttpBinMalformedDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
-
         override fun deserialize(inputStream: InputStream): HttpBinUserAgentModel? = throw IllegalStateException("Malformed data")
     }
 
@@ -254,6 +250,29 @@ class RxFuelTest {
         assertThat(response, notNullValue())
         assertThat(result as Result.Success, isA(Result.Success::class.java))
         val (value, error) = result
+        assertThat(value, notNullValue())
+        assertThat(error, nullValue())
+    }
+
+    @Test
+    fun rxTestObject() {
+        mock.chain(
+                request = mock.request().withPath("/user-agent"),
+                response = mock.reflect()
+        )
+
+        val data = Fuel.get(mock.path("user-agent"))
+                .rx_object(HttpBinUserAgentModelDeserializer())
+                .test()
+                .apply { awaitTerminalEvent() }
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertComplete()
+                .values()[0]
+
+        assertThat(data, notNullValue())
+        assertThat(data as Result.Success, isA(Result.Success::class.java))
+        val (value, error) = data
         assertThat(value, notNullValue())
         assertThat(error, nullValue())
     }

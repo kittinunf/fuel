@@ -46,6 +46,10 @@ subprojects {
             plugin("jacoco")
         }
 
+        configure<JacocoPluginExtension> {
+            toolVersion = Versions.jacocoVersion
+        }
+
         dependencies {
             compile(Dependencies.kotlinStdlib)
             testCompile(Dependencies.junit)
