@@ -199,7 +199,7 @@ class CoroutinesTest {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
-        Fuel.get(mock.path("uuid")).awaitStringResult(Charset.US-ASCII, threadPoolDispatcher).fold({ data ->
+        Fuel.get(mock.path("uuid")).awaitStringResult(Charset.US_ASCII, threadPoolDispatcher).fold({ data ->
             assertTrue(data.isNotEmpty())
             assertTrue(data + ":" + uuidRegex.toRegex().toString(), uuidRegex.matcher(data).find())
         }, { error ->
