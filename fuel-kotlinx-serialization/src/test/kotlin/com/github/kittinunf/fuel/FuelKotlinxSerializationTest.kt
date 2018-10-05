@@ -16,6 +16,7 @@ import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
 import org.junit.Before
@@ -121,7 +122,6 @@ class FuelKotlinxSerializationTest {
                 override fun failure(request: Request, response: Response, error: FuelError) {
                     assertThat(error, notNullValue())
                 }
-
             })
     }
 
@@ -141,12 +141,8 @@ class FuelKotlinxSerializationTest {
                 override fun failure(request: Request, response: Response, error: FuelError) {
                     assertThat(error, instanceOf(Result.Failure::class.java))
                 }
-
             })
     }
-
-    @Serializable
-    data class IssueInfoWithNull(val id: Int, val title: String, val number: Int?)
 
     @Test
     fun serializationTestResponseSyncObject() {
@@ -157,11 +153,16 @@ class FuelKotlinxSerializationTest {
             ).withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        val (_, res, result) = Fuel.get(mock.path("issues/1")).responseObject<IssueInfoWithNull>()
+        val (_, res, result) = Fuel.get(mock.path("issues/1")).responseObject<IssueInfo>()
+
         assertThat(res, notNullValue())
-        assertThat(result.get(), notNullValue())
-        assertThat(result.get(), isA(IssueInfoWithNull::class.java))
         assertThat(result, notNullValue())
+        assertThat(result.component2(), notNullValue())
+        val success = when (result) {
+            is Result.Success -> true
+            is Result.Failure -> false
+        }
+        assertFalse("should not parse null into non-null field", success)
     }
 
     @Test
@@ -192,7 +193,7 @@ class FuelKotlinxSerializationTest {
                     " ]").withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        Fuel.get(mock.path("issues")).responseObject<List<IssueInfo>>(loader  = IssueInfo.serializer().list) { _, _, result ->
+        Fuel.get(mock.path("issues")).responseObject<List<IssueInfo>>(loader = IssueInfo.serializer().list) { _, _, result ->
             val issues = result.get()
             assertNotEquals(issues.size, 0)
             assertThat(issues[0], isA(IssueInfo::class.java))
@@ -225,6 +226,5 @@ class FuelKotlinxSerializationTest {
             assertThat(issueList[0], isA(IssueInfo::class.java))
 
         }
-
     }
 }
