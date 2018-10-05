@@ -144,6 +144,20 @@ class CoroutinesTest {
     }
 
     @Test
+    fun testAwaitForByteArrayResultWithDifferentContext() = runBlocking {
+        mock.chain(
+            request = mock.request().withPath("/ip"),
+            response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("ip")).awaitByteArrayResult(threadPoolDispatcher).fold({ data ->
+            assertTrue(data.isNotEmpty())
+        }, { error ->
+            fail("This test should pass but got an error: ${error.message}")
+        })
+    }
+
+    @Test
     fun testAwaitStringResultErrorDueToNetwork() = runBlocking {
         mock.chain(
             request = mock.request().withPath("/not/found/address"),
@@ -170,6 +184,21 @@ class CoroutinesTest {
         )
 
         Fuel.get(mock.path("uuid")).awaitStringResult().fold({ data ->
+            assertTrue(data.isNotEmpty())
+            assertTrue(data + ":" + uuidRegex.toRegex().toString(), uuidRegex.matcher(data).find())
+        }, { error ->
+            fail("This test should pass but got an error: ${error.message}")
+        })
+    }
+
+    @Test
+    fun testItCanAwaitStringResultWithDifferentContext() = runBlocking {
+        mock.chain(
+            request = mock.request().withPath("/uuid"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
+        )
+
+        Fuel.get(mock.path("uuid")).awaitStringResult(threadPoolDispatcher).fold({ data ->
             assertTrue(data.isNotEmpty())
             assertTrue(data + ":" + uuidRegex.toRegex().toString(), uuidRegex.matcher(data).find())
         }, { error ->
