@@ -15,7 +15,6 @@ import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.KotlinJsonAdapterFactory
 import java.net.HttpURLConnection
 
 class FuelMoshiTest {
@@ -160,7 +159,7 @@ class FuelMoshiTest {
 
     @Test
     fun moshiTestResponseObjectErrorWithGivenAdapter() {
-        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        val moshi = Moshi.Builder().build()
         val adapter = moshi.adapter(HttpBinUserAgentModel::class.java)
         Fuel.get("/useragent")
                 .responseObject(moshiDeserializerOf(adapter)) { _, _, result ->
