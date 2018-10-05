@@ -18,7 +18,7 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Support response deserialization into plain old object (both Kotlin & Java)
 - [x] Automatically invoke handler on Android Main Thread when using Android Module
 - [x] Special test mode for easier testing
-- [x] RxJava 2.x support out of the box
+- [x] Support for reactive programming via RxJava 2.x and Project Reactor 3.x
 - [x] Google Components [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) support
 - [x] Built-in object serialization module (Gson, Jackson, Moshi, Forge) :sparkles:
 - [x] Support Kotlin's [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) module
@@ -62,6 +62,10 @@ The easiest HTTP networking library for Kotlin/Android.
 
 * [Forge](https://github.com/kittinunf/Forge/) - Forge - Functional style JSON parsing written in Kotlin
 
+### Dependency - fuel-reactor
+
+* [Project Reactor](https://github.com/reactor/reactor-core) - Project Reactor - Implementation of Reactive Streams standard
+
 ### Gradle
 
 ``` Groovy
@@ -79,6 +83,7 @@ dependencies {
     compile 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>' //for Jackson support
     compile 'com.github.kittinunf.fuel:fuel-moshi:<latest-version>' //for Moshi support
     compile 'com.github.kittinunf.fuel:fuel-forge:<latest-version>' //for Forge support
+    compile 'com.github.kittinunf.fuel:fuel-reactor:<latest-version>' //for Reactor support
 }
 ```
 
@@ -803,6 +808,48 @@ runBlocking {
         }
     }
 }
+```
+
+### Project Reactor
+
+The Reactor module API provides functions starting with the prefix `mono` to handle instances of `Response`, `Result<T, FuelError>` and values directly (`String`, `ByteArray`, `Any`). All functions expose exceptions as `FuelError` instance.
+
+**Data handling example**
+
+```kotlin
+Fuel.get("https://icanhazdadjoke.com")
+    .header("Accept" to "text/plain")
+    .monoString()
+    .subscribe(::println)
+```
+
+**Error handling example**
+
+```kotlin
+data class Guest(val name: String)
+
+object GuestMapper : ResponseDeserializable<Guest> {
+    override fun deserialize(content: String) =
+        jacksonObjectMapper().readValue<Guest>(content)
+}
+
+Fuel.get("/guestName").monoResultObject(GuestMapper)
+    .map(Result<Guest, FuelError>::get)
+    .map { (name) -> "Welcome to the party, $name!" }
+    .onErrorReturn("I'm sorry, your name is not on the list.")
+    .subscribe(::println)
+```
+
+**Response handling example**
+
+```kotlin
+FuelManager.instance.basePath = "https://httpbin.org"
+
+Fuel.get("/status/404").monoResponse()
+    .filter(Response::isSuccessful)
+    .switchIfEmpty(Fuel.get("/status/200").monoResponse())
+    .map(Response::statusCode)
+    .subscribe(::println)
 ```
 
 ## Other libraries
