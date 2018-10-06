@@ -1,6 +1,11 @@
 package com.github.kittinunf.fuel.core.interceptors
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.isStatusRedirection
 import java.net.URI
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection

@@ -8,7 +8,7 @@ import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.mapError
 import java.io.InterruptedIOException
 
-class SuspendingRequest(internal val request: Request) {
+class SuspendingRequest(private val request: Request) {
     var interruptCallback: ((Request) -> Unit)? = null
 
     suspend fun awaitResult(): Result<Response, FuelError> {

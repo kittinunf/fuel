@@ -14,7 +14,7 @@ import java.util.regex.Pattern
 
 class CoroutinesTest {
 
-    private val uuidRegex: Pattern = Pattern.compile("^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-4[A-Fa-f0-9]{3}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$")
+    private val uuidRegex = Pattern.compile("^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-4[A-Fa-f0-9]{3}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$")
 
     init {
         Fuel.testMode {
