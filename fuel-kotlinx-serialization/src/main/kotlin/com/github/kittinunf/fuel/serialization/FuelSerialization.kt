@@ -13,11 +13,9 @@ import kotlinx.serialization.KSerialLoader
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.serializer
 
-val defaultJSON = JSON.plain
-
 inline fun <reified T : Any> Request.responseObject(
     loader: KSerialLoader<T> = T::class.serializer(),
-    json: JSON = defaultJSON,
+    json: JSON = JSON.plain,
     noinline deserializer: (Request, Response, Result<T, FuelError>) -> Unit
 ) = response(kotlinxDeserializerOf(loader, json), deserializer)
 
@@ -25,15 +23,15 @@ inline fun <reified T : Any> Request.responseObject(
 inline fun <reified T : Any> Request.responseObject(
     deserializer: Handler<T>,
     loader: KSerialLoader<T> = T::class.serializer(),
-    json: JSON = defaultJSON
+    json: JSON = JSON.plain
 ) = response(kotlinxDeserializerOf(loader, json), deserializer)
 
 inline fun <reified T : Any> Request.responseObject(
     loader: KSerialLoader<T> = T::class.serializer(),
-    json: JSON = defaultJSON
+    json: JSON = JSON.plain
 ) = response(kotlinxDeserializerOf<T>(loader, json))
 
-inline fun <reified T : Any> kotlinxDeserializerOf(loader: KSerialLoader<T> = T::class.serializer(), json: JSON = defaultJSON) = object : ResponseDeserializable<T> {
+inline fun <reified T : Any> kotlinxDeserializerOf(loader: KSerialLoader<T> = T::class.serializer(), json: JSON = JSON.plain) = object : ResponseDeserializable<T> {
     override fun deserialize(content: String): T? {
         return try {
             json.parse(loader, content)
