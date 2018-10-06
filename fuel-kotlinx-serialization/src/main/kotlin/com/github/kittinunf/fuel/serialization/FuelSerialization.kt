@@ -33,11 +33,7 @@ inline fun <reified T : Any> Request.responseObject(
 
 inline fun <reified T : Any> kotlinxDeserializerOf(loader: KSerialLoader<T> = T::class.serializer(), json: JSON = JSON.plain) = object : ResponseDeserializable<T> {
     override fun deserialize(content: String): T? {
-        return try {
-            json.parse(loader, content)
-        } catch(e: Exception) {
-            throw FuelError(e)
-        }
+        return json.parse(loader, content)
     }
 
     override fun deserialize(reader: Reader): T? {
