@@ -14,6 +14,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
+import com.squareup.moshi.Moshi
 import java.net.HttpURLConnection
 
 class FuelMoshiTest {
@@ -154,6 +155,23 @@ class FuelMoshiTest {
 
         val triple = Fuel.get(mock.path("user-agent")).responseObject<HttpBinUserAgentModel>()
         assertThat(triple.third.component2(), instanceOf(FuelError::class.java))
+    }
+
+    @Test
+    fun moshiTestResponseObjectErrorWithGivenAdapter() {
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        val moshi = Moshi.Builder().build()
+        val adapter = moshi.adapter(HttpBinUserAgentModel::class.java)
+
+        Fuel.get(mock.path("user-agent"))
+            .responseObject(moshiDeserializerOf(adapter)) { _, _, result ->
+                assertThat(result.component1(), notNullValue())
+                assertThat(result.component2(), notNullValue())
+            }
     }
 
     data class IssueInfo(val id: Int, val title: String, val number: Int)
