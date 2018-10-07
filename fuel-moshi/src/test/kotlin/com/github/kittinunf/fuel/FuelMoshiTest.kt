@@ -159,13 +159,19 @@ class FuelMoshiTest {
 
     @Test
     fun moshiTestResponseObjectErrorWithGivenAdapter() {
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
         val moshi = Moshi.Builder().build()
         val adapter = moshi.adapter(HttpBinUserAgentModel::class.java)
-        Fuel.get("/useragent")
-                .responseObject(moshiDeserializerOf(adapter)) { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
-                }
+
+        Fuel.get(mock.path("user-agent"))
+            .responseObject(moshiDeserializerOf(adapter)) { _, _, result ->
+                assertThat(result.component1(), notNullValue())
+                assertThat(result.component2(), notNullValue())
+            }
     }
 
     data class IssueInfo(val id: Int, val title: String, val number: Int)
