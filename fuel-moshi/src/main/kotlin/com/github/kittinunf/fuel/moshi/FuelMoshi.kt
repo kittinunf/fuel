@@ -8,6 +8,7 @@ import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.JsonAdapter
 
 inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) =
         response(moshiDeserializerOf(T::class.java), handler)
@@ -21,4 +22,9 @@ fun <T : Any> moshiDeserializerOf(clazz: Class<T>) = object : ResponseDeserializ
                 .build()
                 .adapter(clazz)
                 .fromJson(content)
+}
+
+inline fun <reified T : Any> moshiDeserializerOf(adapter: JsonAdapter<T>) = object : ResponseDeserializable<T> {
+    override fun deserialize(content: String): T? =
+            adapter.fromJson(content)
 }
