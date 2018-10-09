@@ -46,6 +46,10 @@ The easiest HTTP networking library for Kotlin/Android.
 
 * [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) - Kotlin Coroutines - Library support for Kotlin coroutines
 
+### Dependency - fuel-kotlinx-serialization
+
+* [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization) - Kotlinx Serialization - Kotlin cross-platform / multi-format serialization
+
 ### Dependency - fuel-gson
 
 * [Gson](https://github.com/google/gson) - Gson - A Java serialization/deserialization library to convert Java Objects into JSON and back
@@ -532,6 +536,52 @@ Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel> { _, _, result ->
 }
 ```
 
+### Deserialization using kotlinx.serialzationn
+
+_requires the [kotlinx-serialization extension](#dependency---fuel-kotlinx-serialization)_
+_requires [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization#gradlejvm)_
+
+
+```kotlin
+@Serializable
+data class HttpBinUserAgentModel(var userAgent: String = "")
+
+Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel> { _, _, result ->
+}
+```
+
+this is by default strict and will reject unknown keys, for that you can pass a custom JSOn instance
+
+JSON(nonstrict = true)
+```kotlin
+@Serializable
+data class HttpBinUserAgentModel(var userAgent: String = "")
+
+Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel>(json = JSON(nonstrict = true)) { _, _, result ->
+}
+```
+
+kotlinx.serialization can not always guess the correct serialzer to use, when generics are involved for example
+
+```kotlin
+@Serializable
+data class HttpBinUserAgentModel(var userAgent: String = "")
+
+Fuel.get("/list/user-agent").responseObject<HttpBinUserAgentModel>(loader = HttpBinUserAgentModel.serilaizer().list) { _, _, result ->
+}
+```
+
+it can be used with coroutines by using `kotlinxDeserilaizerOf()` it takes the same `json` and `loader` as parameters
+
+```kotlin
+@Serializable
+data class HttpBinUserAgentModel(var userAgent: String = "")
+
+Fuel.get("/user-agent").awaitResponseObject<HttpBinUserAgentModel>(kotlinxDeserializerOf()) { _, _, result ->
+}
+```
+
+
 * There are 4 methods to support response deserialization depending on your needs (also depending on JSON parsing library of your choice), and you are required to implement only one of them.
 
 ``` Kotlin
@@ -553,7 +603,6 @@ object Windows1255StringDeserializer : ResponseDeserializable<String> {
         }
     }
 ```
-
 ### Configuration
 
 * Use singleton `FuelManager.instance` to manage global configurations.

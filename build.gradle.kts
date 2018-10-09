@@ -11,12 +11,14 @@ buildscript {
         mavenCentral()
         jcenter()
         google()
+        maven { setUrl("https://kotlin.bintray.com/kotlinx") }
     }
 
     dependencies {
         classpath(Plugins.android)
         classpath(Plugins.jacocoAndroid)
         classpath(Plugins.bintray)
+        classpath(Plugins.serialization)
         classpath(kotlin("gradle-plugin", version = Versions.kotlinVersion))
     }
 }
