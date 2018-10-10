@@ -14,6 +14,7 @@ buildscript {
         google()
         maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
         maven { setUrl("https://kotlin.bintray.com/kotlinx") }
+        maven { setUrl("http://dl.bintray.com/kotlin/kotlin-eap") }
     }
 
     dependencies {

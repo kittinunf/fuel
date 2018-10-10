@@ -6,6 +6,7 @@ apply {
 
 repositories {
     maven { setUrl("https://kotlin.bintray.com/kotlinx") }
+    maven { setUrl("https://dl.bintray.com/kotlin/kotlin-eap") }
 }
 
 dependencies {
