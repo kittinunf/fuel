@@ -14,6 +14,7 @@ object Dependencies {
     val kotlinCoroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.kotlinCoroutinesVersion}"
     val kotlinCoroutinesJvm = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutinesVersion}"
     val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlinVersion}"
+    val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${Versions.kotlinxSerialization}"
     val mockServer = "org.mock-server:mockserver-netty:${Versions.mockServerVersion}"
     val moshi = "com.squareup.moshi:moshi:${Versions.moshiVersion}"
     val result = "com.github.kittinunf.result:result:${Versions.resultVersion}"

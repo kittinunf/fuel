@@ -13,6 +13,7 @@ buildscript {
         jcenter()
         google()
         maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
+        maven { setUrl("https://kotlin.bintray.com/kotlinx") }
     }
 
     dependencies {
@@ -20,6 +21,7 @@ buildscript {
         classpath(Plugins.jacocoAndroid)
         classpath(Plugins.bintray)
         classpath(Plugins.kotlin)
+        classpath(Plugins.serialization)
     }
 }
 
