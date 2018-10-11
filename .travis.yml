@@ -21,7 +21,7 @@ before_script:
   - chmod +x deploy_bintray.sh
 
 script:
-  - travis_retry ./gradlew test --stacktrace
+  - ./gradlew test --stacktrace
 
 after_success:
   - ./gradlew jacocoTestReport
