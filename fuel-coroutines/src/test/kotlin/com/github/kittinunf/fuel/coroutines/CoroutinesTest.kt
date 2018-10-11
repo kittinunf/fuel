@@ -5,11 +5,13 @@ import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.coroutines.MockHelper
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.util.*
+import java.util.UUID
 import java.util.regex.Pattern
 
 class CoroutinesTest {
