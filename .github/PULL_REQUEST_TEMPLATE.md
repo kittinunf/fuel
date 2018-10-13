@@ -1,31 +1,31 @@
-Thank you for submitting your Pull Request. Please make sure you have
+> Thank you for submitting your Pull Request. Please make sure you have
 familiarised yourself with the [Contributing Guidelines](https://github.com/kittunf/Fuel/CONTRIBUTING.md)
 before continuing.
 
 ## Description
 
-Include a summary of the change and which [issue](https://github.com/kittunf/Fuel/issues)
-this fixes. Also include relevant motivation and context. List any dependencies
+> Include a summary of the change and which [issue](https://github.com/kittunf/Fuel/issues)
+this fixes. Also, include relevant motivation and context. List any dependencies
 that are required for this change and why they are necessary.
 
-Fixes #0
+> Fixes #0
 Fixes #0
 
 ## Type of change
 
 Check all that apply
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Bug fix (a non-breaking change which fixes an issue)
+- [ ] New feature (a non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Refactoring (change which changes the current internal or external interface)
+- [ ] Refactoring (a change which changes the current internal or external interface)
 - [ ] This change requires a documentation update
 
 ## How Has This Been Tested?
 
 In case you did not include tests describe why you and how you have verified the
 changes, with instructions so we can reproduce. If you have added comprehensive
-tests for your changes, you may ommit this section.
+tests for your changes, you may omit this section.
 
 ## Checklist:
 
