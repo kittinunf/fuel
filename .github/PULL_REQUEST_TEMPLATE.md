@@ -1,12 +1,14 @@
-> Thank you for submitting your Pull Request. Please make sure you have
-familiarised yourself with the [Contributing Guidelines](https://github.com/kittunf/Fuel/CONTRIBUTING.md)
-before continuing.
+<!-- Thank you for submitting your Pull Request. Please make sure you have
+familiarised yourself with the [Contributing Guidelines](https://github.com/kittinunf/Fuel/CONTRIBUTING.md)
+before continuing. -->
+
+<!-- Remove anything that doesn't apply -->
 
 ## Description
 
-> Include a summary of the change and which [issue](https://github.com/kittunf/Fuel/issues)
+<!-- Include a summary of the change and which [issue](https://github.com/kittinunf/Fuel/issues)
 this fixes. Also, include relevant motivation and context. List any dependencies
-that are required for this change and why they are necessary.
+that are required for this change and why they are necessary. -->
 
 > Fixes #0
 Fixes #0
@@ -35,3 +37,4 @@ tests for your changes, you may omit this section.
 - [ ] My changes generate no new compiler warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
+- [ ] Inspect the bytecode viewer, including reasoning why
