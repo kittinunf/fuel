@@ -10,8 +10,8 @@ before continuing. -->
 this fixes. Also, include relevant motivation and context. List any dependencies
 that are required for this change and why they are necessary. -->
 
-> Fixes #0
-Fixes #0
+<!-- Fixes #0
+Fixes #0 -->
 
 ## Type of change
 
