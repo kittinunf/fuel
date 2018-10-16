@@ -4,12 +4,13 @@ if [[ "$TRAVIS_BRANCH" == */release-v* ]]; then
 
   echo "We're on release branch, deploying at $TRAVIS_BRANCH"
 
-  modules=("fuel" "fuel-android" "fuel-rxjava" "fuel-jackson" "fuel-gson" "fuel-livedata" "fuel-moshi" "fuel-forge" "fuel-coroutines")
-  for i in "${modules[@]}"
+  for i in $(ls -d */);
   do
-    echo ">> Deploying $i ..."
-    ./gradlew :$i:clean :$i:build :$i:bintrayUpload -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY -PdryRun=false
-    echo ">> Done deploying for $i"
+    m=${i%%/}
+    if [[ $m == fuel* ]]; then
+      echo ">> Deploying $m ..."
+      ./gradlew :$i:clean :$i:build :$i:bintrayUpload -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY -PdryRun=false
+    fi
   done
 
 fi
