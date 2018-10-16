@@ -4,13 +4,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import awaitString
 import awaitStringResponse
-import com.github.kittinunf.fuel.*
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.gson.responseObject
+import com.github.kittinunf.fuel.httpDelete
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.fuel.httpPost
+import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rx_object
 import com.github.kittinunf.result.Result
@@ -20,8 +23,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.Reader
 
@@ -43,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         mainGoCoroutineButton.setOnClickListener {
-            launch(UI) {
+            GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
                 executeCoroutine()
             }
         }
@@ -267,7 +272,7 @@ class MainActivity : AppCompatActivity() {
             val url: String = ""
     ) {
         class Deserializer : ResponseDeserializable<Issue> {
-            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Issue::class.java)
+            override fun deserialize(reader: Reader) = Gson().fromJson(reader, Issue::class.java)!!
         }
 
         class ListDeserializer : ResponseDeserializable<List<Issue>> {

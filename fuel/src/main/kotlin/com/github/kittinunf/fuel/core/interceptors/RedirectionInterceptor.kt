@@ -20,6 +20,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
 
                 if (response.isStatusRedirection && request.isAllowRedirects) {
                     val redirectedUrl = response.headers["Location"] ?: response.headers["location"]
+
                     val newMethod = when {
                         response.statusCode in redirectStatusWithGets -> Method.GET
                         else -> request.method

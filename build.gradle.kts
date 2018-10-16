@@ -4,6 +4,7 @@ import com.jfrog.bintray.gradle.BintrayExtension
 import com.novoda.gradle.release.PublishExtension
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -11,15 +12,17 @@ buildscript {
         mavenCentral()
         jcenter()
         google()
-        maven { setUrl("https://kotlin.bintray.com/kotlinx") }
+        maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
+        maven(url = "https://kotlin.bintray.com/kotlinx")
+        maven(url = "http://dl.bintray.com/kotlin/kotlin-eap")
     }
 
     dependencies {
         classpath(Plugins.android)
         classpath(Plugins.jacocoAndroid)
         classpath(Plugins.bintray)
+        classpath(Plugins.kotlin)
         classpath(Plugins.serialization)
-        classpath(kotlin("gradle-plugin", version = Versions.kotlinVersion))
     }
 }
 
@@ -30,6 +33,7 @@ allprojects {
         mavenCentral()
         jcenter()
         google()
+        maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
     }
 }
 
@@ -64,12 +68,6 @@ subprojects {
             sourceSets {
                 getByName("main").java.srcDirs("src/main/kotlin")
                 getByName("test").java.srcDirs("src/main/kotlin")
-            }
-        }
-
-        tasks.withType<KotlinCompile> {
-            kotlinOptions {
-                freeCompilerArgs = listOf("-Xdisable-default-scripting-plugin")
             }
         }
 
