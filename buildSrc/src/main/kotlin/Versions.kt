@@ -3,7 +3,7 @@ object Versions {
     const val publishVersion = "1.15.0"
 
     // Core dependencies
-    const val kotlinVersion = "1.2.71"
+    const val kotlinVersion = "1.3.0-rc-146"
     const val resultVersion = "1.5.0"
     const val jsonVersion = "20170516"
 
@@ -12,7 +12,7 @@ object Versions {
     const val forgeVersion = "0.3.0"
     const val gsonVersion = "2.8.2"
     const val jacksonVersion = "2.9.6"
-    const val kotlinCoroutinesVersion = "0.23.3"
+    const val kotlinCoroutinesVersion = "0.30.1-eap13"
     const val kotlinxSerialization = "0.6.2"
     const val moshiVersion = "1.6.0"
     const val reactorVersion = "3.2.0.M4"

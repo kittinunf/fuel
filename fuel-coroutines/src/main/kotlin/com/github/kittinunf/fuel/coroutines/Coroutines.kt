@@ -5,49 +5,44 @@ import com.github.kittinunf.fuel.core.Request.Companion.byteArrayDeserializer
 import com.github.kittinunf.fuel.core.Request.Companion.stringDeserializer
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.core.response
+import com.github.kittinunf.fuel.core.awaitResponse
 import com.github.kittinunf.result.Result
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.suspendCancellableCoroutine
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.nio.charset.Charset
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 private suspend fun <T : Any, U : Deserializable<T>> Request.await(
         deserializable: U, scope: CoroutineContext
 ): Triple<Request, Response, Result<T, FuelError>> =
         withContext(scope) {
-            suspendCancellableCoroutine<Triple<Request, Response, Result<T, FuelError>>> { continuation ->
-                continuation.invokeOnCancellation { cancel() }
-                continuation.resume(response(deserializable))
-            }
+            awaitResponse(deserializable)
         }
 
-
 suspend fun Request.awaitByteArrayResponse(
-        scope: CoroutineContext = CommonPool
+        scope: CoroutineContext = Dispatchers.Default
 ): Triple<Request, Response, Result<ByteArray, FuelError>> =
         await(byteArrayDeserializer(), scope)
 
 suspend fun Request.awaitStringResponse(
         charset: Charset = Charsets.UTF_8,
-        scope: CoroutineContext = CommonPool
+        scope: CoroutineContext = Dispatchers.Default
 ): Triple<Request, Response, Result<String, FuelError>> = await(stringDeserializer(charset), scope)
 
 suspend fun <U : Any> Request.awaitObjectResponse(
         deserializable: ResponseDeserializable<U>,
-        scope: CoroutineContext = CommonPool
+        scope: CoroutineContext = Dispatchers.Default
 ): Triple<Request, Response, Result<U, FuelError>> = await(deserializable, scope)
 
 /***
- * 
+ *
  *  @param scope : This is the coroutine context you want the call to be made on, the defaut is CommonPool
  *
  *  @return ByteArray if no exceptions are thrown
  */
 @Throws
 suspend fun Request.awaitByteArray(
-        scope: CoroutineContext = CommonPool
+        scope: CoroutineContext = Dispatchers.Default
 ): ByteArray = await(byteArrayDeserializer(), scope).third.get()
 
 /**
@@ -61,7 +56,7 @@ suspend fun Request.awaitByteArray(
 @Throws
 suspend fun Request.awaitString(
         charset: Charset = Charsets.UTF_8,
-        scope: CoroutineContext = CommonPool
+        scope: CoroutineContext = Dispatchers.Default
 ): String = await(stringDeserializer(charset), scope).third.get()
 
 /**
@@ -76,7 +71,7 @@ suspend fun Request.awaitString(
 @Throws
 suspend fun <U : Any> Request.awaitObject(
         deserializable: ResponseDeserializable<U>,
-        scope: CoroutineContext = CommonPool
+        scope: CoroutineContext = Dispatchers.Default
 ): U = await(deserializable, scope).third.get()
 
 /***
@@ -87,7 +82,7 @@ suspend fun <U : Any> Request.awaitObject(
  * @return Result<ByteArray,FuelError>
  */
 suspend fun Request.awaitByteArrayResult(
-        scope: CoroutineContext = CommonPool
+        scope: CoroutineContext = Dispatchers.Default
 ): Result<ByteArray, FuelError> = awaitByteArrayResponse(scope).third
 
 /**
@@ -99,7 +94,7 @@ suspend fun Request.awaitByteArrayResult(
  */
 suspend fun Request.awaitStringResult(
         charset: Charset = Charsets.UTF_8,
-        scope: CoroutineContext = CommonPool
+        scope: CoroutineContext = Dispatchers.Default
 ): Result<String, FuelError> = awaitStringResponse(charset, scope).third
 
 
@@ -113,7 +108,7 @@ suspend fun Request.awaitStringResult(
  */
 suspend fun <U : Any> Request.awaitObjectResult(
         deserializable: ResponseDeserializable<U>,
-        scope: CoroutineContext = CommonPool
+        scope: CoroutineContext = Dispatchers.Default
 ): Result<U, FuelError> = try {
     await(deserializable, scope).third
 } catch (e: Exception) {
