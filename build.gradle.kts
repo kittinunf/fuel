@@ -7,26 +7,15 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-        google()
-        maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
-        maven(url = "https://kotlin.bintray.com/kotlinx")
-        maven(url = "http://dl.bintray.com/kotlin/kotlin-eap")
-    }
-
-    dependencies {
-        classpath(Plugins.android)
-        classpath(Plugins.jacocoAndroid)
-        classpath(Plugins.bintray)
-        classpath(Plugins.kotlin)
-        classpath(Plugins.serialization)
-    }
+plugins {
+    java
+//    kotlin("jvm") version Versions.kotlinVersion apply false
+    id(PluginID.kotlinJvm) version Versions.kotlinVersion apply false
+    id(PluginID.androidLib) version "3.1.3" apply false
+    id(PluginID.jacocoAndroid) version "0.1.3" apply false
+    id(PluginID.bintrayRelease) version "0.8.0" apply false
+    id(PluginID.serialization) version Versions.kotlinVersion apply false
 }
-
-plugins { java }
 
 allprojects {
     repositories {
@@ -82,10 +71,10 @@ subprojects {
 
     if (isAndroidModule) {
         apply {
-            plugin("com.android.library")
-            plugin("kotlin-android")
-            plugin("kotlin-android-extensions")
-            plugin("jacoco-android")
+            plugin(PluginID.androidLib)
+            plugin(PluginID.kotlinAndroid)
+            plugin(PluginID.kotlinAndroidExtensions)
+            plugin(PluginID.jacocoAndroid)
         }
 
         configure<BaseExtension> {
@@ -133,7 +122,7 @@ subprojects {
 
     if (!isSample) {
         apply {
-            plugin("com.novoda.bintray-release")
+            plugin(PluginID.bintrayRelease)
         }
 
         configure<PublishExtension> {
