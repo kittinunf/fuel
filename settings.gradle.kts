@@ -8,19 +8,19 @@ pluginManagement {
     }
     resolutionStrategy {
         eachPlugin {
-            if (requested.id.id == PluginID.kotlinJvm) {
+            if (requested.id.id == Plugins.kotlinJvm) {
                 useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
             }
-            if(requested.id.id == PluginID.androidLib) {
+            if(requested.id.id == Plugins.androidLib) {
                 useModule("com.android.tools.build:gradle:${requested.version}")
             }
-            if(requested.id.id == PluginID.jacocoAndroid) {
+            if(requested.id.id == Plugins.jacocoAndroid) {
                 useModule("com.dicedmelon.gradle:jacoco-android:${requested.version}")
             }
-            if(requested.id.id == PluginID.bintrayRelease) {
+            if(requested.id.id == Plugins.bintrayRelease) {
                 useModule("com.novoda:bintray-release:${requested.version}")
             }
-            if(requested.id.id == PluginID.serialization) {
+            if(requested.id.id == Plugins.serialization) {
                 useModule("org.jetbrains.kotlin:kotlin-serialization:${requested.version}")
             }
         }

@@ -10,11 +10,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     java
 //    kotlin("jvm") version Versions.kotlinVersion apply false
-    id(PluginID.kotlinJvm) version Versions.kotlinVersion apply false
-    id(PluginID.androidLib) version "3.1.3" apply false
-    id(PluginID.jacocoAndroid) version "0.1.3" apply false
-    id(PluginID.bintrayRelease) version "0.8.0" apply false
-    id(PluginID.serialization) version Versions.kotlinVersion apply false
+    id(Plugins.kotlinJvm) version Versions.kotlinVersion apply false
+    id(Plugins.androidLib) version "3.1.3" apply false
+    id(Plugins.jacocoAndroid) version "0.1.3" apply false
+    id(Plugins.bintrayRelease) version "0.8.0" apply false
+    id(Plugins.serialization) version Versions.kotlinVersion apply false
 }
 
 allprojects {
@@ -71,10 +71,10 @@ subprojects {
 
     if (isAndroidModule) {
         apply {
-            plugin(PluginID.androidLib)
-            plugin(PluginID.kotlinAndroid)
-            plugin(PluginID.kotlinAndroidExtensions)
-            plugin(PluginID.jacocoAndroid)
+            plugin(Plugins.androidLib)
+            plugin(Plugins.kotlinAndroid)
+            plugin(Plugins.kotlinAndroidExtensions)
+            plugin(Plugins.jacocoAndroid)
         }
 
         configure<BaseExtension> {
@@ -122,7 +122,7 @@ subprojects {
 
     if (!isSample) {
         apply {
-            plugin(PluginID.bintrayRelease)
+            plugin(Plugins.bintrayRelease)
         }
 
         configure<PublishExtension> {

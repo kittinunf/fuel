@@ -1,6 +1,6 @@
 plugins {
     java
-    id(PluginID.serialization)
+    id(Plugins.serialization)
 }
 
 repositories {

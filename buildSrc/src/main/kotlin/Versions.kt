@@ -13,7 +13,7 @@ object Versions {
     const val gsonVersion = "2.8.2"
     const val jacksonVersion = "2.9.6"
     const val kotlinCoroutinesVersion = "0.30.1-eap13"
-    const val kotlinxSerialization = "0.6.2"
+    const val kotlinxSerialization = "0.8.0-rc13"
     const val moshiVersion = "1.6.0"
     const val reactorVersion = "3.2.0.M4"
     const val rxjavaVersion = "2.1.13"
