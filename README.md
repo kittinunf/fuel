@@ -1,6 +1,6 @@
 # Fuel
 
-[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.2.51-blue.svg)](http://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
+[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.2.51-blue.svg)](https://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
 [![Codecov](https://codecov.io/github/kittinunf/Fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/Fuel)
 
 The easiest HTTP networking library for Kotlin/Android.
@@ -18,7 +18,7 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Support response deserialization into plain old object (both Kotlin & Java)
 - [x] Automatically invoke handler on Android Main Thread when using Android Module
 - [x] Special test mode for easier testing
-- [x] RxJava 2.x support out of the box
+- [x] Support for reactive programming via RxJava 2.x and Project Reactor 3.x
 - [x] Google Components [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) support
 - [x] Built-in object serialization module (Gson, Jackson, Moshi, Forge) :sparkles:
 - [x] Support Kotlin's [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) module
@@ -46,6 +46,10 @@ The easiest HTTP networking library for Kotlin/Android.
 
 * [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) - Kotlin Coroutines - Library support for Kotlin coroutines
 
+### Dependency - fuel-kotlinx-serialization
+
+* [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization) - Kotlinx Serialization - Kotlin cross-platform / multi-format serialization
+
 ### Dependency - fuel-gson
 
 * [Gson](https://github.com/google/gson) - Gson - A Java serialization/deserialization library to convert Java Objects into JSON and back
@@ -61,6 +65,10 @@ The easiest HTTP networking library for Kotlin/Android.
 ### Dependency - fuel-forge
 
 * [Forge](https://github.com/kittinunf/Forge/) - Forge - Functional style JSON parsing written in Kotlin
+
+### Dependency - fuel-reactor
+
+* [Project Reactor](https://github.com/reactor/reactor-core) - Project Reactor - Implementation of Reactive Streams standard
 
 ### Gradle
 
@@ -79,6 +87,7 @@ dependencies {
     compile 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>' //for Jackson support
     compile 'com.github.kittinunf.fuel:fuel-moshi:<latest-version>' //for Moshi support
     compile 'com.github.kittinunf.fuel:fuel-forge:<latest-version>' //for Forge support
+    compile 'com.github.kittinunf.fuel:fuel-reactor:<latest-version>' //for Reactor support
 }
 ```
 
@@ -93,7 +102,7 @@ dependencies {
 * Kotlin
 ``` Kotlin
 //an extension over string (support GET, PUT, POST, DELETE with httpGet(), httpPut(), httpPost(), httpDelete())
-"http://httpbin.org/get".httpGet().responseString { request, response, result ->
+"https://httpbin.org/get".httpGet().responseString { request, response, result ->
   //do something with response
   when (result) {
     is Result.Failure -> {
@@ -106,9 +115,9 @@ dependencies {
 }
 
 //if we set baseURL beforehand, simply use relativePath
-FuelManager.instance.basePath = "http://httpbin.org"
+FuelManager.instance.basePath = "https://httpbin.org"
 "/get".httpGet().responseString { request, response, result ->
-    //make a GET to http://httpbin.org/get and do something with response
+    //make a GET to https://httpbin.org/get and do something with response
     val (data, error) = result
     if (error == null) {
         //do something when success
@@ -119,7 +128,7 @@ FuelManager.instance.basePath = "http://httpbin.org"
 
 //if you prefer this a little longer way, you can always do
 //get
-Fuel.get("http://httpbin.org/get").responseString { request, response, result ->
+Fuel.get("https://httpbin.org/get").responseString { request, response, result ->
 	//do something with response
 	result.fold({ d ->
 	    //do something with data
@@ -133,7 +142,7 @@ Fuel.get("http://httpbin.org/get").responseString { request, response, result ->
 * Java
 ``` Java
 //get
-Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
+Fuel.get("https://httpbin.org/get", params).responseString(new Handler<String>() {
     @Override
     public void failure(Request request, Response response, FuelError error) {
     	//do something when it is failure
@@ -151,13 +160,13 @@ You can also wait for the response. It returns the same parameters as the async 
 
 * Kotlin
 ``` Kotlin
-val (request, response, result) = "http://httpbin.org/get".httpGet().responseString() // result is Result<String, FuelError>
+val (request, response, result) = "https://httpbin.org/get".httpGet().responseString() // result is Result<String, FuelError>
 ```
 
 * Java
 ``` Java
 try {
-    Triple<Request, Response, String> data = Fuel.get("http://www.google.com").responseString();
+    Triple<Request, Response, String> data = Fuel.get("https://www.google.com").responseString();
     Request request = data.getFirst();
     Response response = data.getSecond();
     Result<String,FuelError> text = data.getThird();
@@ -172,7 +181,7 @@ try {
 ### GET
 
 ``` Kotlin
-Fuel.get("http://httpbin.org/get").response { request, response, result ->
+Fuel.get("https://httpbin.org/get").response { request, response, result ->
     println(request)
     println(response)
     val (bytes, error) = result
@@ -187,7 +196,7 @@ Fuel.get("http://httpbin.org/get").response { request, response, result ->
 
 * [Result](https://github.com/kittinunf/Result) is a functional style data structure that represents data that contains result of *Success* or *Failure* but not both. It represents the result of an action that can be success (with result) or error.
 
-* Working with result is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L324), [*destructure*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L266) as because it is just a [data class](http://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *Success* or *Failure*.
+* Working with result is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L324), [*destructure*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L266) as because it is just a [data class](https://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *Success* or *Failure*.
 
 ### Response
 ``` Kotlin
@@ -216,44 +225,64 @@ fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Reques
 ### POST
 
 ``` Kotlin
-Fuel.post("http://httpbin.org/post").response { request, response, result ->
+Fuel.post("https://httpbin.org/post").response { request, response, result ->
 }
 
 //if you have body to post it manually
-Fuel.post("http://httpbin.org/post").jsonBody("{ \"foo\" : \"bar\" }").response { request, response, result ->
+Fuel.post("https://httpbin.org/post").jsonBody("{ \"foo\" : \"bar\" }").response { request, response, result ->
 }
 ```
 
 ### PUT
 
 ``` Kotlin
-Fuel.put("http://httpbin.org/put").response { request, response, result ->
+Fuel.put("https://httpbin.org/put").response { request, response, result ->
 }
 ```
 
 ### DELETE
 
 ``` Kotlin
-Fuel.delete("http://httpbin.org/delete").response { request, response, result ->
+Fuel.delete("https://httpbin.org/delete").response { request, response, result ->
 }
 ```
 
 ### HEAD
 
 ``` Kotlin
-Fuel.head("http://httpbin.org/get").response { request, response, result ->
+Fuel.head("https://httpbin.org/get").response { request, response, result ->
    // request body should be empty.
 }
 ```
 
 ### PATCH
-* The default `client` is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](http://developer.android.com/reference/java/net/HttpURLConnection.html). [`java.net.HttpUrlConnnection`](http://developer.android.com/reference/java/net/HttpURLConnection.html) does not support a [`PATCH`](http://download.java.net/jdk7/archive/b123/docs/api/java/net/HttpURLConnection.html#setRequestMethod(java.lang.String)) method. [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) converts `PATCH` requests to a `POST` request and adds a `X-HTTP-Method-Override: PATCH` header. While this is a semi-standard industry practice not all APIs are configured to accept this header by default.
+* The default `client` is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html) does not support a [`PATCH`](https://download.java.net/jdk7/archive/b123/docs/api/java/net/HttpURLConnection.html#setRequestMethod(java.lang.String)) method. [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) converts `PATCH` requests to a `POST` request and adds a `X-HTTP-Method-Override: PATCH` header. While this is a semi-standard industry practice not all APIs are configured to accept this header by default.
 
 ``` Kotlin
-Fuel.patch("http://httpbin.org/patch").response { request, response, result ->
+Fuel.patch("https://httpbin.org/patch").response { request, response, result ->
    // request body should be empty.
 }
 ```
+
+### CONNECT
+Connect is not supported by the Java JVM via the regular HTTP clients, and is therefore not supported.
+
+### OPTIONS
+There are no convenience methods for making an OPTIONS request, but you can still make one directly:
+
+``` Kotlin
+Fuel.request(Method.OPTIONS, "https://httpbin.org/anything").response { request, response, result ->
+}
+```
+
+### TRACE
+There are no convenience methods for making an TRACE request, but you can still make one directly:
+
+``` Kotlin
+Fuel.request(Method.TRACE, "https://httpbin.org/anything").response { request, response, result ->
+}
+```
+
 
 ### Debug Logging
 * Use `toString()` method to Log (request|response)
@@ -265,14 +294,14 @@ Log.d("log", request.toString())
 ```
 //print and header detail
 //request
---> GET (http://httpbin.org/get?key=value)
+--> GET (https://httpbin.org/get?key=value)
     Body : (empty)
     Headers : (2)
     Accept-Encoding : compress;q=0.5, gzip;q=1.0
     Device : Android
 
 //response
-<-- 200 (http://httpbin.org/get?key=value)
+<-- 200 (https://httpbin.org/get?key=value)
 ```
 
 * Also support cUrl string to Log request, make it very easy to cUrl on command line
@@ -283,7 +312,7 @@ Log.d("cUrl log", request.cUrlString())
 
 ``` Bash
 //print
-curl -i -X POST -d "foo=foo&bar=bar&key=value" -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" -H "Device:Android" -H "Content-Type:application/x-www-form-urlencoded" "http://httpbin.org/post"
+curl -i -X POST -d "foo=foo&bar=bar&key=value" -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" -H "Device:Android" -H "Content-Type:application/x-www-form-urlencoded" "https://httpbin.org/post"
 ```
 
 ### Parameter Support
@@ -291,31 +320,31 @@ curl -i -X POST -d "foo=foo&bar=bar&key=value" -H "Accept-Encoding:compress;q=0.
 * URL encoded style for GET & DELETE request
 
 ``` Kotlin
-Fuel.get("http://httpbin.org/get", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result -> {
-    //resolve to http://httpbin.org/get?foo=foo&bar=bar
+Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result -> {
+    //resolve to https://httpbin.org/get?foo=foo&bar=bar
 }
 
-Fuel.delete("http://httpbin.org/delete", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
-    //resolve to http://httpbin.org/delete?foo=foo&bar=bar
+Fuel.delete("https://httpbin.org/delete", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
+    //resolve to https://httpbin.org/delete?foo=foo&bar=bar
 }
 ```
 
 * Array support for GET requests
 
 ``` Kotlin
-Fuel.get("http://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey"))).response { request, response, result -> {
-    //resolve to http://httpbin.org/get?foo=foo&dwarf[]=grumpy&dwarf[]=happy&dwarf[]=sleepy&dwarf[]=dopey
+Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey"))).response { request, response, result -> {
+    //resolve to https://httpbin.org/get?foo=foo&dwarf[]=grumpy&dwarf[]=happy&dwarf[]=sleepy&dwarf[]=dopey
 }
 ```
 
 * Support x-www-form-urlencoded for PUT & POST
 
 ``` Kotlin
-Fuel.post("http://httpbin.org/post", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
+Fuel.post("https://httpbin.org/post", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
     //http body includes foo=foo&bar=bar
 }
 
-Fuel.put("http://httpbin.org/put", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
+Fuel.put("https://httpbin.org/put", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
     //http body includes foo=foo&bar=bar
 }
 ```
@@ -329,14 +358,14 @@ Default read timeout for a request is 15000 milliseconds.
 val timeout = 5000 // 5000 milliseconds = 5 seconds.
 val timeoutRead = 60000 // 60000 milliseconds = 1 minute.
 
-"http://httpbin.org/get".httpGet().timeout(timeout).timeoutRead(timeoutRead).responseString { request, response, result -> }
+"https://httpbin.org/get".httpGet().timeout(timeout).timeoutRead(timeoutRead).responseString { request, response, result -> }
 ```
 
 * Java
 ``` Java
 int timeout = 5000 // 5000 milliseconds = 5 seconds.
 int timeoutRead = 60000 // 60000 milliseconds = 1 minute.
-Fuel.get("http://httpbin.org/get", params).timeout(timeout).timeoutRead(timeoutRead).responseString(new Handler<String>() {
+Fuel.get("https://httpbin.org/get", params).timeout(timeout).timeoutRead(timeoutRead).responseString(new Handler<String>() {
     @Override
     public void failure(Request request, Response response, FuelError error) {
     	//do something when it is failure
@@ -351,13 +380,13 @@ Fuel.get("http://httpbin.org/get", params).timeout(timeout).timeoutRead(timeoutR
 
 ### Download with or without progress handler
 ``` Kotlin
-Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
+Fuel.download("https://httpbin.org/bytes/32768").destination { response, url ->
     File.createTempFile("temp", ".tmp")
 }.response { req, res, result ->
 
 }
 
-Fuel.download("http://httpbin.org/bytes/32768").destination { response, url ->
+Fuel.download("https://httpbin.org/bytes/32768").destination { response, url ->
     File.createTempFile("temp", ".tmp")
 }.progress { readBytes, totalBytes ->
     val progress = readBytes.toFloat() / totalBytes.toFloat()
@@ -378,7 +407,7 @@ Fuel.upload("/post").source { request, url ->
 Fuel.upload("/put", Method.PUT).source { request, url ->
     File.createTempFile("temp", ".tmp");
 }.responseString { request, response, result ->
-    // calls to http://example.com/api/put with PUT
+    // calls to https://example.com/api/put with PUT
 
 }
 
@@ -434,7 +463,7 @@ Fuel.upload("/post").blob { request, url ->
 val username = "username"
 val password = "abcd1234"
 
-Fuel.get("http://httpbin.org/basic-auth/$user/$password").authenticate(username, password).response { request, response, result ->
+Fuel.get("https://httpbin.org/basic-auth/$user/$password").authenticate(username, password).response { request, response, result ->
 }
 ```
 
@@ -446,7 +475,7 @@ Fuel.get("http://httpbin.org/basic-auth/$user/$password").authenticate(username,
 
 * If one wants to cancel on-going request, one could call `cancel` on the request object
 ``` Kotlin
-val request = Fuel.get("http://httpbin.org/get").response { request, response, result ->
+val request = Fuel.get("https://httpbin.org/get").response { request, response, result ->
     // if request is cancelled successfully, response callback will not be called. Interrupt callback (if provided) will be called instead
 }
 
@@ -456,7 +485,7 @@ request.cancel() //this will cancel on-going request
 
 * Also, interrupt request can be further processed with interrupt callback
 ``` Kotlin
-val request = Fuel.get("http://httpbin.org/get").interrupt { request ->
+val request = Fuel.get("https://httpbin.org/get").interrupt { request ->
     println("${request.url} was interrupted and cancelled")
 }.response { request, response, result ->
     // if request is cancelled successfully, response callback will not be called. Interrupt callback (if provided) will be called instead
@@ -485,7 +514,7 @@ data class User(val firstName: String = "",
 }
 
 //Use httpGet extension
-"http://www.example.com/user/1".httpGet().responseObject(User.Deserializer()) { req, res, result ->
+"https://www.example.com/user/1".httpGet().responseObject(User.Deserializer()) { req, res, result ->
     //result is of type Result<User, Exception>
     val (user, err) = result
 
@@ -506,6 +535,52 @@ data class HttpBinUserAgentModel(var userAgent: String = "")
 Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel> { _, _, result ->
 }
 ```
+
+### Deserialization using kotlinx.serialzationn
+
+_requires the [kotlinx-serialization extension](#dependency---fuel-kotlinx-serialization)_
+_requires [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization#gradlejvm)_
+
+
+```kotlin
+@Serializable
+data class HttpBinUserAgentModel(var userAgent: String = "")
+
+Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel> { _, _, result ->
+}
+```
+
+this is by default strict and will reject unknown keys, for that you can pass a custom JSOn instance
+
+JSON(nonstrict = true)
+```kotlin
+@Serializable
+data class HttpBinUserAgentModel(var userAgent: String = "")
+
+Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel>(json = JSON(nonstrict = true)) { _, _, result ->
+}
+```
+
+kotlinx.serialization can not always guess the correct serialzer to use, when generics are involved for example
+
+```kotlin
+@Serializable
+data class HttpBinUserAgentModel(var userAgent: String = "")
+
+Fuel.get("/list/user-agent").responseObject<HttpBinUserAgentModel>(loader = HttpBinUserAgentModel.serilaizer().list) { _, _, result ->
+}
+```
+
+it can be used with coroutines by using `kotlinxDeserilaizerOf()` it takes the same `json` and `loader` as parameters
+
+```kotlin
+@Serializable
+data class HttpBinUserAgentModel(var userAgent: String = "")
+
+Fuel.get("/user-agent").awaitResponseObject<HttpBinUserAgentModel>(kotlinxDeserializerOf()) { _, _, result ->
+}
+```
+
 
 * There are 4 methods to support response deserialization depending on your needs (also depending on JSON parsing library of your choice), and you are required to implement only one of them.
 
@@ -528,7 +603,6 @@ object Windows1255StringDeserializer : ResponseDeserializable<String> {
         }
     }
 ```
-
 ### Configuration
 
 * Use singleton `FuelManager.instance` to manage global configurations.
@@ -576,7 +650,7 @@ Fuel.get("/get").response { request, response, result ->
 }
 ```
 
-* `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](http://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/core/Client.kt) protocol, and set back to `FuelManager.instance` to kick off the effect.
+* `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/core/Client.kt) protocol, and set back to `FuelManager.instance` to kick off the effect.
 
 * `keyStore` is configurable by user. By default it is `null`.
 
@@ -610,7 +684,7 @@ inline fun <reified T> DbResponseInterceptor() =
         }
 
 manager.addResponseInterceptor(DBResponseInterceptor<Dog>)
-manager.request(Method.GET, "http://www.example.com/api/dog/1").response() // Db interceptor will be called to intercept data and save into Database of your choice
+manager.request(Method.GET, "https://www.example.com/api/dog/1").response() // Db interceptor will be called to intercept data and save into Database of your choice
 ```
 
 ### Test mode
@@ -630,7 +704,7 @@ In order to disable test mode, just call `Fuel.regularMode()`
 * Fuel supports [RxJava](https://github.com/ReactiveX/RxJava) right off the box.
 
 ``` Kotlin
-"http://www.example.com/photos/1".httpGet().rx_object(Photo.Deserializer()).subscribe {
+"https://www.example.com/photos/1".httpGet().rx_object(Photo.Deserializer()).subscribe {
 	//do something
 }
 ```
@@ -785,6 +859,48 @@ runBlocking {
 }
 ```
 
+### Project Reactor
+
+The Reactor module API provides functions starting with the prefix `mono` to handle instances of `Response`, `Result<T, FuelError>` and values directly (`String`, `ByteArray`, `Any`). All functions expose exceptions as `FuelError` instance.
+
+**Data handling example**
+
+```kotlin
+Fuel.get("https://icanhazdadjoke.com")
+    .header("Accept" to "text/plain")
+    .monoString()
+    .subscribe(::println)
+```
+
+**Error handling example**
+
+```kotlin
+data class Guest(val name: String)
+
+object GuestMapper : ResponseDeserializable<Guest> {
+    override fun deserialize(content: String) =
+        jacksonObjectMapper().readValue<Guest>(content)
+}
+
+Fuel.get("/guestName").monoResultObject(GuestMapper)
+    .map(Result<Guest, FuelError>::get)
+    .map { (name) -> "Welcome to the party, $name!" }
+    .onErrorReturn("I'm sorry, your name is not on the list.")
+    .subscribe(::println)
+```
+
+**Response handling example**
+
+```kotlin
+FuelManager.instance.basePath = "https://httpbin.org"
+
+Fuel.get("/status/404").monoResponse()
+    .filter(Response::isSuccessful)
+    .switchIfEmpty(Fuel.get("/status/200").monoResponse())
+    .map(Response::statusCode)
+    .subscribe(::println)
+```
+
 ## Other libraries
 If you like Fuel, you might also like other libraries of mine;
 * [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
@@ -798,4 +914,4 @@ Fuel is brought to you by [contributors](https://github.com/kittinunf/Fuel/graph
 
 ## Licenses
 
-Fuel is released under the [MIT](http://opensource.org/licenses/MIT) license.
+Fuel is released under the [MIT](https://opensource.org/licenses/MIT) license.

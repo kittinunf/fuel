@@ -43,3 +43,5 @@ build
 *~
 *.swp
 *.log
+fuel/MockServerCertificate.pem
+fuel/MockServerPrivateKey.pem

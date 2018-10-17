@@ -22,14 +22,9 @@ inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.
 
 inline fun <reified T : Any> Request.responseObjects(noinline deserializer: JSON.() -> DeserializedResult<T>) = response(forgesDeserializerOf(deserializer))
 
-inline fun <reified T : Any> forgeDeserializerOf(noinline deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<T> {
-
+fun <T : Any> forgeDeserializerOf(deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<T> {
     override fun deserialize(content: String): T? = Forge.modelFromJson(content, deserializer).component1()
-
 }
-
-inline fun <reified T : Any> forgesDeserializerOf(noinline deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<List<T>> {
-
+fun <T : Any> forgesDeserializerOf(deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<List<T>> {
     override fun deserialize(content: String): List<T>? = Forge.modelsFromJson(content, deserializer).map { it.get<T>() }
-
 }

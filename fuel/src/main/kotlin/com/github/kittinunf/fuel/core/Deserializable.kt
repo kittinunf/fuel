@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.core.requests.AsyncTaskRequest
+import com.github.kittinunf.fuel.core.requests.SuspendingRequest
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import com.github.kittinunf.result.mapError
@@ -93,4 +94,16 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple
             }
 
     return Triple(this, response ?: Response.error(), result)
+}
+
+suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
+    val r = SuspendingRequest(taskRequest.request).awaitResult()
+    val res =
+        r.map {
+            deserializable.deserialize(it)
+        }.mapError {
+            it as? FuelError ?: FuelError(it)
+        }
+
+    return Triple(this, r.component1() ?: Response.error(), res)
 }

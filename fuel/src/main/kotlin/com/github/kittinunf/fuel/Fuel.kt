@@ -115,13 +115,36 @@ class Fuel {
         fun head(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.HEAD, convertible, parameters)
 
-        //request
-        private fun request(method: Method, path: String, parameters: List<Pair<String, Any?>>? = null): Request =
+        /**
+         * Convenience method to make a request
+         *
+         * @see Method
+         *
+         * @param method [Method] the HTTP method to make the request with
+         * @param path [String] the absolute url or relative path (to FuelManager.instance.basePath)
+         * @param parameters [List<Pair<String, Any?>>?] list of parameters
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun request(method: Method, path: String, parameters: List<Pair<String, Any?>>? = null): Request =
                 FuelManager.instance.request(method, path, parameters)
 
-        private fun request(method: Method, convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
+        /**
+         * Convenience method to make a request from a [com.github.kittinunf.fuel.Fuel.PathStringConvertible}
+         *
+         * @see Method
+         * @see Fuel.request(Method, String, List<Pair<String, Any?>>?)
+         *
+         * @param convertible [PathStringConvertible]
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun request(method: Method, convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(method, convertible.path, parameters)
 
+        /**
+         * Convenience method to make a request from a [com.github.kittinunf.fuel.Fuel.RequestConvertible}
+         */
         @JvmStatic
         fun request(convertible: RequestConvertible): Request = FuelManager.instance.request(convertible)
     }
@@ -129,11 +152,11 @@ class Fuel {
 
 @JvmOverloads
 fun String.httpGet(parameters: List<Pair<String, Any?>>? = null): Request = Fuel.get(this, parameters?.flatMap { pair ->
-    (pair.second as? Iterable<*> )?.let {
-        it.map { "${pair.first}[]" to it }.toList()
-    } ?: (pair.second as? Array<*> )?.let {
-        it.map { "${pair.first}[]" to it }.toList()
-    } ?: listOf(pair)
+    (pair.second as? Iterable<*> )?.map {
+        "${pair.first}[]" to it
+    }?.toList() ?: (pair.second as? Array<*> )?.map {
+        "${pair.first}[]" to it
+    }?.toList() ?: listOf(pair)
 })
 
 @JvmOverloads
