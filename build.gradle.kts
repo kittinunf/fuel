@@ -9,11 +9,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-//    kotlin("jvm") version Versions.kotlinVersion apply false
-    id(Plugins.kotlinJvm) version Versions.kotlinVersion apply false
-    id(Plugins.androidLib) version "3.1.3" apply false
-    id(Plugins.jacocoAndroid) version "0.1.3" apply false
-    id(Plugins.bintrayRelease) version "0.8.0" apply false
+    kotlin("jvm") version Versions.kotlinVersion apply false
+    id(Plugins.androidLib) version Versions.androidVersion apply false
+    id(Plugins.jacocoAndroid) version Versions.jacocoAndroidVersion apply false
+    id(Plugins.bintrayRelease) version Versions.bintrayReleaseVersion apply false
     id(Plugins.serialization) version Versions.kotlinVersion apply false
 }
 

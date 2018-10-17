@@ -7,6 +7,11 @@ object Versions {
     const val resultVersion = "1.5.0"
     const val jsonVersion = "20170516"
 
+    // Plugin Versions
+    const val androidVersion = "3.1.3"
+    const val jacocoAndroidVersion = "0.1.3"
+    const val bintrayReleaseVersion = "0.8.0"
+
     // Modules dependencies
     const val androidArchVersion = "1.1.1"
     const val forgeVersion = "0.3.0"
