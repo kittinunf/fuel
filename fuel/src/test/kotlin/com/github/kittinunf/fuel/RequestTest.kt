@@ -240,6 +240,37 @@ class RequestTest : MockHttpTestCase() {
     }
 
     @Test
+    fun httpGetRequestWithParametersAndBody() {
+        val paramKey = "foo"
+        val paramValue = "bar"
+        val body = "{ $paramKey : $paramValue }"
+
+        mock.chain(
+                request = mock.request().withMethod(Method.GET.value).withPath("/get"),
+                response = mock.reflect()
+        )
+
+        val (request, response, result)
+                = manager.request(Method.GET, mock.path("get"), listOf(paramKey to paramValue))
+                .body(body)
+                .responseString()
+
+        val (data, error) = result
+        val string = data as String
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response.statusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString(paramKey))
+        assertThat(string, containsString(paramValue))
+    }
+
+    @Test
     fun httpPostRequestWithParameters() {
         val paramKey = "foo"
         val paramValue = "bar"

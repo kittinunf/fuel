@@ -113,6 +113,5 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
     private fun setDoOutput(connection: HttpURLConnection, method: Method) = when (method) {
         Method.HEAD, Method.OPTIONS, Method.TRACE -> connection.doOutput = false
         Method.GET, Method.DELETE, Method.POST, Method.PUT, Method.PATCH -> connection.doOutput = true
-
     }
 }
