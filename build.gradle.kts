@@ -117,6 +117,8 @@ subprojects {
             html.enabled(true)
             xml.enabled(true)
         }
+
+        tasks.withType<Javadoc>().all { enabled = false }
     }
 
     if (!isSample) {
