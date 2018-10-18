@@ -1,10 +1,10 @@
 object Versions {
     // Library version
-    const val publishVersion = "1.15.0"
+    const val publishVersion = "1.16.0"
 
     // Core dependencies
     const val kotlinVersion = "1.3.0-rc-146"
-    const val resultVersion = "1.5.0"
+    const val resultVersion = "1.6.0"
     const val jsonVersion = "20170516"
 
     // Modules dependencies
