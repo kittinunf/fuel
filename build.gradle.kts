@@ -7,26 +7,14 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-        google()
-        maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
-        maven(url = "https://kotlin.bintray.com/kotlinx")
-        maven(url = "http://dl.bintray.com/kotlin/kotlin-eap")
-    }
-
-    dependencies {
-        classpath(Plugins.android)
-        classpath(Plugins.jacocoAndroid)
-        classpath(Plugins.bintray)
-        classpath(Plugins.kotlin)
-        classpath(Plugins.serialization)
-    }
+plugins {
+    java
+    kotlin("jvm") version Kotlin.version apply false
+    id(Android.libPlugin) version Android.version apply false
+    id(Jacoco.Android.plugin) version Jacoco.Android.version apply false
+    id(BintrayRelease.plugin) version BintrayRelease.version apply false
+    id(KotlinX.Serialization.plugin) version Kotlin.version apply false
 }
-
-plugins { java }
 
 allprojects {
     repositories {
@@ -48,17 +36,17 @@ subprojects {
     if (isJvmModule) {
         apply {
             plugin("java")
-            plugin("kotlin")
-            plugin("jacoco")
+            plugin(Kotlin.plugin)
+            plugin(Jacoco.plugin)
         }
 
         configure<JacocoPluginExtension> {
-            toolVersion = Versions.jacocoVersion
+            toolVersion = Jacoco.version
         }
 
         dependencies {
-            compile(Dependencies.kotlinStdlib)
-            testCompile(Dependencies.junit)
+            compile(Kotlin.stdlib)
+            testCompile(JUnit.dependency)
         }
 
         configure<JavaPluginConvention> {
@@ -82,20 +70,20 @@ subprojects {
 
     if (isAndroidModule) {
         apply {
-            plugin("com.android.library")
-            plugin("kotlin-android")
-            plugin("kotlin-android-extensions")
-            plugin("jacoco-android")
+            plugin(Android.libPlugin)
+            plugin(Kotlin.androidPlugin)
+            plugin(Kotlin.androidExtensionsPlugin)
+            plugin(Jacoco.Android.plugin)
         }
 
         configure<BaseExtension> {
-            compileSdkVersion(Versions.fuelCompileSdkVersion)
+            compileSdkVersion(Fuel.compileSdkVersion)
 
             defaultConfig {
-                minSdkVersion(Versions.fuelMinSdkVersion)
-                targetSdkVersion(Versions.fuelCompileSdkVersion)
+                minSdkVersion(Fuel.minSdkVersion)
+                targetSdkVersion(Fuel.compileSdkVersion)
                 versionCode = 1
-                versionName = Versions.publishVersion
+                versionName = Fuel.publishVersion
             }
 
             sourceSets {
@@ -135,7 +123,7 @@ subprojects {
 
     if (!isSample) {
         apply {
-            plugin("com.novoda.bintray-release")
+            plugin(BintrayRelease.plugin)
         }
 
         configure<PublishExtension> {
@@ -144,7 +132,7 @@ subprojects {
             desc = "The easiest HTTP networking library in Kotlin/Android"
             groupId = "com.github.kittinunf.fuel"
             setLicences("MIT")
-            publishVersion = Versions.publishVersion
+            publishVersion = Fuel.publishVersion
             uploadName = "Fuel-Android"
             website = "https://github.com/kittinunf/Fuel"
         }

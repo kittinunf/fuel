@@ -1,7 +1,6 @@
-plugins { java }
-
-apply {
-    plugin("kotlinx-serialization")
+plugins {
+    java
+    id(KotlinX.Serialization.plugin)
 }
 
 repositories {
@@ -11,6 +10,6 @@ repositories {
 
 dependencies {
     compile(project(":fuel"))
-    compile(Dependencies.serialization)
-    testCompile(Dependencies.mockServer)
+    compile(KotlinX.Serialization.dependency)
+    testCompile(MockServer.dependency)
 }
