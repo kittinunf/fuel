@@ -9,11 +9,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-    kotlin("jvm") version Versions.kotlinVersion apply false
-    id(Plugins.androidLib) version Versions.androidVersion apply false
-    id(Plugins.jacocoAndroid) version Versions.jacocoAndroidVersion apply false
-    id(Plugins.bintrayRelease) version Versions.bintrayReleaseVersion apply false
-    id(Plugins.serialization) version Versions.kotlinVersion apply false
+    kotlin("jvm") version Kotlin.version apply false
+    id(Android.libPlugin) version Android.version apply false
+    id(Jacoco.Android.plugin) version Jacoco.Android.version apply false
+    id(BintrayRelease.plugin) version BintrayRelease.version apply false
+    id(KotlinX.Serialization.plugin) version Kotlin.version apply false
 }
 
 allprojects {
@@ -36,17 +36,17 @@ subprojects {
     if (isJvmModule) {
         apply {
             plugin("java")
-            plugin("kotlin")
-            plugin("jacoco")
+            plugin(Kotlin.plugin)
+            plugin(Jacoco.plugin)
         }
 
         configure<JacocoPluginExtension> {
-            toolVersion = Versions.jacocoVersion
+            toolVersion = Jacoco.version
         }
 
         dependencies {
-            compile(Dependencies.kotlinStdlib)
-            testCompile(Dependencies.junit)
+            compile(Kotlin.stdlib)
+            testCompile(JUnit.dependency)
         }
 
         configure<JavaPluginConvention> {
@@ -70,20 +70,20 @@ subprojects {
 
     if (isAndroidModule) {
         apply {
-            plugin(Plugins.androidLib)
-            plugin(Plugins.kotlinAndroid)
-            plugin(Plugins.kotlinAndroidExtensions)
-            plugin(Plugins.jacocoAndroid)
+            plugin(Android.libPlugin)
+            plugin(Kotlin.androidPlugin)
+            plugin(Kotlin.androidExtensionsPlugin)
+            plugin(Jacoco.Android.plugin)
         }
 
         configure<BaseExtension> {
-            compileSdkVersion(Versions.fuelCompileSdkVersion)
+            compileSdkVersion(Fuel.compileSdkVersion)
 
             defaultConfig {
-                minSdkVersion(Versions.fuelMinSdkVersion)
-                targetSdkVersion(Versions.fuelCompileSdkVersion)
+                minSdkVersion(Fuel.minSdkVersion)
+                targetSdkVersion(Fuel.compileSdkVersion)
                 versionCode = 1
-                versionName = Versions.publishVersion
+                versionName = Fuel.publishVersion
             }
 
             sourceSets {
@@ -123,7 +123,7 @@ subprojects {
 
     if (!isSample) {
         apply {
-            plugin(Plugins.bintrayRelease)
+            plugin(BintrayRelease.plugin)
         }
 
         configure<PublishExtension> {
@@ -132,7 +132,7 @@ subprojects {
             desc = "The easiest HTTP networking library in Kotlin/Android"
             groupId = "com.github.kittinunf.fuel"
             setLicences("MIT")
-            publishVersion = Versions.publishVersion
+            publishVersion = Fuel.publishVersion
             uploadName = "Fuel-Android"
             website = "https://github.com/kittinunf/Fuel"
         }

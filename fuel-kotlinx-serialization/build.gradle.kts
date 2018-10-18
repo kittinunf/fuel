@@ -1,6 +1,6 @@
 plugins {
     java
-    id(Plugins.serialization)
+    id(KotlinX.Serialization.plugin)
 }
 
 repositories {
@@ -10,6 +10,6 @@ repositories {
 
 dependencies {
     compile(project(":fuel"))
-    compile(Dependencies.serialization)
-    testCompile(Dependencies.mockServer)
+    compile(KotlinX.Serialization.dependency)
+    testCompile(MockServer.dependency)
 }

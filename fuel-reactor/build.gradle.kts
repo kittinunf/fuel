@@ -4,8 +4,8 @@ repositories {
 
 dependencies {
     compile(project(":fuel"))
-    compile(Dependencies.reactorCore)
-    testCompile(Dependencies.reactorTest)
-    testCompile(Dependencies.mockServer)
+    compile(Reactor.core)
+    testCompile(Reactor.test)
+    testCompile(MockServer.dependency)
     testCompile(project(":fuel-jackson"))
 }

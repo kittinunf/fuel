@@ -3,16 +3,16 @@ import org.jetbrains.kotlin.gradle.dsl.Coroutines
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-android-extensions")
+    id(Android.appPlugin)
+    id(Kotlin.androidPlugin)
+    id(Kotlin.androidExtensionsPlugin)
 }
 
 dependencies {
-    implementation(Dependencies.kotlinStdlib)
-    implementation(Dependencies.androidAppCompat)
-    implementation(Dependencies.kotlinCoroutinesAndroid)
-    implementation(Dependencies.rxJavaAndroid)
+    implementation(Kotlin.stdlib)
+    implementation(Android.Support.appCompat)
+    implementation(KotlinX.Coroutines.android)
+    implementation(RxJava.Android.dependency)
 
     api(project(":fuel-rxjava"))
     api(project(":fuel-android"))
@@ -20,20 +20,20 @@ dependencies {
     api(project(":fuel-gson"))
     api(project(":fuel-coroutines"))
 
-    androidTestImplementation(Dependencies.androidAnnotation)
-    androidTestImplementation(Dependencies.androidTestRunner)
-    androidTestImplementation(Dependencies.androidTestRules)
-    androidTestImplementation(Dependencies.androidEspressoCore)
-    androidTestImplementation(Dependencies.androidEspressoIntents)
+    androidTestImplementation(Android.Support.annotation)
+    androidTestImplementation(Android.Test.runner)
+    androidTestImplementation(Android.Test.rules)
+    androidTestImplementation(Android.Espresso.core)
+    androidTestImplementation(Android.Espresso.intents)
 }
 
 configure<BaseExtension> {
-    compileSdkVersion(Versions.fuelCompileSdkVersion)
+    compileSdkVersion(Fuel.compileSdkVersion)
 
     defaultConfig {
         applicationId = "com.example.fuel"
-        minSdkVersion(Versions.fuelMinSdkVersion)
-        targetSdkVersion(Versions.fuelCompileSdkVersion)
+        minSdkVersion(Fuel.minSdkVersion)
+        targetSdkVersion(Fuel.compileSdkVersion)
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
