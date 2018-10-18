@@ -4,7 +4,7 @@ object Versions {
 
     // Core dependencies
     const val kotlinVersion = "1.2.71"
-    const val resultVersion = "1.5.0"
+    const val resultVersion = "1.6.0"
     const val jsonVersion = "20170516"
 
     // Modules dependencies
