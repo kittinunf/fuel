@@ -1,6 +1,6 @@
 object Versions {
     // Library version
-    const val publishVersion = "1.15.0"
+    const val publishVersion = "1.15.1"
 
     // Core dependencies
     const val kotlinVersion = "1.2.71"
