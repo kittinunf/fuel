@@ -1,7 +1,7 @@
 plugins { java }
 
 dependencies {
-    compile(Dependencies.result)
-    testCompile(Dependencies.json)
-    testCompile(Dependencies.mockServer)
+    compile(Result.dependency)
+    testCompile(Json.dependency)
+    testCompile(MockServer.dependency)
 }

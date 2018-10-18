@@ -1,7 +1,7 @@
 dependencies {
     api(project(":fuel"))
-    implementation(Dependencies.kotlinStdlib)
-    testImplementation(Dependencies.robolectric)
-    testImplementation(Dependencies.junit)
-    testCompile(Dependencies.mockServer)
+    implementation(Kotlin.stdlib)
+    testImplementation(RoboElectric.dependency)
+    testImplementation(JUnit.dependency)
+    testCompile(MockServer.dependency)
 }
