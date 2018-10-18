@@ -7,13 +7,18 @@ object Versions {
     const val resultVersion = "1.6.0"
     const val jsonVersion = "20170516"
 
+    // Plugin Versions
+    const val androidVersion = "3.1.3"
+    const val jacocoAndroidVersion = "0.1.3"
+    const val bintrayReleaseVersion = "0.8.0"
+
     // Modules dependencies
     const val androidArchVersion = "1.1.1"
     const val forgeVersion = "0.3.0"
     const val gsonVersion = "2.8.2"
     const val jacksonVersion = "2.9.6"
     const val kotlinCoroutinesVersion = "0.30.1-eap13"
-    const val kotlinxSerialization = "0.6.2"
+    const val kotlinxSerialization = "0.8.0-rc13"
     const val moshiVersion = "1.6.0"
     const val reactorVersion = "3.2.0.M4"
     const val rxjavaVersion = "2.1.13"
