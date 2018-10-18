@@ -1,7 +1,9 @@
 object Plugins {
-    const val android = "com.android.tools.build:gradle:3.1.3"
-    const val jacocoAndroid = "com.dicedmelon.gradle:jacoco-android:0.1.3"
-    const val bintray = "com.novoda:bintray-release:0.8.0"
-    const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}"
-    const val serialization = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlinVersion}"
+    const val kotlinJvm = "org.jetbrains.kotlin.jvm"
+    const val kotlinAndroid = "kotlin-android"
+    const val kotlinAndroidExtensions = "kotlin-android-extensions"
+    const val androidLib = "com.android.library"
+    const val jacocoAndroid = "jacoco-android"
+    const val bintrayRelease = "com.novoda.bintray-release"
+    const val serialization = "kotlinx-serialization"
 }

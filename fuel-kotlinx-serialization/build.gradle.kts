@@ -1,7 +1,6 @@
-plugins { java }
-
-apply {
-    plugin("kotlinx-serialization")
+plugins {
+    java
+    id(Plugins.serialization)
 }
 
 repositories {
