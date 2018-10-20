@@ -270,7 +270,7 @@ class RequestTest : MockHttpTestCase() {
     fun httpPostRequestWithBody() {
         val foo = "foo"
         val bar = "bar"
-        val body = "{ $foo : $bar }"
+        val body = "{ $foo: $bar }"
 
         // Reflect encodes the body as a string, and gives back the body as a property of the body
         //  therefore the outer body here is the ey and the inner string is the actual body
@@ -289,6 +289,7 @@ class RequestTest : MockHttpTestCase() {
         val string = data as String
 
         assertThat(request, notNullValue())
+        assertThat(request.httpHeaders["Content-Type"], equalTo("application/json"))
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
