@@ -2,13 +2,15 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Handler
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
@@ -92,7 +94,6 @@ class RequestHandlerTest : MockHttpTestCase() {
                 res = response
                 err = error
             }
-
         })
 
         assertThat(req, notNullValue())

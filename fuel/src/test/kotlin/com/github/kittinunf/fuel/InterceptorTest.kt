@@ -8,7 +8,10 @@ import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import com.github.kittinunf.fuel.util.encodeBase64ToString
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.not
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
@@ -16,7 +19,7 @@ import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.net.HttpURLConnection
-import java.util.*
+import java.util.Random
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class InterceptorTest : MockHttpTestCase() {
@@ -157,7 +160,7 @@ class InterceptorTest : MockHttpTestCase() {
 
         fun <T> customLoggingInterceptor() = { next: (T) -> T ->
             { t: T ->
-                println("1: ${t.toString()}")
+                println("1: $t")
                 interceptorCalled = true
                 next(t)
             }
@@ -195,9 +198,9 @@ class InterceptorTest : MockHttpTestCase() {
         var interceptorCalled = false
         fun <T> customLoggingBreakingInterceptor() = { _: (T) -> T ->
             { t: T ->
-                println("1: ${t.toString()}")
+                println("1: $t")
                 interceptorCalled = true
-                //if next is not called, next Interceptor will not be called as well
+                // if next is not called, next Interceptor will not be called as well
                 t
             }
         }
@@ -205,7 +208,7 @@ class InterceptorTest : MockHttpTestCase() {
         var interceptorNotCalled = true
         fun <T> customLoggingInterceptor() = { next: (T) -> T ->
             { t: T ->
-                println("1: ${t.toString()}")
+                println("1: $t")
                 interceptorNotCalled = false
                 next(t)
             }
@@ -216,7 +219,6 @@ class InterceptorTest : MockHttpTestCase() {
             addRequestInterceptor(customLoggingBreakingInterceptor())
             addRequestInterceptor(customLoggingInterceptor())
         }
-
 
         val (request, response, result) = manager.request(Method.GET, mock.path("get")).header(mapOf("User-Agent" to "Fuel")).response()
         val (data, error) = result

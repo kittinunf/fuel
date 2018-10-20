@@ -1,9 +1,16 @@
 package com.github.kittinunf.fuel.forge
 
-import com.github.kittinunf.forge.core.*
+import com.github.kittinunf.forge.core.JSON
+import com.github.kittinunf.forge.core.apply
+import com.github.kittinunf.forge.core.at
+import com.github.kittinunf.forge.core.map
+import com.github.kittinunf.forge.core.maybeAt
 import com.github.kittinunf.forge.util.create
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers
 import org.json.JSONException
@@ -122,7 +129,6 @@ class FuelForgeTest {
                     override fun failure(request: Request, response: Response, error: FuelError) {
                         Assert.assertThat(error, CoreMatchers.notNullValue())
                     }
-
                 })
     }
 
@@ -146,7 +152,6 @@ class FuelForgeTest {
                     override fun failure(request: Request, response: Response, error: FuelError) {
                         Assert.assertThat(error, CoreMatchers.notNullValue())
                     }
-
                 })
     }
 
@@ -166,7 +171,6 @@ class FuelForgeTest {
                     override fun failure(request: Request, response: Response, error: FuelError) {
                         Assert.assertThat(error, CoreMatchers.instanceOf(Result.Failure::class.java))
                     }
-
                 })
     }
 

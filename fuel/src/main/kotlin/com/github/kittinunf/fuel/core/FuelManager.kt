@@ -42,7 +42,7 @@ class FuelManager {
         HttpsURLConnection.getDefaultHostnameVerifier()
     }
 
-    //background executor
+    // background executor
     var executor: ExecutorService by readWriteLazy {
         Executors.newCachedThreadPool { command ->
             Thread(command).also { thread ->
@@ -59,7 +59,7 @@ class FuelManager {
 
     private fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
 
-    //callback executor
+    // callback executor
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
     fun request(method: Method, path: String, param: List<Pair<String, Any?>>? = null): Request {
@@ -142,9 +142,7 @@ class FuelManager {
     }
 
     companion object {
-        //manager
+        // manager
         var instance by readWriteLazy { FuelManager() }
-
     }
-
 }

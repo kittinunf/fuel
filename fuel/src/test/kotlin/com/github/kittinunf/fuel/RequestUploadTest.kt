@@ -1,12 +1,16 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Blob
-import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.DataPart
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.requests.retrieveBoundaryInfo
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.io.File
@@ -138,7 +142,6 @@ class RequestUploadTest : MockHttpTestCase() {
         val (request, response, result) = manager.upload(mock.path("nope")).source { _, _ ->
                     File(currentDir, "lorem_ipsum_short.tmp")
                 }.progress { _, _ ->
-
                 }.responseString()
 
         val (data, error) = result
@@ -164,7 +167,6 @@ class RequestUploadTest : MockHttpTestCase() {
         val (request, response, result) = manager.upload(mock.path("upload")).source { _, _ ->
                     File(currentDir, "not_found_file.tmp")
                 }.progress { _, _ ->
-
                 }.responseString()
         val (data, error) = result
 

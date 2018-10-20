@@ -21,5 +21,4 @@ abstract class BaseTestCase {
     protected fun disableTestMode() {
         Fuel.regularMode()
     }
-
 }

@@ -23,7 +23,6 @@ abstract class BaseTestCase {
         lock.await(seconds, TimeUnit.SECONDS)
     }
 
-
     @Before
     fun setup() {
         this.mock = MockHelper()
@@ -34,5 +33,4 @@ abstract class BaseTestCase {
     fun breakdown() {
         this.mock.tearDown()
     }
-
 }

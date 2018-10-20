@@ -4,7 +4,9 @@ import com.github.kittinunf.fuel.android.core.Json
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.httpGet
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.json.JSONObject
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -58,5 +60,4 @@ class RequestAndroidSyncTest : BaseTestCase() {
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
-
 }

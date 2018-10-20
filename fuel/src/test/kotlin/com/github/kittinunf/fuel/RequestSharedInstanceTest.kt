@@ -4,7 +4,9 @@ import com.github.kittinunf.fuel.core.Encoding
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.io.File
@@ -352,7 +354,6 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
             }.responseString()
         val (data, error) = result
 
-
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
@@ -363,5 +364,4 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
 
         assertThat(read, isEqualTo(total))
     }
-
 }

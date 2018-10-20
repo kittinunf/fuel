@@ -302,5 +302,4 @@ class BlockingRequestTest : MockHttpTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response.statusCode, isEqualTo(statusCode))
     }
-
 }

@@ -45,7 +45,7 @@ class FuelKotlinxSerializationTest {
         this.mock.tearDown()
     }
 
-    //Model
+    // Model
     @Serializable
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
@@ -224,7 +224,6 @@ class FuelKotlinxSerializationTest {
         Fuel.get(mock.path("issues")).responseString { _: Request, _: Response, result: Result<String, FuelError> ->
             val issueList = kotlinxDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
             assertThat(issueList[0], isA(IssueInfo::class.java))
-
         }
     }
 }

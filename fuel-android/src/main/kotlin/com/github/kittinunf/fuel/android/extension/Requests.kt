@@ -1,10 +1,15 @@
 package com.github.kittinunf.fuel.android.extension
 
 import com.github.kittinunf.fuel.android.core.Json
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Deserializable
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 
-//jsonObject
+// jsonObject
 fun Request.responseJson(handler: (Request, Response, Result<Json, FuelError>) -> Unit) =
         response(jsonDeserializer(), handler)
 

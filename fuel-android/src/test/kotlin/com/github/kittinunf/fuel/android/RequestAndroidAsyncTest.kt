@@ -10,7 +10,9 @@ import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.json.JSONObject
 import org.junit.Assert.assertThat
 import org.junit.Before
@@ -31,18 +33,18 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         }
     }
 
-    //Model
+    // Model
     data class HttpBinHeadersModel(var headers: Map<String, List<String>> = mutableMapOf())
 
-    //Deserializer
+    // Deserializer
     class HttpBinHeadersDeserializer : ResponseDeserializable<HttpBinHeadersModel> {
 
         override fun deserialize(content: String): HttpBinHeadersModel {
             val model = HttpBinHeadersModel()
             val reader = JsonReader(StringReader(content))
             reader.beginObject()
-            while(reader.hasNext()) {
-                when(reader.nextName()) {
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
                     "headers" -> model.headers = deserializeHeaders(reader)
                     else -> reader.skipValue()
                 }
@@ -52,7 +54,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         }
 
         private fun deserializeHeaders(reader: JsonReader): Map<String, List<String>> {
-            val result = HashMap<String, List<String>>()
+            val result = hashMapOf<String, List<String>>()
             reader.beginObject()
             while (reader.hasNext()) {
                 val name = reader.nextName()
@@ -67,7 +69,6 @@ class RequestAndroidAsyncTest : BaseTestCase() {
             reader.endObject()
             return result
         }
-
     }
 
     @Before
@@ -323,7 +324,6 @@ class RequestAndroidAsyncTest : BaseTestCase() {
 
                 lock.countDown()
             }
-
         })
 
         await()
@@ -338,5 +338,4 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(res?.statusCode, isEqualTo(statusCode))
     }
-
 }
