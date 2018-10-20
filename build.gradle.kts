@@ -14,6 +14,7 @@ plugins {
     id(Jacoco.Android.plugin) version Jacoco.Android.version apply false
     id(BintrayRelease.plugin) version BintrayRelease.version apply false
     id(KotlinX.Serialization.plugin) version Kotlin.version apply false
+    id("org.jmailen.kotlinter") version "1.20.1" apply false
 }
 
 allprojects {
@@ -124,6 +125,7 @@ subprojects {
     if (!isSample) {
         apply {
             plugin(BintrayRelease.plugin)
+            plugin("org.jmailen.kotlinter")
         }
 
         configure<PublishExtension> {
