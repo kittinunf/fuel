@@ -49,7 +49,7 @@ class FuelGsonTest {
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(gsonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
+                .responseObject(gsonDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
                     assertThat(result.component1(), notNullValue())
                     assertThat(result.component2(), notNullValue())
                 }
@@ -63,7 +63,7 @@ class FuelGsonTest {
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(gsonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
+                .responseObject(gsonDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
                     assertThat(result.component1(), notNullValue())
                     assertThat(result.component2(), instanceOf(Result.Failure::class.java))
                 }
