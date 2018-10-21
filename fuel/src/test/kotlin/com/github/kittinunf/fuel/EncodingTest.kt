@@ -166,7 +166,7 @@ class EncodingTest : BaseTestCase() {
     fun testPostRequestEncodingWithReservedCharacters() {
         val path = "https://www.example.com/files"
         val parameters = listOf("param1" to "val+ue", "param2" to "val ue",
-                "param3" to "val!ue" ,"param4" to ":/?#[]@$&'()*+,;= ")
+                "param3" to "val!ue", "param4" to ":/?#[]@$&'()*+,;= ")
         val request = Encoding(
                 httpMethod = Method.POST,
                 urlString = path,
@@ -180,5 +180,4 @@ class EncodingTest : BaseTestCase() {
         val bodyString = String(body)
         assertThat(bodyString, isEqualTo("param1=val%2Bue&param2=val+ue&param3=val%21ue&param4=%3A%2F%3F%23%5B%5D%40%24%26%27%28%29*%2B%2C%3B%3D+"))
     }
-
 }

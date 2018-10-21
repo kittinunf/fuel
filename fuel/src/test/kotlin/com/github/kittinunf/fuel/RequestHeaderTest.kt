@@ -1,10 +1,12 @@
 package com.github.kittinunf.fuel
 
-
-import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.FuelManager
-import org.hamcrest.CoreMatchers.*
-import org.junit.Assert.*
+import com.github.kittinunf.fuel.core.Method
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
@@ -49,29 +51,29 @@ class RequestHeaderTest : MockHttpTestCase() {
         )
 
         val (_, response, _) = manager.request(Method.GET, mock.path("get"))
-                .header("foo" to "bar","a" to "b", "cookie" to "val1=x", "cookie" to "val2=y","cookie" to "val3=z", "cookie" to "val4=j")
+                .header("foo" to "bar", "a" to "b", "cookie" to "val1=x", "cookie" to "val2=y", "cookie" to "val3=z", "cookie" to "val4=j")
                 .responseString()
 
-        assertEquals("val1=x; val2=y; val3=z; val4=j", response.headers["Cookie"]?.firstOrNull())
+        assertThat("val1=x; val2=y; val3=z; val4=j", equalTo(response.headers["Cookie"]?.firstOrNull()))
     }
 
     @Test
-    fun multipleHeadersByTheSameKeyWillBeCorrectlyFormatted(){
+    fun multipleHeadersByTheSameKeyWillBeCorrectlyFormatted() {
         val manager = FuelManager()
         val request = manager.request(Method.GET, mock.path("get"))
-                .header("foo" to "bar","a" to "b", "cookie" to "val1=x", "cookie" to "val2=y","cookie" to "val3=z", "cookie" to "val4=j")
+                .header("foo" to "bar", "a" to "b", "cookie" to "val1=x", "cookie" to "val2=y", "cookie" to "val3=z", "cookie" to "val4=j")
 
-        assertEquals("val1=x; val2=y; val3=z; val4=j",request.headers["cookie"] )
-        assertEquals("bar",request.headers["foo"] )
-        assertEquals("b",request.headers["a"] )
+        assertThat("val1=x; val2=y; val3=z; val4=j", equalTo(request.headers["cookie"]))
+        assertThat("bar", equalTo(request.headers["foo"]))
+        assertThat("b", equalTo(request.headers["a"]))
     }
 
     @Test
-    fun multipleHeadersByTheSameKeyWillShowLastUsingMap(){
+    fun multipleHeadersByTheSameKeyWillShowLastUsingMap() {
         val manager = FuelManager()
         val request = manager.request(Method.GET, mock.path("get"))
-                .header(mapOf("cookie" to "val1=x", "cookie" to "val2=y"),false)
+                .header(mapOf("cookie" to "val1=x", "cookie" to "val2=y"), false)
 
-        assertEquals("val2=y",request.headers["cookie"] )
+        assertThat("val2=y", equalTo(request.headers["cookie"]))
     }
 }

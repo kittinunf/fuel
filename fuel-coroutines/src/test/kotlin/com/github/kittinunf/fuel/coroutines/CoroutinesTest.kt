@@ -118,7 +118,6 @@ class CoroutinesTest {
             Fuel.get(mock.path("not/found/address")).awaitStringResponse().third.fold({
                 fail("This should not be called")
             }, {
-
             })
         } catch (exception: Exception) {
             fail("This test should fail as exception should be caught")
@@ -319,4 +318,3 @@ class CoroutinesTest {
         }
     }
 }
-

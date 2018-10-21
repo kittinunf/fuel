@@ -1,7 +1,12 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
-import org.hamcrest.CoreMatchers.*
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.ResponseDeserializable
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.CoreMatchers.not
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.io.Reader
@@ -10,11 +15,11 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 class RequestObjectTest : MockHttpTestCase() {
 
     data class ReflectMockModel(var userAgent: String = "") {
-        class Deserializer: ResponseDeserializable<ReflectMockModel> {
+        class Deserializer : ResponseDeserializable<ReflectMockModel> {
             override fun deserialize(content: String): ReflectMockModel = ReflectMockModel(content)
         }
 
-        class MalformedDeserializer: ResponseDeserializable<ReflectMockModel> {
+        class MalformedDeserializer : ResponseDeserializable<ReflectMockModel> {
             override fun deserialize(reader: Reader): ReflectMockModel = throw IllegalStateException("Malformed data")
         }
     }
@@ -75,5 +80,4 @@ class RequestObjectTest : MockHttpTestCase() {
         assertThat(error?.exception as IllegalStateException, isA(IllegalStateException::class.java))
         assertThat(error.exception.message, equalTo("Malformed data"))
     }
-
 }

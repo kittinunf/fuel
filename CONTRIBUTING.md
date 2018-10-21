@@ -35,3 +35,25 @@ Answer the following questions:
 - **What side effects does this change have?**
 
   This is the most important question to answer, as it can point out problems where you are making too many changes in one commit or branch. One or two bullet points for related changes may be okay, but five or six are likely indicators of a commit that is doing too many things.
+
+## Linter
+
+Fuel uses [ktlint](https://github.com/shyiko/ktlint) to help eliminate style error. This ensures that our project has consistency in styling and/or formatting.
+To make sure that you have a quick feedback loop on styling error consider install `ktlint` locally and integrate it as a github commit hook.
+
+### Installation
+
+``` Bash
+curl -sSLO https://github.com/shyiko/ktlint/releases/download/0.29.0/ktlint &&
+  chmod a+x ktlint &&
+  sudo mv ktlint /usr/local/bin/
+```
+
+### Github commit hook
+``` Bash
+ktlint --install-git-pre-commit-hook
+```
+
+For more detailed instruction, please visit [ktlint](https://github.com/shyiko/ktlint) repository.
+
+

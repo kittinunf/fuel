@@ -110,6 +110,12 @@ object RxJava {
     }
 }
 
+// Lint
+object Ktlint {
+    const val version = "1.20.1"
+    const val plugin = "org.jmailen.kotlinter"
+}
+
 // Testing dependencies
 object JUnit {
     const val version = "4.12"

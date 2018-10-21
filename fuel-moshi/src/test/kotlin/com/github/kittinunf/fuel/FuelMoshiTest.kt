@@ -111,7 +111,6 @@ class FuelMoshiTest {
                 override fun failure(request: Request, response: Response, error: FuelError) {
                     assertThat(error, notNullValue())
                 }
-
             })
     }
 
@@ -188,7 +187,6 @@ class FuelMoshiTest {
                     "{ \"id\": 2, \"title\": \"issue 2\", \"number\": 32 }, " +
                     " ]").withStatusCode(HttpURLConnection.HTTP_OK)
         )
-
 
         Fuel.get(mock.path("issues")).responseObject<List<IssueInfo>> { _, _, result ->
             val issues = result.get()

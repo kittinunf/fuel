@@ -26,7 +26,6 @@ class RequestValidationTest : MockHttpTestCase() {
             response = mock.response().withStatusCode(418)
         )
 
-
         // Test defaults
         for (status in (200..299)) {
             val (request, response, result) = FuelManager().request(Method.GET, mock.path("$status")).response()
@@ -67,7 +66,7 @@ class RequestValidationTest : MockHttpTestCase() {
             response = mock.response().withStatusCode(203)
         )
 
-        //this validate (200..202) which should fail with 203
+        // this validate (200..202) which should fail with 203
         val (request, response, result) = manager.request(Method.GET, mock.path("any")).responseString()
         val (data, error) = result
 
@@ -102,5 +101,4 @@ class RequestValidationTest : MockHttpTestCase() {
 
         assertThat(response.statusCode, isEqualTo(preDefinedStatusCode))
     }
-
 }

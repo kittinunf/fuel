@@ -20,5 +20,4 @@ private class ReadWriteLazyVal<T>(private val initializer: () -> T) : ReadWriteP
     override operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         this.value = value
     }
-
 }

@@ -11,7 +11,7 @@ import com.google.gson.Gson
 import java.io.Reader
 
 // Created by ihor_kucherenko on 7/4/17.
-//https://github.com/KucherenkoIhor
+// https://github.com/KucherenkoIhor
 
 inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) =
         response(gsonDeserializerOf(T::class.java), handler)
