@@ -57,9 +57,11 @@ class MockHelper {
      * @param server [ClientAndServer] the server to register on
      */
     fun chain(
-            request: HttpRequest, response: HttpResponse,
-            times: Times = Times.once(),
-            server: ClientAndServer = server()) {
+        request: HttpRequest,
+        response: HttpResponse,
+        times: Times = Times.once(),
+        server: ClientAndServer = server()
+    ) {
         server.`when`(request, times).respond(response)
     }
 
@@ -67,10 +69,11 @@ class MockHelper {
      * @see chain(HttpRequest, HttpResponse, Times, ClientAndServer)
      */
     fun chain(
-            request: HttpRequest,
-            response: HttpTemplate,
-            times: Times = Times.once(),
-            server: ClientAndServer = server()) {
+        request: HttpRequest,
+        response: HttpTemplate,
+        times: Times = Times.once(),
+        server: ClientAndServer = server()
+    ) {
         server.`when`(request, times).respond(response)
     }
 
@@ -123,7 +126,7 @@ class MockHelper {
      * @param path [String] the relative path
      * @return [String] the full path
      */
-    fun path(path: String): String =  "http://localhost:${server().localPort}/$path"
+    fun path(path: String): String = "http://localhost:${server().localPort}/$path"
 
     companion object {
         const val REFLECT_TEMPLATE = """

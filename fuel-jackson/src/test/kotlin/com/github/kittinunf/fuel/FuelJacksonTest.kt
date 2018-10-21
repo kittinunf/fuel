@@ -42,7 +42,7 @@ class FuelJacksonTest {
         this.mock.tearDown()
     }
 
-    //Model
+    // Model
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
     @Test
@@ -118,7 +118,6 @@ class FuelJacksonTest {
                 override fun failure(request: Request, response: Response, error: FuelError) {
                     assertThat(error, notNullValue())
                 }
-
             })
     }
 
@@ -138,7 +137,6 @@ class FuelJacksonTest {
                 override fun failure(request: Request, response: Response, error: FuelError) {
                     assertThat(error, instanceOf(Result.Failure::class.java))
                 }
-
             })
     }
 
@@ -216,8 +214,6 @@ class FuelJacksonTest {
         Fuel.get(mock.path("issues")).responseString { _: Request, _: Response, result: Result<String, FuelError> ->
             val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
             assertThat(issueList[0], isA(IssueInfo::class.java))
-
         }
-
     }
 }

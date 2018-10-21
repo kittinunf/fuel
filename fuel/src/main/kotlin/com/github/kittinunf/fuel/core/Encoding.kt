@@ -7,13 +7,15 @@ import java.net.URISyntaxException
 import java.net.URL
 import java.net.URLEncoder
 
-class Encoding(val httpMethod: Method,
-               val urlString: String,
-               val requestType: Request.Type = Request.Type.REQUEST,
-               val baseUrlString: String? = null,
-               val parameters: List<Pair<String, Any?>>? = null,
-               val timeoutInMillisecond: Int = 15000,
-               val timeoutReadInMillisecond: Int = timeoutInMillisecond) : Fuel.RequestConvertible {
+class Encoding(
+    val httpMethod: Method,
+    val urlString: String,
+    val requestType: Request.Type = Request.Type.REQUEST,
+    val baseUrlString: String? = null,
+    val parameters: List<Pair<String, Any?>>? = null,
+    val timeoutInMillisecond: Int = 15000,
+    val timeoutReadInMillisecond: Int = timeoutInMillisecond
+) : Fuel.RequestConvertible {
 
     private val encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
         var modifiedPath = path
@@ -51,14 +53,13 @@ class Encoding(val httpMethod: Method,
             header(headerPairs, false)
             if (data != null) body(data)
         }
-
     }
 
     override val request by lazy { encoder(httpMethod, urlString, parameters) }
 
     private fun createUrl(path: String): URL {
         val url = try {
-            //give precedence to local path
+            // give precedence to local path
             URL(path)
         } catch (e: MalformedURLException) {
             var base = baseUrlString ?: ""
@@ -83,7 +84,7 @@ class Encoding(val httpMethod: Method,
 
     private fun queryFromParameters(params: List<Pair<String, Any?>>?): String = params.orEmpty()
             .filterNot { it.second == null }
-            .map { (key, value) ->  URLEncoder.encode(key, "UTF-8") to URLEncoder.encode("$value", "UTF-8") }
+            .map { (key, value) -> URLEncoder.encode(key, "UTF-8") to URLEncoder.encode("$value", "UTF-8") }
             .joinToString("&") { (key, value) -> "$key=$value" }
 
     private val defaultHeaders = mapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")

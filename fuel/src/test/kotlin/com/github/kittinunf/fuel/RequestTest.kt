@@ -1,10 +1,17 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.util.decodeBase64
 import com.google.common.net.MediaType
 import junit.framework.TestCase.assertEquals
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.json.JSONArray
 import org.json.JSONObject
@@ -12,7 +19,7 @@ import org.junit.Test
 import org.mockserver.model.BinaryBody
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.*
+import java.util.Random
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestTest : MockHttpTestCase() {
@@ -20,7 +27,6 @@ class RequestTest : MockHttpTestCase() {
 
     class PathStringConvertibleImpl(url: String) : Fuel.PathStringConvertible {
         override val path = url
-
     }
 
     class RequestConvertibleImpl(val method: Method, private val url: String) : Fuel.RequestConvertible {
@@ -671,4 +677,3 @@ class RequestTest : MockHttpTestCase() {
         assertEquals(list.toList(), query.getJSONArray("foo[]").map { it.toString() })
     }
 }
-

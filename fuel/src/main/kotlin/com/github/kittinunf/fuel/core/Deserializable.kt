@@ -23,7 +23,7 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
         }
     }
 
-    //One of these methods must be implemented
+    // One of these methods must be implemented
     fun deserialize(bytes: ByteArray): T? = null
 
     fun deserialize(inputStream: InputStream): T? = null
@@ -51,9 +51,11 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler
     return this
 }
 
-private fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U,
-                                                              success: (Request, Response, T) -> Unit,
-                                                              failure: (Request, Response, FuelError) -> Unit): Request {
+private fun <T : Any, U : Deserializable<T>> Request.response(
+    deserializable: U,
+    success: (Request, Response, T) -> Unit,
+    failure: (Request, Response, FuelError) -> Unit
+): Request {
     val asyncRequest = AsyncTaskRequest(taskRequest)
 
     asyncRequest.successCallback = { response ->

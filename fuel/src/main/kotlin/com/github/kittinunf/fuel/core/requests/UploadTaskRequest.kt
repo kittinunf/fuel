@@ -40,7 +40,7 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 contentLength += writeln()
                 contentLength += writeln()
 
-                //input file data
+                // input file data
                 if (outputStream != null) {
                     inputStream().use {
                         it.copyTo(outputStream, BUFFER_SIZE, progress = { writtenBytes ->

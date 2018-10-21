@@ -13,25 +13,26 @@ import java.nio.charset.Charset
 import kotlin.coroutines.CoroutineContext
 
 private suspend fun <T : Any, U : Deserializable<T>> Request.await(
-        deserializable: U, scope: CoroutineContext
+    deserializable: U,
+    scope: CoroutineContext
 ): Triple<Request, Response, Result<T, FuelError>> =
         withContext(scope) {
             awaitResponse(deserializable)
         }
 
 suspend fun Request.awaitByteArrayResponse(
-        scope: CoroutineContext = Dispatchers.Default
+    scope: CoroutineContext = Dispatchers.Default
 ): Triple<Request, Response, Result<ByteArray, FuelError>> =
         await(byteArrayDeserializer(), scope)
 
 suspend fun Request.awaitStringResponse(
-        charset: Charset = Charsets.UTF_8,
-        scope: CoroutineContext = Dispatchers.Default
+    charset: Charset = Charsets.UTF_8,
+    scope: CoroutineContext = Dispatchers.Default
 ): Triple<Request, Response, Result<String, FuelError>> = await(stringDeserializer(charset), scope)
 
 suspend fun <U : Any> Request.awaitObjectResponse(
-        deserializable: ResponseDeserializable<U>,
-        scope: CoroutineContext = Dispatchers.Default
+    deserializable: ResponseDeserializable<U>,
+    scope: CoroutineContext = Dispatchers.Default
 ): Triple<Request, Response, Result<U, FuelError>> = await(deserializable, scope)
 
 /***
@@ -42,7 +43,7 @@ suspend fun <U : Any> Request.awaitObjectResponse(
  */
 @Throws
 suspend fun Request.awaitByteArray(
-        scope: CoroutineContext = Dispatchers.Default
+    scope: CoroutineContext = Dispatchers.Default
 ): ByteArray = await(byteArrayDeserializer(), scope).third.get()
 
 /**
@@ -55,8 +56,8 @@ suspend fun Request.awaitByteArray(
  */
 @Throws
 suspend fun Request.awaitString(
-        charset: Charset = Charsets.UTF_8,
-        scope: CoroutineContext = Dispatchers.Default
+    charset: Charset = Charsets.UTF_8,
+    scope: CoroutineContext = Dispatchers.Default
 ): String = await(stringDeserializer(charset), scope).third.get()
 
 /**
@@ -70,8 +71,8 @@ suspend fun Request.awaitString(
  */
 @Throws
 suspend fun <U : Any> Request.awaitObject(
-        deserializable: ResponseDeserializable<U>,
-        scope: CoroutineContext = Dispatchers.Default
+    deserializable: ResponseDeserializable<U>,
+    scope: CoroutineContext = Dispatchers.Default
 ): U = await(deserializable, scope).third.get()
 
 /***
@@ -82,7 +83,7 @@ suspend fun <U : Any> Request.awaitObject(
  * @return Result<ByteArray,FuelError>
  */
 suspend fun Request.awaitByteArrayResult(
-        scope: CoroutineContext = Dispatchers.Default
+    scope: CoroutineContext = Dispatchers.Default
 ): Result<ByteArray, FuelError> = awaitByteArrayResponse(scope).third
 
 /**
@@ -93,10 +94,9 @@ suspend fun Request.awaitByteArrayResult(
  * @return Result<String,FuelError>
  */
 suspend fun Request.awaitStringResult(
-        charset: Charset = Charsets.UTF_8,
-        scope: CoroutineContext = Dispatchers.Default
+    charset: Charset = Charsets.UTF_8,
+    scope: CoroutineContext = Dispatchers.Default
 ): Result<String, FuelError> = awaitStringResponse(charset, scope).third
-
 
 /**
  * This function catches both server errors and Deserialization Errors
@@ -107,8 +107,8 @@ suspend fun Request.awaitStringResult(
  * @return Result object
  */
 suspend fun <U : Any> Request.awaitObjectResult(
-        deserializable: ResponseDeserializable<U>,
-        scope: CoroutineContext = Dispatchers.Default
+    deserializable: ResponseDeserializable<U>,
+    scope: CoroutineContext = Dispatchers.Default
 ): Result<U, FuelError> = try {
     await(deserializable, scope).third
 } catch (e: Exception) {
@@ -124,8 +124,5 @@ suspend fun Request.awaitResponseResult(): ByteArray = awaitByteArray()
 
 @Deprecated("please use 'awaitObjectResult(deserializable)'", ReplaceWith("awaitObjectResult(deserializable)"))
 suspend fun <U : Any> Request.awaitSafelyObjectResult(
-        deserializable: ResponseDeserializable<U>
+    deserializable: ResponseDeserializable<U>
 ): Result<U, FuelError> = this.awaitObjectResult(deserializable)
-
-
-

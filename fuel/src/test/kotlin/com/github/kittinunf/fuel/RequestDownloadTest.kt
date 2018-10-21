@@ -1,9 +1,11 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Method
 import com.google.common.net.MediaType
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -11,7 +13,7 @@ import org.mockserver.model.BinaryBody
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
-import java.util.*
+import java.util.Random
 import java.util.concurrent.TimeUnit
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
@@ -41,7 +43,7 @@ class RequestDownloadTest : MockHttpTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertThat(file.length(),isEqualTo(numberOfBytes.toLong()))
+        assertThat(file.length(), isEqualTo(numberOfBytes.toLong()))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response.statusCode, isEqualTo(statusCode))
@@ -78,9 +80,9 @@ class RequestDownloadTest : MockHttpTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertEquals(data is ByteArray,true)
-        assertEquals((data as ByteArray).size.toLong(),read)
-        assertThat(file.length(),isEqualTo(numberOfBytes.toLong()))
+        assertEquals(data is ByteArray, true)
+        assertEquals((data as ByteArray).size.toLong(), read)
+        assertThat(file.length(), isEqualTo(numberOfBytes.toLong()))
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
         val statusCode = HttpURLConnection.HTTP_OK
@@ -119,8 +121,8 @@ class RequestDownloadTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(file.length(),isEqualTo(response.data.size.toLong()))
-        assertThat(file.length(),isEqualTo(numberOfBytes.toLong()))
+        assertThat(file.length(), isEqualTo(response.data.size.toLong()))
+        assertThat(file.length(), isEqualTo(numberOfBytes.toLong()))
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
         val statusCode = HttpURLConnection.HTTP_OK
@@ -143,7 +145,6 @@ class RequestDownloadTest : MockHttpTestCase() {
             println(file.absolutePath)
             file
         }.progress { _, _ ->
-
         }.responseString()
         val (data, error) = result
 
@@ -151,7 +152,7 @@ class RequestDownloadTest : MockHttpTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, notNullValue())
         assertThat(data, nullValue())
-        assertThat(file.length(),isEqualTo(0L))
+        assertThat(file.length(), isEqualTo(0L))
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
         assertThat(response.statusCode, isEqualTo(statusCode))
@@ -170,7 +171,6 @@ class RequestDownloadTest : MockHttpTestCase() {
             val dir = System.getProperty("user.dir")
             File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
         }.progress { _, _ ->
-
         }.responseString()
         val (data, error) = result
 
@@ -222,11 +222,10 @@ class RequestDownloadTest : MockHttpTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertThat(file.length(),isEqualTo(numberOfBytes.toLong()))
+        assertThat(file.length(), isEqualTo(numberOfBytes.toLong()))
 
         assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response.statusCode, isEqualTo(statusCode))
     }
-
 }

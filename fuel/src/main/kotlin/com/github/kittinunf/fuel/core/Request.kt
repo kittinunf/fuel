@@ -21,18 +21,19 @@ import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
 class Request(
-        val method: Method,
-        val path: String,
-        val url: URL,
-        var type: Type = Type.REQUEST,
-        val headers: MutableMap<String, String> = mutableMapOf(),
-        val parameters: List<Pair<String, Any?>> = listOf(),
-        var name: String = "",
-        val names: MutableList<String> = mutableListOf(),
-        val mediaTypes: MutableList<String> = mutableListOf(),
-        var isAllowRedirects: Boolean = true,
-        var timeoutInMillisecond: Int,
-        var timeoutReadInMillisecond: Int) : Fuel.RequestConvertible {
+    val method: Method,
+    val path: String,
+    val url: URL,
+    var type: Type = Type.REQUEST,
+    val headers: MutableMap<String, String> = mutableMapOf(),
+    val parameters: List<Pair<String, Any?>> = listOf(),
+    var name: String = "",
+    val names: MutableList<String> = mutableListOf(),
+    val mediaTypes: MutableList<String> = mutableListOf(),
+    var isAllowRedirects: Boolean = true,
+    var timeoutInMillisecond: Int,
+    var timeoutReadInMillisecond: Int
+) : Fuel.RequestConvertible {
 
     @Deprecated(replaceWith = ReplaceWith("method"), message = "http naming is deprecated, use 'method' instead")
     val httpMethod
@@ -48,7 +49,7 @@ class Request(
         UPLOAD
     }
 
-    //body
+    // body
     var bodyCallback: ((Request, OutputStream?, Long) -> Long)? = null
 
     private fun getHttpBody(): ByteArray = ByteArrayOutputStream().apply {
@@ -57,7 +58,7 @@ class Request(
 
     internal lateinit var client: Client
 
-    //underlying task request
+    // underlying task request
     internal val taskRequest: TaskRequest by lazy {
         when (type) {
             Type.DOWNLOAD -> DownloadTaskRequest(this)
@@ -68,19 +69,19 @@ class Request(
 
     private var taskFuture: Future<*>? = null
 
-    //configuration
+    // configuration
     internal var socketFactory: SSLSocketFactory? = null
     internal var hostnameVerifier: HostnameVerifier? = null
 
-    //callers
+    // callers
     internal lateinit var executor: ExecutorService
     internal lateinit var callbackExecutor: Executor
 
-    //interceptor
+    // interceptor
     internal var requestInterceptor: ((Request) -> Request)? = null
     internal var responseInterceptor: ((Request, Response) -> Response)? = null
 
-    //interfaces
+    // interfaces
     fun timeout(timeout: Int): Request {
         timeoutInMillisecond = timeout
         return this
@@ -297,27 +298,27 @@ class Request(
     fun cUrlString(): String = buildString {
         append("$ curl -i")
 
-        //method
+        // method
         if (method != Method.GET) {
             append(" -X $method")
         }
 
-        //body
+        // body
         val escapedBody = String(getHttpBody()).replace("\"", "\\\"")
         if (escapedBody.isNotEmpty()) {
             append(" -d \"$escapedBody\"")
         }
 
-        //headers
+        // headers
         for ((key, value) in headers) {
             append(" -H \"$key:$value\"")
         }
 
-        //url
+        // url
         append(" $url")
     }
 
-    //byte array
+    // byte array
     fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit) =
             response(byteArrayDeserializer(), handler)
 
@@ -325,7 +326,7 @@ class Request(
 
     fun response() = response(byteArrayDeserializer())
 
-    //string
+    // string
     fun responseString(charset: Charset = Charsets.UTF_8, handler: (Request, Response, Result<String, FuelError>) -> Unit) =
             response(stringDeserializer(charset), handler)
 
@@ -336,7 +337,7 @@ class Request(
     @JvmOverloads
     fun responseString(charset: Charset = Charsets.UTF_8) = response(stringDeserializer(charset))
 
-    //object
+    // object
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit) = response(deserializer, handler)
 
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) = response(deserializer, handler)
@@ -348,5 +349,4 @@ class Request(
 
         fun stringDeserializer(charset: Charset = Charsets.UTF_8) = StringDeserializer(charset)
     }
-
 }

@@ -38,7 +38,7 @@ class FuelGsonTest {
         this.mock.tearDown()
     }
 
-    //Model
+    // Model
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
     @Test
@@ -113,7 +113,6 @@ class FuelGsonTest {
                     override fun failure(request: Request, response: Response, error: FuelError) {
                         assertThat(error, notNullValue())
                     }
-
                 })
     }
 
@@ -133,7 +132,6 @@ class FuelGsonTest {
                     override fun failure(request: Request, response: Response, error: FuelError) {
                         assertThat(error, instanceOf(Result.Failure::class.java))
                     }
-
                 })
     }
 

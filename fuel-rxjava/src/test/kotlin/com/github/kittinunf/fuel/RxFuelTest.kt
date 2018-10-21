@@ -43,7 +43,6 @@ class RxFuelTest {
         this.mock.tearDown()
     }
 
-
     @Test
     fun rxTestResponse() {
         mock.chain(
@@ -148,10 +147,10 @@ class RxFuelTest {
         assertThat(error?.exception?.message, containsString("404 Not Found"))
     }
 
-    //Model
+    // Model
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
-    //Deserializer
+    // Deserializer
     class HttpBinUserAgentModelDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
         override fun deserialize(content: String): HttpBinUserAgentModel? = HttpBinUserAgentModel(content)
     }
