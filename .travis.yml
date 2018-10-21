@@ -1,5 +1,8 @@
 language: android
 
+env:
+  - REVIEWDOG_VERSION=0.9.11
+
 android:
   components:
     - tools
@@ -21,8 +24,12 @@ before_script:
   - chmod +x deploy_bintray.sh
 
 script:
-  - ./gradlew lintKotlin
-  - ./gradlew test --stacktrace
+  - ./gradlew build
+
+after_failure:
+  - curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o ./reviewdog
+  - chmod +x ./reviewdog
+  - find . -type f -name "*-lint.txt" -print0 | xargs -0 cat | ./reviewdog -efm="%f:%l:%c: %m" -name="ktlint" -reporter=github-pr-review
 
 after_success:
   - ./gradlew jacocoTestReport

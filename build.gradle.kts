@@ -1,11 +1,9 @@
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
-import com.jfrog.bintray.gradle.BintrayExtension
 import com.novoda.gradle.release.PublishExtension
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jmailen.gradle.kotlinter.KotlinterExtension
+import org.jmailen.gradle.kotlinter.support.ReporterType
 
 plugins {
     java
@@ -137,6 +135,10 @@ subprojects {
             publishVersion = Fuel.publishVersion
             uploadName = "Fuel-Android"
             website = "https://github.com/kittinunf/Fuel"
+        }
+
+        configure<KotlinterExtension> {
+            reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
         }
     }
 }
