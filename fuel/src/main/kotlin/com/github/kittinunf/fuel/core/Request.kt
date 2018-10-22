@@ -37,15 +37,6 @@ class Request(
     var timeoutInMillisecond: Int,
     var timeoutReadInMillisecond: Int
 ) : Fuel.RequestConvertible {
-
-    @Deprecated(replaceWith = ReplaceWith("method"), message = "http naming is deprecated, use 'method' instead")
-    val httpMethod
-        get() = method
-
-    @Deprecated(replaceWith = ReplaceWith("headers"), message = "http naming is deprecated, use 'headers' instead")
-    val httpHeaders
-        get() = headers
-
     enum class Type {
         REQUEST,
         DOWNLOAD,
