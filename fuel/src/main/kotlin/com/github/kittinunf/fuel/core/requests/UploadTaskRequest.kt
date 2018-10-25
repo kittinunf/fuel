@@ -1,10 +1,15 @@
 package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.Blob
+import com.github.kittinunf.fuel.core.Body
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.util.copyTo
+import java.io.InputStreamReader
 import java.io.OutputStream
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
+import java.io.Reader
 import java.net.URL
 import java.net.URLConnection
 
@@ -12,9 +17,11 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
     var progressCallback: ((Long, Long) -> Unit)? = null
     lateinit var sourceCallback: (Request, URL) -> Iterable<Blob>
 
-    private var bodyCallBack = fun(request: Request, outputStream: OutputStream?, totalLength: Long): Long {
-        var contentLength = 0L
-        outputStream.apply {
+    fun stream(output: Boolean) : Any {
+        var contentLength= 0L
+
+        val stream = PipedOutputStream()
+        stream.buffered().apply {
             request.parameters.forEach { (name, data) ->
                 contentLength += write("--$boundary")
                 contentLength += writeln()
@@ -28,6 +35,8 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
             }
 
             val files = sourceCallback(request, request.url)
+            // need to convert to double to not lose anything between int and long
+            val filesLength = contentLength + files.sumByDouble { it.length.toDouble() }.toLong()
 
             files.forEachIndexed { i, (name, length, inputStream) ->
                 val postFix = if (files.count() == 1) "" else "${i + 1}"
@@ -42,10 +51,10 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 contentLength += writeln()
 
                 // input file data
-                if (outputStream != null) {
+                if (output) {
                     inputStream().use {
-                        it.copyTo(outputStream, BUFFER_SIZE, progress = { writtenBytes ->
-                            progressCallback?.invoke(contentLength + writtenBytes, totalLength)
+                        it.copyTo(this, BUFFER_SIZE, progress = { writtenBytes ->
+                            progressCallback?.invoke(contentLength + writtenBytes, contentLength + filesLength)
                         })
                     }
                 }
@@ -57,14 +66,22 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
             contentLength += writeln()
         }
 
-        progressCallback?.invoke(contentLength, totalLength)
+        progressCallback?.invoke(contentLength, contentLength)
+        if (output) {
+            return InputStreamReader(PipedInputStream(stream))
+        }
+
         return contentLength
     }
 
     private val boundary = retrieveBoundaryInfo(request)
 
     init {
-        request.bodyCallback = bodyCallBack
+        // TODO: actually change how dataparts / blobs are injected.
+        request.body = Body(
+            { stream(true) as Reader },
+            stream(false) as Long
+        )
     }
 }
 

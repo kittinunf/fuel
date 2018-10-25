@@ -154,7 +154,7 @@ class EncodingTest : BaseTestCase() {
         ).request
 
         val body = ByteArrayOutputStream().apply {
-            request.bodyCallback?.invoke(request, this, 0)
+            request.body.writeTo(this)
         }.toByteArray()
 
         val bodyString = String(body)
@@ -174,7 +174,7 @@ class EncodingTest : BaseTestCase() {
         ).request
 
         val body = ByteArrayOutputStream().apply {
-            request.bodyCallback?.invoke(request, this, 0)
+            request.body.writeTo(this)
         }.toByteArray()
 
         val bodyString = String(body)

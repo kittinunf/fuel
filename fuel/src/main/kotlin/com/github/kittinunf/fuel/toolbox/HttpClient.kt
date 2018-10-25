@@ -98,17 +98,19 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
     }
 
     private fun setBodyIfDoOutput(connection: HttpURLConnection, request: Request) {
-        val bodyCallback = request.bodyCallback
-        if (bodyCallback != null && connection.doOutput) {
-            val contentLength = bodyCallback(request, null, 0)
-
-            if (request.type == Request.Type.UPLOAD)
-                connection.setFixedLengthStreamingMode(contentLength.toInt())
-
-            BufferedOutputStream(connection.outputStream).use {
-                bodyCallback(request, it, contentLength)
-            }
+        val body = request.body
+        if (!connection.doOutput || body.isEmpty()) {
+            return
         }
+
+        val contentLength = body.length
+        if (contentLength != null) {
+            connection.setFixedLengthStreamingMode(contentLength.toLong())
+        } else {
+            connection.setChunkedStreamingMode(4096)
+        }
+
+        body.writeTo(connection.outputStream)
     }
 
     private fun setDoOutput(connection: HttpURLConnection, method: Method) = when (method) {

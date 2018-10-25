@@ -9,9 +9,13 @@ import com.github.kittinunf.fuel.core.requests.TaskRequest
 import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 import com.github.kittinunf.result.Result
-import java.io.ByteArrayOutputStream
+import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.OutputStream
+import java.io.FileReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.Reader
+import java.io.StringReader
 import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.Callable
@@ -44,14 +48,8 @@ class Request(
         UPLOAD
     }
 
-    // body
-    var bodyCallback: ((Request, OutputStream?, Long) -> Long)? = null
-
-    private fun getHttpBody(): ByteArray = ByteArrayOutputStream().apply {
-        bodyCallback?.invoke(request, this, 0)
-    }.toByteArray()
-
     internal lateinit var client: Client
+    internal var body: Body = Body()
 
     // underlying task request
     internal val taskRequest: TaskRequest by lazy {
@@ -214,16 +212,83 @@ class Request(
         return this
     }
 
-    fun body(body: ByteArray): Request {
-        bodyCallback = { _, outputStream, _ ->
-            outputStream?.write(body)
-            body.size.toLong()
-        }
+    /**
+     * Sets the body to be read from a generic body source.
+     *
+     * @note in earlier versions the body callback would be called multiple times in order to maybe get the size. But
+     *  that would lead to closed streams being unable to be read. If the size is known, set it before anything else.
+     *
+     * @param openReader [BodySource] a function that yields a reader
+     * @param length [Number?] size in +bytes+ if it is known
+     * @param charset [Charset] the charset to write with
+     *
+     * @return [Request] the request
+     */
+    fun body(openReader: BodySource, length: Number? = null, charset: Charset = Charsets.UTF_8): Request {
+        this.body = Body.from(openReader = openReader, length = length, charset = charset)
         return this
     }
 
-    fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
+    /**
+     * Sets the body from an open reader
+     *
+     * @note the reader will be closed once the body is read
+     *
+     * @param reader [Reader] an open reader
+     * @param length [Number?] size in bytes if it is known
+     * @param charset [Charset] the charset to write with
+     *
+     * @return [Request] the request
+     */
+    fun body(reader: Reader, length: Number? = null, charset: Charset = Charsets.UTF_8) = body({ reader }, length, charset)
 
+    /**
+     * Sets the body from a generic stream
+     *
+     * @note the stream will be read from the position it's at. Make sure you rewind it if you want it to be read from
+     *  the start.
+     *
+     * @param stream [InputStream] a stream to read from
+     * @param length [Number?] size in bytes if it is known
+     * @param charset [Charset] the charset to write with
+     *
+     * @return [Request] the request
+     */
+    fun body(stream: InputStream, length: Number? = null, charset: Charset = Charsets.UTF_8) = body({ InputStreamReader(stream) }, length, charset)
+
+    /**
+     * Sets the body from a byte array
+     *
+     * @param body [ByteArray] the bytes to write
+     * @param charset [Charset] the charset to write with
+     * @return [Request] the request
+     */
+    fun body(body: ByteArray, charset: Charset = Charsets.UTF_8): Request = body(ByteArrayInputStream(body), body.size, charset)
+
+    /**
+     * Sets the body from a string
+     *
+     * @param body [String] the string to write
+     * @param charset [Charset] the charset to write with
+     * @return [Request] the request
+     */
+    fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body({ StringReader(body) }, charset.encode(body).limit(), charset)
+
+    /**
+     * Sets the body to the contents of a file.
+     *
+     * @note this does *NOT* make this a multipart upload. For that you can use the upload request. This function can be
+     *  used if you want to upload the single contents of a text based file as an inline body.
+     *
+     * @param file [File] the file to write to the body
+     * @param charset [Charset] the charset to write with
+     * @return [Request] the request
+     */
+    fun body(file: File, charset: Charset = Charsets.UTF_8): Request = body({ FileReader(file) }, file.length(), charset)
+
+    /**
+     * Set the body to a JSON string and automatically set the json content type
+     */
     fun jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request {
         this[Headers.CONTENT_TYPE] = "application/json"
         return body(body, charset)
@@ -365,7 +430,7 @@ class Request(
      */
     override fun toString(): String = buildString {
         appendln("--> $url")
-        appendln("\"Body : ${if (getHttpBody().isNotEmpty()) String(getHttpBody()) else "(empty)"}\"")
+        appendln("\"Body : ${if (body.isNotEmpty()) String(body.toByteArray()) else "(empty)"}\"")
         appendln("\"Headers : (${headers.size})\"")
 
         val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
@@ -392,7 +457,7 @@ class Request(
 
         // body
         appendln()
-        appendln(String(getHttpBody()))
+        appendln(String(body.toByteArray()))
     }
 
     /**
@@ -412,7 +477,7 @@ class Request(
         }
 
         // body
-        val escapedBody = String(getHttpBody()).replace("\"", "\\\"")
+        val escapedBody = String(body.toByteArray()).replace("\"", "\\\"")
         if (escapedBody.isNotEmpty()) {
             append(" -d \"$escapedBody\"")
         }
