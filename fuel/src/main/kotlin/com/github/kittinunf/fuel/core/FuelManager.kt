@@ -131,7 +131,13 @@ class FuelManager {
 
     private fun request(request: Request): Request {
         request.client = client
-        request.headers += baseHeaders.orEmpty()
+
+        // Sets base headers ONLY if they are not set
+        val unsetBaseHeaders = request.headers.keys.fold(Headers.from(baseHeaders.orEmpty())) {
+            result, it -> result.remove(it); result
+        }
+        request.header(unsetBaseHeaders)
+
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
