@@ -9,6 +9,7 @@ import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 import com.github.kittinunf.result.Result
 import java.io.ByteArrayOutputStream
+import java.io.Console
 import java.io.File
 import java.io.OutputStream
 import java.net.URL
@@ -17,10 +18,11 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
+import java.util.logging.Logger
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
-typealias RequestInterceptor = (Request) -> Response
+typealias RequestInterceptor = (Request) -> Request
 typealias ResponseInterceptor = (Request, Response) -> Response
 
 class Request(
@@ -72,8 +74,8 @@ class Request(
     internal lateinit var callbackExecutor: Executor
 
     // interceptor
-    internal var requestInterceptor: RequestInterceptor? = null
-    internal var responseInterceptor: ResponseInterceptor? = null
+    internal lateinit var requestInterceptor: RequestInterceptor
+    internal lateinit var responseInterceptor: ResponseInterceptor
 
     // interfaces
     fun timeout(timeout: Int): Request {
@@ -92,43 +94,85 @@ class Request(
      * @return the current values (or empty if none)
      */
     operator fun get(header: String): HeaderValues {
-        return headers[header] ?: emptyList()
+        return headers[header]
     }
 
     /**
      * Set the values of the header, overriding what's there, after normalisation of the header
      * @param header [String] the header name
-     * @param values [List<Any>] the values to be transformed through #toString
+     * @param values [Collection<*>] the values to be transformed through #toString
      * @return self
      */
-    operator fun set(header: String, values: List<Any>): Request {
+    operator fun set(header: String, values: Collection<*>): Request {
         headers[header] = values.map { it.toString() }
         return this
     }
 
-    fun body(body: ByteArray): Request {
-        bodyCallback = { _, outputStream, _ ->
-            outputStream?.write(body)
-            body.size.toLong()
-        }
     /**
      * Set the value of the header, overriding what's there, after normalisation of the header
      * @param header [String] the header name
      * @param value [Any] the value to be transformed through #toString
      */
     operator fun set(header: String, value: Any): Request {
-        headers[header] = value.toString()
+        when(value) {
+            is Collection<*> -> this[header] = value
+            else -> headers[header] = value.toString()
+        }
         return this
     }
 
-    fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
-    fun header(header: String): HeaderValues = get(header)
-    fun header(header: String, value: List<Any>) = set(header, value)
+    /**
+     * Get the current values
+     *
+     * @see get(header: String)
+     * @return [HeaderValues] the current values
+     */
+    fun header(header: String) = get(header)
+
+    /**
+     * Replace the headers with the map provided
+     *
+     * @see set(header: String, values: Collection<*>)
+     * @see set(header: String, value: Any)
+     *
+     * @param headers [Map<String, Any>] map of headers to replace. Value can be a list or single value
+     * @return [Request] the modified request
+     */
+    fun header(headers: Map<String, Any>) = headers.entries.fold(this) { result, entry -> result.set(entry.key, entry.value) }
+
+    /**
+     * Replace the headers with the pairs provided
+     *
+     * @see set(header: String, values: Collection<*>)
+     * @see set(header: String, value: Any)
+     *
+     * @param headers [Pair<String, Any>] map of headers to replace. Value can be a list or single value
+     * @return [Request] the modified request
+     */
+    fun header(vararg headers: Pair<String, Any>) = headers.fold(this) { result, pair -> result.set(pair.first, pair.second) }
+
+    /**
+     * Replace the header with the provided values
+     *
+     * @see set(header: String, values: Collection<*>)
+     *
+     * @param header [String] the header to set
+     * @param values [List<Any>] the values to set the header to
+     * @return [Request] the modified request
+     */
+    fun header(header: String, values: Collection<*>) = set(header, values)
+
+    /**
+     * Replace the header with the provided value
+     *
+     * @see set(header: String, values: List<Any>)
+     *
+     * @param header [String] the header to set
+     * @param value [Any] the value to set the header to
+     * @return [Request] the modified request
+     */
     fun header(header: String, value: Any): Request = set(header, value)
 
-    fun jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request {
-        headers["Content-Type"] = "application/json"
-        return body(body, charset)
     /**
      * Appends the value to the header or sets it if there was none yet
      * @param header [String] the header name to append to
@@ -145,8 +189,24 @@ class Request(
      * @param values [Any] the value to be transformed through #toString
      */
     fun appendHeader(header: String, vararg values: Any): Request {
-        headers.appendAll(header, listOf(values))
+        headers.append(header, listOf(values))
         return this
+    }
+
+    fun body(body: ByteArray): Request {
+        bodyCallback = { _, outputStream, _ ->
+            outputStream?.write(body)
+            body.size.toLong()
+        }
+        return this
+    }
+
+    fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
+
+
+    fun jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request {
+        this[Headers.CONTENT_TYPE] = "application/json"
+        return body(body, charset)
     }
 
     fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
@@ -160,6 +220,9 @@ class Request(
             }
             else -> throw IllegalStateException("progress is only used with RequestType.DOWNLOAD or RequestType.UPLOAD")
         }
+        return this
+    }
+
     /**
      * Append each pair, using the key as header name and value as header content
      * @param pairs [Pair<String, Any>]
@@ -172,15 +235,18 @@ class Request(
     /**
      *  Replace each pair, using the key as header name and value as header content
      */
-    fun header(vararg pairs: Pair<String, Any>): Request {
-        pairs.forEach { pair -> header(pair.first, pair.second) }
-        return this
-    }
+
 
     fun blobs(blobs: (Request, URL) -> Iterable<Blob>): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest
                 ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
-    fun authenticate(username: String, password: String): Request = basicAuthentication(username, password)
+        uploadTaskRequest.sourceCallback = blobs
+        return this
+    }
+
+    fun blob(blob: (Request, URL) -> Blob) = blobs { request, _ -> listOf(blob(request, request.url)) }
+
+    fun authenticate(username: String, password: String) = basicAuthentication(username, password)
 
     fun basicAuthentication(username: String, password: String): Request {
         val auth = "$username:$password"
@@ -189,8 +255,6 @@ class Request(
         return this
     }
 
-    fun blob(blob: (Request, URL) -> Blob): Request {
-        blobs { request, _ -> listOf(blob(request, request.url)) }
     fun bearerAuthentication(bearerToken: String): Request {
         this[Headers.AUTHORIZATION] = "Bearer $bearerToken"
         return this
@@ -280,17 +344,17 @@ class Request(
         taskFuture?.cancel(true)
     }
 
-    override val request: Request
-        get() = this
+    override val request: Request get() = this
 
     override fun toString(): String = buildString {
         appendln("--> $url")
         appendln("\"Body : ${if (getHttpBody().isNotEmpty()) String(getHttpBody()) else "(empty)"}\"")
         appendln("\"Headers : (${headers.size})\"")
-        for ((key, value) in headers) {
-            appendln("$key : $value")
-        }
+
+        val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
+        headers.transformIterate(appendHeaderWithValue)
     }
+
 
     fun httpString(): String = buildString {
         // url
@@ -298,9 +362,10 @@ class Request(
         appendln("${method.value} $url$params")
         appendln()
         // headers
-        for ((key, value) in headers) {
-            appendln("$key : $value")
-        }
+
+        val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
+        headers.transformIterate(appendHeaderWithValue)
+
         // body
         appendln()
         appendln(String(getHttpBody()))
@@ -321,9 +386,8 @@ class Request(
         }
 
         // headers
-        for ((key, value) in headers) {
-            append(" -H \"$key:$value\"")
-        }
+        val appendHeaderWithValue = { key: String, value: String -> append(" -H \"$key:$value\"") }
+        headers.transformIterate(appendHeaderWithValue)
 
         // url
         append(" $url")
