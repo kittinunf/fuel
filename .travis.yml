@@ -22,6 +22,7 @@ cache:
 
 before_script:
   - chmod +x deploy_bintray.sh
+  - chmod +x add_review.sh
 
 script:
   - ./gradlew build
@@ -29,7 +30,7 @@ script:
 after_failure:
   - curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o ./reviewdog
   - chmod +x ./reviewdog
-  - find . -type f -name "*-lint.txt" -print0 | xargs -0 cat | ./reviewdog -efm="%f:%l:%c:%m" -name="ktlint" -reporter=github-pr-review
+  - ./add_review.sh
 
 after_success:
   - ./gradlew jacocoTestReport
