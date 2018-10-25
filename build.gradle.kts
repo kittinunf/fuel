@@ -1,11 +1,8 @@
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
-import com.jfrog.bintray.gradle.BintrayExtension
 import com.novoda.gradle.release.PublishExtension
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jmailen.gradle.kotlinter.KotlinterExtension
+import org.jmailen.gradle.kotlinter.support.ReporterType
 
 plugins {
     java
@@ -19,9 +16,9 @@ plugins {
 
 allprojects {
     repositories {
+        google()
         mavenCentral()
         jcenter()
-        google()
         maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
     }
 }
@@ -51,8 +48,8 @@ subprojects {
         }
 
         configure<JavaPluginConvention> {
-            sourceCompatibility = JavaVersion.VERSION_1_6
-            targetCompatibility = JavaVersion.VERSION_1_6
+            sourceCompatibility = JavaVersion.VERSION_1_7
+            targetCompatibility = JavaVersion.VERSION_1_7
 
             sourceSets {
                 getByName("main").java.srcDirs("src/main/kotlin")
@@ -93,8 +90,8 @@ subprojects {
             }
 
             compileOptions {
-                setSourceCompatibility(JavaVersion.VERSION_1_6)
-                setTargetCompatibility(JavaVersion.VERSION_1_6)
+                setSourceCompatibility(JavaVersion.VERSION_1_7)
+                setTargetCompatibility(JavaVersion.VERSION_1_7)
             }
 
             buildTypes {
@@ -137,6 +134,10 @@ subprojects {
             publishVersion = Fuel.publishVersion
             uploadName = "Fuel-Android"
             website = "https://github.com/kittinunf/Fuel"
+        }
+
+        configure<KotlinterExtension> {
+            reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
         }
     }
 }
