@@ -3,7 +3,7 @@ object Fuel {
     const val publishVersion = "1.16.0"
 
     const val compileSdkVersion = 27
-    const val minSdkVersion = 14
+    const val minSdkVersion = 19
 }
 
 // Core dependencies
