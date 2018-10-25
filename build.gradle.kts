@@ -48,8 +48,8 @@ subprojects {
         }
 
         configure<JavaPluginConvention> {
-            sourceCompatibility = JavaVersion.VERSION_1_6
-            targetCompatibility = JavaVersion.VERSION_1_6
+            sourceCompatibility = JavaVersion.VERSION_1_7
+            targetCompatibility = JavaVersion.VERSION_1_7
 
             sourceSets {
                 getByName("main").java.srcDirs("src/main/kotlin")
@@ -90,8 +90,8 @@ subprojects {
             }
 
             compileOptions {
-                setSourceCompatibility(JavaVersion.VERSION_1_6)
-                setTargetCompatibility(JavaVersion.VERSION_1_6)
+                setSourceCompatibility(JavaVersion.VERSION_1_7)
+                setTargetCompatibility(JavaVersion.VERSION_1_7)
             }
 
             buildTypes {
