@@ -232,8 +232,6 @@ class Request(
     /**
      *  Replace each pair, using the key as header name and value as header content
      */
-
-
     fun blobs(blobs: (Request, URL) -> Iterable<Blob>): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest
                 ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
