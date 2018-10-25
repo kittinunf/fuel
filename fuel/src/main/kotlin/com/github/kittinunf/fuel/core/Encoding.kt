@@ -20,7 +20,7 @@ class Encoding(
     private val encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
         var modifiedPath = path
         var data: String? = null
-        val headerPairs = defaultHeaders.toMutableMap()
+        val headerPairs = Headers.from(defaultHeaders)
         when {
             encodeParameterInUrl(method) -> {
                 var querySign = ""
@@ -34,10 +34,10 @@ class Encoding(
             }
             requestType == Request.Type.UPLOAD -> {
                 val boundary = System.currentTimeMillis().toString(16)
-                headerPairs += "Content-Type" to "multipart/form-data; boundary=$boundary"
+                headerPairs[Headers.CONTENT_TYPE] = "multipart/form-data; boundary=$boundary"
             }
             else -> {
-                headerPairs += "Content-Type" to "application/x-www-form-urlencoded"
+                headerPairs[Headers.CONTENT_TYPE] = "application/x-www-form-urlencoded"
                 data = queryFromParameters(parameters)
             }
         }
@@ -48,9 +48,9 @@ class Encoding(
                 type = requestType,
                 parameters = parameters ?: emptyList(),
                 timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond
+                timeoutReadInMillisecond = timeoutReadInMillisecond,
+                headers = headerPairs
         ).apply {
-            header(headerPairs, false)
             if (data != null) body(data)
         }
     }
@@ -87,5 +87,5 @@ class Encoding(
             .map { (key, value) -> URLEncoder.encode(key, "UTF-8") to URLEncoder.encode("$value", "UTF-8") }
             .joinToString("&") { (key, value) -> "$key=$value" }
 
-    private val defaultHeaders = mapOf("Accept-Encoding" to "compress;q=0.5, gzip;q=1.0")
+    private val defaultHeaders = Headers.from(mapOf(Headers.ACCEPT_ENCODING to "compress;q=0.5, gzip;q=1.0"))
 }
