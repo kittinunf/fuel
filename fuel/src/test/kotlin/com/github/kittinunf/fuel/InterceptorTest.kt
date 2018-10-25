@@ -19,7 +19,7 @@ import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.net.HttpURLConnection
-import java.util.*
+import java.util.Random
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class InterceptorTest : MockHttpTestCase() {

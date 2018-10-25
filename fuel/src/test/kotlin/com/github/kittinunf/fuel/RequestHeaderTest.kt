@@ -89,6 +89,5 @@ class RequestHeaderTest : MockHttpTestCase() {
 
         assertThat("val2=y; val3=x", equalTo(Headers.collapse(HeaderName(Headers.COOKIE), request[Headers.COOKIE])))
         assertThat("text/html", equalTo(Headers.collapse(HeaderName(Headers.CONTENT_TYPE), request[Headers.CONTENT_TYPE])))
-
     }
 }

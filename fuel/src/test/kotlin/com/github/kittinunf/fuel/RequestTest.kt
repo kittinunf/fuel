@@ -1,6 +1,10 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Headers
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.util.decodeBase64
 import com.google.common.net.MediaType
 import junit.framework.TestCase.assertEquals
