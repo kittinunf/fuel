@@ -152,7 +152,7 @@ Fuel.get("https://httpbin.org/get").responseString { request, response, result -
 ```
 
 * Java
-``` Java
+```java
 //get
 Fuel.get("https://httpbin.org/get", params).responseString(new Handler<String>() {
     @Override
@@ -332,7 +332,7 @@ curl -i -X POST -d "foo=foo&bar=bar&key=value" -H "Accept-Encoding:compress;q=0.
 * URL encoded style for GET & DELETE request
 
 ```kotlin
-Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result -> {
+Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
     //resolve to https://httpbin.org/get?foo=foo&bar=bar
 }
 
@@ -344,7 +344,7 @@ Fuel.delete("https://httpbin.org/delete", listOf("foo" to "foo", "bar" to "bar")
 * Array support for GET requests
 
 ```kotlin
-Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey"))).response { request, response, result -> {
+Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey"))).response { request, response, result ->
     //resolve to https://httpbin.org/get?foo=foo&dwarf[]=grumpy&dwarf[]=happy&dwarf[]=sleepy&dwarf[]=dopey
 }
 ```
@@ -445,7 +445,7 @@ Fuel.upload("/post").dataParts { request, url ->
 	DataPart(File.createTempFile("temp3", ".tmp"), "third-file", "image/jpeg") 
     ) 
 }.responseString { request, response, result ->
-    ... 
+    /* ... */ 
 }
 ```
 ### Upload a multipart form without a file
@@ -456,7 +456,7 @@ Fuel.upload("/post", param = formData)
     //Upload normally requires a file, but we can give it an empty list of `DataPart`
     .dataParts { request, url -> listOf<DataPart>() } 
     .responseString { request, response, result ->
-        ...
+        /* ... */
     }
 ```
 	
@@ -645,14 +645,16 @@ FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
     - `operator fun set(header: String, value: Collection<Any>): Request`: `request["foo"] = listOf("a", "b")`
     - `operator fun set(header: String, value: Any): Request`: `request["foo"] = "a"`
 * By default, all subsequent calls overwrite earlier calls, but you may use the `appendHeader` variant to append values to existing values.
-    - In earlier versions a `mapOf` overwrote, and `varargs pair` did not, but this was confusing. 
+    - In earlier versions a `mapOf` overwrote, and `varargs pair` did not, but this was confusing.
+* Some of the HTTP headers are defined under `Headers.Companion` and can be used instead of literal strings.
 
 ```kotlin
 Fuel.post("/my-post-path")
-    .header("Accept", "text/html, */*; q=0.1")
-    .header("Content-Type", "image/png")
-    .header("Cookie" to "basic=very")
-    .appendHeader("Cookie" to "value_1=foo", "Cookie" to "value_2=bar", "Accept" to "application/json")
+    .header(Headers.ACCEPT, "text/html, */*; q=0.1")
+    .header(Headers.CONTENT_TYPE, "image/png")
+    .header(HEADERS.COOKIE to "basic=very")
+    .appendHeader(HEADERS.COOKIE to "value_1=foo", HEADERS.COOKIE to "value_2=bar", HEADERS.ACCEPT to "application/json")
+    .appendHeader("MyFoo" to "bar", "MyFoo" to "baz")
     .response { /*...*/ }
     
  // => request with:
@@ -660,6 +662,7 @@ Fuel.post("/my-post-path")
  //      Accept: "text/html, */*; q=0.1; application/json"
  //      Content-Type: "image/png"
  //      Cookie: "basic=very; value_1=foo; value2=bar"
+ //      MyFoo: "bar; baz"
 ```
 
 * `baseParams` is used to manage common `key=value` query param, which will be automatically included in all of your subsequent requests in format of ` List<Pair<String, Any?>>` (`Any` is converted to `String` by `toString()` method)
@@ -891,7 +894,7 @@ The Reactor module API provides functions starting with the prefix `mono` to han
 
 ```kotlin
 Fuel.get("https://icanhazdadjoke.com")
-    .header("Accept" to "text/plain")
+    .header(Headers.ACCEPT to "text/plain")
     .monoString()
     .subscribe(::println)
 ```

@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.Request.Companion.toString
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
@@ -97,6 +98,7 @@ class Request(
 
     /**
      * Set the values of the header, overriding what's there, after normalisation of the header
+     *
      * @param header [String] the header name
      * @param values [Collection<*>] the values to be transformed through #toString
      * @return self
@@ -108,6 +110,7 @@ class Request(
 
     /**
      * Set the value of the header, overriding what's there, after normalisation of the header
+     *
      * @param header [String] the header name
      * @param value [Any] the value to be transformed through #toString
      */
@@ -130,6 +133,10 @@ class Request(
     /**
      * Replace the headers with the map provided
      *
+     * @note In earlier versions the mapOf variant of this function worked differently than the vararg pairs variant,
+     *  which has been changed to make any call to header(...) always overwrite the values and any call to
+     *  appendHeader(...) will try to append the value.
+     *
      * @see set(header: String, values: Collection<*>)
      * @see set(header: String, value: Any)
      *
@@ -140,6 +147,10 @@ class Request(
 
     /**
      * Replace the headers with the pairs provided
+     *
+     * @note In earlier versions the mapOf variant of this function worked differently than the vararg pairs variant,
+     *  which has been changed to make any call to header(...) always overwrite the values and any call to
+     *  appendHeader(...) will try to append the value.
      *
      * @see set(header: String, values: Collection<*>)
      * @see set(header: String, value: Any)
@@ -173,6 +184,7 @@ class Request(
 
     /**
      * Appends the value to the header or sets it if there was none yet
+     *
      * @param header [String] the header name to append to
      * @param value [Any] the value to be transformed through #toString
      */
@@ -183,11 +195,22 @@ class Request(
 
     /**
      * Appends the value to the header or sets it if there was none yet
+     *
      * @param header [String] the header name to append to
      * @param values [Any] the value to be transformed through #toString
      */
     fun appendHeader(header: String, vararg values: Any): Request {
         headers.append(header, listOf(values))
+        return this
+    }
+
+    /**
+     * Append each pair, using the key as header name and value as header content
+     *
+     * @param pairs [Pair<String, Any>]
+     */
+    fun appendHeader(vararg pairs: Pair<String, Any>): Request {
+        pairs.forEach { pair -> appendHeader(pair.first, pair.second) }
         return this
     }
 
@@ -217,15 +240,6 @@ class Request(
             }
             else -> throw IllegalStateException("progress is only used with RequestType.DOWNLOAD or RequestType.UPLOAD")
         }
-        return this
-    }
-
-    /**
-     * Append each pair, using the key as header name and value as header content
-     * @param pairs [Pair<String, Any>]
-     */
-    fun appendHeader(vararg pairs: Pair<String, Any>): Request {
-        pairs.forEach { pair -> appendHeader(pair.first, pair.second) }
         return this
     }
 
@@ -341,6 +355,14 @@ class Request(
 
     override val request: Request get() = this
 
+    /**
+     * Returns a string representation of the request.
+     *
+     * @see httpString
+     * @see cUrlString
+     *
+     * @return [String] the string representation
+     */
     override fun toString(): String = buildString {
         appendln("--> $url")
         appendln("\"Body : ${if (getHttpBody().isNotEmpty()) String(getHttpBody()) else "(empty)"}\"")
@@ -350,6 +372,14 @@ class Request(
         headers.transformIterate(appendHeaderWithValue)
     }
 
+    /**
+     * Returns a representation that can be used over the HTTP protocol
+     *
+     * @see toString
+     * @see cUrlString
+     *
+     * @return [String] the string representation
+     */
     fun httpString(): String = buildString {
         // url
         val params = parameters.joinToString(separator = "&", prefix = "?") { "${it.first}=${it.second}" }
@@ -365,6 +395,14 @@ class Request(
         appendln(String(getHttpBody()))
     }
 
+    /**
+     * Returns a representation that can be used with cURL
+     *
+     * @see toString
+     * @see httpString
+     *
+     * @return [String] the string representation
+     */
     fun cUrlString(): String = buildString {
         append("$ curl -i")
 
