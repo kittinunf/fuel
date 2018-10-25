@@ -45,6 +45,7 @@ The easiest HTTP networking library for Kotlin/Android.
 ### Dependency - fuel-android
 
 * [Android SDK](https://developer.android.com/studio/index.html) - Android SDK
+* Min SDK: 19 
 
 ### Dependency - fuel-livedata
 
