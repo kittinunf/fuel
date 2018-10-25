@@ -11,7 +11,7 @@ class Response(
     val url: URL,
     val statusCode: Int = -1,
     val responseMessage: String = "",
-    val headers: Map<String, List<String>> = emptyMap(),
+    val headers: Headers = Headers(),
     val contentLength: Long = 0L,
     val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
 ) {
@@ -39,8 +39,17 @@ class Response(
         }
     }
 
+    /**
+     * Get the current values of the header, after normalisation of the header
+     * @param header [String] the header name
+     * @return the current values (or empty if none)
+     */
+    operator fun get(header: String): HeaderValues {
+        return headers[header]
+    }
+
     override fun toString(): String {
-        val contentType = guessContentType(headers)
+        val contentType = guessContentType()
         val dataString = processBody(contentType, data)
 
         return buildString {
@@ -49,16 +58,15 @@ class Response(
             appendln("Length : $contentLength")
             appendln("Body : ($dataString)")
             appendln("Headers : (${headers.size})")
-            for ((key, value) in headers) {
-                appendln("$key : $value")
-            }
+
+            val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
+            headers.transformIterate(appendHeaderWithValue)
         }
     }
 
-    internal fun guessContentType(headers: Map<String, List<String>>): String {
-        // TODO: use case insensitive map
-        val contentTypeFromHeaders = (headers["Content-Type"] ?: headers["content-type"])?.first()
-        if (contentTypeFromHeaders is String && !contentTypeFromHeaders.isNullOrEmpty()) {
+    internal fun guessContentType(headers: Headers = this.headers): String {
+        val contentTypeFromHeaders = headers[Headers.CONTENT_TYPE].lastOrNull()
+        if (!contentTypeFromHeaders.isNullOrEmpty()) {
             return contentTypeFromHeaders
         }
 
