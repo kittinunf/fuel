@@ -1,9 +1,6 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.Encoding
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.util.decodeBase64
 import com.google.common.net.MediaType
 import junit.framework.TestCase.assertEquals
@@ -105,7 +102,7 @@ class RequestTest : MockHttpTestCase() {
         val decodedImage = "iVBORwKGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAClEQVQYV2NgYAAAAAMAAWgmWQAAAAASUVORK5CYII=".decodeBase64()
 
         val httpResponse = mock.response()
-                .withHeader("Content-Type", "image/png")
+                .withHeader(Headers.CONTENT_TYPE, "image/png")
                 .withBody(BinaryBody(decodedImage))
 
         mock.chain(
@@ -120,7 +117,6 @@ class RequestTest : MockHttpTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-
         assertThat(response.toString(), containsString("bytes of image/png"))
 
         val statusCode = HttpURLConnection.HTTP_OK
@@ -189,7 +185,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        val headers: Map<String, List<String>> = mapOf(Pair("Content-Type", listOf("")))
+        val headers: Headers = Headers.from(mapOf(Pair(Headers.CONTENT_TYPE, listOf(""))))
         assertThat(response.guessContentType(headers), isEqualTo("(unknown)"))
     }
 
@@ -295,7 +291,7 @@ class RequestTest : MockHttpTestCase() {
         val string = data as String
 
         assertThat(request, notNullValue())
-        assertThat(request.httpHeaders["Content-Type"], equalTo("application/json"))
+        assertThat(request["Content-Type"].lastOrNull(), equalTo("application/json"))
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
@@ -610,7 +606,7 @@ class RequestTest : MockHttpTestCase() {
         val request = Request(method = Method.GET,
                 path = "",
                 url = URL("http://httpbin.org/get"),
-                headers = mutableMapOf("Authentication" to "Bearer xxx"),
+                headers = Headers.from("Authentication" to "Bearer xxx"),
                 parameters = listOf("foo" to "xxx"),
                 timeoutInMillisecond = 15000,
                 timeoutReadInMillisecond = 15000)
@@ -623,7 +619,7 @@ class RequestTest : MockHttpTestCase() {
         val request = Request(method = Method.POST,
                 path = "",
                 url = URL("http://httpbin.org/post"),
-                headers = mutableMapOf("Authentication" to "Bearer xxx"),
+                headers = Headers.from("Authentication" to "Bearer xxx"),
                 parameters = listOf("foo" to "xxx"),
                 timeoutInMillisecond = 15000,
                 timeoutReadInMillisecond = 15000)
@@ -635,7 +631,7 @@ class RequestTest : MockHttpTestCase() {
     fun httpStringWithOutParams() {
         val request = Request(Method.GET, "",
                 url = URL("http://httpbin.org/post"),
-                headers = mutableMapOf("Content-Type" to "text/html"),
+                headers = Headers.from("Content-Type" to "text/html"),
                 timeoutInMillisecond = 15000,
                 timeoutReadInMillisecond = 15000)
 
@@ -647,7 +643,7 @@ class RequestTest : MockHttpTestCase() {
     fun httpStringWithParams() {
         val request = Request(Method.POST, "",
                 url = URL("http://httpbin.org/post"),
-                headers = mutableMapOf("Content-Type" to "text/html"),
+                headers = Headers.from("Content-Type" to "text/html"),
                 parameters = listOf("foo" to "xxx"),
                 timeoutInMillisecond = 15000,
                 timeoutReadInMillisecond = 15000).body("it's a body")

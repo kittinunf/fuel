@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.Blob
+import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.util.copyTo
 import java.io.OutputStream
@@ -89,6 +90,6 @@ private fun guessContentType(name: String): String = try {
 }
 
 fun retrieveBoundaryInfo(request: Request): String {
-    return request.headers["Content-Type"]?.split("boundary=", limit = 2)?.getOrNull(1)
+    return request[Headers.CONTENT_TYPE].lastOrNull()?.split("boundary=", limit = 2)?.getOrNull(1)
             ?: System.currentTimeMillis().toString(16)
 }

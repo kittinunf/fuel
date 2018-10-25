@@ -3,6 +3,7 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.DataPart
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.requests.retrieveBoundaryInfo
@@ -337,7 +338,7 @@ class RequestUploadTest : MockHttpTestCase() {
         val request = Request(Method.POST, "", URL("http://httpbin.org"),
                 timeoutInMillisecond = 15000,
                 timeoutReadInMillisecond = 15000)
-        request.header(Pair("Content-Type", "multipart/form-data; boundary=160f77ec3eff"))
+        request.header(Pair(Headers.CONTENT_TYPE, "multipart/form-data; boundary=160f77ec3eff"))
 
         val boundary = retrieveBoundaryInfo(request)
 

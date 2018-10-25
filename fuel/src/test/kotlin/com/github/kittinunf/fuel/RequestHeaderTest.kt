@@ -1,6 +1,8 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.HeaderName
+import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
@@ -42,7 +44,7 @@ class RequestHeaderTest : MockHttpTestCase() {
     }
 
     @Test
-    fun httpRequestHeaderWithDuplicateValuesForCookieKey() {
+    fun cookieHeaderUsingAppendIsCorrectlyCollapsed() {
         val manager = FuelManager()
 
         mock.chain(
@@ -51,29 +53,42 @@ class RequestHeaderTest : MockHttpTestCase() {
         )
 
         val (_, response, _) = manager.request(Method.GET, mock.path("get"))
-                .header("foo" to "bar", "a" to "b", "cookie" to "val1=x", "cookie" to "val2=y", "cookie" to "val3=z", "cookie" to "val4=j")
+                .appendHeader("foo" to "bar", "a" to "b", "cookie" to "val1=x", "cookie" to "val2=y", "cookie" to "val3=z", "cookie" to "val4=j")
                 .responseString()
 
-        assertThat("val1=x; val2=y; val3=z; val4=j", equalTo(response.headers["Cookie"]?.firstOrNull()))
+        assertThat("val1=x; val2=y; val3=z; val4=j", equalTo(response[Headers.COOKIE].lastOrNull()))
     }
 
     @Test
-    fun multipleHeadersByTheSameKeyWillBeCorrectlyFormatted() {
+    fun headersCollapseCorrectly() {
         val manager = FuelManager()
         val request = manager.request(Method.GET, mock.path("get"))
-                .header("foo" to "bar", "a" to "b", "cookie" to "val1=x", "cookie" to "val2=y", "cookie" to "val3=z", "cookie" to "val4=j")
+            .appendHeader("foo" to "bar; p=2", "foo" to "baz", "cookie" to "val1=x", "cookie" to "val2=y", "cookie" to "val3=z", "cookie" to "val4=j")
 
-        assertThat("val1=x; val2=y; val3=z; val4=j", equalTo(request.headers["cookie"]))
-        assertThat("bar", equalTo(request.headers["foo"]))
-        assertThat("b", equalTo(request.headers["a"]))
+        assertThat("val1=x; val2=y; val3=z; val4=j", equalTo(Headers.collapse(HeaderName(Headers.COOKIE), request[Headers.COOKIE])))
+        assertThat("bar; p=2, baz", equalTo(Headers.collapse(HeaderName("foo"), request["foo"])))
     }
 
     @Test
-    fun multipleHeadersByTheSameKeyWillShowLastUsingMap() {
+    fun cookieHeaderUsingHeaderUsesLastValue() {
         val manager = FuelManager()
         val request = manager.request(Method.GET, mock.path("get"))
-                .header(mapOf("cookie" to "val1=x", "cookie" to "val2=y"), false)
+                .header("cookie" to "val1=x", "cookie" to "val2=y")
 
-        assertThat("val2=y", equalTo(request.headers["cookie"]))
+        assertThat("val2=y", equalTo(Headers.collapse(HeaderName(Headers.COOKIE), request[Headers.COOKIE])))
+    }
+
+    @Test
+    fun headersAreNormalised() {
+        val manager = FuelManager()
+        val request = manager.request(Method.GET, mock.path("get"))
+                .header("cookie" to "val1=x", "Cookie" to "val2=y")
+                .appendHeader("cOoKie" to "val3=x")
+                .header("content-type", "application/vnd.fuel.test.v1+json")
+                .appendHeader("Content-Type", "text/html")
+
+        assertThat("val2=y; val3=x", equalTo(Headers.collapse(HeaderName(Headers.COOKIE), request[Headers.COOKIE])))
+        assertThat("text/html", equalTo(Headers.collapse(HeaderName(Headers.CONTENT_TYPE), request[Headers.CONTENT_TYPE])))
+
     }
 }
