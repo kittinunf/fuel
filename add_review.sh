@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm lint.txt
+rm -f lint.txt
 
 for file in $(find . -type f -name "*-lint.txt");
 do
@@ -12,5 +12,4 @@ do
   done < $file
 done
 
-#cat lint.txt | ./reviewdog -efm="%f:%l:%c: %m" -name="ktlint" -diff="git diff master"
 cat lint.txt | ./reviewdog -efm="%f:%l:%c: %m" -name="ktlint" -reporter=github-pr-review

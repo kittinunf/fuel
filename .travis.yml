@@ -25,7 +25,8 @@ before_script:
   - chmod +x add_review.sh
 
 script:
-  - ./gradlew build
+  - ./gradlew lintKotlin
+  - ./gradlew test
 
 after_failure:
   - curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o ./reviewdog
