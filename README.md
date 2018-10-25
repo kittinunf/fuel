@@ -1,6 +1,8 @@
 # Fuel
 
-[ ![Kotlin](https://img.shields.io/badge/Kotlin-1.2.51-blue.svg)](https://kotlinlang.org) [ ![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg) ](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0.rc.146-blue.svg)](https://kotlinlang.org) 
+[![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg)](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) 
+[![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
 [![Codecov](https://codecov.io/github/kittinunf/Fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/Fuel)
 
 The easiest HTTP networking library for Kotlin/Android.
@@ -26,6 +28,16 @@ The easiest HTTP networking library for Kotlin/Android.
 
 ## Installation
 
+### There are 2 versions of Fuel build against different Kotlin Versions 
+
+#### [![Download](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg?version=1.15.1)](https://bintray.com/kittinunf/maven/Fuel-Android/1.15.1/link)
+* Kotlin - 1.2.71
+* Coroutine - 0.23.3
+
+#### [![Download](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg?version=1.16.0)](https://bintray.com/kittinunf/maven/Fuel-Android/1.16.0/link)
+* Kotlin - 1.3.0-rc-146
+* Coroutine - 0.30.1-eap13
+
 ### Dependency - fuel
 
 * [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
@@ -33,6 +45,7 @@ The easiest HTTP networking library for Kotlin/Android.
 ### Dependency - fuel-android
 
 * [Android SDK](https://developer.android.com/studio/index.html) - Android SDK
+* Min SDK: 19 
 
 ### Dependency - fuel-livedata
 

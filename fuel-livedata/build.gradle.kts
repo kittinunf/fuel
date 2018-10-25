@@ -1,8 +1,8 @@
 dependencies {
     api(project(":fuel"))
-    implementation(Dependencies.kotlinStdlib)
-    implementation(Dependencies.androidArchExtensions)
-    testImplementation(Dependencies.robolectric)
-    testImplementation(Dependencies.junit)
-    testCompile(Dependencies.mockServer)
+    implementation(Kotlin.stdlib)
+    implementation(Android.Arch.extensions)
+    testImplementation(RoboElectric.dependency)
+    testImplementation(JUnit.dependency)
+    testCompile(MockServer.dependency)
 }

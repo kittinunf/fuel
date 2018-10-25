@@ -8,7 +8,7 @@ interface Environment {
 
 fun createEnvironment(): Environment = try {
     Class.forName(AndroidEnvironmentClass).newInstance() as Environment
-} catch(exception: ClassNotFoundException) {
+} catch (exception: ClassNotFoundException) {
     DefaultEnvironment()
 }
 
@@ -17,4 +17,3 @@ class DefaultEnvironment : Environment {
 }
 
 const val AndroidEnvironmentClass = "com.github.kittinunf.fuel.android.util.AndroidEnvironment"
-

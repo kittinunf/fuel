@@ -1,21 +1,21 @@
 import com.android.build.gradle.BaseExtension
 
 plugins {
-    id("com.android.application")
+    id(Android.appPlugin)
 }
 
 dependencies {
-    implementation(Dependencies.androidAppCompat)
+    implementation(Android.Support.appCompat)
     api(project(":fuel-android"))
 }
 
 configure<BaseExtension> {
-    compileSdkVersion(Versions.fuelCompileSdkVersion)
+    compileSdkVersion(Fuel.compileSdkVersion)
 
     defaultConfig {
         applicationId = "com.example.java.fuel"
-        minSdkVersion(Versions.fuelMinSdkVersion)
-        targetSdkVersion(Versions.fuelCompileSdkVersion)
+        minSdkVersion(Fuel.minSdkVersion)
+        targetSdkVersion(Fuel.compileSdkVersion)
         versionCode = 1
         versionName = "1.0"
     }

@@ -1,5 +1,8 @@
 language: android
 
+env:
+  - REVIEWDOG_VERSION=0.9.11
+
 android:
   components:
     - tools
@@ -19,9 +22,16 @@ cache:
 
 before_script:
   - chmod +x deploy_bintray.sh
+  - chmod +x add_review.sh
 
 script:
-  - ./gradlew test --stacktrace
+  - ./gradlew lintKotlin
+  - ./gradlew test
+
+after_failure:
+  - curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o ./reviewdog
+  - chmod +x ./reviewdog
+  - ./add_review.sh
 
 after_success:
   - ./gradlew jacocoTestReport

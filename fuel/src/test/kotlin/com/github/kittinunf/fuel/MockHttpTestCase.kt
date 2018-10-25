@@ -17,5 +17,4 @@ abstract class MockHttpTestCase : BaseTestCase() {
     fun tearDown() {
         this.mock.tearDown()
     }
-
 }

@@ -25,4 +25,3 @@ fun loggingResponseInterceptor(): (Request, Response) -> Response =
             println(response.toString())
             response
         }
-

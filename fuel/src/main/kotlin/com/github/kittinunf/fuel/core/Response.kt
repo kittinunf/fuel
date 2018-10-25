@@ -8,12 +8,12 @@ import java.net.URL
 import java.net.URLConnection
 
 class Response(
-        val url: URL,
-        val statusCode: Int = -1,
-        val responseMessage: String = "",
-        val headers: Map<String, List<String>> = emptyMap(),
-        val contentLength: Long = 0L,
-        val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
+    val url: URL,
+    val statusCode: Int = -1,
+    val responseMessage: String = "",
+    val headers: Map<String, List<String>> = emptyMap(),
+    val contentLength: Long = 0L,
+    val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
 ) {
     @Deprecated(replaceWith = ReplaceWith("contentLength"), message = "http naming is deprecated, use 'contentLength' instead")
     val httpContentLength
@@ -34,7 +34,7 @@ class Response(
     var data: ByteArray by readWriteLazy {
         try {
             dataStream.readBytes()
-        } catch (ex: IOException) {  // If dataStream closed by deserializer
+        } catch (ex: IOException) { // If dataStream closed by deserializer
             ByteArray(0)
         }
     }

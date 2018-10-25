@@ -1,7 +1,9 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Method
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.io.File
@@ -12,7 +14,6 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
     class PathStringConvertibleImpl(url: String) : Fuel.PathStringConvertible {
         override val path = url
     }
-
 
     @Test
     fun httpGetRequestWithSharedInstance() {
@@ -165,5 +166,4 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response.statusCode, isEqualTo(statusCode))
     }
-
 }

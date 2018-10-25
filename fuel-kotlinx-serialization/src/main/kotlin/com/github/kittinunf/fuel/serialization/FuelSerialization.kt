@@ -19,7 +19,6 @@ inline fun <reified T : Any> Request.responseObject(
     noinline deserializer: (Request, Response, Result<T, FuelError>) -> Unit
 ) = response(kotlinxDeserializerOf(loader, json), deserializer)
 
-
 inline fun <reified T : Any> Request.responseObject(
     deserializer: Handler<T>,
     loader: KSerialLoader<T> = T::class.serializer(),

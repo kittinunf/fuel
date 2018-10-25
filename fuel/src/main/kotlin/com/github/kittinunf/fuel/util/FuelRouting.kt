@@ -8,7 +8,7 @@ import com.github.kittinunf.fuel.core.Request
 /**
  * Created by matteocrippa on 8/16/17.
  */
-interface FuelRouting: Fuel.RequestConvertible {
+interface FuelRouting : Fuel.RequestConvertible {
     /**
      * Base path handler for the remote call.
      */
@@ -38,7 +38,6 @@ interface FuelRouting: Fuel.RequestConvertible {
      * Headers for remote call.
      */
     val headers: Map<String, String>?
-
 
     /**
      * @return a Request object.

@@ -18,4 +18,3 @@ enum class Method(val value: String) {
     TRACE("TRACE"),
     PATCH("PATCH"),
 }
-

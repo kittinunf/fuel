@@ -89,16 +89,15 @@ class FuelLiveDataTest {
             }
     }
 
-    //Model
+    // Model
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
-    //Deserializer
+    // Deserializer
     class HttpBinUserAgentModelDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
 
         override fun deserialize(content: String): HttpBinUserAgentModel {
             return HttpBinUserAgentModel(content)
         }
-
     }
 
     @Test
@@ -130,5 +129,4 @@ class FuelLiveDataTest {
                 assertThat(it?.second, instanceOf(Result.Failure::class.java))
             }
     }
-
 }

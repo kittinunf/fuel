@@ -3,7 +3,12 @@ package com.github.kittinunf.fuel.forge
 import com.github.kittinunf.forge.Forge
 import com.github.kittinunf.forge.core.DeserializedResult
 import com.github.kittinunf.forge.core.JSON
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 
 inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.() -> DeserializedResult<T>, noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) =

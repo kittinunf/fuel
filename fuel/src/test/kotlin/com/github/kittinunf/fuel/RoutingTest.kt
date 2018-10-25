@@ -5,16 +5,18 @@ import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.util.FuelRouting
 import com.github.kittinunf.fuel.util.decodeBase64ToString
 import com.github.kittinunf.fuel.util.encodeBase64
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
 import org.json.JSONObject
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RoutingTest: MockHttpTestCase() {
+class RoutingTest : MockHttpTestCase() {
     private val manager: FuelManager by lazy { FuelManager() }
-    sealed class TestApi(private val host: String): FuelRouting {
+    sealed class TestApi(private val host: String) : FuelRouting {
         override val basePath = this.host
 
         class GetTest(host: String) : TestApi(host)
@@ -86,7 +88,6 @@ class RoutingTest: MockHttpTestCase() {
                     else -> null
                 }
             }
-
     }
 
     @Test

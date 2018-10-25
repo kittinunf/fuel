@@ -26,8 +26,8 @@ class Fuel {
         @JvmStatic
         fun regularMode() = testMode { timeout = null; blocking = false }
 
-        //convenience methods
-        //get
+        // convenience methods
+        // get
         @JvmStatic
         @JvmOverloads
         fun get(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
@@ -38,7 +38,7 @@ class Fuel {
         fun get(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.GET, convertible, parameters)
 
-        //post
+        // post
         @JvmStatic
         @JvmOverloads
         fun post(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
@@ -49,7 +49,7 @@ class Fuel {
         fun post(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.POST, convertible, parameters)
 
-        //put
+        // put
         @JvmStatic
         @JvmOverloads
         fun put(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
@@ -60,7 +60,7 @@ class Fuel {
         fun put(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.PUT, convertible, parameters)
 
-        //patch
+        // patch
         @JvmStatic
         @JvmOverloads
         fun patch(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
@@ -71,7 +71,7 @@ class Fuel {
         fun patch(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.PATCH, convertible, parameters)
 
-        //delete
+        // delete
         @JvmStatic
         @JvmOverloads
         fun delete(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
@@ -82,7 +82,7 @@ class Fuel {
         fun delete(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 request(Method.DELETE, convertible, parameters)
 
-        //download
+        // download
         @JvmStatic
         @JvmOverloads
         fun download(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
@@ -93,7 +93,7 @@ class Fuel {
         fun download(convertible: PathStringConvertible, parameters: List<Pair<String, Any?>>? = null): Request =
                 download(convertible.path, parameters)
 
-        //upload
+        // upload
         @JvmStatic
         @JvmOverloads
         fun upload(path: String, method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request =
@@ -104,7 +104,7 @@ class Fuel {
         fun upload(convertible: PathStringConvertible, method: Method = Method.POST, parameters: List<Pair<String, Any?>>? = null): Request =
                 upload(convertible.path, method, parameters)
 
-        //head
+        // head
         @JvmStatic
         @JvmOverloads
         fun head(path: String, parameters: List<Pair<String, Any?>>? = null): Request =
@@ -152,9 +152,9 @@ class Fuel {
 
 @JvmOverloads
 fun String.httpGet(parameters: List<Pair<String, Any?>>? = null): Request = Fuel.get(this, parameters?.flatMap { pair ->
-    (pair.second as? Iterable<*> )?.map {
+    (pair.second as? Iterable<*>)?.map {
         "${pair.first}[]" to it
-    }?.toList() ?: (pair.second as? Array<*> )?.map {
+    }?.toList() ?: (pair.second as? Array<*>)?.map {
         "${pair.first}[]" to it
     }?.toList() ?: listOf(pair)
 })

@@ -38,7 +38,7 @@ class FuelGsonTest {
         this.mock.tearDown()
     }
 
-    //Model
+    // Model
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
     @Test
@@ -49,7 +49,7 @@ class FuelGsonTest {
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(gsonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
+                .responseObject(gsonDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
                     assertThat(result.component1(), notNullValue())
                     assertThat(result.component2(), notNullValue())
                 }
@@ -63,7 +63,7 @@ class FuelGsonTest {
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(gsonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
+                .responseObject(gsonDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
                     assertThat(result.component1(), notNullValue())
                     assertThat(result.component2(), instanceOf(Result.Failure::class.java))
                 }
@@ -113,7 +113,6 @@ class FuelGsonTest {
                     override fun failure(request: Request, response: Response, error: FuelError) {
                         assertThat(error, notNullValue())
                     }
-
                 })
     }
 
@@ -133,7 +132,6 @@ class FuelGsonTest {
                     override fun failure(request: Request, response: Response, error: FuelError) {
                         assertThat(error, instanceOf(Result.Failure::class.java))
                     }
-
                 })
     }
 

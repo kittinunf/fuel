@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
  * Executes all submitted tasks directly in the same thread as the caller.
  */
 internal class SameThreadExecutorService : AbstractExecutorService() {
-    //volatile because can be viewed by other threads
+    // volatile because can be viewed by other threads
     @Volatile private var terminated: Boolean = false
 
     override fun shutdown() {

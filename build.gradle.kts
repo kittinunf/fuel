@@ -1,38 +1,24 @@
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
-import com.jfrog.bintray.gradle.BintrayExtension
 import com.novoda.gradle.release.PublishExtension
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jmailen.gradle.kotlinter.KotlinterExtension
+import org.jmailen.gradle.kotlinter.support.ReporterType
 
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-        google()
-        maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
-        maven(url = "https://kotlin.bintray.com/kotlinx")
-        maven(url = "http://dl.bintray.com/kotlin/kotlin-eap")
-    }
-
-    dependencies {
-        classpath(Plugins.android)
-        classpath(Plugins.jacocoAndroid)
-        classpath(Plugins.bintray)
-        classpath(Plugins.kotlin)
-        classpath(Plugins.serialization)
-    }
+plugins {
+    java
+    kotlin("jvm") version Kotlin.version apply false
+    id(Android.libPlugin) version Android.version apply false
+    id(Jacoco.Android.plugin) version Jacoco.Android.version apply false
+    id(BintrayRelease.plugin) version BintrayRelease.version apply false
+    id(KotlinX.Serialization.plugin) version Kotlin.version apply false
+    id(Ktlint.plugin) version Ktlint.version apply false
 }
-
-plugins { java }
 
 allprojects {
     repositories {
+        google()
         mavenCentral()
         jcenter()
-        google()
         maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
     }
 }
@@ -48,22 +34,22 @@ subprojects {
     if (isJvmModule) {
         apply {
             plugin("java")
-            plugin("kotlin")
-            plugin("jacoco")
+            plugin(Kotlin.plugin)
+            plugin(Jacoco.plugin)
         }
 
         configure<JacocoPluginExtension> {
-            toolVersion = Versions.jacocoVersion
+            toolVersion = Jacoco.version
         }
 
         dependencies {
-            compile(Dependencies.kotlinStdlib)
-            testCompile(Dependencies.junit)
+            compile(Kotlin.stdlib)
+            testCompile(JUnit.dependency)
         }
 
         configure<JavaPluginConvention> {
-            sourceCompatibility = JavaVersion.VERSION_1_6
-            targetCompatibility = JavaVersion.VERSION_1_6
+            sourceCompatibility = JavaVersion.VERSION_1_7
+            targetCompatibility = JavaVersion.VERSION_1_7
 
             sourceSets {
                 getByName("main").java.srcDirs("src/main/kotlin")
@@ -82,20 +68,20 @@ subprojects {
 
     if (isAndroidModule) {
         apply {
-            plugin("com.android.library")
-            plugin("kotlin-android")
-            plugin("kotlin-android-extensions")
-            plugin("jacoco-android")
+            plugin(Android.libPlugin)
+            plugin(Kotlin.androidPlugin)
+            plugin(Kotlin.androidExtensionsPlugin)
+            plugin(Jacoco.Android.plugin)
         }
 
         configure<BaseExtension> {
-            compileSdkVersion(Versions.fuelCompileSdkVersion)
+            compileSdkVersion(Fuel.compileSdkVersion)
 
             defaultConfig {
-                minSdkVersion(Versions.fuelMinSdkVersion)
-                targetSdkVersion(Versions.fuelCompileSdkVersion)
+                minSdkVersion(Fuel.minSdkVersion)
+                targetSdkVersion(Fuel.compileSdkVersion)
                 versionCode = 1
-                versionName = Versions.publishVersion
+                versionName = Fuel.publishVersion
             }
 
             sourceSets {
@@ -104,8 +90,8 @@ subprojects {
             }
 
             compileOptions {
-                setSourceCompatibility(JavaVersion.VERSION_1_6)
-                setTargetCompatibility(JavaVersion.VERSION_1_6)
+                setSourceCompatibility(JavaVersion.VERSION_1_7)
+                setTargetCompatibility(JavaVersion.VERSION_1_7)
             }
 
             buildTypes {
@@ -129,11 +115,14 @@ subprojects {
             html.enabled(true)
             xml.enabled(true)
         }
+
+        tasks.withType<Javadoc>().all { enabled = false }
     }
 
     if (!isSample) {
         apply {
-            plugin("com.novoda.bintray-release")
+            plugin(BintrayRelease.plugin)
+            plugin(Ktlint.plugin)
         }
 
         configure<PublishExtension> {
@@ -142,9 +131,13 @@ subprojects {
             desc = "The easiest HTTP networking library in Kotlin/Android"
             groupId = "com.github.kittinunf.fuel"
             setLicences("MIT")
-            publishVersion = Versions.publishVersion
+            publishVersion = Fuel.publishVersion
             uploadName = "Fuel-Android"
             website = "https://github.com/kittinunf/Fuel"
+        }
+
+        configure<KotlinterExtension> {
+            reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
         }
     }
 }

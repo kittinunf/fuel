@@ -9,7 +9,7 @@ if [[ "$TRAVIS_BRANCH" == */release-v* ]]; then
     m=${i%%/}
     if [[ $m == fuel* ]]; then
       echo ">> Deploying $m ..."
-      ./gradlew :$i:clean :$i:build :$i:bintrayUpload -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY -PdryRun=false
+      ./gradlew :$m:clean :$m:build :$m:bintrayUpload -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY -PdryRun=false
     fi
   done
 

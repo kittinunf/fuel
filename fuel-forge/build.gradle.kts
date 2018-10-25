@@ -2,6 +2,6 @@ plugins { java }
 
 dependencies {
     compile(project(":fuel"))
-    compile(Dependencies.forge)
-    testCompile(Dependencies.mockServer)
+    compile(Forge.dependency)
+    testCompile(MockServer.dependency)
 }
