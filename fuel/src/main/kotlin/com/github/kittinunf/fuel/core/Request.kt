@@ -9,7 +9,6 @@ import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 import com.github.kittinunf.result.Result
 import java.io.ByteArrayOutputStream
-import java.io.Console
 import java.io.File
 import java.io.OutputStream
 import java.net.URL
@@ -18,7 +17,6 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
-import java.util.logging.Logger
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
@@ -114,7 +112,7 @@ class Request(
      * @param value [Any] the value to be transformed through #toString
      */
     operator fun set(header: String, value: Any): Request {
-        when(value) {
+        when (value) {
             is Collection<*> -> this[header] = value
             else -> headers[header] = value.toString()
         }
@@ -202,7 +200,6 @@ class Request(
     }
 
     fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
-
 
     fun jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request {
         this[Headers.CONTENT_TYPE] = "application/json"
@@ -354,7 +351,6 @@ class Request(
         val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
         headers.transformIterate(appendHeaderWithValue)
     }
-
 
     fun httpString(): String = buildString {
         // url

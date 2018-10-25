@@ -17,7 +17,7 @@ data class HeaderName(val name: String) {
 
 typealias HeaderValues = Collection<String>
 
-class Headers: MutableMap<String, HeaderValues> {
+class Headers : MutableMap<String, HeaderValues> {
 
     private var contents: HashMap<HeaderName, HeaderValues> = HashMap()
 
@@ -167,7 +167,7 @@ class Headers: MutableMap<String, HeaderValues> {
         }
 
         fun isSingleValue(key: HeaderName): Boolean {
-            return when(key) {
+            return when (key) {
                 // These headers, per RFC, SHOULD only appear once.
                 HeaderName(AGE) -> true
                 HeaderName(CONTENT_TYPE) -> true
@@ -181,7 +181,7 @@ class Headers: MutableMap<String, HeaderValues> {
         }
 
         fun collapse(header: HeaderName, values: HeaderValues): String {
-            return when(header){
+            return when (header) {
                 HeaderName(COOKIE) -> values.joinToString("; ")
                 else -> values.joinToString(", ")
             }
@@ -203,7 +203,6 @@ class Headers: MutableMap<String, HeaderValues> {
                     }
                     else -> result.set(key, value.toString())
                 }
-
             }
         }
 

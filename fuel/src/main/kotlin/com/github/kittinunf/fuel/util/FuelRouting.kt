@@ -1,7 +1,10 @@
 package com.github.kittinunf.fuel.util
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.HeaderValues
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
 
 /**
  * Created by matteocrippa on 8/16/17.
