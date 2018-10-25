@@ -3,6 +3,7 @@ package com.github.kittinunf.fuel.toolbox
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Client
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
@@ -51,9 +52,10 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
             requestMethod = if (request.method == Method.PATCH) Method.POST.value else request.method.value
             instanceFollowRedirects = false
 
-            for ((key, value) in request.headers) {
-                setRequestProperty(key, value)
-            }
+            request.headers.transformIterate(
+                { key, values -> setRequestProperty(key, values) },
+                { key, value -> addRequestProperty(key, value) }
+            )
 
             if (request.method == Method.PATCH) {
                 setRequestProperty("X-HTTP-Method-Override", "PATCH")
@@ -64,10 +66,9 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
         }
 
         val contentEncoding = connection.contentEncoding ?: ""
-
         return Response(
                 url = request.url,
-                headers = connection.headerFields.filterKeys { it != null },
+                headers = Headers.from(connection.headerFields),
                 contentLength = connection.contentLength.toLong(),
                 statusCode = connection.responseCode,
                 responseMessage = connection.responseMessage.orEmpty(),
