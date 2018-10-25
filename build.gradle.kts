@@ -1,7 +1,6 @@
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
 import com.novoda.gradle.release.PublishExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jmailen.gradle.kotlinter.KotlinterExtension
 import org.jmailen.gradle.kotlinter.support.ReporterType
 
@@ -17,9 +16,9 @@ plugins {
 
 allprojects {
     repositories {
+        google()
         mavenCentral()
         jcenter()
-        google()
         maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
     }
 }
