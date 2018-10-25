@@ -8,10 +8,4 @@ class Json(val content: String) {
     fun obj(): JSONObject = JSONObject(content)
 
     fun array(): JSONArray = JSONArray(content)
-
-
-
-
-
-
 }
