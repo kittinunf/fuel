@@ -246,7 +246,7 @@ class RequestTest : MockHttpTestCase() {
         val body = "{ $paramKey : $paramValue }"
 
         mock.chain(
-                request = mock.request().withMethod(Method.GET.value).withPath("/get"),
+                request = mock.request().withPath("/get"),
                 response = mock.reflect()
         )
 
