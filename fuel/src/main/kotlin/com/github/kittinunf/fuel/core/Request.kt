@@ -442,8 +442,15 @@ class Request(
      * @return [String] the string representation
      */
     override fun toString(): String = buildString {
+
+        val bodyString = when {
+            body.isEmpty() -> "(empty)"
+            body.isConsumed() -> "(consumed)"
+            else -> String(body.toByteArray())
+        }
+
         appendln("--> $url")
-        appendln("\"Body : ${if (body.isNotEmpty()) String(body.toByteArray()) else "(empty)"}\"")
+        appendln("\"Body : ${bodyString}\"")
         appendln("\"Headers : (${headers.size})\"")
 
         val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
