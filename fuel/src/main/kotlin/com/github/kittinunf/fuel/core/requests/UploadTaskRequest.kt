@@ -4,112 +4,178 @@ import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.Body
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.requests.UploadBody.Companion.DEFAULT_CHARSET
 import com.github.kittinunf.fuel.util.copyTo
-import java.io.InputStreamReader
+import java.io.ByteArrayOutputStream
 import java.io.OutputStream
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
-import java.io.Reader
 import java.net.URL
 import java.net.URLConnection
+import java.nio.charset.Charset
 
-internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
-    var progressCallback: ((Long, Long) -> Unit)? = null
-    lateinit var sourceCallback: (Request, URL) -> Iterable<Blob>
-
-    fun stream(output: Boolean) : Any {
-        var contentLength= 0L
-
-        val stream = PipedOutputStream()
-        stream.buffered().apply {
-            request.parameters.forEach { (name, data) ->
-                contentLength += write("--$boundary")
-                contentLength += writeln()
-                contentLength += write("Content-Disposition: form-data; name=\"$name\"")
-                contentLength += writeln()
-                contentLength += write("Content-Type: text/plain")
-                contentLength += writeln()
-                contentLength += writeln()
-                contentLength += write(data.toString())
-                contentLength += writeln()
 typealias BlobProgressCallback = (Long, Long) -> Any?
 typealias UploadProgressCallback = ((Long, Long) -> Unit)
 typealias UploadSourceCallback = (Request, URL) -> Iterable<Blob>
-            }
 
-            val files = sourceCallback(request, request.url)
-            // need to convert to double to not lose anything between int and long
-            val filesLength = contentLength + files.sumByDouble { it.length.toDouble() }.toLong()
+internal data class UploadBody(val request: Request, val taskRequest: UploadTaskRequest) : Body {
+    override fun isEmpty() = false
+    override fun isNotEmpty() = true
 
-            files.forEachIndexed { i, (name, length, inputStream) ->
-                val postFix = if (files.count() == 1) "" else "${i + 1}"
-                val fieldName = request.names.getOrElse(i) { request.name + postFix }
-
-                contentLength += write("--$boundary")
-                contentLength += writeln()
-                contentLength += write("Content-Disposition: form-data; name=\"$fieldName\"; filename=\"$name\"")
-                contentLength += writeln()
-                contentLength += write("Content-Type: " + request.mediaTypes.getOrElse(i) { guessContentType(name) })
-                contentLength += writeln()
-                contentLength += writeln()
-
-                // input file data
-                if (output) {
-                    inputStream().use {
-                        it.copyTo(this, BUFFER_SIZE, progress = { writtenBytes ->
-                            progressCallback?.invoke(contentLength + writtenBytes, contentLength + filesLength)
-                        })
-                    }
-                }
-                contentLength += length
-                contentLength += writeln()
-            }
-
-            contentLength += write("--$boundary--")
-            contentLength += writeln()
-        }
-
-        progressCallback?.invoke(contentLength, contentLength)
-        if (output) {
-            return InputStreamReader(PipedInputStream(stream))
-        }
-
-        return contentLength
+    override fun toByteArray(): ByteArray {
+        return ByteArrayOutputStream(length!!.toInt()).apply {
+            writeTo(this, null)
+        }.toByteArray()
     }
 
-    private val boundary = retrieveBoundaryInfo(request)
+    override fun writeTo(outputStream: OutputStream, charset: Charset?) {
+        val sourceCallback = taskRequest.sourceCallback
+        val progressCallback = taskRequest.progressCallback
+        val expectedLength = length!!.toLong()
+
+        outputStream.apply {
+            // Parameters
+            val parameterLength = request.parameters.sumByDouble { (name, data) ->
+                writeParameter(this, name, data).toDouble()
+            }
+
+            // Blobs / Files
+            var previousLastProgress = parameterLength
+            val files = sourceCallback(request, request.url)
+            val filesWithHeadersLength = files.withIndex().sumByDouble { (i, blob) ->
+                val blobLength = writeBlob(this, i, blob, progress = { blobProgress, _ ->
+                    progressCallback?.invoke(
+                        (previousLastProgress + blobProgress).toLong(),
+                        (expectedLength)
+                    )
+                })
+
+
+                previousLastProgress += blobLength
+                blobLength.toDouble()
+            }
+
+            // Sum and Trailer
+            val writtenLength = 0L +
+                parameterLength +
+                filesWithHeadersLength +
+                writeString("--$boundary--") +
+                writeBytes(CRLF)
+
+            progressCallback?.invoke(writtenLength.toLong(), expectedLength)
+
+            // This is a buffered stream, so flush what's remaining
+            flush()
+
+            // No more writing
+            close()
+        }
+    }
+
+    override val length: Number? by lazy {
+        (
+            // Parameters size
+            request.parameters.sumByDouble { (name, data) ->
+                writeParameter(ByteArrayOutputStream(), name, data).toDouble()
+            } +
+
+            // Blobs / Files size
+            taskRequest.sourceCallback(request, request.url).withIndex().sumByDouble { (index, blob) ->
+                0.0 + writeBlobHeader(ByteArrayOutputStream(), index, blob) + blob.length + CRLF.size
+            } +
+
+            // Trailer size
+            "--$boundary--".toByteArray(DEFAULT_CHARSET).size + CRLF.size
+        ).toLong()
+    }
+
+    val boundary: String by lazy { retrieveBoundaryInfo(request) }
+
+    private fun writeParameter(outputStream: OutputStream, name: String, data: Any?) : Long {
+        outputStream.apply {
+            return 0L +
+                writeString("--$boundary") +
+                writeBytes(CRLF) +
+                writeString("${Headers.CONTENT_DISPOSITION}: form-data; name=\"$name\"") +
+                writeBytes(CRLF) +
+                writeString("${Headers.CONTENT_TYPE}: text/plain; charset=${DEFAULT_CHARSET.name()}") +
+                writeBytes(CRLF) +
+                writeBytes(CRLF) +
+                writeString(data.toString()) +
+                writeBytes(CRLF)
+        }
+    }
+
+    private fun writeBlob(outputStream: OutputStream, index: Int, blob: Blob, progress: BlobProgressCallback) : Long {
+        outputStream.apply {
+            val headerLength = writeBlobHeader(outputStream, index, blob)
+
+            blob.inputStream().use {
+                it.copyTo(this, PROGRESS_BUFFER_SIZE, progress = { writtenBytes ->
+                    progress.invoke(headerLength + writtenBytes, headerLength + blob.length)
+                })
+            }
+
+            return headerLength + blob.length + writeBytes(CRLF)
+        }
+    }
+
+    private fun writeBlobHeader(outputStream: OutputStream, index: Int, blob: Blob) : Long {
+        val (name, _, _) = blob
+        val fieldName = request.names.getOrElse(index) { "${request.name}_${index + 1}" }
+        val mediaType = request.mediaTypes.getOrElse(index) { guessContentType(name) }
+
+        outputStream.apply {
+            return 0L +
+                writeString("--$boundary") +
+                writeBytes(CRLF) +
+                writeString("${Headers.CONTENT_DISPOSITION}: form-data; name=\"$fieldName\"; filename=\"$name\"") +
+                writeBytes(CRLF) +
+                writeString("${Headers.CONTENT_TYPE}: $mediaType") +
+                writeBytes(CRLF) +
+                writeBytes(CRLF)
+        }
+    }
+
+    companion object {
+        val DEFAULT_CHARSET = Charsets.UTF_8
+        private const val GENERIC_BYTE_CONTENT = "application/octet-stream"
+        private const val PROGRESS_BUFFER_SIZE = 1024
+        private val CRLF = "\r\n".toByteArray(DEFAULT_CHARSET)
+
+        fun retrieveBoundaryInfo(request: Request): String {
+            return request[Headers.CONTENT_TYPE].lastOrNull()?.split("boundary=", limit = 2)?.getOrNull(1)
+                    ?: System.currentTimeMillis().toString(16)
+        }
+
+        fun guessContentType(name: String): String = try {
+            URLConnection.guessContentTypeFromName(name) ?: GENERIC_BYTE_CONTENT
+        } catch (ex: NoClassDefFoundError) {
+            // The MimetypesFileTypeMap class doesn't exists on old Android devices.
+            GENERIC_BYTE_CONTENT
+        }
+
+        fun from(uploadTaskRequest: UploadTaskRequest, request: Request): Body {
+            return UploadBody(taskRequest = uploadTaskRequest, request = request)
+        }
+    }
+
+}
+
+internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
+    lateinit var sourceCallback: UploadSourceCallback
+    var progressCallback: UploadProgressCallback? = null
 
     init {
-        // TODO: actually change how dataparts / blobs are injected.
-        request.body = Body(
-            { stream(true) as Reader },
-            stream(false) as Long
-        )
+        request.body = UploadBody.from(this, request)
     }
 }
 
-fun OutputStream?.write(str: String): Int {
-    val data = str.toByteArray()
-    this?.write(data)
-    return data.size
+private fun OutputStream.writeString(string: String, charset: Charset = DEFAULT_CHARSET) : Int {
+    val bytes = string.toByteArray(charset)
+    write(bytes)
+    return bytes.size
 }
 
-fun OutputStream?.writeln(): Int {
-    this?.write(CRLF)
-    return CRLF.size
-}
-
-private const val BUFFER_SIZE = 1024
-private val CRLF = "\r\n".toByteArray()
-
-private fun guessContentType(name: String): String = try {
-    URLConnection.guessContentTypeFromName(name) ?: "application/octet-stream"
-} catch (ex: NoClassDefFoundError) {
-    // The MimetypesFileTypeMap class doesn't exists on old Android devices.
-    "application/octet-stream"
-}
-
-fun retrieveBoundaryInfo(request: Request): String {
-    return request[Headers.CONTENT_TYPE].lastOrNull()?.split("boundary=", limit = 2)?.getOrNull(1)
-            ?: System.currentTimeMillis().toString(16)
+private fun OutputStream.writeBytes(bytes: ByteArray) : Int {
+    write(bytes)
+    return bytes.size
 }
