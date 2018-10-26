@@ -36,6 +36,7 @@ class Request(
     val headers: Headers = Headers(),
     val parameters: List<Pair<String, Any?>> = listOf(),
     var name: String = "",
+    var name: String = "file",
     val names: MutableList<String> = mutableListOf(),
     val mediaTypes: MutableList<String> = mutableListOf(),
     var isAllowRedirects: Boolean = true,

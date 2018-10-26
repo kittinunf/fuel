@@ -34,7 +34,9 @@ data class DefaultBody(
         // This actually writes whatever the body is outputting with the given charset.
         outputStream.bufferedWriter(charset ?: this.charset).apply {
             val reader = openReader!!.invoke().buffered()
+            println("[Body] got reader: $reader")
             reader.copyTo(this)
+            println("[Body] done with copy")
             reader.close()
 
             // The outputStream is buffered, but we are done reading, so it's time to flush what's left
