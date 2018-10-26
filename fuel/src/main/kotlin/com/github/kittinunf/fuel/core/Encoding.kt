@@ -87,5 +87,5 @@ class Encoding(
             .map { (key, value) -> URLEncoder.encode(key, "UTF-8") to URLEncoder.encode("$value", "UTF-8") }
             .joinToString("&") { (key, value) -> "$key=$value" }
 
-    private val defaultHeaders = Headers.from(mapOf(Headers.ACCEPT_ENCODING to "compress;q=0.5, gzip;q=1.0"))
+    private val defaultHeaders = Headers.from()
 }
