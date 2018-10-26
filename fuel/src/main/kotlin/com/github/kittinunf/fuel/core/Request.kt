@@ -1,14 +1,13 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.Request.Companion.toString
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
 import com.github.kittinunf.fuel.core.requests.TaskRequest
+import com.github.kittinunf.fuel.core.requests.UploadSourceCallback
 import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
 import com.github.kittinunf.fuel.util.encodeBase64ToString
-import com.github.kittinunf.result.Result
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileReader
@@ -41,6 +40,7 @@ class Request(
     val names: MutableList<String> = mutableListOf(),
     val mediaTypes: MutableList<String> = mutableListOf(),
     var isAllowRedirects: Boolean = true,
+    val useHttpCache: Boolean? = null,
     var timeoutInMillisecond: Int,
     var timeoutReadInMillisecond: Int
 ) : Fuel.RequestConvertible {
@@ -51,7 +51,7 @@ class Request(
     }
 
     internal lateinit var client: Client
-    internal var body: Body = Body()
+    internal var body: Body = DefaultBody()
 
     // underlying task request
     internal val taskRequest: TaskRequest by lazy {
@@ -221,13 +221,13 @@ class Request(
      *  that would lead to closed streams being unable to be read. If the size is known, set it before anything else.
      *
      * @param openReader [BodySource] a function that yields a reader
-     * @param length [Number?] size in +bytes+ if it is known
+     * @param calculateLength [Number?] size in +bytes+ if it is known
      * @param charset [Charset] the charset to write with
      *
      * @return [Request] the request
      */
-    fun body(openReader: BodySource, length: Number? = null, charset: Charset = Charsets.UTF_8): Request {
-        this.body = Body.from(openReader = openReader, length = length, charset = charset)
+    fun body(openReader: BodySource, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request {
+        this.body = DefaultBody.from(openReader = openReader, calculateLength = calculateLength, charset = charset)
         return this
     }
 
@@ -237,12 +237,13 @@ class Request(
      * @note the reader will be closed once the body is read
      *
      * @param reader [Reader] an open reader
-     * @param length [Number?] size in bytes if it is known
+     * @param calculateLength [Number?] size in bytes if it is known
      * @param charset [Charset] the charset to write with
      *
      * @return [Request] the request
      */
-    fun body(reader: Reader, length: Number? = null, charset: Charset = Charsets.UTF_8) = body({ reader }, length, charset)
+    fun body(reader: Reader, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8) =
+        body({ reader }, calculateLength, charset)
 
     /**
      * Sets the body from a generic stream
@@ -251,21 +252,23 @@ class Request(
      *  the start.
      *
      * @param stream [InputStream] a stream to read from
-     * @param length [Number?] size in bytes if it is known
+     * @param calculateLength [Number?] size in bytes if it is known
      * @param charset [Charset] the charset to write with
      *
      * @return [Request] the request
      */
-    fun body(stream: InputStream, length: Number? = null, charset: Charset = Charsets.UTF_8) = body({ InputStreamReader(stream) }, length, charset)
+    fun body(stream: InputStream, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8) =
+        body({ InputStreamReader(stream) }, calculateLength, charset)
 
     /**
      * Sets the body from a byte array
      *
-     * @param body [ByteArray] the bytes to write
+     * @param bytes [ByteArray] the bytes to write
      * @param charset [Charset] the charset to write with
      * @return [Request] the request
      */
-    fun body(body: ByteArray, charset: Charset = Charsets.UTF_8): Request = body(ByteArrayInputStream(body), body.size, charset)
+    fun body(bytes: ByteArray, charset: Charset = Charsets.UTF_8) =
+        body(ByteArrayInputStream(bytes), { bytes.size }, charset)
 
     /**
      * Sets the body from a string
@@ -274,7 +277,7 @@ class Request(
      * @param charset [Charset] the charset to write with
      * @return [Request] the request
      */
-    fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body({ StringReader(body) }, charset.encode(body).limit(), charset)
+    fun body(body: String, charset: Charset = Charsets.UTF_8): Request =
         body({ StringReader(body) }, { charset.encode(body).limit() }, charset)
 
     /**
