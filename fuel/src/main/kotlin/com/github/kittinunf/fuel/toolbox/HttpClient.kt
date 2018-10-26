@@ -9,6 +9,7 @@ import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -89,19 +90,15 @@ internal class HttpClient(
                 setRequestProperty("X-HTTP-Method-Override", Method.PATCH.value)
             }
 
-            println(request)
-
             setDoOutput(connection, request.method)
             setBodyIfDoOutput(connection, request)
         }
-
 
         val headers = Headers.from(connection.headerFields)
         val transferEncoding = headers[Headers.TRANSFER_ENCODING]
         val contentEncoding = headers[Headers.CONTENT_ENCODING].lastOrNull()
         var contentLength =  headers[Headers.CONTENT_LENGTH].lastOrNull()?.toLong() ?: -1
         val shouldDecode = (request.decodeContent ?: decodeContent) && contentEncoding != null && contentEncoding != "identity"
-
 
         if (shouldDecode) {
             // URLConnection.getContentLength() returns the number of bytes transmitted and cannot be used to predict
@@ -117,18 +114,18 @@ internal class HttpClient(
         // Since the transfer encoding will be undone by decodeTransfer
         headers.remove(Headers.TRANSFER_ENCODING)
 
-            return Response(
-                    url = request.url,
-                    headers = headers,
-                    contentLength = contentLength,
-                    statusCode = connection.responseCode,
-                    responseMessage = connection.responseMessage.orEmpty(),
-                    dataStream = decodeContent(
-                            stream = decodeTransfer(safeDataStream(connection), transferEncoding),
-                            encoding = contentEncoding,
-                            shouldDecode = shouldDecode
-                    )
+        return Response(
+            url = request.url,
+            headers = headers,
+            contentLength = contentLength,
+            statusCode = connection.responseCode,
+            responseMessage = connection.responseMessage.orEmpty(),
+            dataStream = decodeContent(
+                stream = decodeTransfer(safeDataStream(connection), transferEncoding),
+                encoding = contentEncoding,
+                shouldDecode = shouldDecode
             )
+        )
     }
 
     private fun safeDataStream(connection: HttpURLConnection): InputStream? {
@@ -203,6 +200,7 @@ internal class HttpClient(
         // The input and output streams returned by this class are not buffered. Most body implementations should wrap
         // the input stream with BufferedOutputStream. Bulk implementations may forgo this.
         body.writeTo(connection.outputStream, null)
+        connection.outputStream.flush()
     }
 
     private fun setDoOutput(connection: HttpURLConnection, method: Method) = when (method) {
