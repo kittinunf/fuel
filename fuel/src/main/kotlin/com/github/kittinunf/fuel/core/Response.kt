@@ -15,22 +15,6 @@ class Response(
     val contentLength: Long = 0L,
     val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
 ) {
-    @Deprecated(replaceWith = ReplaceWith("contentLength"), message = "http naming is deprecated, use 'contentLength' instead")
-    val httpContentLength
-        get() = contentLength
-
-    @Deprecated(replaceWith = ReplaceWith("responseMessage"), message = "http naming is deprecated, use 'responseMessage' instead")
-    val httpResponseMessage
-        get() = responseMessage
-
-    @Deprecated(replaceWith = ReplaceWith("statusCode"), message = "http naming is deprecated, use 'statusCode' instead")
-    val httpStatusCode
-        get() = statusCode
-
-    @Deprecated(replaceWith = ReplaceWith("headers"), message = "http naming is deprecated, use 'headers' instead")
-    val httpResponseHeaders
-        get() = headers
-
     var data: ByteArray by readWriteLazy {
         try {
             dataStream.readBytes()
