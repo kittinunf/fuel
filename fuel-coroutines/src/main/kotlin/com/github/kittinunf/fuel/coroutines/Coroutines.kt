@@ -1,11 +1,11 @@
 import com.github.kittinunf.fuel.core.Deserializable
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Request.Companion.byteArrayDeserializer
-import com.github.kittinunf.fuel.core.Request.Companion.stringDeserializer
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.awaitResponse
+import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
+import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.result.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -23,12 +23,12 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
 suspend fun Request.awaitByteArrayResponse(
     scope: CoroutineContext = Dispatchers.Default
 ): Triple<Request, Response, Result<ByteArray, FuelError>> =
-        await(byteArrayDeserializer(), scope)
+        await(ByteArrayDeserializer(), scope)
 
 suspend fun Request.awaitStringResponse(
     charset: Charset = Charsets.UTF_8,
     scope: CoroutineContext = Dispatchers.Default
-): Triple<Request, Response, Result<String, FuelError>> = await(stringDeserializer(charset), scope)
+): Triple<Request, Response, Result<String, FuelError>> = await(StringDeserializer(charset), scope)
 
 suspend fun <U : Any> Request.awaitObjectResponse(
     deserializable: ResponseDeserializable<U>,
@@ -44,7 +44,7 @@ suspend fun <U : Any> Request.awaitObjectResponse(
 @Throws
 suspend fun Request.awaitByteArray(
     scope: CoroutineContext = Dispatchers.Default
-): ByteArray = await(byteArrayDeserializer(), scope).third.get()
+): ByteArray = await(ByteArrayDeserializer(), scope).third.get()
 
 /**
  *  @note errors thrown in deserialization will not be caught
@@ -58,7 +58,7 @@ suspend fun Request.awaitByteArray(
 suspend fun Request.awaitString(
     charset: Charset = Charsets.UTF_8,
     scope: CoroutineContext = Dispatchers.Default
-): String = await(stringDeserializer(charset), scope).third.get()
+): String = await(StringDeserializer(charset), scope).third.get()
 
 /**
  * @note This function will throw the an exception if an error is thrown either at the HTTP level
