@@ -23,6 +23,10 @@ data class DefaultBody(
     val charset: Charset = Charsets.UTF_8
 ) : Body {
     override fun toByteArray(): ByteArray {
+        if (isEmpty()) {
+            return ByteArray(0)
+        }
+
         return ByteArrayOutputStream(length?.toInt() ?: 32).let {
             writeTo(it, charset)
             it.close()
@@ -36,7 +40,6 @@ data class DefaultBody(
             val reader = openReader!!.invoke().buffered()
             println("[Body] got reader: $reader")
             reader.copyTo(this)
-            println("[Body] done with copy")
             reader.close()
 
             // The outputStream is buffered, but we are done reading, so it's time to flush what's left
