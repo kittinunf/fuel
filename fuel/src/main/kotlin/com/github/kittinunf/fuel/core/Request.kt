@@ -283,6 +283,10 @@ class Request(
      * @note this does *NOT* make this a multipart upload. For that you can use the upload request. This function can be
      *  used if you want to upload the single contents of a text based file as an inline body.
      *
+     * @note when charset is not UTF-8, this forces the client to use chunked encoding, because file.length() gives the
+     *  length of the file in bytes without considering the charset. If the charset is to be considered, the file needs
+     *  to be read in its entirety which defeats the purpose of using a file.
+     *
      * @param file [File] the file to write to the body
      * @param charset [Charset] the charset to write with
      * @return [Request] the request
