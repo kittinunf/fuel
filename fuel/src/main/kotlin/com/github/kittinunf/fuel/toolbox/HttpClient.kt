@@ -19,7 +19,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-internal class HttpClient(private val proxy: Proxy? = null) : Client {
+internal class HttpClient(private val proxy: Proxy? = null, var useHttpCache: Boolean = true) : Client {
     override fun executeRequest(request: Request): Response {
         try {
             return doRequest(request)
@@ -48,8 +48,8 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
             connectTimeout = Fuel.testConfiguration.coerceTimeout(request.timeoutInMillisecond)
             readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.timeoutReadInMillisecond)
             doInput = true
-            useCaches = false
             requestMethod = if (request.method == Method.PATCH) Method.POST.value else request.method.value
+            useCaches = request.useHttpCache ?: useHttpCache
             instanceFollowRedirects = false
 
             request.headers.transformIterate(
