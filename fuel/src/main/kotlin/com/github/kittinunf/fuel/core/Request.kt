@@ -27,7 +27,6 @@ import javax.net.ssl.SSLSocketFactory
 private typealias RequestInterceptor = (Request) -> Request
 private typealias ResponseInterceptor = (Request, Response) -> Response
 typealias Parameters = List<Pair<String, Any?>>
-typealias ProgressCallback = (readBytes: Long, totalBytes: Long) -> Unit
 
 class Request(
     val method: Method,
