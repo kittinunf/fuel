@@ -2,31 +2,51 @@ package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.Body
+import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.Headers
+import com.github.kittinunf.fuel.core.ProgressCallback
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.requests.UploadBody.Companion.DEFAULT_CHARSET
 import com.github.kittinunf.fuel.util.copyTo
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.InputStreamReader
 import java.io.OutputStream
 import java.net.URL
 import java.net.URLConnection
 import java.nio.charset.Charset
 
 typealias BlobProgressCallback = (Long, Long) -> Any?
-typealias UploadProgressCallback = ((Long, Long) -> Unit)
 typealias UploadSourceCallback = (Request, URL) -> Iterable<Blob>
 
 internal data class UploadBody(val request: Request, val taskRequest: UploadTaskRequest) : Body {
+
+    private var inputAvailable: Boolean = true
+
+    override fun isConsumed() = !inputAvailable
     override fun isEmpty() = false
-    override fun isNotEmpty() = true
 
     override fun toByteArray(): ByteArray {
-        return ByteArrayOutputStream(length!!.toInt()).apply {
-            writeTo(this, null)
-        }.toByteArray()
+        return ByteArrayOutputStream(length?.toInt() ?: 32).let {
+            writeTo(it, null)
+            it.close()
+            it.toByteArray()
+        }.apply {
+            // The entire body is now in memory, and can act as a regular body
+            request.body = DefaultBody.from(
+                { InputStreamReader(ByteArrayInputStream(this)) },
+                { this.size }
+            )
+        }
     }
 
     override fun writeTo(outputStream: OutputStream, charset: Charset?) {
+        if (!inputAvailable) {
+            throw IllegalStateException(
+                "The inputs have already been written to an output stream and can not be consumed again."
+            )
+        }
+
         val sourceCallback = taskRequest.sourceCallback
         val progressCallback = taskRequest.progressCallback
         val expectedLength = length!!.toLong()
@@ -48,7 +68,6 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
                     )
                 })
 
-
                 previousLastProgress += blobLength
                 blobLength.toDouble()
             }
@@ -64,10 +83,9 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
 
             // This is a buffered stream, so flush what's remaining
             flush()
-
-            // No more writing
-            close()
         }
+
+        inputAvailable = false
     }
 
     override val length: Number? by lazy {
@@ -135,6 +153,7 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
         }
     }
 
+
     companion object {
         val DEFAULT_CHARSET = Charsets.UTF_8
         private const val GENERIC_BYTE_CONTENT = "application/octet-stream"
@@ -154,7 +173,9 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
         }
 
         fun from(uploadTaskRequest: UploadTaskRequest, request: Request): Body {
-            return UploadBody(taskRequest = uploadTaskRequest, request = request)
+            return UploadBody(taskRequest = uploadTaskRequest, request = request).apply {
+                inputAvailable = true
+            }
         }
     }
 
@@ -162,7 +183,7 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
 
 internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
     lateinit var sourceCallback: UploadSourceCallback
-    var progressCallback: UploadProgressCallback? = null
+    var progressCallback: ProgressCallback? = null
 
     init {
         request.body = UploadBody.from(this, request)
