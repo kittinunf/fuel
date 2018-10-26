@@ -14,20 +14,20 @@ import kotlinx.serialization.json.JSON
 import kotlinx.serialization.serializer
 
 inline fun <reified T : Any> Request.responseObject(
-        loader: DeserializationStrategy<T> = T::class.serializer(),
-        json: JSON = JSON.plain,
-        noinline deserializer: (Request, Response, Result<T, FuelError>) -> Unit
+    loader: DeserializationStrategy<T> = T::class.serializer(),
+    json: JSON = JSON.plain,
+    noinline deserializer: (Request, Response, Result<T, FuelError>) -> Unit
 ) = response(kotlinxDeserializerOf(loader, json), deserializer)
 
 inline fun <reified T : Any> Request.responseObject(
-        deserializer: Handler<T>,
-        loader: DeserializationStrategy<T> = T::class.serializer(),
-        json: JSON = JSON.plain
+    deserializer: Handler<T>,
+    loader: DeserializationStrategy<T> = T::class.serializer(),
+    json: JSON = JSON.plain
 ) = response(kotlinxDeserializerOf(loader, json), deserializer)
 
 inline fun <reified T : Any> Request.responseObject(
-        loader: DeserializationStrategy<T> = T::class.serializer(),
-        json: JSON = JSON.plain
+    loader: DeserializationStrategy<T> = T::class.serializer(),
+    json: JSON = JSON.plain
 ) = response(kotlinxDeserializerOf<T>(loader, json))
 
 inline fun <reified T : Any> kotlinxDeserializerOf(loader: DeserializationStrategy<T> = T::class.serializer(), json: JSON = JSON.plain) = object : ResponseDeserializable<T> {
