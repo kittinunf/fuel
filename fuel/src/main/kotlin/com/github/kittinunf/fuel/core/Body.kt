@@ -11,9 +11,9 @@ typealias BodySource = (() -> Reader)
 typealias BodyLength = (() -> Number)
 
 interface Body {
-    fun toByteArray() : ByteArray
+    fun toByteArray(): ByteArray
     fun writeTo(outputStream: OutputStream, charset: Charset? = null)
-    fun isEmpty() : Boolean
+    fun isEmpty(): Boolean
     fun isConsumed(): Boolean
 
     val length: Number?
@@ -58,7 +58,7 @@ data class DefaultBody(
         }
     }
 
-    override fun isEmpty() = openReader == null  || (length != null && length == 0)
+    override fun isEmpty() = openReader == null || (length != null && length == 0)
     override fun isConsumed() = openReader === CONSUMED_READER
 
     override val length: Number? by lazy {
@@ -81,5 +81,4 @@ data class DefaultBody(
             )
         }
     }
-
 }

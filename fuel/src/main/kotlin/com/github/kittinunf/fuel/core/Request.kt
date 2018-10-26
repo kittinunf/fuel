@@ -294,7 +294,7 @@ class Request(
      * @param charset [Charset] the charset to write with
      * @return [Request] the request
      */
-    fun body(file: File, charset: Charset = Charsets.UTF_8): Request = when(charset) {
+    fun body(file: File, charset: Charset = Charsets.UTF_8): Request = when (charset) {
         Charsets.UTF_8 -> body({ FileReader(file) }, { file.length() }, charset)
         else -> body({ FileReader(file) }, null, charset)
     }
@@ -525,8 +525,8 @@ class Request(
         response(StringDeserializer(), handler)
 
     @JvmOverloads
-    fun responseString(charset: Charset = Charsets.UTF_8)
-        = response(StringDeserializer(charset))
+    fun responseString(charset: Charset = Charsets.UTF_8) =
+        response(StringDeserializer(charset))
 
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: HandlerWithResult<T>) =
         response(deserializer, handler)

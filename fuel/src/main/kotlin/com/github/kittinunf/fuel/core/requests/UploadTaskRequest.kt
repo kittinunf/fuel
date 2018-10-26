@@ -107,7 +107,7 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
 
     val boundary: String by lazy { retrieveBoundaryInfo(request) }
 
-    private fun writeParameter(outputStream: OutputStream, name: String, data: Any?) : Long {
+    private fun writeParameter(outputStream: OutputStream, name: String, data: Any?): Long {
         outputStream.apply {
             return 0L +
                 writeString("--$boundary") +
@@ -122,7 +122,7 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
         }
     }
 
-    private fun writeBlob(outputStream: OutputStream, index: Int, blob: Blob, progress: BlobProgressCallback) : Long {
+    private fun writeBlob(outputStream: OutputStream, index: Int, blob: Blob, progress: BlobProgressCallback): Long {
         outputStream.apply {
             val headerLength = writeBlobHeader(outputStream, index, blob)
 
@@ -136,7 +136,7 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
         }
     }
 
-    private fun writeBlobHeader(outputStream: OutputStream, index: Int, blob: Blob) : Long {
+    private fun writeBlobHeader(outputStream: OutputStream, index: Int, blob: Blob): Long {
         val (name, _, _) = blob
         val fieldName = request.names.getOrElse(index) { "${request.name}_${index + 1}" }
         val mediaType = request.mediaTypes.getOrElse(index) { guessContentType(name) }
@@ -152,7 +152,6 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
                 writeBytes(CRLF)
         }
     }
-
 
     companion object {
         val DEFAULT_CHARSET = Charsets.UTF_8
@@ -178,7 +177,6 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
             }
         }
     }
-
 }
 
 internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
@@ -190,13 +188,13 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
     }
 }
 
-private fun OutputStream.writeString(string: String, charset: Charset = DEFAULT_CHARSET) : Int {
+private fun OutputStream.writeString(string: String, charset: Charset = DEFAULT_CHARSET): Int {
     val bytes = string.toByteArray(charset)
     write(bytes)
     return bytes.size
 }
 
-private fun OutputStream.writeBytes(bytes: ByteArray) : Int {
+private fun OutputStream.writeBytes(bytes: ByteArray): Int {
     write(bytes)
     return bytes.size
 }

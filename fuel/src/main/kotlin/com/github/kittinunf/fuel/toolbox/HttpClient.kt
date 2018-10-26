@@ -97,7 +97,7 @@ internal class HttpClient(
         val headers = Headers.from(connection.headerFields)
         val transferEncoding = headers[Headers.TRANSFER_ENCODING]
         val contentEncoding = headers[Headers.CONTENT_ENCODING].lastOrNull()
-        var contentLength =  headers[Headers.CONTENT_LENGTH].lastOrNull()?.toLong() ?: -1
+        var contentLength = headers[Headers.CONTENT_LENGTH].lastOrNull()?.toLong() ?: -1
         val shouldDecode = (request.decodeContent ?: decodeContent) && contentEncoding != null && contentEncoding != "identity"
 
         if (shouldDecode) {
@@ -133,7 +133,7 @@ internal class HttpClient(
             (connection.errorStream ?: connection.inputStream) ?.let { BufferedInputStream(it) }
         } catch (exception: IOException) {
             // Stream error
-            try { (connection.errorStream ?: connection.inputStream).close()} catch (_: IOException) {}
+            try { (connection.errorStream ?: connection.inputStream).close() } catch (_: IOException) {}
             ByteArrayInputStream(exception.message?.toByteArray() ?: ByteArray(0))
         }
     }
@@ -161,7 +161,7 @@ internal class HttpClient(
     }
 
     private fun decode(stream: InputStream, encoding: String): InputStream {
-        return when(encoding) {
+        return when (encoding) {
             "gzip" -> GZIPInputStream(stream)
             "deflate" -> InflaterInputStream(stream)
             "identity" -> stream
