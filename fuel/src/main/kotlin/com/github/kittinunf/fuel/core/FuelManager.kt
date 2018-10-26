@@ -64,12 +64,12 @@ class FuelManager {
 
     fun request(method: Method, path: String, param: List<Pair<String, Any?>>? = null): Request {
         val request = request(Encoding(
-                httpMethod = method,
-                urlString = path,
-                baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param,
-                timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond
+            httpMethod = method,
+            urlString = path,
+            baseUrlString = basePath,
+            parameters = if (param == null) baseParams else baseParams + param,
+            timeoutInMillisecond = timeoutInMillisecond,
+            timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request)
         return request(request)
     }
@@ -79,26 +79,26 @@ class FuelManager {
 
     fun download(path: String, param: List<Pair<String, Any?>>? = null): Request {
         val request = Encoding(
-                httpMethod = Method.GET,
-                urlString = path,
-                requestType = Request.Type.DOWNLOAD,
-                baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param,
-                timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond
+            httpMethod = Method.GET,
+            urlString = path,
+            requestType = Request.Type.DOWNLOAD,
+            baseUrlString = basePath,
+            parameters = if (param == null) baseParams else baseParams + param,
+            timeoutInMillisecond = timeoutInMillisecond,
+            timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request
         return request(request)
     }
 
     fun upload(path: String, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
         val request = Encoding(
-                httpMethod = method,
-                urlString = path,
-                requestType = Request.Type.UPLOAD,
-                baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param,
-                timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond
+            httpMethod = method,
+            urlString = path,
+            requestType = Request.Type.UPLOAD,
+            baseUrlString = basePath,
+            parameters = if (param == null) baseParams else baseParams + param,
+            timeoutInMillisecond = timeoutInMillisecond,
+            timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request
         return request(request)
     }
