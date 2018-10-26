@@ -304,7 +304,7 @@ class Request(
         return body(body, charset)
     }
 
-    fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
+    fun progress(handler: ProgressCallback): Request {
         val taskRequest = taskRequest
         when (taskRequest) {
             is DownloadTaskRequest -> {
@@ -321,7 +321,7 @@ class Request(
     /**
      *  Replace each pair, using the key as header name and value as header content
      */
-    fun blobs(blobs: (Request, URL) -> Iterable<Blob>): Request {
+    fun blobs(blobs: UploadSourceCallback): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest
                 ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
         uploadTaskRequest.sourceCallback = blobs

@@ -32,6 +32,9 @@ internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
                 contentLength += writeln()
                 contentLength += write(data.toString())
                 contentLength += writeln()
+typealias BlobProgressCallback = (Long, Long) -> Any?
+typealias UploadProgressCallback = ((Long, Long) -> Unit)
+typealias UploadSourceCallback = (Request, URL) -> Iterable<Blob>
             }
 
             val files = sourceCallback(request, request.url)
