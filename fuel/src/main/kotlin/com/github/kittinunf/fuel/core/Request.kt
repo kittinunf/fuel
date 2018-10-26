@@ -41,6 +41,7 @@ class Request(
     val mediaTypes: MutableList<String> = mutableListOf(),
     var isAllowRedirects: Boolean = true,
     val useHttpCache: Boolean? = null,
+    val decodeContent: Boolean? = null,
     var timeoutInMillisecond: Int,
     var timeoutReadInMillisecond: Int
 ) : Fuel.RequestConvertible {
