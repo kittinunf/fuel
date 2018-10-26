@@ -133,8 +133,7 @@ internal class HttpClient(
 
     private fun safeDataStream(connection: HttpURLConnection): InputStream? {
         return try {
-            connection.errorStream ?:
-            connection.inputStream
+            (connection.errorStream ?: connection.inputStream) ?.let { BufferedInputStream(it) }
         } catch (exception: IOException) {
             // Stream error
             try { (connection.errorStream ?: connection.inputStream).close()} catch (_: IOException) {}
