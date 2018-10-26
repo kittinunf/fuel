@@ -170,9 +170,10 @@ class Headers : MutableMap<String, HeaderValues> {
             return when (key) {
                 // These headers, per RFC, SHOULD only appear once.
                 HeaderName(AGE) -> true
-                HeaderName(CONTENT_TYPE) -> true
+                HeaderName(CONTENT_ENCODING) -> true
                 HeaderName(CONTENT_LENGTH) -> true
                 HeaderName(CONTENT_LOCATION) -> true
+                HeaderName(CONTENT_TYPE) -> true
                 HeaderName(EXPECT) -> true
                 HeaderName(EXPIRES) -> true
                 HeaderName(LOCATION) -> true
@@ -211,8 +212,11 @@ class Headers : MutableMap<String, HeaderValues> {
         }
 
         const val ACCEPT_ENCODING = "Accept-Encoding"
+        const val ACCEPT_TRANSFER_ENCODING = "TE"
         const val AGE = "Age"
         const val AUTHORIZATION = "Authorization"
+        const val CONTENT_DISPOSITION = "Content-Disposition"
+        const val CONTENT_ENCODING = "Content-Encoding"
         const val CONTENT_LENGTH = "Content-Length"
         const val CONTENT_LOCATION = "Content-Location"
         const val CONTENT_TYPE = "Content-Type"
@@ -221,5 +225,6 @@ class Headers : MutableMap<String, HeaderValues> {
         const val EXPIRES = "Expires"
         const val LOCATION = "Location"
         const val SET_COOKIE = "Set-Cookie"
+        const val TRANSFER_ENCODING = "Transfer-Encoding"
     }
 }
