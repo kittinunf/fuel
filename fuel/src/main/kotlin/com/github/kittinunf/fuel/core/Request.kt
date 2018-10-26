@@ -274,6 +274,7 @@ class Request(
      * @return [Request] the request
      */
     fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body({ StringReader(body) }, charset.encode(body).limit(), charset)
+        body({ StringReader(body) }, { charset.encode(body).limit() }, charset)
 
     /**
      * Sets the body to the contents of a file.
@@ -285,7 +286,10 @@ class Request(
      * @param charset [Charset] the charset to write with
      * @return [Request] the request
      */
-    fun body(file: File, charset: Charset = Charsets.UTF_8): Request = body({ FileReader(file) }, file.length(), charset)
+    fun body(file: File, charset: Charset = Charsets.UTF_8): Request = when(charset) {
+        Charsets.UTF_8 -> body({ FileReader(file) }, { file.length() }, charset)
+        else -> body({ FileReader(file) }, null, charset)
+    }
 
     /**
      * Set the body to a JSON string and automatically set the json content type
