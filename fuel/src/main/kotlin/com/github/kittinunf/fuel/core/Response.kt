@@ -7,7 +7,7 @@ import java.io.InputStream
 import java.net.URL
 import java.net.URLConnection
 
-class Response(
+data class Response(
     val url: URL,
     val statusCode: Int = -1,
     val responseMessage: String = "",
