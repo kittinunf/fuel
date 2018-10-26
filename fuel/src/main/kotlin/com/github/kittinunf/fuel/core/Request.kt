@@ -25,8 +25,10 @@ import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
-typealias RequestInterceptor = (Request) -> Request
-typealias ResponseInterceptor = (Request, Response) -> Response
+private typealias RequestInterceptor = (Request) -> Request
+private typealias ResponseInterceptor = (Request, Response) -> Response
+typealias Parameters = List<Pair<String, Any?>>
+typealias ProgressCallback = (readBytes: Long, totalBytes: Long) -> Unit
 
 class Request(
     val method: Method,
@@ -34,8 +36,7 @@ class Request(
     val url: URL,
     var type: Type = Type.REQUEST,
     val headers: Headers = Headers(),
-    val parameters: List<Pair<String, Any?>> = listOf(),
-    var name: String = "",
+    val parameters: Parameters = listOf(),
     var name: String = "file",
     val names: MutableList<String> = mutableListOf(),
     val mediaTypes: MutableList<String> = mutableListOf(),
@@ -495,35 +496,28 @@ class Request(
         append(" $url")
     }
 
-    // byte array
-    fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit) =
-            response(byteArrayDeserializer(), handler)
+    fun response(handler: HandlerWithResult<ByteArray>) =
+        response(ByteArrayDeserializer(), handler)
+    fun response(handler: Handler<ByteArray>) =
+        response(ByteArrayDeserializer(), handler)
+    fun response() =
+        response(ByteArrayDeserializer())
 
-    fun response(handler: Handler<ByteArray>) = response(byteArrayDeserializer(), handler)
-
-    fun response() = response(byteArrayDeserializer())
-
-    // string
-    fun responseString(charset: Charset = Charsets.UTF_8, handler: (Request, Response, Result<String, FuelError>) -> Unit) =
-            response(stringDeserializer(charset), handler)
-
-    fun responseString(charset: Charset, handler: Handler<String>) = response(stringDeserializer(charset), handler)
-
-    fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: HandlerWithResult<String>) =
+        response(StringDeserializer(charset), handler)
+    fun responseString(charset: Charset, handler: Handler<String>) =
+        response(StringDeserializer(charset), handler)
+    fun responseString(handler: Handler<String>) =
+        response(StringDeserializer(), handler)
 
     @JvmOverloads
-    fun responseString(charset: Charset = Charsets.UTF_8) = response(stringDeserializer(charset))
+    fun responseString(charset: Charset = Charsets.UTF_8)
+        = response(StringDeserializer(charset))
 
-    // object
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit) = response(deserializer, handler)
-
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) = response(deserializer, handler)
-
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) = response(deserializer)
-
-    companion object {
-        fun byteArrayDeserializer() = ByteArrayDeserializer()
-
-        fun stringDeserializer(charset: Charset = Charsets.UTF_8) = StringDeserializer(charset)
-    }
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: HandlerWithResult<T>) =
+        response(deserializer, handler)
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) =
+        response(deserializer, handler)
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) =
+            response(deserializer)
 }
