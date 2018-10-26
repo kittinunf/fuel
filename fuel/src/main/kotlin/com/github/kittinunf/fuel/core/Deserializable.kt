@@ -8,6 +8,8 @@ import com.github.kittinunf.result.mapError
 import java.io.InputStream
 import java.io.Reader
 
+typealias HandlerWithResult<T> = (Request, Response, Result<T, FuelError>) -> Unit
+
 interface Deserializable<out T : Any> {
     fun deserialize(response: Response): T
 }
@@ -33,7 +35,7 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     fun deserialize(content: String): T? = null
 }
 
-fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit): Request {
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: HandlerWithResult<T>): Request {
     response(deserializable, { _, response, value ->
         handler(this@response, response, Result.Success(value))
     }, { _, response, error ->
