@@ -135,7 +135,7 @@ class Headers : MutableMap<String, HeaderValues> {
         return contents.isEmpty()
     }
 
-    fun transformIterate(set: (key: String, value: String) -> Any, add: (key: String, value: String) -> Any = set) {
+    fun transformIterate(set: (key: String, value: String) -> Any?, add: (key: String, value: String) -> Any? = set) {
         for ((key, values) in this) {
             val header = HeaderName(key)
             when (Headers.isCollapsible(header)) {
@@ -162,7 +162,7 @@ class Headers : MutableMap<String, HeaderValues> {
             return when (key) {
                 // These headers, per RFC, SHOULD NOT be collapsed into a single value
                 HeaderName(SET_COOKIE) -> false
-                else -> true
+                else -> !isSingleValue(key)
             }
         }
 
