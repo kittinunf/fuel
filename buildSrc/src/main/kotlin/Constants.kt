@@ -26,7 +26,6 @@ object Json {
     const val dependency = "org.json:json:$version"
 }
 
-
 object Android {
     const val version = "3.1.3"
     const val appPlugin = "com.android.application"
@@ -102,7 +101,7 @@ object Reactor {
 object RxJava {
     object Jvm {
         const val version = "2.1.13"
-        const val dependency =  "io.reactivex.rxjava2:rxjava:$version"
+        const val dependency = "io.reactivex.rxjava2:rxjava:$version"
     }
     object Android {
         const val version = "2.1.0"
