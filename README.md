@@ -653,17 +653,17 @@ FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
 Fuel.post("/my-post-path")
     .header(Headers.ACCEPT, "text/html, */*; q=0.1")
     .header(Headers.CONTENT_TYPE, "image/png")
-    .header(HEADERS.COOKIE to "basic=very")
-    .appendHeader(HEADERS.COOKIE to "value_1=foo", HEADERS.COOKIE to "value_2=bar", HEADERS.ACCEPT to "application/json")
+    .header(Headers.COOKIE to "basic=very")
+    .appendHeader(Headers.COOKIE to "value_1=foo", Headers.COOKIE to "value_2=bar", Headers.ACCEPT to "application/json")
     .appendHeader("MyFoo" to "bar", "MyFoo" to "baz")
     .response { /*...*/ }
     
  // => request with:
  //    Headers:
- //      Accept: "text/html, */*; q=0.1; application/json"
+ //      Accept: "text/html, */*; q=0.1, application/json"
  //      Content-Type: "image/png"
- //      Cookie: "basic=very; value_1=foo; value2=bar"
- //      MyFoo: "bar; baz"
+ //      Cookie: "basic=very; value_1=foo; value_2=bar"
+ //      MyFoo: "bar, baz"
 ```
 
 * `baseParams` is used to manage common `key=value` query param, which will be automatically included in all of your subsequent requests in format of ` List<Pair<String, Any?>>` (`Any` is converted to `String` by `toString()` method)

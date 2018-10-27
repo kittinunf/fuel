@@ -3,7 +3,7 @@ package com.github.kittinunf.fuel.core
 import com.github.kittinunf.fuel.BaseTestCase
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
-import org.junit.Assert.assertThat
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
@@ -135,7 +135,7 @@ class HeadersTest : BaseTestCase() {
         // RFC exception
         assertThat(
             "Expected SET_COOKIE to not be collapsible",
-            Headers.isCollapsible(HeaderName(Headers.SET_COOKIE)),
+            Headers.isCollapsible(Headers.SET_COOKIE),
             isEqualTo(false)
         )
     }
@@ -151,7 +151,7 @@ class HeadersTest : BaseTestCase() {
         singles.forEach {
             assertThat(
                 "Expected $it to be a single value",
-                Headers.isSingleValue(HeaderName(it)),
+                Headers.isSingleValue(it),
                 isEqualTo(true)
             )
         }
@@ -200,7 +200,7 @@ class HeadersTest : BaseTestCase() {
 
         val acceptEncodingSets = recordSet[Headers.ACCEPT_ENCODING]
         val expectedCollapsedAcceptEncoding = Headers.collapse(
-            HeaderName(Headers.ACCEPT_ENCODING),
+            Headers.ACCEPT_ENCODING,
             headers[Headers.ACCEPT_ENCODING]
         )
         assertThat("Expected ACCEPT_ENCODING to be added via 'set'", acceptEncodingSets, notNullValue())
@@ -214,6 +214,5 @@ class HeadersTest : BaseTestCase() {
 
         assertThat(recordSet.size, isEqualTo(2))
         assertThat(recordAdd.size, isEqualTo(1))
-
     }
 }

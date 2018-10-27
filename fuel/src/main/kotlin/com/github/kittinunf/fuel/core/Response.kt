@@ -48,6 +48,8 @@ class Response(
         return headers[header]
     }
 
+    fun header(header: String) = get(header)
+
     override fun toString(): String {
         val contentType = guessContentType()
         val dataString = processBody(contentType, data)
