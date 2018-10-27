@@ -142,8 +142,8 @@ class FuelManager {
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
+        request.requestTransformer = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseTransformer = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 

@@ -10,8 +10,8 @@ internal open class TaskRequest(internal val request: Request) : Callable<Respon
     var interruptCallback: ((Request) -> Unit)? = null
 
     override fun call(): Response = try {
-        val modifiedRequest = request.requestInterceptor.invoke(request)
-        request.responseInterceptor.invoke(modifiedRequest, request.client.executeRequest(modifiedRequest))
+        val modifiedRequest = request.requestTransformer.invoke(request)
+        request.responseTransformer.invoke(modifiedRequest, request.client.executeRequest(modifiedRequest))
     } catch (error: FuelError) {
         if (error.exception as? InterruptedIOException != null) {
             interruptCallback?.invoke(request)

@@ -11,11 +11,11 @@ class SuspendingRequest(private val request: Request) {
     var interruptCallback: ((Request) -> Unit)? = null
 
     suspend fun awaitResult(): Result<Response, FuelError> {
-        val modifiedRequest = request.requestInterceptor.invoke(request)
+        val modifiedRequest = request.requestTransformer.invoke(request)
         val response = request.client.awaitRequest(modifiedRequest)
 
         return Result.of<Response, FuelError> {
-            request.responseInterceptor.invoke(modifiedRequest, response)
+            request.responseTransformer.invoke(modifiedRequest, response)
         }.mapError { e ->
             val error = e as? FuelError ?: FuelError(e)
             if (error.exception as? InterruptedIOException != null) {

@@ -21,8 +21,8 @@ import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
-typealias RequestInterceptor = (Request) -> Request
-typealias ResponseInterceptor = (Request, Response) -> Response
+typealias RequestTransformer = (Request) -> Request
+typealias ResponseTransformer = (Request, Response) -> Response
 
 class Request(
     val method: Method,
@@ -73,8 +73,8 @@ class Request(
     internal lateinit var callbackExecutor: Executor
 
     // interceptor
-    internal lateinit var requestInterceptor: RequestInterceptor
-    internal lateinit var responseInterceptor: ResponseInterceptor
+    internal lateinit var requestTransformer: RequestTransformer
+    internal lateinit var responseTransformer: ResponseTransformer
 
     // interfaces
     fun timeout(timeout: Int): Request {
