@@ -146,7 +146,7 @@ class Headers : MutableMap<String, HeaderValues> {
         val header = HeaderName(key)
         return contents[header].orEmpty().let {
             when (Headers.isSingleValue(header)) {
-                true -> listOf(it.last())
+                true -> listOfNotNull(it.lastOrNull())
                 false -> it
             }
         }
