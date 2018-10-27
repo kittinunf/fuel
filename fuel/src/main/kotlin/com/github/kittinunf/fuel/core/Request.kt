@@ -24,8 +24,8 @@ import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
-private typealias RequestInterceptor = (Request) -> Request
-private typealias ResponseInterceptor = (Request, Response) -> Response
+private typealias RequestTransformer = (Request) -> Request
+private typealias ResponseTransformer = (Request, Response) -> Response
 typealias Parameters = List<Pair<String, Any?>>
 
 class Request(
@@ -41,8 +41,8 @@ class Request(
     var isAllowRedirects: Boolean = true,
     val useHttpCache: Boolean? = null,
     val decodeContent: Boolean? = null,
-    var timeoutInMillisecond: Int,
-    var timeoutReadInMillisecond: Int
+    var timeoutInMillisecond: Int = 15_000,
+    var timeoutReadInMillisecond: Int = 15_000
 ) : Fuel.RequestConvertible {
     enum class Type {
         REQUEST,
@@ -73,8 +73,8 @@ class Request(
     internal lateinit var callbackExecutor: Executor
 
     // interceptor
-    internal lateinit var requestInterceptor: RequestInterceptor
-    internal lateinit var responseInterceptor: ResponseInterceptor
+    internal lateinit var requestTransformer: RequestTransformer
+    internal lateinit var responseTransformer: ResponseTransformer
 
     // interfaces
     fun timeout(timeout: Int): Request {
@@ -140,10 +140,13 @@ class Request(
      * @see set(header: String, values: Collection<*>)
      * @see set(header: String, value: Any)
      *
-     * @param headers [Map<String, Any>] map of headers to replace. Value can be a list or single value
+     * @param map [Map<String, Any>] map of headers to replace. Value can be a list or single value
      * @return [Request] the modified request
      */
-    fun header(headers: Map<String, Any>) = headers.entries.fold(this) { result, entry -> result.set(entry.key, entry.value) }
+    fun header(map: Map<String, Any>): Request {
+        headers.putAll(Headers.from(map))
+        return this
+    }
 
     /**
      * Replace the headers with the pairs provided
@@ -155,10 +158,13 @@ class Request(
      * @see set(header: String, values: Collection<*>)
      * @see set(header: String, value: Any)
      *
-     * @param headers [Pair<String, Any>] map of headers to replace. Value can be a list or single value
+     * @param pairs [Pair<String, Any>] map of headers to replace. Value can be a list or single value
      * @return [Request] the modified request
      */
-    fun header(vararg headers: Pair<String, Any>) = headers.fold(this) { result, pair -> result.set(pair.first, pair.second) }
+    fun header(vararg pairs: Pair<String, Any>): Request {
+        headers.putAll(Headers.from(*pairs))
+        return this
+    }
 
     /**
      * Replace the header with the provided values
@@ -183,6 +189,17 @@ class Request(
     fun header(header: String, value: Any): Request = set(header, value)
 
     /**
+     * Replace the header with the provided values
+     *
+     * @see set(header: String, values: List<Any>)
+     *
+     * @param header [String] the header to set
+     * @param values [Any] the values to set the header to
+     * @return [Request] the modified request
+     */
+    fun header(header: String, vararg values: Any) = set(header, values.toList())
+
+    /**
      * Appends the value to the header or sets it if there was none yet
      *
      * @param header [String] the header name to append to
@@ -200,7 +217,7 @@ class Request(
      * @param values [Any] the value to be transformed through #toString
      */
     fun appendHeader(header: String, vararg values: Any): Request {
-        headers.append(header, listOf(values))
+        headers.append(header, values.toList())
         return this
     }
 

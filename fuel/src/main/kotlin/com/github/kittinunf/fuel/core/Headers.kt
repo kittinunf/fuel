@@ -1,13 +1,27 @@
 package com.github.kittinunf.fuel.core
 
+/**
+ * Special case-insensitive string wrapper that can be used as key to lookup headers.
+ *
+ * @see Headers
+ * @param name [String] the header name
+ */
 data class HeaderName(val name: String) {
     private val normalized = name.toUpperCase()
+
     override fun hashCode(): Int {
         return normalized.hashCode()
     }
 
+    /**
+     * Equals any string or header name that is equals without regarding case
+     */
     override fun equals(other: Any?): Boolean {
-        return (other is HeaderName) && other.normalized == normalized
+        return when (other) {
+            is HeaderName -> other.normalized == normalized
+            is String -> HeaderName(other).normalized == normalized
+            else -> false
+        }
     }
 
     override fun toString(): String {
@@ -49,44 +63,52 @@ class Headers : MutableMap<String, HeaderValues> {
     /**
      * Associates the specified [value] with the specified [key] in the map.
      *
-     * @return the previous value associated with the key, or `null` if the key was not present in the map.
+     * @param key [String] the header name
+     * @param value [HeaderValues] the new values
+     * @return [HeaderValues?] the previous value at [key], or `null` if the [key] was not present in the map.
      */
     override fun put(key: String, value: HeaderValues): HeaderValues? {
         return contents.put(HeaderName(key), value)
     }
 
-    fun append(key: String, value: Collection<*>): Headers {
-        val current = contents.getOrPut(HeaderName(key)) { emptyList() }
-        put(key, current.plus(value.map { it.toString() }))
+    /**
+     * Appends the entire [values] to the current values at [header]
+     *
+     * @param header [String] the header to append to
+     * @param values [Collection] the values to append, coerced with [Any.toString]
+     */
+    fun append(header: String, values: Collection<*>): Headers {
+        put(header, this[header].plus(values.map { it.toString() }))
         return this
     }
 
-    fun append(key: String, value: Any): Headers {
-        // Some headers can not be appended per the RFC
-        if (Headers.isSingleValue(HeaderName(key))) {
-            set(key, value.toString())
-            return this
+    /**
+     * Appends a single value [value] to the current values at [header]
+     *
+     * @param header [String] the header to append to
+     * @param value [Any] the value to append, coerced with [Any.toString]
+     */
+    fun append(header: String, value: Any): Headers {
+        return when (Headers.isSingleValue(header)) {
+            true -> set(header, value.toString())
+            false -> set(header, this[header].plus(value.toString()))
         }
-
-        put(key, this[key].plus(value.toString()))
-        return this
-    }
-
-    fun replace(key: String, value: String): Headers {
-        put(key, listOf(value))
-        return this
     }
 
     /**
      * Updates this map with key/value pairs from the specified map [from].
+     *
      */
     override fun putAll(from: Map<out String, HeaderValues>) {
-        // No need to map the `from` input to a map with header name
-        from.forEach { put(it.key, it.value) }
+        // The call to [Headers.from] actually filters out invalid entries (duplicate headers which are isSingle), and
+        // makes sure that multiple values for a single Header are all added (e.g. "foo" to "a", "foo" to "b").
+        Headers.from(from).forEach {
+            put(it.key, it.value)
+        }
     }
 
     /**
-     * Removes the specified key and its corresponding value from this map.
+     * Removes the specified [key] and its corresponding value from this map.
      *
      * @return the previous value associated with the key, or `null` if the key was not present in the map.
      */
@@ -107,7 +129,7 @@ class Headers : MutableMap<String, HeaderValues> {
         return contents.containsKey(HeaderName(key))
     }
 
-        /**
+    /**
      * Returns `true` if the map maps one or more keys to the specified [value].
      */
     override fun containsValue(value: HeaderValues): Boolean {
@@ -116,13 +138,31 @@ class Headers : MutableMap<String, HeaderValues> {
 
     /**
      * Returns the value corresponding to the given [key], or `null` if such a key is not present in the map.
+     *
+     * @param key [String] the header name
+     * @return [HeaderValues] the values at [key] or an empty list
      */
     override fun get(key: String): HeaderValues {
-        return contents[HeaderName(key)].orEmpty()
+        val header = HeaderName(key)
+        return contents[header].orEmpty().let {
+            when (Headers.isSingleValue(header)) {
+                true -> listOf(it.last())
+                false -> it
+            }
+        }
     }
 
-    operator fun set(key: String, value: String) = replace(key, value)
+    /**
+     * @see put
+     */
+    operator fun set(key: String, value: String): Headers {
+        put(key, listOf(value))
+        return this
+    }
 
+    /**
+     * @see put
+     */
     operator fun set(key: String, values: HeaderValues): Headers {
         put(key, values)
         return this
@@ -135,15 +175,26 @@ class Headers : MutableMap<String, HeaderValues> {
         return contents.isEmpty()
     }
 
-    fun transformIterate(set: (key: String, value: String) -> Any, add: (key: String, value: String) -> Any = set) {
+    /**
+     * Iterates all the keys and values, going through the RFC defined rules for each one and when applicable, calling
+     * one of two callbacks [set] or [add].
+     *
+     * @see isCollapsible
+     * @see collapse
+     * @see isSingleValue
+     */
+    fun transformIterate(set: (key: String, value: String) -> Any?, add: (key: String, value: String) -> Any? = set) {
         for ((key, values) in this) {
             val header = HeaderName(key)
             when (Headers.isCollapsible(header)) {
                 true ->
-                    // NOTE: HTTP requires all request properties which can
-                    //     * legally have multiple instances with the same key
-                    //     * to use a comma-separated list syntax which enables multiple
-                    //     * properties to be appended into a single property.
+                    // From the [HttpURLConnection.setRequestProperty](https://docs.oracle.com/javase/7/docs/api/java/net/URLConnection.html#setRequestProperty(java.lang.String,%20java.lang.String))
+                    //
+                    //   NOTE: HTTP requires all request properties which can
+                    //         legally have multiple instances with the same key
+                    //         to use a comma-separated list syntax which enables multiple
+                    //         properties to be appended into a single property.
+                    //
                     set(key, Headers.collapse(header, values))
                 false -> when (Headers.isSingleValue(header)) {
                     true -> values.lastOrNull()?.let { set(key, it) }
@@ -153,22 +204,55 @@ class Headers : MutableMap<String, HeaderValues> {
         }
     }
 
-    override fun toString(): String {
-        return contents.toString()
-    }
+    override fun toString() = contents.toString()
 
     companion object {
-        fun isCollapsible(key: HeaderName): Boolean {
-            return when (key) {
-                // These headers, per RFC, SHOULD NOT be collapsed into a single value
+        /**
+         * Determines if a multiple values may be collapsed into an ordered list.
+         *
+         * @see isSingleValue
+         * @see collapse
+         *
+         * RFC 7230 links to RFC 6265 stating that:
+         *
+         *  Note: In practice, the "Set-Cookie" header field (RFC6265) often
+         *  appears multiple times in a response message and does not use the
+         *  list syntax, violating the above requirements on multiple header
+         *  fields with the same name.  Since it cannot be combined into a
+         *  single field-value, recipients ought to handle "Set-Cookie" as a
+         *  special case while processing header fields.  (See Appendix A.2.3
+         *  of Kri2001 for details.)
+         *
+         * @see [RFC 7230](https://tools.ietf.org/html/rfc7230#section-3.2.2))
+         * @see [RFC 6265](https://tools.ietf.org/html/rfc6265#section-5.2)
+         *
+         * @param header [HeaderName] the header to check
+         * @return [Boolean] true if can be collapsed into a single value
+         */
+        fun isCollapsible(header: HeaderName): Boolean {
+            return when (header) {
                 HeaderName(SET_COOKIE) -> false
-                else -> true
+                else -> !isSingleValue(header)
             }
         }
 
-        fun isSingleValue(key: HeaderName): Boolean {
-            return when (key) {
-                // These headers, per RFC, SHOULD only appear once.
+        /**
+         * This function determines if a header is allowed to have multiple values.
+         *
+         * RFC 7230, 3.2.2 Field order states that:
+         *
+         *  A sender MUST NOT generate multiple header fields with the same field
+         *  name in a message unless either the entire field value for that
+         *  header field is defined as a comma-separated list [i.e., #(values)]
+         *  or the header field is a well-known exception (as noted below).
+         *
+         * @see [RFC 7230](https://tools.ietf.org/html/rfc7230#section-3.2.2))
+         *
+         * @param header [HeaderName] the header to check
+         * @return [Boolean] true if it is a single value, false otherwise
+         */
+        fun isSingleValue(header: HeaderName): Boolean {
+            return when (header) {
                 HeaderName(AGE) -> true
                 HeaderName(CONTENT_ENCODING) -> true
                 HeaderName(CONTENT_LENGTH) -> true
@@ -181,6 +265,26 @@ class Headers : MutableMap<String, HeaderValues> {
             }
         }
 
+        /**
+         * This functions collapses multiple HeaderValues into a single value.
+         *
+         * @see isSingleValue
+         * @see isCollapsible
+         *
+         * RFC 7230, 3.2.2 Field order states that:
+         *
+         *  A recipient MAY combine multiple header fields with the same field
+         *  name into one "field-name: field-value" pair, without changing the
+         *  semantics of the message, by appending each subsequent field value to
+         *  the combined field value in order, separated by a comma.  The order
+         *  in which header fields with the same field name are received is
+         *  therefore significant to the interpretation of the combined field
+         *  value; a proxy MUST NOT change the order of these field values when
+         *  forwarding a message.
+         *
+         * @param header [HeaderName] the header to check
+         * @return [Boolean] true if it is a single value, false otherwise
+         */
         fun collapse(header: HeaderName, values: HeaderValues): String {
             return when (header) {
                 HeaderName(COOKIE) -> values.joinToString("; ")
@@ -188,30 +292,40 @@ class Headers : MutableMap<String, HeaderValues> {
             }
         }
 
-        fun from(mapOf: Map<String, Any>): Headers {
-            return mapOf.entries.fold(Headers()) { result, entry ->
+        fun isCollapsible(header: String) = isCollapsible(HeaderName(header))
+        fun isSingleValue(header: String) = isSingleValue(HeaderName(header))
+        fun collapse(header: String, values: HeaderValues) = collapse(HeaderName(header), values)
+
+        /**
+         * Creates a valid Headers from the [pairs] map, applying the rules defined by the RFCs.
+         *
+         * @return [Headers]
+         */
+        fun from(pairs: Collection<Pair<String, Any>>): Headers {
+            return pairs.fold(Headers()) { result, entry ->
                 // The issue here is that connection.headerFields is typed as Map<String, List<String>> but in fact is
                 //   a Map<String?, List<String>> and thus needs this cast here or it will break as an
                 //   java.lang.IllegalArgumentException: Parameter specified as non-null is null
                 //
-                val key = (entry.key as String?).orEmpty().ifBlank { null } ?: return@fold result
-                val value = entry.value
+                val key = (entry.first as String?).orEmpty().ifBlank { null } ?: return@fold result
+                val value = entry.second
 
                 when (value) {
                     is Collection<*> -> {
                         val values = value.ifEmpty { null } ?: return@fold result
-                        result.set(key, values.map { v -> v.toString() })
+                        result.append(key, values.map { v -> v.toString() })
                     }
-                    else -> result.set(key, value.toString())
+                    else -> result.append(key, value.toString())
                 }
             }
         }
 
-        fun from(vararg pairs: Pair<String, Any>): Headers {
-            return from(pairs.toMap())
-        }
+        fun from(source: Map<out String, Any>): Headers = from(source.entries.map { Pair(it.key, it.value) })
+        fun from(vararg pairs: Pair<String, Any>) = from(pairs.toList())
 
+        const val ACCEPT = "Accept"
         const val ACCEPT_ENCODING = "Accept-Encoding"
+        const val ACCEPT_LANGUAGE = "Accept-Language"
         const val ACCEPT_TRANSFER_ENCODING = "TE"
         const val AGE = "Age"
         const val AUTHORIZATION = "Authorization"
