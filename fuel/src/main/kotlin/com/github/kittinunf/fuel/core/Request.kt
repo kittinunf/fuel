@@ -467,7 +467,7 @@ class Request(
         }
 
         appendln("--> $url")
-        appendln("\"Body : ${bodyString}\"")
+        appendln("\"Body : $bodyString\"")
         appendln("\"Headers : (${headers.size})\"")
 
         val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
