@@ -23,6 +23,7 @@ data class MultipartRequest(
         return this
     }
 
+    @JvmOverloads
     fun source(fileName: String? = null, contentType: String? = null, source: LegacySource) = dataPart({
         request -> DataPart.from(source.invoke(request, request.url), fileName = fileName, contentType = contentType)
     })

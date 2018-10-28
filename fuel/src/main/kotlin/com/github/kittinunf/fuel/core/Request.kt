@@ -58,11 +58,12 @@ interface RequestExecutions {
     fun response(handler: Handler<ByteArray>): CancellableRequest
     fun response(): Triple<Request, Response, Result<ByteArray, FuelError>>
 
-    fun responseString(charset: Charset = Charsets.UTF_8, handler: HandlerWithResult<String>): CancellableRequest
+    fun responseString(charset: Charset, handler: HandlerWithResult<String>): CancellableRequest
+    fun responseString(handler: HandlerWithResult<String>): CancellableRequest
     fun responseString(charset: Charset, handler: Handler<String>): CancellableRequest
     fun responseString(handler: Handler<String>): CancellableRequest
-
-    fun responseString(charset: Charset = Charsets.UTF_8): Triple<Request, Response, Result<String, FuelError>>
+    fun responseString(charset: Charset): Triple<Request, Response, Result<String, FuelError>>
+    fun responseString(): Triple<Request, Response, Result<String, FuelError>>
 
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: HandlerWithResult<T>): CancellableRequest
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): CancellableRequest

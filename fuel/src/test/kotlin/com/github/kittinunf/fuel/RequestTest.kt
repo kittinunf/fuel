@@ -10,8 +10,8 @@ import com.github.kittinunf.fuel.core.RegularRequest
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.util.decodeBase64
-import junit.framework.Assert.fail
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue

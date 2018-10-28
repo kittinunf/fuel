@@ -376,13 +376,16 @@ data class RegularRequest(
 
     override fun responseString(charset: Charset, handler: HandlerWithResult<String>) =
         response(StringDeserializer(charset), handler)
+    override fun responseString(handler: HandlerWithResult<String>) =
+        response(StringDeserializer(), handler)
     override fun responseString(charset: Charset, handler: Handler<String>) =
         response(StringDeserializer(charset), handler)
     override fun responseString(handler: Handler<String>) =
         response(StringDeserializer(), handler)
-
     override fun responseString(charset: Charset) =
         response(StringDeserializer(charset))
+    override fun responseString() =
+        response(StringDeserializer())
 
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: HandlerWithResult<T>) =
         response(deserializer, handler)
