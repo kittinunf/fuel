@@ -118,11 +118,3 @@ suspend fun <U : Any> Request.awaitObjectResult(
     }
     Result.Failure(fuelError)
 }
-
-@Deprecated("please use 'awaitByteArray()'", ReplaceWith("awaitByteArray()", "deserializable"))
-suspend fun Request.awaitResponseResult(): ByteArray = awaitByteArray()
-
-@Deprecated("please use 'awaitObjectResult(deserializable)'", ReplaceWith("awaitObjectResult(deserializable)"))
-suspend fun <U : Any> Request.awaitSafelyObjectResult(
-    deserializable: ResponseDeserializable<U>
-): Result<U, FuelError> = this.awaitObjectResult(deserializable)
