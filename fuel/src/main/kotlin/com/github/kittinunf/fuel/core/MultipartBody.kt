@@ -36,27 +36,20 @@ data class MultipartBody(private val request: MultipartRequest) : Body {
         }
 
         inputAvailable = false
-
-        val expectedLength = length?.toLong()
-        val progressCallback = { current: Long, total: Long ->
-            request.progress.invoke(current, total)
-            onProgress?.invoke(current)
-        }
-
         return outputStream.let { stream ->
             // Parameters
             val parametersLength = request.parameters.fold(0L) { result, parameter ->
                 val (name, data) = parameter
 
                 (result + writeParameter(stream, name, data)).apply {
-                    progressCallback.invoke(this, expectedLength ?: this)
+                    onProgress?.invoke(this)
                 }
             }
 
             // Blobs / Files
             val partsWithHeaders = request.dataParts.fold(0L) { result, dataPart ->
                 (result + writeDataPart(stream, dataPart, onProgress = { partProgress, _ ->
-                    progressCallback.invoke(result + partProgress, expectedLength ?: result + partProgress)
+                    onProgress?.invoke(result + partProgress)
                 }))
             }
 
@@ -67,7 +60,7 @@ data class MultipartBody(private val request: MultipartRequest) : Body {
                 stream.writeString("--$boundary--") +
                 stream.writeBytes(CRLF)
 
-            progressCallback.invoke(writtenLength, expectedLength ?: writtenLength)
+            onProgress?.invoke(writtenLength)
 
             // This is a buffered stream, so flush what's remaining
             stream.flush()

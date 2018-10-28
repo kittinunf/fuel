@@ -25,7 +25,7 @@ data class DownloadRequestExecutor(
                 } else {
                     readBytes
                 }
-                request.progress.invoke(readBytes, totalBytes)
+                request.responseProgress.invoke(readBytes, totalBytes)
             })
         }
 

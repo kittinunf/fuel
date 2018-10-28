@@ -3,6 +3,7 @@ package com.github.kittinunf.fuel.core.requests
 import com.github.kittinunf.fuel.core.DataPart
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.MultipartBody
+import com.github.kittinunf.fuel.core.ProgressCallback
 import com.github.kittinunf.fuel.core.Request
 import java.io.File
 import java.net.URL
@@ -27,6 +28,11 @@ data class MultipartRequest(
     fun source(fileName: String? = null, contentType: String? = null, source: LegacySource) = dataPart({
         request -> DataPart.from(source.invoke(request, request.url), fileName = fileName, contentType = contentType)
     })
+
+    fun progress(progress: ProgressCallback): MultipartRequest {
+        requestProgress(progress)
+        return this
+    }
 
     val dataParts: Iterable<DataPart> by lazy {
         sources = Collections.unmodifiableCollection(sources)

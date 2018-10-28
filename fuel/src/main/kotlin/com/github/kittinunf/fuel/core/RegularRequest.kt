@@ -23,7 +23,8 @@ data class RegularRequest(
     override val headers: Headers = Headers(),
     override val parameters: Parameters = listOf(),
     override var body: Body = DefaultBody(),
-    override val progress: Progress = Progress()
+    override val requestProgress: Progress = Progress(),
+    override val responseProgress: Progress = Progress()
 ) : Request {
     override lateinit var executor: RequestExecutor
 
@@ -250,13 +251,23 @@ data class RegularRequest(
         return body(body, charset)
     }
 
-    override fun progress(handler: ProgressCallback): Request {
-        progress.add(handler)
+    override fun requestProgress(handler: ProgressCallback): Request {
+        requestProgress.add(handler)
         return request
     }
 
-    override fun progress(handlers: Progress): Request {
-        progress.add(*handlers.handlers.toTypedArray())
+    override fun requestProgress(handlers: Progress): Request {
+        requestProgress.add(*handlers.handlers.toTypedArray())
+        return request
+    }
+
+    override fun responseProgress(handler: ProgressCallback): Request {
+        responseProgress.add(handler)
+        return request
+    }
+
+    override fun responseProgress(handlers: Progress): Request {
+        responseProgress.add(*handlers.handlers.toTypedArray())
         return request
     }
 

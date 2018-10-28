@@ -49,7 +49,8 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                             }
                         }
                     )
-                    .progress(request.progress)
+                    .requestProgress(request.requestProgress)
+                    .responseProgress(request.responseProgress)
 
                 // redirect
                 next(newRequest, newRequest.response().second)

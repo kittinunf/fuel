@@ -44,9 +44,12 @@ interface Request : RequestOptions, RequestExecutions, RequestRepresentation, Re
     fun body(file: File, charset: Charset = Charsets.UTF_8): Request
     fun jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request
 
-    val progress: Progress
-    fun progress(handler: ProgressCallback): Request
-    fun progress(handlers: Progress): Request
+    val requestProgress: Progress
+    val responseProgress: Progress
+    fun responseProgress(handler: ProgressCallback): Request
+    fun responseProgress(handlers: Progress): Request
+    fun requestProgress(handler: ProgressCallback): Request
+    fun requestProgress(handlers: Progress): Request
 
     fun multipart(): MultipartRequest
     fun download(): DownloadRequest

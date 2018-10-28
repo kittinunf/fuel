@@ -199,9 +199,13 @@ internal class HttpClient(
             connection.setChunkedStreamingMode(4096)
         }
 
+        val totalBytes = if ((contentLength ?: -1L).toLong() > 0) { contentLength!!.toLong() } else { null }
+
         // The input and output streams returned by this class are not buffered. Most body implementations should wrap
         // the input stream with BufferedOutputStream. Bulk implementations may forgo this.
-        body.writeTo(connection.outputStream, null)
+        body.writeTo(connection.outputStream, null, onProgress = {
+            request.requestProgress.invoke(it, totalBytes ?: it)
+        })
         connection.outputStream.flush()
     }
 

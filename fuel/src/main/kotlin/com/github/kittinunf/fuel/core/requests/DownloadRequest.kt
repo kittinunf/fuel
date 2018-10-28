@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core.requests
 
+import com.github.kittinunf.fuel.core.ProgressCallback
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.executors.DownloadRequestExecutor
@@ -15,6 +16,11 @@ data class DownloadRequest(
 
     override fun destination(destination: DownloadDestinationCallback): DownloadRequest {
         this.destination = destination
+        return this
+    }
+
+    fun progress(progress: ProgressCallback): DownloadRequest {
+        responseProgress(progress)
         return this
     }
 
