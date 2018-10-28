@@ -64,10 +64,10 @@ class BodyTest : BaseTestCase() {
             .apply {
                 val output = ByteArrayOutputStream(value.size)
                 assertThat(body.length?.toInt(), equalTo(value.size))
-                assertArrayEquals(body.toByteArray(), value)
+                assertArrayEquals(value, body.toByteArray())
 
                 body.writeTo(output)
-                assertArrayEquals(output.toByteArray(), value)
+                assertArrayEquals(value, output.toByteArray())
             }
     }
 

@@ -95,7 +95,7 @@ internal class HttpClient(
         }
 
         val headers = Headers.from(connection.headerFields)
-        val transferEncoding = headers[Headers.TRANSFER_ENCODING]
+        val transferEncoding = headers[Headers.TRANSFER_ENCODING].flatMap { it.split(',') }.map { it.trim() }
         val contentEncoding = headers[Headers.CONTENT_ENCODING].lastOrNull()
         var contentLength = headers[Headers.CONTENT_LENGTH].lastOrNull()?.toLong() ?: -1
         val shouldDecode = (request.decodeContent ?: decodeContent) && contentEncoding != null && contentEncoding != "identity"
@@ -148,8 +148,8 @@ internal class HttpClient(
             return stream
         }
 
-        val encoding = encodings.last()
-        return decodeTransfer(decode(stream, encoding), encodings.toList().dropLast(1))
+        val encoding = encodings.first()
+        return decodeTransfer(decode(stream, encoding), encodings.toList().drop(1))
     }
 
     private fun decodeContent(stream: InputStream, encoding: String?, shouldDecode: Boolean): InputStream {
