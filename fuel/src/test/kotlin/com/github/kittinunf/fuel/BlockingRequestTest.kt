@@ -25,9 +25,9 @@ class BlockingRequestTest : MockHttpTestCase() {
 
         private fun createRequest(): Request {
             val encoder = Encoding(
-                    httpMethod = method,
-                    urlString = url,
-                    parameters = listOf("foo" to "bar")
+                httpMethod = method,
+                urlString = url,
+                parameters = listOf("foo" to "bar")
             )
             return encoder.request
         }

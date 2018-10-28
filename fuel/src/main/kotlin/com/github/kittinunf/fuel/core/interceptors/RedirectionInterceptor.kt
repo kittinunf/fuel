@@ -20,7 +20,7 @@ private val redirectStatusWithGets = listOf(
 fun redirectResponseInterceptor(manager: FuelManager) =
         { next: (Request, Response) -> Response ->
             inner@{ request: Request, response: Response ->
-                if (!response.isStatusRedirection || !request.isAllowRedirects) {
+                if (!response.isStatusRedirection || request.executor.followRedirects == false) {
                     return@inner next(request, response)
                 }
 
@@ -29,26 +29,29 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                     return@inner next(request, response)
                 }
 
-                val newUrl = if (URI(redirectedUrl).isAbsolute) {
-                    URL(redirectedUrl)
-                } else {
-                    URL(request.url, redirectedUrl)
-                }
-                val newHeaders = Headers.from(request.headers)
+                val encodedRequest = Encoding(
+                    httpMethod = when {
+                        response.statusCode in redirectStatusWithGets -> Method.GET
+                        else -> request.method
+                    },
+                    urlString = when(URI(redirectedUrl).isAbsolute) {
+                        true -> URL(redirectedUrl).toString()
+                        false -> URL(request.url, redirectedUrl).toString()
+                    }
+                ).request
 
-                val newMethod = when {
-                    response.statusCode in redirectStatusWithGets -> Method.GET
-                    else -> request.method
-                }
-
-                val encoding = Encoding(httpMethod = newMethod, urlString = newUrl.toString())
-
-                // check whether it is the same host or not
-                if (newUrl.host != request.url.host) {
-                    newHeaders.remove(Headers.AUTHORIZATION)
-                }
+                val newRequest = manager.request(encodedRequest)
+                    .header(
+                        Headers.from(request.headers).let {
+                            when(encodedRequest.url.host != request.url.host) {
+                                true -> it.apply { this.remove(Headers.AUTHORIZATION) }
+                                else -> it
+                            }
+                        }
+                    )
+                    .progress(request.progress)
 
                 // redirect
-                next(request, manager.request(encoding).header(newHeaders).response().second)
+                next(newRequest, newRequest.response().second)
             }
         }

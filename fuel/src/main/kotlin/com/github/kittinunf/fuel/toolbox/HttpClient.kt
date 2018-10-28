@@ -9,6 +9,7 @@ import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.executors.RequestExecutor
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -51,13 +52,14 @@ internal class HttpClient(
 
     @Throws
     private fun doRequest(request: Request): Response {
+        val executor = request.executor
         val connection = establishConnection(request) as HttpURLConnection
         connection.apply {
-            connectTimeout = Fuel.testConfiguration.coerceTimeout(request.timeoutInMillisecond)
-            readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.timeoutReadInMillisecond)
+            connectTimeout = Fuel.testConfiguration.coerceTimeout(executor.timeoutInMilliseconds)
+            readTimeout = Fuel.testConfiguration.coerceTimeoutRead(executor.timeoutReadInMilliseconds)
             requestMethod = HttpClient.coerceMethod(request.method).value
             doInput = true
-            useCaches = request.useHttpCache ?: useHttpCache
+            useCaches = executor.useHttpCaching ?: useHttpCache
             instanceFollowRedirects = false
 
             request.headers.transformIterate(
@@ -98,7 +100,7 @@ internal class HttpClient(
         val transferEncoding = headers[Headers.TRANSFER_ENCODING]
         val contentEncoding = headers[Headers.CONTENT_ENCODING].lastOrNull()
         var contentLength = headers[Headers.CONTENT_LENGTH].lastOrNull()?.toLong() ?: -1
-        val shouldDecode = (request.decodeContent ?: decodeContent) && contentEncoding != null && contentEncoding != "identity"
+        val shouldDecode = (executor.decodeContent ?: decodeContent) && contentEncoding != null && contentEncoding != "identity"
 
         if (shouldDecode) {
             // URLConnection.getContentLength() returns the number of bytes transmitted and cannot be used to predict
@@ -170,12 +172,12 @@ internal class HttpClient(
         }
     }
 
-    private fun establishConnection(request: Request): URLConnection {
+    private fun establishConnection(request: Request, executor: RequestExecutor = request.executor): URLConnection {
         val urlConnection = if (proxy != null) request.url.openConnection(proxy) else request.url.openConnection()
         return if (request.url.protocol == "https") {
             (urlConnection as HttpsURLConnection).apply {
-                sslSocketFactory = request.socketFactory
-                hostnameVerifier = request.hostnameVerifier
+                sslSocketFactory = executor.socketFactory
+                hostnameVerifier = executor.hostnameVerifier
             }
         } else {
             urlConnection as HttpURLConnection

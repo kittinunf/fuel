@@ -21,9 +21,10 @@ class CustomClientTest : BaseTestCase() {
         FuelManager().apply {
             client = object : Client {
                 override fun executeRequest(request: Request): Response = Response(
-                        url = request.url,
-                        dataStream = mockJson.inputStream(),
-                        statusCode = 200)
+                    url = request.url,
+                    dataStream = mockJson.inputStream(),
+                    statusCode = 200
+                )
             }
         }
     }

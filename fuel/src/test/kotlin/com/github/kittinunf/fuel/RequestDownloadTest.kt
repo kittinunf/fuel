@@ -2,14 +2,12 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
-import com.google.common.net.MediaType
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
-import org.mockserver.model.BinaryBody
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -29,7 +27,7 @@ class RequestDownloadTest : MockHttpTestCase() {
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+            response = mock.response().withBody(bytes)
         )
 
         val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
@@ -60,7 +58,7 @@ class RequestDownloadTest : MockHttpTestCase() {
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+            response = mock.response().withBody(bytes)
         )
 
         var read = -1L
@@ -100,7 +98,7 @@ class RequestDownloadTest : MockHttpTestCase() {
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+            response = mock.response().withBody(bytes)
         )
 
         var read = -1L
@@ -197,7 +195,7 @@ class RequestDownloadTest : MockHttpTestCase() {
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
             response = mock.response()
                         .withDelay(TimeUnit.SECONDS, 3)
-                        .withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+                        .withBody(bytes)
         )
 
         var read = -1L
@@ -224,7 +222,10 @@ class RequestDownloadTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
         assertThat(file.length(), isEqualTo(numberOfBytes.toLong()))
 
-        assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
+        assertThat(
+            "read bytes $read and total $total bytes should be equal",
+            read == total && read != -1L && total != -1L, isEqualTo(true)
+        )
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response.statusCode, isEqualTo(statusCode))
     }

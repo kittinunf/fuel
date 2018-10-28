@@ -10,14 +10,11 @@ import java.net.URLEncoder
 class Encoding(
     val httpMethod: Method,
     val urlString: String,
-    val requestType: Request.Type = Request.Type.REQUEST,
     val baseUrlString: String? = null,
-    val parameters: List<Pair<String, Any?>>? = null,
-    val timeoutInMillisecond: Int = 15000,
-    val timeoutReadInMillisecond: Int = timeoutInMillisecond
+    val parameters: Parameters? = null
 ) : Fuel.RequestConvertible {
 
-    private val encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
+    private val encoder: (Method, String, Parameters?) -> Request = { method, path, parameters ->
         var modifiedPath = path
         var data: String? = null
         val headerPairs = Headers.from(defaultHeaders)
@@ -32,26 +29,22 @@ class Encoding(
                 }
                 modifiedPath += (querySign + queryParamString)
             }
-            requestType == Request.Type.UPLOAD -> {
-                val boundary = System.currentTimeMillis().toString(16)
-                headerPairs[Headers.CONTENT_TYPE] = "multipart/form-data; boundary=$boundary"
-            }
             else -> {
                 headerPairs[Headers.CONTENT_TYPE] = "application/x-www-form-urlencoded"
                 data = queryFromParameters(parameters)
             }
         }
-        Request(
-                method = method,
-                path = modifiedPath,
-                url = createUrl(modifiedPath),
-                type = requestType,
-                parameters = parameters ?: emptyList(),
-                timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond,
-                headers = headerPairs
-        ).apply {
-            if (data != null) body(data)
+        RegularRequest(
+            method = method,
+            path = modifiedPath,
+            url = createUrl(modifiedPath),
+            parameters = parameters ?: emptyList(),
+            headers = headerPairs
+        ).let {
+            when (data) {
+                null -> it
+                else -> it.body(data)
+            }
         }
     }
 

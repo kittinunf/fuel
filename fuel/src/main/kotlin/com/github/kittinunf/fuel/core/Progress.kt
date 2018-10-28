@@ -3,8 +3,8 @@ package com.github.kittinunf.fuel.core
 typealias ProgressCallback = (readBytes: Long, totalBytes: Long) -> Unit
 
 data class Progress(val handlers: MutableCollection<ProgressCallback> = mutableListOf()) {
-    fun add(handler: ProgressCallback): Progress {
-        plusAssign(handler)
+    fun add(vararg handlers: ProgressCallback): Progress {
+        handlers.forEach { handler -> plusAssign(handler) }
         return this
     }
 

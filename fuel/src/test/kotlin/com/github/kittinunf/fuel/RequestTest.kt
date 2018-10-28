@@ -1,12 +1,16 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.RegularRequest
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.util.decodeBase64
-import com.google.common.net.MediaType
+import junit.framework.Assert.fail
 import junit.framework.TestCase.assertEquals
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
@@ -106,8 +110,8 @@ class RequestTest : MockHttpTestCase() {
         val decodedImage = "iVBORwKGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAClEQVQYV2NgYAAAAAMAAWgmWQAAAAASUVORK5CYII=".decodeBase64()
 
         val httpResponse = mock.response()
-                .withHeader(Headers.CONTENT_TYPE, "image/png")
-                .withBody(BinaryBody(decodedImage))
+            .withHeader(Headers.CONTENT_TYPE, "image/png")
+            .withBody(BinaryBody(decodedImage))
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/image"),
@@ -134,7 +138,7 @@ class RequestTest : MockHttpTestCase() {
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+            response = mock.response().withBody(bytes).withHeader(Headers.CONTENT_TYPE, "application/octet-stream")
         )
 
         val (request, response, result) = manager.request(Method.GET, mock.path("bytes")).responseString()
@@ -158,7 +162,7 @@ class RequestTest : MockHttpTestCase() {
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+            response = mock.response().withBody(bytes)
         )
 
         val (request, response, result) = manager.request(Method.GET, mock.path("bytes")).responseString()
@@ -295,7 +299,7 @@ class RequestTest : MockHttpTestCase() {
         val string = data as String
 
         assertThat(request, notNullValue())
-        assertThat(request["Content-Type"].lastOrNull(), equalTo("application/json"))
+        assertThat(request[Headers.CONTENT_TYPE].lastOrNull(), equalTo("application/json"))
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
@@ -554,90 +558,65 @@ class RequestTest : MockHttpTestCase() {
         assertThat(string, containsString(paramValue))
     }
 
-    // @Test
-    // TODO turn on when it works reliably
+    @Test
     fun httpGetRequestCancel() {
         regularMode {
-            /*
-                TODO: turn into mocked request. This one is failing because the mock server probably
-                    doesn't allow for streamed responses. Or maybe something else. Does show the
-                    issue with completed requests that are cancelled. Should probably be killed even
-                    if they are completed.
-
-
-            val bytes = ByteArray(1024 * 1024)
+            // Standard buffer is 4096, make it 3 times as big just to be sure
+            val bytes = ByteArray(1024 * 12)
             Random().nextBytes(bytes)
 
             mock.chain(
                 request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
-                response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+                response = mock.response().withBody(bytes)
             )
 
-            val file = File.createTempFile(bytes.toString(), null)
-            val requestPrimed = manager.download(mock.path("bytes")).destination { _, _ -> file }
+            val cancellableRequest = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304")
+                .response(object : Handler<ByteArray> {
+                    override fun success(request: Request, response: Response, value: ByteArray) {
+                        assertThat(request, notNullValue())
+                        assertThat(response.contentLength, isEqualTo(-1L)) // this is true
+                        assertThat(value, nullValue()) // but then this is not
+                    }
 
-            requestPrimed.progress { _, _ ->
-                requestPrimed.cancel()
-            }
+                    override fun failure(request: Request, response: Response, error: FuelError) {
+                        fail("Expected to not hit failure path")
+                    }
+                })
 
-            val (request, response, result) = requestPrimed.response()
-            val (data, error) = result
-
-            assertThat(request, notNullValue())
-            assertThat(response, nullValue())
-            assertThat(data, nullValue())
-            assertThat(error, nullValue())
-
-            */
-
-            val (request, response, result) = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString()
-            request.cancel()
-
-            // TODO: investigate. By this time there is already data loaded and cancel doesn't
-            //  actually cancel anything. See comments next to assertions below:
-
-            val (data, error) = result
-
-            assertThat(request, notNullValue())
-            assertThat(response.contentLength, isEqualTo(-1L)) // this is true
-            assertThat(data, nullValue()) // but then this is not
-            assertThat(error, nullValue())
+            cancellableRequest.cancel()
         }
     }
 
     @Test
     fun httpGetCurlString() {
-        val request = Request(method = Method.GET,
-                path = "",
-                url = URL("http://httpbin.org/get"),
-                headers = Headers.from("Authentication" to "Bearer xxx"),
-                parameters = listOf("foo" to "xxx"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000)
+        val request = RegularRequest(method = Method.GET,
+            path = "",
+            url = URL("http://httpbin.org/get"),
+            headers = Headers.from("Authentication" to "Bearer xxx"),
+            parameters = listOf("foo" to "xxx")
+        )
 
         assertThat(request.cUrlString(), isEqualTo("$ curl -i -H \"Authentication:Bearer xxx\" http://httpbin.org/get"))
     }
 
     @Test
     fun httpPostCurlString() {
-        val request = Request(method = Method.POST,
-                path = "",
-                url = URL("http://httpbin.org/post"),
-                headers = Headers.from("Authentication" to "Bearer xxx"),
-                parameters = listOf("foo" to "xxx"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000)
+        val request = RegularRequest(method = Method.POST,
+            path = "",
+            url = URL("http://httpbin.org/post"),
+            headers = Headers.from("Authentication" to "Bearer xxx"),
+            parameters = listOf("foo" to "xxx")
+        )
 
         assertThat(request.cUrlString(), isEqualTo("$ curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
     }
 
     @Test
     fun httpStringWithOutParams() {
-        val request = Request(Method.GET, "",
-                url = URL("http://httpbin.org/post"),
-                headers = Headers.from("Content-Type" to "text/html"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000)
+        val request = RegularRequest(Method.GET, "",
+            url = URL("http://httpbin.org/post"),
+            headers = Headers.from("Content-Type" to "text/html")
+        )
 
         assertThat(request.httpString(), startsWith("GET http"))
         assertThat(request.httpString(), containsString("Content-Type"))
@@ -645,12 +624,11 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpStringWithParams() {
-        val request = Request(Method.POST, "",
-                url = URL("http://httpbin.org/post"),
-                headers = Headers.from("Content-Type" to "text/html"),
-                parameters = listOf("foo" to "xxx"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000).body("it's a body")
+        val request = RegularRequest(Method.POST, "",
+            url = URL("http://httpbin.org/post"),
+            headers = Headers.from("Content-Type" to "text/html"),
+            parameters = listOf("foo" to "xxx")
+        ).body("it's a body")
 
         assertThat(request.httpString(), startsWith("POST http"))
         assertThat(request.httpString(), containsString("Content-Type"))

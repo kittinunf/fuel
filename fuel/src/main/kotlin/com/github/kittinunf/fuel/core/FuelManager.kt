@@ -1,8 +1,13 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.executors.RequestTransformer
+import com.github.kittinunf.fuel.core.executors.ResponseTransformer
 import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
+import com.github.kittinunf.fuel.core.requests.DownloadRequest
+import com.github.kittinunf.fuel.core.requests.GenericRequestExecutor
+import com.github.kittinunf.fuel.core.requests.MultipartRequest
 import com.github.kittinunf.fuel.toolbox.HttpClient
 import com.github.kittinunf.fuel.util.SameThreadExecutorService
 import com.github.kittinunf.fuel.util.readWriteLazy
@@ -17,12 +22,15 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 
+typealias RequestInterceptor = (RequestTransformer) -> RequestTransformer
+typealias ResponseInterceptor = (ResponseTransformer) -> ResponseTransformer
+
 class FuelManager {
     var client: Client by readWriteLazy { HttpClient(proxy) }
     var proxy: Proxy? = null
     var basePath: String? = null
-    var timeoutInMillisecond: Int = 15000
-    var timeoutReadInMillisecond: Int = timeoutInMillisecond
+    var timeoutInMilliseconds: Int = 15000
+    var timeoutReadInMilliseconds: Int = timeoutInMilliseconds
 
     var baseHeaders: Map<String, String>? = null
     var baseParams: List<Pair<String, Any?>> = emptyList()
@@ -52,72 +60,65 @@ class FuelManager {
         }
     }
 
-    private val requestInterceptors: MutableList<((Request) -> Request) -> ((Request) -> Request)> =
-            mutableListOf()
-    private val responseInterceptors: MutableList<((Request, Response) -> Response) -> ((Request, Response) -> Response)> =
-            mutableListOf(redirectResponseInterceptor(this), validatorResponseInterceptor(200..299))
+    private val requestInterceptors: MutableList<RequestInterceptor> = mutableListOf()
+    private val responseInterceptors: MutableList<ResponseInterceptor> = mutableListOf(
+        redirectResponseInterceptor(this),
+        validatorResponseInterceptor(200..299)
+    )
 
     private fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
 
     // callback executor
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
-    fun request(method: Method, path: String, param: List<Pair<String, Any?>>? = null): Request {
-        val request = request(Encoding(
+    fun request(method: Method, path: String, param: Parameters? = null): Request {
+        val request = Encoding(
             httpMethod = method,
             urlString = path,
             baseUrlString = basePath,
-            parameters = if (param == null) baseParams else baseParams + param,
-            timeoutInMillisecond = timeoutInMillisecond,
-            timeoutReadInMillisecond = timeoutReadInMillisecond
-        ).request)
-        return request(request)
+            parameters = if (param == null) baseParams else baseParams + param
+        ).request
+        return applyManager(request)
     }
 
-    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request =
+    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: Parameters? = null): Request =
             request(method, convertible.path, param)
 
-    fun download(path: String, param: List<Pair<String, Any?>>? = null): Request {
+    fun request(convertible: Fuel.RequestConvertible) = applyManager(convertible.request)
+
+    fun download(path: String, param: List<Pair<String, Any?>>? = null): DownloadRequest {
         val request = Encoding(
             httpMethod = Method.GET,
             urlString = path,
-            requestType = Request.Type.DOWNLOAD,
             baseUrlString = basePath,
-            parameters = if (param == null) baseParams else baseParams + param,
-            timeoutInMillisecond = timeoutInMillisecond,
-            timeoutReadInMillisecond = timeoutReadInMillisecond
+            parameters = if (param == null) baseParams else baseParams + param
         ).request
-        return request(request)
+        return applyManager(request).download()
     }
 
-    fun upload(path: String, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
+    fun upload(path: String, method: Method = Method.POST, param: Parameters? = null): MultipartRequest {
         val request = Encoding(
             httpMethod = method,
             urlString = path,
-            requestType = Request.Type.UPLOAD,
             baseUrlString = basePath,
-            parameters = if (param == null) baseParams else baseParams + param,
-            timeoutInMillisecond = timeoutInMillisecond,
-            timeoutReadInMillisecond = timeoutReadInMillisecond
+            parameters = if (param == null) baseParams else baseParams + param
         ).request
-        return request(request)
+        return applyManager(request).multipart()
     }
 
-    fun request(convertible: Fuel.RequestConvertible): Request = request(convertible.request)
-
-    fun addRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)) {
+    fun addRequestInterceptor(interceptor: RequestInterceptor) {
         requestInterceptors += interceptor
     }
 
-    fun addResponseInterceptor(interceptor: ((Request, Response) -> Response) -> ((Request, Response) -> Response)) {
+    fun addResponseInterceptor(interceptor: ResponseInterceptor) {
         responseInterceptors += interceptor
     }
 
-    fun removeRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)) {
+    fun removeRequestInterceptor(interceptor: RequestInterceptor) {
         requestInterceptors -= interceptor
     }
 
-    fun removeResponseInterceptor(interceptor: ((Request, Response) -> Response) -> ((Request, Response) -> Response)) {
+    fun removeResponseInterceptor(interceptor: ResponseInterceptor) {
         responseInterceptors -= interceptor
     }
 
@@ -129,22 +130,26 @@ class FuelManager {
         responseInterceptors.clear()
     }
 
-    private fun request(request: Request): Request {
-        request.client = client
-
+    private fun applyManager(request: Request): Request {
         // Sets base headers ONLY if they are not set
         val unsetBaseHeaders = request.headers.keys.fold(Headers.from(baseHeaders.orEmpty())) {
             result, it -> result.remove(it); result
         }
-        request.header(unsetBaseHeaders)
 
-        request.socketFactory = socketFactory
-        request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
-        request.callbackExecutor = callbackExecutor
-        request.requestTransformer = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseTransformer = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
-        return request
+        request.executor = GenericRequestExecutor(
+            request,
+            client = client,
+            socketFactory = socketFactory,
+            hostnameVerifier = hostnameVerifier,
+            executor = createExecutor(),
+            callbackExecutor = callbackExecutor,
+            requestTransformer = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) },
+            responseTransformer = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) },
+            timeoutInMilliseconds = timeoutInMilliseconds,
+            timeoutReadInMilliseconds = timeoutReadInMilliseconds
+        )
+
+        return request.header(unsetBaseHeaders)
     }
 
     companion object {

@@ -949,8 +949,8 @@ class InterceptorTest : MockHttpTestCase() {
 
         val manager = FuelManager()
         val (_, _, result) = manager.request(Method.GET, mock.path("redirect"))
-                .allowRedirects(false)
-                .responseString()
+            .followRedirects(false)
+            .responseString()
 
         val (data, error) = result
 

@@ -12,10 +12,10 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingNormal() {
         val request = Encoding(
-                httpMethod = Method.GET,
-                baseUrlString = "http://www.example.com",
-                urlString = "test",
-                parameters = listOf("a" to "b")
+            httpMethod = Method.GET,
+            baseUrlString = "http://www.example.com",
+            urlString = "test",
+            parameters = listOf("a" to "b")
         ).request
 
         assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?a=b"))
@@ -24,10 +24,10 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingWithBaseUrlStringWithLastSlash() {
         val request = Encoding(
-                httpMethod = Method.GET,
-                baseUrlString = "http://www.example.com/",
-                urlString = "/test",
-                parameters = listOf("a" to "b")
+            httpMethod = Method.GET,
+            baseUrlString = "http://www.example.com/",
+            urlString = "/test",
+            parameters = listOf("a" to "b")
         ).request
 
         assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?a=b"))
@@ -36,10 +36,10 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingWithNoParam() {
         val request = Encoding(
-                httpMethod = Method.GET,
-                baseUrlString = "http://www.example.com",
-                urlString = "test",
-                parameters = null
+            httpMethod = Method.GET,
+            baseUrlString = "http://www.example.com",
+            urlString = "test",
+            parameters = null
         ).request
 
         assertThat(request.url.toString(), isEqualTo("http://www.example.com/test"))
@@ -48,10 +48,10 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingWithIntegerParameter() {
         val request = Encoding(
-                httpMethod = Method.GET,
-                baseUrlString = "http://www.example.com",
-                urlString = "test",
-                parameters = listOf("foo" to 1)
+            httpMethod = Method.GET,
+            baseUrlString = "http://www.example.com",
+            urlString = "test",
+            parameters = listOf("foo" to 1)
         ).request
 
         assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?foo=1"))
@@ -60,10 +60,10 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingWithDoubleParameter() {
         val request = Encoding(
-                httpMethod = Method.GET,
-                baseUrlString = "http://www.example.com",
-                urlString = "test",
-                parameters = listOf("foo" to 1.1)
+            httpMethod = Method.GET,
+            baseUrlString = "http://www.example.com",
+            urlString = "test",
+            parameters = listOf("foo" to 1.1)
         ).request
 
         assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?foo=1.1"))
@@ -72,10 +72,10 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingWithBooleanParameter() {
         val request = Encoding(
-                httpMethod = Method.GET,
-                baseUrlString = "http://www.example.com",
-                urlString = "test",
-                parameters = listOf("foo" to true)
+            httpMethod = Method.GET,
+            baseUrlString = "http://www.example.com",
+            urlString = "test",
+            parameters = listOf("foo" to true)
         ).request
 
         assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?foo=true"))
@@ -84,10 +84,10 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingWithNoParamAndNoRelativeUrlString() {
         val request = Encoding(
-                httpMethod = Method.GET,
-                baseUrlString = "http://www.example.com/test",
-                urlString = "",
-                parameters = null
+            httpMethod = Method.GET,
+            baseUrlString = "http://www.example.com/test",
+            urlString = "",
+            parameters = null
         ).request
 
         assertThat(request.url.toString(), isEqualTo("http://www.example.com/test"))
@@ -96,10 +96,10 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingWithJustBaseUrlString() {
         val request = Encoding(
-                httpMethod = Method.GET,
-                baseUrlString = "http://www.example.com/test?a=b",
-                urlString = "",
-                parameters = null
+            httpMethod = Method.GET,
+            baseUrlString = "http://www.example.com/test?a=b",
+            urlString = "",
+            parameters = null
         ).request
 
         assertThat(request.url.toString(), isEqualTo("http://www.example.com/test?a=b"))
@@ -108,10 +108,10 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingWithPercentEscapedCharacterPath() {
         val request = Encoding(
-                httpMethod = Method.GET,
-                baseUrlString = "http://www.example.com/U$3|2|\\|@me/P@$\$vv0|2|)",
-                urlString = "",
-                parameters = null
+            httpMethod = Method.GET,
+            baseUrlString = "http://www.example.com/U$3|2|\\|@me/P@$\$vv0|2|)",
+            urlString = "",
+            parameters = null
         ).request
 
         assertThat(request.url.toString(), isEqualTo("http://www.example.com/U$3%7C2%7C%5C%7C@me/P@$\$vv0%7C2%7C)"))
@@ -121,8 +121,8 @@ class EncodingTest : BaseTestCase() {
     fun testEncodingAlreadyEncodedUrl() {
         val supposed = "https://www.example.com/files/%D7%98%D7%A7%D7%A1%D7%98%20%D7%91%D7%A2%D7%91%D7%A8%D7%99%D7%AA%201%203.txt"
         val request = Encoding(
-                httpMethod = Method.GET,
-                urlString = supposed
+            httpMethod = Method.GET,
+            urlString = supposed
         ).request
 
         assertThat(request.url.toString(), isEqualTo(supposed))
@@ -131,7 +131,7 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingNonAsciiString() {
         val hebrewString = "טקסט בעברית 1 3.txt"
-        val path = "https://www.example.com/files/" + hebrewString
+        val path = "https://www.example.com/files/$hebrewString"
 
         val request = Encoding(
                 httpMethod = Method.GET,
@@ -148,9 +148,9 @@ class EncodingTest : BaseTestCase() {
         val path = "https://www.example.com/files"
         val parameters = listOf("param1" to "value1", "param2" to "value2")
         val request = Encoding(
-                httpMethod = Method.POST,
-                urlString = path,
-                parameters = parameters
+            httpMethod = Method.POST,
+            urlString = path,
+            parameters = parameters
         ).request
 
         val body = ByteArrayOutputStream().apply {
@@ -168,9 +168,9 @@ class EncodingTest : BaseTestCase() {
         val parameters = listOf("param1" to "val+ue", "param2" to "val ue",
                 "param3" to "val!ue", "param4" to ":/?#[]@$&'()*+,;= ")
         val request = Encoding(
-                httpMethod = Method.POST,
-                urlString = path,
-                parameters = parameters
+            httpMethod = Method.POST,
+            urlString = path,
+            parameters = parameters
         ).request
 
         val body = ByteArrayOutputStream().apply {

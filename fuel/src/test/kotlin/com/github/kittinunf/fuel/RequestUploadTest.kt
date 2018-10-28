@@ -5,8 +5,8 @@ import com.github.kittinunf.fuel.core.DataPart
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.requests.UploadBody
+import com.github.kittinunf.fuel.core.MultipartBody.Companion.retrieveBoundaryInfo
+import com.github.kittinunf.fuel.core.RegularRequest
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.isA
@@ -35,9 +35,9 @@ class RequestUploadTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload")).source { _, _ ->
-                    File(currentDir, "lorem_ipsum_short.tmp")
-                }.responseString()
+        val (request, response, result) = manager.upload(mock.path("upload")).source("file-name") {
+            _, _ -> File(currentDir, "lorem_ipsum_short.tmp")
+        }.responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -62,7 +62,6 @@ class RequestUploadTest : MockHttpTestCase() {
                 .source { _, _ ->
                     File(currentDir, "lorem_ipsum_short.tmp")
                 }
-                .name { "file-name" }
                 .responseString()
 
         val (data, error) = result
@@ -86,8 +85,8 @@ class RequestUploadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), Method.PUT)
-                .source { _, _ -> File(currentDir, "lorem_ipsum_long.tmp")
-                }.responseString()
+            .source { _, _ -> File(currentDir, "lorem_ipsum_long.tmp") }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -192,11 +191,8 @@ class RequestUploadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .sources { _, _ ->
-                    listOf(File(currentDir, "lorem_ipsum_short.tmp"),
-                            File(currentDir, "lorem_ipsum_long.tmp"))
-                }
-                .name { "file-name" }
+                .source("file-name_1") { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
+                .source("file-name_2") { _, _ -> File(currentDir, "lorem_ipsum_long.tmp") }
                 .responseString()
         val (data, error) = result
 
@@ -223,12 +219,10 @@ class RequestUploadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .dataParts { _, _ ->
-                    listOf(
-                            DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg"),
-                            DataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "second-file", type = "image/jpeg")
-                    )
-                }
+                .dataPart(
+                    DataPart.from(File(currentDir, "lorem_ipsum_short.tmp"), contentType = "image/jpeg"),
+                    DataPart.from(File(currentDir, "lorem_ipsum_long.tmp"), fileName = "second-file", contentType = "image/jpeg")
+                )
                 .responseString()
         val (data, error) = result
 
@@ -256,10 +250,12 @@ class RequestUploadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .blob { r, _ ->
-                    r.name = "coolblob"
-                    Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name)
-                }
+                .dataPart(
+                    DataPart.from(
+                        Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name),
+                        fileName = "coolblob"
+                    )
+                )
                 .responseString()
         val (data, error) = result
 
@@ -280,15 +276,14 @@ class RequestUploadTest : MockHttpTestCase() {
         val manager = FuelManager()
 
         mock.chain(
-                request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
-                response = mock.reflect()
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .source { r, _ ->
-                    r.header(Pair("Content-Type", "multipart/form-data; boundary=160f77ec3eff"))
-                    File(currentDir, "lorem_ipsum_short.tmp")
-                }
+                .multipart()
+                .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
+                .header(Headers.CONTENT_TYPE to "multipart/form-data; boundary=160f77ec3eff")
                 .responseString()
         val (data, error) = result
 
@@ -335,22 +330,18 @@ class RequestUploadTest : MockHttpTestCase() {
 
     @Test
     fun getBoundaryWithBoundaryHeaders() {
-        val request = Request(Method.POST, "", URL("http://httpbin.org"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000)
+        val request = RegularRequest(Method.POST, "", URL("http://httpbin.org"))
         request.header(Pair(Headers.CONTENT_TYPE, "multipart/form-data; boundary=160f77ec3eff"))
 
-        val boundary = UploadBody.retrieveBoundaryInfo(request)
+        val boundary = retrieveBoundaryInfo(request)
 
         assertThat(boundary, equalTo("160f77ec3eff"))
     }
 
     @Test
     fun getBoundaryWithEmptyHeaders() {
-        val request = Request(Method.POST, "", URL("http://httpbin.org"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000)
-        val boundary = UploadBody.retrieveBoundaryInfo(request)
+        val request = RegularRequest(Method.POST, "", URL("http://httpbin.org"))
+        val boundary = retrieveBoundaryInfo(request)
 
         assertThat(boundary, notNullValue())
     }
