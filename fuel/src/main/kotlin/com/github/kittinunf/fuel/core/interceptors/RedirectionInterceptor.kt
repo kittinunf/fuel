@@ -34,7 +34,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                         response.statusCode in redirectStatusWithGets -> Method.GET
                         else -> request.method
                     },
-                    urlString = when(URI(redirectedUrl).isAbsolute) {
+                    urlString = when (URI(redirectedUrl).isAbsolute) {
                         true -> URL(redirectedUrl).toString()
                         false -> URL(request.url, redirectedUrl).toString()
                     }
@@ -43,7 +43,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                 val newRequest = manager.request(encodedRequest)
                     .header(
                         Headers.from(request.headers).let {
-                            when(encodedRequest.url.host != request.url.host) {
+                            when (encodedRequest.url.host != request.url.host) {
                                 true -> it.apply { this.remove(Headers.AUTHORIZATION) }
                                 else -> it
                             }
