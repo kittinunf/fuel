@@ -39,5 +39,5 @@ fun <R : Any> Request.rx(resultBlock: Request.() -> R): Single<R> =
         Single.create { emitter ->
             val result = resultBlock()
             emitter.onSuccess(result)
-            emitter.setCancellable { this.cancel() }
+            // emitter.setCancellable { /* this.cancel() */ }
         }
