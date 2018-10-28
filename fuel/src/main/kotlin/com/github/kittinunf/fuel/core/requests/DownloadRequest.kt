@@ -30,5 +30,3 @@ data class DownloadRequest(
         }
     }
 }
-
-private const val BUFFER_SIZE = 1024
