@@ -1,7 +1,5 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.util.CopyProgress
-import com.github.kittinunf.fuel.util.copyTo
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -13,7 +11,7 @@ typealias BodyLength = (() -> Number)
 
 interface Body {
     fun toByteArray(): ByteArray
-    fun writeTo(outputStream: OutputStream, charset: Charset? = null, onProgress: CopyProgress? = null): Long
+    fun writeTo(outputStream: OutputStream, charset: Charset? = null): Long
     fun isEmpty(): Boolean
     fun isConsumed(): Boolean
 
@@ -44,11 +42,11 @@ data class DefaultBody(
         }
     }
 
-    override fun writeTo(outputStream: OutputStream, charset: Charset?, onProgress: CopyProgress?): Long {
+    override fun writeTo(outputStream: OutputStream, charset: Charset?): Long {
         // This actually writes whatever the body is outputting with the given charset.
         return outputStream.buffered().let {
             val stream = openStream!!.invoke().buffered()
-            val length = stream.copyTo(it, onProgress = onProgress)
+            val length = stream.copyTo(it)
             stream.close()
 
             // The outputStream is buffered, but we are done reading, so it's time to flush what's left

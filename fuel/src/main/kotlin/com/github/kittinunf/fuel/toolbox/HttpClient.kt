@@ -10,6 +10,8 @@ import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.executors.RequestExecutor
+import com.github.kittinunf.fuel.util.ProgressInputStream
+import com.github.kittinunf.fuel.util.ProgressOutputStream
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -99,7 +101,7 @@ internal class HttpClient(
         val headers = Headers.from(connection.headerFields)
         val transferEncoding = headers[Headers.TRANSFER_ENCODING]
         val contentEncoding = headers[Headers.CONTENT_ENCODING].lastOrNull()
-        var contentLength = headers[Headers.CONTENT_LENGTH].lastOrNull()?.toLong() ?: -1
+        var contentLength = headers[Headers.CONTENT_LENGTH].lastOrNull()?.toLong()
         val shouldDecode = (executor.decodeContent ?: decodeContent) && contentEncoding != null && contentEncoding != "identity"
 
         if (shouldDecode) {
@@ -110,7 +112,7 @@ internal class HttpClient(
             headers.remove(Headers.CONTENT_ENCODING)
             headers.remove(Headers.CONTENT_LENGTH)
 
-            contentLength = -1
+            contentLength = null
         }
 
         // Since the transfer encoding will be undone by decodeTransfer
@@ -119,13 +121,18 @@ internal class HttpClient(
         return Response(
             url = request.url,
             headers = headers,
-            contentLength = contentLength,
+            contentLength = contentLength ?: -1,
             statusCode = connection.responseCode,
             responseMessage = connection.responseMessage.orEmpty(),
-            dataStream = decodeContent(
-                stream = decodeTransfer(safeDataStream(connection), transferEncoding),
-                encoding = contentEncoding,
-                shouldDecode = shouldDecode
+            dataStream = ProgressInputStream(
+                decodeContent(
+                    stream = decodeTransfer(safeDataStream(connection), transferEncoding),
+                    encoding = contentEncoding,
+                    shouldDecode = shouldDecode
+                ),
+                onProgress = { readBytes ->
+                    request.responseProgress.invoke(readBytes, contentLength ?: readBytes)
+                }
             )
         )
     }
@@ -203,9 +210,15 @@ internal class HttpClient(
 
         // The input and output streams returned by this class are not buffered. Most body implementations should wrap
         // the input stream with BufferedOutputStream. Bulk implementations may forgo this.
-        body.writeTo(connection.outputStream, null, onProgress = {
-            request.requestProgress.invoke(it, totalBytes ?: it)
-        })
+        body.writeTo(
+            ProgressOutputStream(
+                connection.outputStream,
+                onProgress = {
+                    request.requestProgress.invoke(it, totalBytes ?: it)
+                }
+            ), null
+        )
+
         connection.outputStream.flush()
     }
 

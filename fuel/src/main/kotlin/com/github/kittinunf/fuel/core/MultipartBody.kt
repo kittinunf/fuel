@@ -1,7 +1,6 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.core.requests.MultipartRequest
-import com.github.kittinunf.fuel.util.CopyProgress
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
@@ -28,7 +27,7 @@ data class MultipartBody(private val request: MultipartRequest) : Body {
         }
     }
 
-    override fun writeTo(outputStream: OutputStream, charset: Charset?, onProgress: CopyProgress?): Long {
+    override fun writeTo(outputStream: OutputStream, charset: Charset?): Long {
         if (!inputAvailable) {
             throw IllegalStateException(
                 "The inputs have already been written to an output stream and can not be consumed again."
@@ -41,16 +40,12 @@ data class MultipartBody(private val request: MultipartRequest) : Body {
             val parametersLength = request.parameters.fold(0L) { result, parameter ->
                 val (name, data) = parameter
 
-                (result + writeParameter(stream, name, data)).apply {
-                    onProgress?.invoke(this)
-                }
+                (result + writeParameter(stream, name, data))
             }
 
             // Blobs / Files
             val partsWithHeaders = request.dataParts.fold(0L) { result, dataPart ->
-                (result + writeDataPart(stream, dataPart, onProgress = { partProgress, _ ->
-                    onProgress?.invoke(result + partProgress)
-                }))
+                (result + writeDataPart(stream, dataPart))
             }
 
             // Sum and Trailer
@@ -59,8 +54,6 @@ data class MultipartBody(private val request: MultipartRequest) : Body {
                 partsWithHeaders +
                 stream.writeString("--$boundary--") +
                 stream.writeBytes(CRLF)
-
-            onProgress?.invoke(writtenLength)
 
             // This is a buffered stream, so flush what's remaining
             stream.flush()
@@ -103,21 +96,10 @@ data class MultipartBody(private val request: MultipartRequest) : Body {
         }
     }
 
-    private fun writeDataPart(outputStream: OutputStream, dataPart: DataPart, onProgress: ProgressCallback): Long {
+    private fun writeDataPart(outputStream: OutputStream, dataPart: DataPart): Long {
         outputStream.apply {
             val headerLength = writeDataPartHeader(outputStream, dataPart)
-            val partLength = when (dataPart.length) {
-                null -> null
-                else -> headerLength + dataPart.length.toLong()
-            }
-
-            val totalLength = dataPart.writeTo(
-                this, onProgress = { writtenBytes ->
-                    val currentTotal = headerLength + writtenBytes
-                    onProgress.invoke(currentTotal, partLength ?: currentTotal)
-                }
-            )
-
+            val totalLength = dataPart.writeTo(this)
             return headerLength + totalLength + writeBytes(CRLF)
         }
     }
