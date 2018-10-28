@@ -11,25 +11,25 @@ import com.github.kittinunf.result.Result
 import io.reactivex.Single
 import java.nio.charset.Charset
 
-fun Request.rx_response() = rx_response(ByteArrayDeserializer())
+fun Request.toRxResponse() = toRxResponse(ByteArrayDeserializer())
 
-fun Request.rx_responseString(charset: Charset = Charsets.UTF_8) = rx_response(StringDeserializer(charset))
+fun Request.toRxResponseString(charset: Charset = Charsets.UTF_8) = toRxResponse(StringDeserializer(charset))
 
-fun <T : Any> Request.rx_responseObject(deserializable: Deserializable<T>) = rx_response(deserializable)
+fun <T : Any> Request.toRxResponseObject(deserializable: Deserializable<T>) = toRxResponse(deserializable)
 
-private fun <T : Any> Request.rx_response(deserializable: Deserializable<T>): Single<Pair<Response, Result<T, FuelError>>> =
+private fun <T : Any> Request.toRxResponse(deserializable: Deserializable<T>): Single<Pair<Response, Result<T, FuelError>>> =
         rx {
             val (_, response, result) = response(deserializable)
             response to result
         }
 
-fun Request.rx_bytes() = rx_result(ByteArrayDeserializer())
+fun Request.toRxBytes() = toRxResult(ByteArrayDeserializer())
 
-fun Request.rx_string(charset: Charset = Charsets.UTF_8) = rx_result(StringDeserializer(charset))
+fun Request.toRxString(charset: Charset = Charsets.UTF_8) = toRxResult(StringDeserializer(charset))
 
-fun <T : Any> Request.rx_object(deserializable: Deserializable<T>) = rx_result(deserializable)
+fun <T : Any> Request.toRxObject(deserializable: Deserializable<T>) = toRxResult(deserializable)
 
-private fun <T : Any> Request.rx_result(deserializable: Deserializable<T>): Single<Result<T, FuelError>> =
+private fun <T : Any> Request.toRxResult(deserializable: Deserializable<T>): Single<Result<T, FuelError>> =
         rx {
             val (_, _, result) = response(deserializable)
             result

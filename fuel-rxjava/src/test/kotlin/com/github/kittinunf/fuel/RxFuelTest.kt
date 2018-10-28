@@ -3,12 +3,12 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.fuel.rx.rx
-import com.github.kittinunf.fuel.rx.rx_bytes
-import com.github.kittinunf.fuel.rx.rx_object
-import com.github.kittinunf.fuel.rx.rx_response
-import com.github.kittinunf.fuel.rx.rx_responseObject
-import com.github.kittinunf.fuel.rx.rx_responseString
-import com.github.kittinunf.fuel.rx.rx_string
+import com.github.kittinunf.fuel.rx.toRxBytes
+import com.github.kittinunf.fuel.rx.toRxObject
+import com.github.kittinunf.fuel.rx.toRxResponse
+import com.github.kittinunf.fuel.rx.toRxResponseObject
+import com.github.kittinunf.fuel.rx.toRxResponseString
+import com.github.kittinunf.fuel.rx.toRxString
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue
@@ -51,7 +51,7 @@ class RxFuelTest {
         )
 
         val (response, data) = Fuel.get(mock.path("user-agent"))
-                .rx_response()
+                .toRxResponse()
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -70,7 +70,7 @@ class RxFuelTest {
             response = mock.reflect()
         )
 
-        val (response, data) = Fuel.get(mock.path("user-agent")).rx_responseString()
+        val (response, data) = Fuel.get(mock.path("user-agent")).toRxResponseString()
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -89,7 +89,7 @@ class RxFuelTest {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(ByteArray(555) { 0 })
         )
 
-        val data = Fuel.get(mock.path("bytes")).rx_bytes()
+        val data = Fuel.get(mock.path("bytes")).toRxBytes()
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -111,7 +111,7 @@ class RxFuelTest {
             response = mock.reflect()
         )
 
-        val data = Fuel.get(mock.path("user-agent")).rx_string()
+        val data = Fuel.get(mock.path("user-agent")).toRxString()
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -132,7 +132,7 @@ class RxFuelTest {
             request = mock.request().withPath("/error"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
-        val data = Fuel.get(mock.path("error")).rx_string()
+        val data = Fuel.get(mock.path("error")).toRxString()
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -167,7 +167,7 @@ class RxFuelTest {
         )
 
         val (response, result) = Fuel.get(mock.path("user-agent"))
-                .rx_responseObject(HttpBinUserAgentModelDeserializer())
+                .toRxResponseObject(HttpBinUserAgentModelDeserializer())
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -191,7 +191,7 @@ class RxFuelTest {
         )
 
         val (response, result) = Fuel.get(mock.path("user-agent"))
-                .rx_responseObject(HttpBinUserAgentModelDeserializer())
+                .toRxResponseObject(HttpBinUserAgentModelDeserializer())
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -214,7 +214,7 @@ class RxFuelTest {
         )
 
         val (response, result) = Fuel.get(mock.path("user-agent"))
-                .rx_responseObject(HttpBinMalformedDeserializer())
+                .toRxResponseObject(HttpBinMalformedDeserializer())
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()
@@ -261,7 +261,7 @@ class RxFuelTest {
         )
 
         val data = Fuel.get(mock.path("user-agent"))
-                .rx_object(HttpBinUserAgentModelDeserializer())
+                .toRxObject(HttpBinUserAgentModelDeserializer())
                 .test()
                 .apply { awaitTerminalEvent() }
                 .assertNoErrors()

@@ -15,7 +15,7 @@ import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.fuel.livedata.liveDataObject
-import com.github.kittinunf.fuel.rx.rx_object
+import com.github.kittinunf.fuel.rx.toRxObject
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -237,7 +237,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun httpRxSupport() {
         val disposable = "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
-                .rx_object(Issue.Deserializer())
+                .toRxObject(Issue.Deserializer())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { result ->
