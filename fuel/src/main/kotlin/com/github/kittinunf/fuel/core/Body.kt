@@ -1,18 +1,19 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.util.CopyProgress
+import com.github.kittinunf.fuel.util.copyTo
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.InputStreamReader
+import java.io.InputStream
 import java.io.OutputStream
-import java.io.Reader
 import java.nio.charset.Charset
 
-typealias BodySource = (() -> Reader)
+typealias BodySource = (() -> InputStream)
 typealias BodyLength = (() -> Number)
 
 interface Body {
     fun toByteArray(): ByteArray
-    fun writeTo(outputStream: OutputStream, charset: Charset? = null)
+    fun writeTo(outputStream: OutputStream, charset: Charset? = null, onProgress: CopyProgress? = null): Long
     fun isEmpty(): Boolean
     fun isConsumed(): Boolean
 
@@ -20,7 +21,7 @@ interface Body {
 }
 
 data class DefaultBody(
-    private var openReader: BodySource? = null,
+    private var openStream: BodySource? = null,
     private var calculateLength: BodyLength? = null,
     val charset: Charset = Charsets.UTF_8
 ) : Body {
@@ -38,28 +39,30 @@ data class DefaultBody(
             it.close()
             it.toByteArray()
         }.apply {
-            openReader = { InputStreamReader(ByteArrayInputStream(this)) }
+            openStream = { ByteArrayInputStream(this) }
             calculateLength = { this.size }
         }
     }
 
-    override fun writeTo(outputStream: OutputStream, charset: Charset?) {
+    override fun writeTo(outputStream: OutputStream, charset: Charset?, onProgress: CopyProgress?): Long {
         // This actually writes whatever the body is outputting with the given charset.
-        outputStream.bufferedWriter(charset ?: this.charset).apply {
-            val reader = openReader!!.invoke().buffered()
-            reader.copyTo(this)
-            reader.close()
+        return outputStream.buffered().let {
+            val stream = openStream!!.invoke().buffered()
+            val length = stream.copyTo(it, onProgress = onProgress)
+            stream.close()
 
             // The outputStream is buffered, but we are done reading, so it's time to flush what's left
-            flush()
+            it.flush()
 
             // This prevents implementations from writing the body twice
-            openReader = CONSUMED_READER
+            openStream = CONSUMED_READER
+
+            length
         }
     }
 
-    override fun isEmpty() = openReader == null || (length != null && length == 0)
-    override fun isConsumed() = openReader === CONSUMED_READER
+    override fun isEmpty() = openStream == null || (length != null && length == 0)
+    override fun isConsumed() = openStream === CONSUMED_READER
 
     override val length: Number? by lazy {
         calculateLength?.invoke()
@@ -73,9 +76,9 @@ data class DefaultBody(
             )
         }
 
-        fun from(openReader: BodySource, calculateLength: BodyLength?, charset: Charset = Charsets.UTF_8): Body {
+        fun from(openStream: BodySource, calculateLength: BodyLength?, charset: Charset = Charsets.UTF_8): Body {
             return DefaultBody(
-                openReader = openReader,
+                openStream = openStream,
                 calculateLength = calculateLength,
                 charset = charset
             )
