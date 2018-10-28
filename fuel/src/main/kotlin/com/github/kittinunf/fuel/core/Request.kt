@@ -1,14 +1,13 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
-import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
-import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
-import com.github.kittinunf.fuel.core.requests.TaskRequest
-import com.github.kittinunf.fuel.core.requests.UploadSourceCallback
-import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
-import com.github.kittinunf.fuel.util.encodeBase64ToString
-import java.io.ByteArrayInputStream
+import com.github.kittinunf.fuel.core.executors.CancellableRequest
+import com.github.kittinunf.fuel.core.executors.RequestExecutor
+import com.github.kittinunf.fuel.core.executors.RequestOptions
+import com.github.kittinunf.fuel.core.requests.DownloadDestinationCallback
+import com.github.kittinunf.fuel.core.requests.DownloadRequest
+import com.github.kittinunf.fuel.core.requests.MultipartRequest
+import com.github.kittinunf.result.Result
 import java.io.File
 import java.io.InputStream
 import java.net.URL
