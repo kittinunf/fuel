@@ -20,6 +20,9 @@ class BodyTest : BaseTestCase() {
         val body = DefaultBody()
         assertThat(body.isEmpty(), equalTo(true))
         assertThat(body.isConsumed(), equalTo(false))
+
+        val request = Request(Method.POST, "/", URL("https://test.fuel.com/"))
+        assertThat(request.toString(), containsString("(empty)"))
     }
 
     @Test
