@@ -45,4 +45,3 @@ class DeleteIssue306 : MockHttpTestCase() {
         assertThat(reflected!!.body?.string ?: "(no body)", equalTo(root))
     }
 }
-

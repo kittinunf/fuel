@@ -228,7 +228,7 @@ data class MockReflectedBody(
                 contentType = json.optString("contentType")
             )
 
-            return when(base.type) {
+            return when (base.type) {
                 "STRING" -> base.copy(string = json.getString("string"))
                 "BINARY" -> base.copy(binary = json.getString("binary").decodeBase64())
                 else -> base
