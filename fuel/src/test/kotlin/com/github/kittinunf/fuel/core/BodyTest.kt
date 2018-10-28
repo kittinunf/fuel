@@ -11,7 +11,6 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.StringReader
 import java.net.URL
-import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class BodyTest : BaseTestCase() {
 
@@ -116,7 +115,7 @@ class BodyTest : BaseTestCase() {
     @Test
     fun bodyToByteArrayLoadsItIntoMemory() {
         val value = "String Body ${Math.random()}"
-        val body = DefaultBody.from({ StringReader(value)}, { value.length })
+        val body = DefaultBody.from({ StringReader(value) }, { value.length })
         body.toByteArray()
 
         val output = ByteArrayOutputStream(value.length)
