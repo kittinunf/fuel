@@ -10,7 +10,6 @@ object Fuel {
 object Kotlin {
     const val version = "1.3.0-rc-146"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Kotlin.version}"
-    const val jvmId = "org.jetbrains.kotlin.jvm"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
     const val androidExtensionsPlugin = "kotlin-android-extensions"
