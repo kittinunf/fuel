@@ -311,6 +311,7 @@ class Headers : MutableMap<String, HeaderValues> {
         const val ACCEPT_TRANSFER_ENCODING = "TE"
         const val AGE = "Age"
         const val AUTHORIZATION = "Authorization"
+        const val CACHE_CONTROL = "Cache-Control"
         const val CONTENT_DISPOSITION = "Content-Disposition"
         const val CONTENT_ENCODING = "Content-Encoding"
         const val CONTENT_LENGTH = "Content-Length"

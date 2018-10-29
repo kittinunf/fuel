@@ -170,6 +170,9 @@ data class MockReflected(
     val reflect: Boolean = true,
     val userAgent: String? = null
 ) {
+
+    operator fun get(key: String) = headers[key]
+
     class Deserializer : ResponseDeserializable<MockReflected> {
         override fun deserialize(content: String) = MockReflected.from(JSONObject(content))
     }

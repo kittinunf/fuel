@@ -1,5 +1,7 @@
 package com.github.kittinunf.fuel
 
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
 import org.junit.After
 import org.junit.Before
 import org.slf4j.event.Level
@@ -18,5 +20,14 @@ abstract class MockHttpTestCase : BaseTestCase() {
     @After
     fun tearDown() {
         this.mock.tearDown()
+    }
+
+    fun reflectedRequest(method: Method, path: String, parameters: List<Pair<String, Any?>>? = null): Request {
+        mock.chain(
+            request = mock.request().withMethod(method.value).withPath("/$path"),
+            response = mock.reflect()
+        )
+
+        return Fuel.request(method, mock.path(path), parameters)
     }
 }

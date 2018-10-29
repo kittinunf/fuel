@@ -189,7 +189,7 @@ internal class HttpClient(
         }
 
         val contentLength = body.length
-        if (contentLength != null) {
+        if (contentLength != null && contentLength != -1) {
             // The content has a known length, so no need to chunk
             connection.setFixedLengthStreamingMode(contentLength.toLong())
         } else {
