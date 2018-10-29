@@ -116,7 +116,7 @@ internal data class UploadBody(
         ).toLong()
     }
 
-    val boundary: String by lazy { retrieveBoundaryInfo(request) }
+    private val boundary: String by lazy { retrieveBoundaryInfo(request) }
 
     private fun writeParameter(outputStream: OutputStream, name: String, data: Any?): Long {
         outputStream.apply {

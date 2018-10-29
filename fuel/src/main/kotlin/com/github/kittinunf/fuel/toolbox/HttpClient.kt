@@ -45,7 +45,6 @@ internal class HttpClient(
         try {
             continuation.resume(doRequest(request))
         } catch (exception: Exception) {
-            println(exception)
             continuation.resumeWithException(exception as? FuelError
                 ?: FuelError(exception, ByteArray(0), Response(request.url)))
         }

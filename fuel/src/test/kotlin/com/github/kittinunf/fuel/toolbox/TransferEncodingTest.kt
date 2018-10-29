@@ -111,7 +111,6 @@ class TransferEncodingTest : MockHttpTestCase() {
 
         // It's written to here
         val gzipped = outputData.toByteArray()
-        println(String(gzipped))
 
         mock.chain(
             request = mock.request()

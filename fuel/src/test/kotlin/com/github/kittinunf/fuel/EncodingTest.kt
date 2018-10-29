@@ -158,7 +158,6 @@ class EncodingTest : BaseTestCase() {
         }.toByteArray()
 
         val bodyString = String(body)
-        print(bodyString)
         assertThat(bodyString, isEqualTo("param1=value1&param2=value2"))
     }
 

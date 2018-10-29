@@ -49,8 +49,6 @@ class ContentEncodingTest : MockHttpTestCase() {
                 .response()
         val (data, error) = response
 
-        println(error)
-        print(error?.stackTrace?.joinToString { it.toString() + "\n" })
         assertThat("Expected data to be present, actual error $error", data, notNullValue())
         assertArrayEquals(value, data)
 

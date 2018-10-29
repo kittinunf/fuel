@@ -70,7 +70,5 @@ class ResponseLoggingIssue364 : MockHttpTestCase() {
         assertThat(loggedOutput.length, not(equalTo(0)))
         assertThat(loggedOutput, containsString("\"body\":"))
         assertThat(loggedOutput, containsString(value))
-
-        println(response)
     }
 }

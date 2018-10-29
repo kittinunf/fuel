@@ -16,7 +16,6 @@ interface Deserializable<out T : Any> {
 
 interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     override fun deserialize(response: Response): T {
-        println(response)
         response.body.toStream().use { stream ->
             return deserialize(stream)
                 ?: deserialize(stream.reader())
