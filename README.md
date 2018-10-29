@@ -22,7 +22,7 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Special test mode for easier testing
 - [x] Support for reactive programming via RxJava 2.x and Project Reactor 3.x
 - [x] Google Components [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) support
-- [x] Built-in object serialization module (kotlinx-seriualization, Gson, Jackson, Moshi, Forge) :sparkles:
+- [x] Built-in object serialization module (kotlinx-serialization, Gson, Jackson, Moshi, Forge) :sparkles:
 - [x] Support Kotlin's [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) module
 - [x] API Routing
 
