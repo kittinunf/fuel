@@ -5,7 +5,6 @@ import com.github.kittinunf.fuel.MockHttpTestCase
 import com.github.kittinunf.fuel.MockReflected
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.response
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.not
@@ -15,8 +14,6 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockserver.matchers.Times
 import org.mockserver.model.Header.header
-import java.io.ByteArrayInputStream
-import java.io.StringReader
 
 class HttpClientTest : MockHttpTestCase() {
 
@@ -94,7 +91,6 @@ class HttpClientTest : MockHttpTestCase() {
         val request = Fuel.patch(mock.path("patch-body-output"))
             .body("my-body")
 
-
         mock.chain(
             request = mock.request().withMethod(Method.POST.value).withPath("/patch-body-output"),
             response = mock.reflect()
@@ -154,6 +150,5 @@ class HttpClientTest : MockHttpTestCase() {
 
         assertThat("Expected data, actual error $error2", data2, notNullValue())
         assertThat(data2, equalTo("fresh"))
-
     }
 }
