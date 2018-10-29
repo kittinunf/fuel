@@ -272,7 +272,7 @@ class Headers : MutableMap<String, HeaderValues> {
          * @return [Boolean] true if it is a single value, false otherwise
          */
         fun collapse(header: HeaderName, values: HeaderValues) =
-            values.joinToString { COLLAPSE_SEPARATOR[header] ?: ", " }
+            values.joinToString(COLLAPSE_SEPARATOR[header] ?: ", ")
 
         fun isCollapsible(header: String) = isCollapsible(HeaderName(header))
         fun isSingleValue(header: String) = isSingleValue(HeaderName(header))
