@@ -21,7 +21,7 @@ interface Body {
 }
 
 data class DefaultBody(
-    internal var openStream: BodySource? = null,
+    internal var openStream: BodySource = EMPTY_STREAM,
     private var calculateLength: BodyLength? = null,
     val charset: Charset = Charsets.UTF_8
 ) : Body {
@@ -31,12 +31,8 @@ data class DefaultBody(
             return ByteArray(0)
         }
 
-        // Stream may be completely consumed by writeTo. Therefore there is no guarantee that the stream will be
-        // available a second time
-
-        return ByteArrayOutputStream(length?.toInt() ?: 32).let {
-            writeTo(it, charset)
-            it.close()
+        return ByteArrayOutputStream(length?.toInt() ?: 32).use {
+            writeTo(it)
             it.toByteArray()
         }.apply {
             openStream = { ByteArrayInputStream(this) }
@@ -44,28 +40,28 @@ data class DefaultBody(
         }
     }
 
-    override fun toStream(): InputStream = openStream!!.invoke().buffered().apply {
+    override fun toStream(): InputStream = openStream.invoke().buffered().apply {
         // The caller is now responsible for this stream. This make sure that you can't call this twice without handling
         // it. The caller must still call `.close()` on the returned value when done.
         openStream = CONSUMED_STREAM
     }
 
-    override fun writeTo(outputStream: OutputStream, charset: Charset?) {
-        // This actually writes whatever the body is outputting with the given charset.
-        outputStream.buffered().apply {
-            val reader = openStream!!.invoke().buffered()
-            reader.copyTo(this)
+    override fun writeTo(outputStream: OutputStream) {
+        outputStream.apply {
+            val reader = openStream.invoke()
+            // `copyTo` writes efficiently using a buffer. Reading ensured to be buffered by calling `.buffered`
+            reader.buffered().copyTo(this)
             reader.close()
 
-            // The outputStream is buffered, but we are done reading, so it's time to flush what's left
+            // The outputStream could be buffered, but we are done reading, so it's time to flush what's left
             flush()
 
-            // This prevents implementations from writing the body twice
+            // This prevents implementations from consuming the input stream twice
             openStream = CONSUMED_STREAM
         }
     }
 
-    override fun isEmpty() = openStream == null || (length != null && length == 0)
+    override fun isEmpty() = openStream === EMPTY_STREAM || (length?.toLong() == 0L)
     override fun isConsumed() = openStream === CONSUMED_STREAM
 
     override val length: Number? by lazy {
@@ -75,11 +71,14 @@ data class DefaultBody(
     }
 
     companion object {
+        private val EMPTY_STREAM = {
+            ByteArrayInputStream(ByteArray(0))
+        }
 
-        val CONSUMED_STREAM = {
-            throw IllegalStateException(
+        private val CONSUMED_STREAM = {
+            throw FuelError(IllegalStateException(
                 "The input has already been written to an output stream and can not be consumed again."
-            )
+            ))
         }
 
         fun from(openStream: BodySource, calculateLength: BodyLength?, charset: Charset = Charsets.UTF_8): Body {

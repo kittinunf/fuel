@@ -40,8 +40,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitResponseSuccess() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/ip"),
-                response = mock.reflect()
+            request = mock.request().withPath("/ip"),
+            response = mock.reflect()
         )
 
         try {
@@ -58,8 +58,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitResponseErrorDueToNetwork() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/invalid/url"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/invalid/url"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         try {
@@ -77,8 +77,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitStringResponseSuccess() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/uuid"),
-                response = mock.reflect()
+            request = mock.request().withPath("/uuid"),
+            response = mock.reflect()
         )
 
         try {
@@ -96,8 +96,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitObjectResponse() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/uuid"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
+            request = mock.request().withPath("/uuid"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
         Fuel.get(mock.path("uuid")).awaitObjectResponse(UUIDResponseDeserializer).third.fold({ data ->
@@ -110,8 +110,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitStringResponseDoesNotThrowException() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/not/found/address"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/not/found/address"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         try {
@@ -127,8 +127,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitForByteArrayResult() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/ip"),
-                response = mock.reflect()
+            request = mock.request().withPath("/ip"),
+            response = mock.reflect()
         )
 
         Fuel.get(mock.path("ip")).awaitByteArrayResult().fold({ data ->
@@ -141,8 +141,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitStringResultErrorDueToNetwork() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/not/found/address"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/not/found/address"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         try {
@@ -160,8 +160,8 @@ class CoroutinesTest {
     @Test
     fun testItCanAwaitStringResult() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/uuid"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
+            request = mock.request().withPath("/uuid"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
         Fuel.get(mock.path("uuid")).awaitStringResult().fold({ data ->
@@ -175,8 +175,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitForObjectResultCatchesError() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/error/404"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/error/404"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         try {
@@ -193,8 +193,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitForObjectResultCatchesDeserializeError() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/ip"),
-                response = mock.response().withBody(ByteArray(1) { 2 })
+            request = mock.request().withPath("/ip"),
+            response = mock.response().withBody(ByteArray(1) { 2 })
         )
 
         try {
@@ -212,8 +212,8 @@ class CoroutinesTest {
     @Test
     fun testItCanAwaitByteArray() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/uuid"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
+            request = mock.request().withPath("/uuid"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
         assertTrue(Fuel.get(mock.path("uuid")).awaitByteArray().isNotEmpty())
@@ -222,8 +222,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitResponseResultSuccess() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/uuid"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
+            request = mock.request().withPath("/uuid"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
         try {
@@ -237,8 +237,8 @@ class CoroutinesTest {
     @Test
     fun testItCanAwaitForStringResultCanThrowException() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/error/404"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/error/404"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         try {
@@ -252,8 +252,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitStringResultSuccess() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/uuid"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
+            request = mock.request().withPath("/uuid"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
         try {
@@ -267,8 +267,8 @@ class CoroutinesTest {
     @Test
     fun testItCanAwaitForObject() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/uuid"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
+            request = mock.request().withPath("/uuid"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
         assertTrue(Fuel.get(mock.path("uuid")).awaitObject(UUIDResponseDeserializer).uuid.isNotEmpty())
@@ -277,8 +277,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitObjectResultSuccess() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/uuid"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
+            request = mock.request().withPath("/uuid"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(UUID.randomUUID().toString())
         )
 
         try {
@@ -292,8 +292,8 @@ class CoroutinesTest {
     @Test
     fun testAwaitObjectResultExceptionDueToNetwork() = runBlocking {
         mock.chain(
-                request = mock.request().withPath("/some/invalid/path"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/some/invalid/path"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         try {

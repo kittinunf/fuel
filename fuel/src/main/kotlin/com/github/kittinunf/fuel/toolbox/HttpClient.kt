@@ -45,8 +45,9 @@ internal class HttpClient(
         try {
             continuation.resume(doRequest(request))
         } catch (exception: Exception) {
+            println(exception)
             continuation.resumeWithException(exception as? FuelError
-                    ?: FuelError(exception, ByteArray(0), Response(request.url)))
+                ?: FuelError(exception, ByteArray(0), Response(request.url)))
         }
     }
 
@@ -205,7 +206,7 @@ internal class HttpClient(
 
         // The input and output streams returned by this class are not buffered. Most body implementations should wrap
         // the input stream with BufferedOutputStream. Bulk implementations may forgo this.
-        body.writeTo(connection.outputStream, null)
+        body.writeTo(connection.outputStream)
         connection.outputStream.flush()
     }
 

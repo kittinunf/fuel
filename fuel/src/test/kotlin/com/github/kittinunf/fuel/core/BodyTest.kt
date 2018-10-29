@@ -104,7 +104,7 @@ class BodyTest : BaseTestCase() {
             }
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test(expected = FuelError::class)
     fun bodyCanOnlyBeReadOnce() {
         val body = DefaultBody.from({ ByteArrayInputStream("body".toByteArray()) }, { 4 })
         body.writeTo(ByteArrayOutputStream())

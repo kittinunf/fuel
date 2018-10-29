@@ -16,14 +16,14 @@ private suspend fun <T : Any, U : Deserializable<T>> Request.await(
     deserializable: U,
     scope: CoroutineContext
 ): Triple<Request, Response, Result<T, FuelError>> =
-        withContext(scope) {
-            awaitResponse(deserializable)
-        }
+    withContext(scope) {
+        awaitResponse(deserializable)
+    }
 
 suspend fun Request.awaitByteArrayResponse(
     scope: CoroutineContext = Dispatchers.Default
 ): Triple<Request, Response, Result<ByteArray, FuelError>> =
-        await(ByteArrayDeserializer(), scope)
+    await(ByteArrayDeserializer(), scope)
 
 suspend fun Request.awaitStringResponse(
     charset: Charset = Charsets.UTF_8,
@@ -118,11 +118,3 @@ suspend fun <U : Any> Request.awaitObjectResult(
     }
     Result.Failure(fuelError)
 }
-
-@Deprecated("please use 'awaitByteArray()'", ReplaceWith("awaitByteArray()", "deserializable"))
-suspend fun Request.awaitResponseResult(): ByteArray = awaitByteArray()
-
-@Deprecated("please use 'awaitObjectResult(deserializable)'", ReplaceWith("awaitObjectResult(deserializable)"))
-suspend fun <U : Any> Request.awaitSafelyObjectResult(
-    deserializable: ResponseDeserializable<U>
-): Result<U, FuelError> = this.awaitObjectResult(deserializable)

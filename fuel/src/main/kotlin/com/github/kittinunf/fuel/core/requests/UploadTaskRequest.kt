@@ -3,6 +3,7 @@ package com.github.kittinunf.fuel.core.requests
 import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.Body
 import com.github.kittinunf.fuel.core.DefaultBody
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.ProgressCallback
 import com.github.kittinunf.fuel.core.Request
@@ -38,7 +39,7 @@ internal data class UploadBody(
 
     override fun toByteArray(): ByteArray {
         return ByteArrayOutputStream(length?.toInt() ?: 32).let {
-            writeTo(it, null)
+            writeTo(it)
             it.close()
             it.toByteArray()
         }.apply {
@@ -50,11 +51,11 @@ internal data class UploadBody(
         }
     }
 
-    override fun writeTo(outputStream: OutputStream, charset: Charset?) {
+    override fun writeTo(outputStream: OutputStream) {
         if (!inputAvailable) {
-            throw IllegalStateException(
+            throw FuelError(IllegalStateException(
                 "The inputs have already been written to an output stream and can not be consumed again."
-            )
+            ))
         }
 
         val sourceCallback = taskRequest.sourceCallback

@@ -16,10 +16,8 @@ interface Deserializable<out T : Any> {
 
 interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     override fun deserialize(response: Response): T {
+        println(response)
         response.body.toStream().use { stream ->
-            println("time to deserialize")
-            println(response)
-
             return deserialize(stream)
                 ?: deserialize(stream.reader())
                 ?: response.let {
@@ -29,10 +27,10 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 
                     deserialize(response.data)
                         ?: deserialize(String(response.data))
-                        ?: throw IllegalStateException(
+                        ?: throw FuelError(IllegalStateException(
                             "One of deserialize(ByteArray) or deserialize(InputStream) or deserialize(Reader) or " +
                                 "deserialize(String) must be implemented"
-                        )
+                        ))
                 }
         }
     }
