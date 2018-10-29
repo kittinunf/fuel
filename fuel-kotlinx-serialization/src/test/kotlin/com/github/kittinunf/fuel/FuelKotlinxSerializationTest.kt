@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.serialization.kotlinxDeserializerOf
 import com.github.kittinunf.fuel.serialization.responseObject
 import com.github.kittinunf.result.Result
+import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.list
 import org.hamcrest.CoreMatchers.equalTo
@@ -24,6 +25,7 @@ import org.junit.Test
 import org.mockserver.matchers.Times
 import java.net.HttpURLConnection
 
+@ImplicitReflectionSerializer
 class FuelKotlinxSerializationTest {
 
     init {
