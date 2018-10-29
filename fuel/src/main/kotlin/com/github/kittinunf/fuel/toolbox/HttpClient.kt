@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Client
+import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.HeaderName
 import com.github.kittinunf.fuel.core.HeaderValues
@@ -120,10 +121,15 @@ internal class HttpClient(
             contentLength = contentLength,
             statusCode = connection.responseCode,
             responseMessage = connection.responseMessage.orEmpty(),
-            dataStream = decodeContent(
-                stream = decodeTransfer(safeDataStream(connection), transferEncoding),
-                encoding = contentEncoding,
-                shouldDecode = shouldDecode
+            body = DefaultBody.from(
+                {
+                    decodeContent(
+                        stream = decodeTransfer(safeDataStream(connection), transferEncoding),
+                        encoding = contentEncoding,
+                        shouldDecode = shouldDecode
+                    )
+                },
+                { contentLength }
             )
         )
     }

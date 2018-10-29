@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.MockHttpTestCase
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
+import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertArrayEquals
@@ -46,8 +47,13 @@ class ContentEncodingTest : MockHttpTestCase() {
                 .header(Headers.ACCEPT_ENCODING, "gzip")
                 .body(value)
                 .response()
+        val (data, error) = response
 
-        assertArrayEquals(value, response.component1())
+        println(error)
+        print(error?.stackTrace?.joinToString { it.toString() + "\n" })
+        assertThat("Expected data to be present, actual error $error", data, notNullValue())
+        assertArrayEquals(value, data)
+
         assertThat(result[Headers.CONTENT_ENCODING].lastOrNull(), nullValue())
         assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), nullValue())
     }

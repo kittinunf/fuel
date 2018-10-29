@@ -1,9 +1,6 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.util.readWriteLazy
 import java.io.ByteArrayInputStream
-import java.io.IOException
-import java.io.InputStream
 import java.net.URL
 import java.net.URLConnection
 
@@ -13,15 +10,10 @@ data class Response(
     val responseMessage: String = "",
     val headers: Headers = Headers(),
     val contentLength: Long = 0L,
-    val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
+    internal var body: Body = DefaultBody()
 ) {
-    var data: ByteArray by readWriteLazy {
-        try {
-            dataStream.readBytes()
-        } catch (ex: IOException) { // If dataStream closed by deserializer
-            ByteArray(0)
-        }
-    }
+    fun body(): Body = body
+    val data get() = body.toByteArray()
 
     /**
      * Get the current values of the header, after normalisation of the header
@@ -36,13 +28,18 @@ data class Response(
 
     override fun toString(): String {
         val contentType = guessContentType()
-        val dataString = processBody(contentType, data)
+
+        val bodyString = when {
+            body.isEmpty() -> "empty"
+            body.isConsumed() -> "consumed"
+            else -> processBody(contentType, body.toByteArray())
+        }
 
         return buildString {
             appendln("<-- $statusCode ($url)")
             appendln("Response : $responseMessage")
             appendln("Length : $contentLength")
-            appendln("Body : ($dataString)")
+            appendln("Body : ($bodyString)")
             appendln("Headers : (${headers.size})")
 
             val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }

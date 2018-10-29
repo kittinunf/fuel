@@ -10,6 +10,7 @@ import com.github.kittinunf.fuel.core.requests.UploadBody.Companion.DEFAULT_CHAR
 import com.github.kittinunf.fuel.util.copyTo
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.io.OutputStream
 import java.net.URL
 import java.net.URLConnection
@@ -18,12 +19,22 @@ import java.nio.charset.Charset
 typealias BlobProgressCallback = (Long, Long) -> Any?
 typealias UploadSourceCallback = (Request, URL) -> Iterable<Blob>
 
-internal data class UploadBody(val request: Request, val taskRequest: UploadTaskRequest) : Body {
+internal data class UploadBody(
+    val request: Request,
+    val taskRequest: UploadTaskRequest
+) : Body {
 
     private var inputAvailable: Boolean = true
 
     override fun isConsumed() = !inputAvailable
     override fun isEmpty() = false
+
+    override fun toStream(): InputStream {
+        throw UnsupportedOperationException(
+            "Conversion `toStream` is not supported on UploadBody, because the source is not a single single stream." +
+                "Use `toByteArray` to write the contents to memory or `writeTo` to write the contents to a stream."
+        )
+    }
 
     override fun toByteArray(): ByteArray {
         return ByteArrayOutputStream(length?.toInt() ?: 32).let {
@@ -50,7 +61,7 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
         val progressCallback = taskRequest.progressCallback
         val expectedLength = length!!.toLong()
 
-        outputStream.apply {
+        outputStream.buffered().apply {
             // Parameters
             val parameterLength = request.parameters.sumByDouble { (name, data) ->
                 writeParameter(this, name, data).toDouble()

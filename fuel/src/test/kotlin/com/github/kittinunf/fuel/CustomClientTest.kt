@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Client
+import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
@@ -21,9 +22,10 @@ class CustomClientTest : BaseTestCase() {
         FuelManager().apply {
             client = object : Client {
                 override fun executeRequest(request: Request): Response = Response(
-                        url = request.url,
-                        dataStream = mockJson.inputStream(),
-                        statusCode = 200)
+                    url = request.url,
+                    body = DefaultBody.from({ mockJson.inputStream() }, null),
+                    statusCode = 200
+                )
             }
         }
     }

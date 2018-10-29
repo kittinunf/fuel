@@ -11,6 +11,8 @@ typealias BodyLength = (() -> Number)
 
 interface Body {
     fun toByteArray(): ByteArray
+    fun toStream(): InputStream
+
     fun writeTo(outputStream: OutputStream, charset: Charset? = null)
     fun isEmpty(): Boolean
     fun isConsumed(): Boolean
@@ -42,6 +44,12 @@ data class DefaultBody(
         }
     }
 
+    override fun toStream(): InputStream = openStream!!.invoke().buffered().apply {
+        // The caller is now responsible for this stream. This make sure that you can't call this twice without handling
+        // it. The caller must still call `.close()` on the returned value when done.
+        openStream = CONSUMED_STREAM
+    }
+
     override fun writeTo(outputStream: OutputStream, charset: Charset?) {
         // This actually writes whatever the body is outputting with the given charset.
         outputStream.buffered().apply {
@@ -61,7 +69,9 @@ data class DefaultBody(
     override fun isConsumed() = openStream === CONSUMED_STREAM
 
     override val length: Number? by lazy {
-        calculateLength?.invoke()
+        calculateLength?.invoke()?.let {
+            if (it.toLong() == -1L) { null } else { it }
+        }
     }
 
     companion object {
@@ -72,9 +82,9 @@ data class DefaultBody(
             )
         }
 
-        fun from(openReader: BodySource, calculateLength: BodyLength?, charset: Charset = Charsets.UTF_8): Body {
+        fun from(openStream: BodySource, calculateLength: BodyLength?, charset: Charset = Charsets.UTF_8): Body {
             return DefaultBody(
-                openStream = openReader,
+                openStream = openStream,
                 calculateLength = calculateLength,
                 charset = charset
             )

@@ -39,7 +39,8 @@ class Request(
     var useHttpCache: Boolean? = null,
     var decodeContent: Boolean? = null,
     var timeoutInMillisecond: Int = 15_000,
-    var timeoutReadInMillisecond: Int = 15_000
+    var timeoutReadInMillisecond: Int = 15_000,
+    internal var body: Body = DefaultBody()
 ) : Fuel.RequestConvertible {
     enum class Type {
         REQUEST,
@@ -48,7 +49,7 @@ class Request(
     }
 
     internal lateinit var client: Client
-    internal var body: Body = DefaultBody()
+    fun body(): Body = body
 
     // underlying task request
     internal val taskRequest: TaskRequest by lazy {
@@ -241,7 +242,7 @@ class Request(
      * @return [Request] the request
      */
     fun body(openStream: BodySource, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request {
-        this.body = DefaultBody.from(openReader = openStream, calculateLength = calculateLength, charset = charset)
+        this.body = DefaultBody.from(openStream = openStream, calculateLength = calculateLength, charset = charset)
         return this
     }
 

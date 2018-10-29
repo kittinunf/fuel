@@ -16,12 +16,24 @@ interface Deserializable<out T : Any> {
 
 interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     override fun deserialize(response: Response): T {
-        try {
-            return deserialize(response.dataStream) ?: deserialize(response.dataStream.reader())
-            ?: deserialize(response.data) ?: deserialize(String(response.data))
-            ?: throw IllegalStateException("One of deserialize(ByteArray) or deserialize(InputStream) or deserialize(Reader) or deserialize(String) must be implemented")
-        } finally {
-            response.dataStream.close()
+        response.body.toStream().use { stream ->
+            println("time to deserialize")
+            println(response)
+
+            return deserialize(stream)
+                ?: deserialize(stream.reader())
+                ?: response.let {
+                    // Reassign the body here so it can be read once more.
+                    val length = it.body.length
+                    it.body = DefaultBody.from({ stream }, length?.let { l -> { l } })
+
+                    deserialize(response.data)
+                        ?: deserialize(String(response.data))
+                        ?: throw IllegalStateException(
+                            "One of deserialize(ByteArray) or deserialize(InputStream) or deserialize(Reader) or " +
+                                "deserialize(String) must be implemented"
+                        )
+                }
         }
     }
 
