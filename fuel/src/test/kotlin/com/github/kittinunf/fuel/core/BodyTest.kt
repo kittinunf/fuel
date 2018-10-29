@@ -9,7 +9,6 @@ import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.StringReader
 import java.net.URL
 
 class BodyTest : BaseTestCase() {
@@ -26,7 +25,7 @@ class BodyTest : BaseTestCase() {
 
     @Test
     fun bodyIsConsumedAfterWriting() {
-        val body = DefaultBody.from({ StringReader("body") }, { 4 })
+        val body = DefaultBody.from({ ByteArrayInputStream("body".toByteArray()) }, { 4 })
         assertThat(body.isConsumed(), equalTo(false))
 
         body.writeTo(ByteArrayOutputStream())
@@ -107,7 +106,7 @@ class BodyTest : BaseTestCase() {
 
     @Test(expected = IllegalStateException::class)
     fun bodyCanOnlyBeReadOnce() {
-        val body = DefaultBody.from({ StringReader("body") }, { 4 })
+        val body = DefaultBody.from({ ByteArrayInputStream("body".toByteArray()) }, { 4 })
         body.writeTo(ByteArrayOutputStream())
         body.writeTo(ByteArrayOutputStream())
     }
@@ -115,7 +114,7 @@ class BodyTest : BaseTestCase() {
     @Test
     fun bodyToByteArrayLoadsItIntoMemory() {
         val value = "String Body ${Math.random()}"
-        val body = DefaultBody.from({ StringReader(value) }, { value.length })
+        val body = DefaultBody.from({ ByteArrayInputStream(value.toByteArray()) }, { value.length })
         body.toByteArray()
 
         val output = ByteArrayOutputStream(value.length)

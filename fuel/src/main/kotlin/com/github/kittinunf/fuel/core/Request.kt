@@ -10,11 +10,8 @@ import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileReader
+import java.io.FileInputStream
 import java.io.InputStream
-import java.io.InputStreamReader
-import java.io.Reader
-import java.io.StringReader
 import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.Callable
@@ -237,30 +234,16 @@ class Request(
      * @note in earlier versions the body callback would be called multiple times in order to maybe get the size. But
      *  that would lead to closed streams being unable to be read. If the size is known, set it before anything else.
      *
-     * @param openReader [BodySource] a function that yields a reader
+     * @param openStream [BodySource] a function that yields a stream
      * @param calculateLength [Number?] size in +bytes+ if it is known
      * @param charset [Charset] the charset to write with
      *
      * @return [Request] the request
      */
-    fun body(openReader: BodySource, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request {
-        this.body = DefaultBody.from(openReader = openReader, calculateLength = calculateLength, charset = charset)
+    fun body(openStream: BodySource, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request {
+        this.body = DefaultBody.from(openReader = openStream, calculateLength = calculateLength, charset = charset)
         return this
     }
-
-    /**
-     * Sets the body from an open reader
-     *
-     * @note the reader will be closed once the body is read
-     *
-     * @param reader [Reader] an open reader
-     * @param calculateLength [Number?] size in bytes if it is known
-     * @param charset [Charset] the charset to write with
-     *
-     * @return [Request] the request
-     */
-    fun body(reader: Reader, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8) =
-        body({ reader }, calculateLength, charset)
 
     /**
      * Sets the body from a generic stream
@@ -275,7 +258,7 @@ class Request(
      * @return [Request] the request
      */
     fun body(stream: InputStream, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8) =
-        body({ InputStreamReader(stream) }, calculateLength, charset)
+        body({ stream }, calculateLength, charset)
 
     /**
      * Sets the body from a byte array
@@ -295,7 +278,7 @@ class Request(
      * @return [Request] the request
      */
     fun body(body: String, charset: Charset = Charsets.UTF_8): Request =
-        body({ StringReader(body) }, { charset.encode(body).limit() }, charset)
+        body(body.toByteArray(charset), charset)
 
     /**
      * Sets the body to the contents of a file.
@@ -312,8 +295,8 @@ class Request(
      * @return [Request] the request
      */
     fun body(file: File, charset: Charset = Charsets.UTF_8): Request = when (charset) {
-        Charsets.UTF_8 -> body({ FileReader(file) }, { file.length() }, charset)
-        else -> body({ FileReader(file) }, null, charset)
+        Charsets.UTF_8 -> body({ FileInputStream(file) }, { file.length() }, charset)
+        else -> body({ FileInputStream(file) }, null, charset)
     }
 
     /**

@@ -10,7 +10,6 @@ import com.github.kittinunf.fuel.core.requests.UploadBody.Companion.DEFAULT_CHAR
 import com.github.kittinunf.fuel.util.copyTo
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.InputStreamReader
 import java.io.OutputStream
 import java.net.URL
 import java.net.URLConnection
@@ -34,7 +33,7 @@ internal data class UploadBody(val request: Request, val taskRequest: UploadTask
         }.apply {
             // The entire body is now in memory, and can act as a regular body
             request.body = DefaultBody.from(
-                { InputStreamReader(ByteArrayInputStream(this)) },
+                { ByteArrayInputStream(this) },
                 { this.size }
             )
         }
