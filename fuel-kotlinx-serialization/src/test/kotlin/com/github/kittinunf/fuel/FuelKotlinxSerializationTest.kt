@@ -193,7 +193,7 @@ class FuelKotlinxSerializationTest {
                     " ]").withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        Fuel.get(mock.path("issues")).responseObject<List<IssueInfo>>(loader = IssueInfo.serializer().list) { _, _, result ->
+        Fuel.get(mock.path("issues")).responseObject(loader = IssueInfo.serializer().list) { _, _, result ->
             val issues = result.get()
             assertNotEquals(issues.size, 0)
             assertThat(issues[0], isA(IssueInfo::class.java))
@@ -211,16 +211,26 @@ class FuelKotlinxSerializationTest {
             times = Times.exactly(2)
         )
 
-        Fuel.get(mock.path("issues")).response { _: Request, response: Response, result: Result<ByteArray, FuelError> ->
-            var issueList = kotlinxDeserializerOf<List<IssueInfo>>().deserialize(response)
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-            issueList = kotlinxDeserializerOf<List<IssueInfo>>().deserialize(response.dataStream)!!
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-            issueList = kotlinxDeserializerOf<List<IssueInfo>>().deserialize(response.dataStream.reader())!!
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-            issueList = kotlinxDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
+        Fuel.get(mock.path("issues")).response { _: Request, response: Response, _: Result<ByteArray, FuelError> ->
+            val issueList = kotlinxDeserializerOf<List<IssueInfo>>().deserialize(response)
             assertThat(issueList[0], isA(IssueInfo::class.java))
         }
+
+        Fuel.get(mock.path("issues")).response { _: Request, response: Response, _: Result<ByteArray, FuelError> ->
+            val issueList = kotlinxDeserializerOf<List<IssueInfo>>().deserialize(response.body().toStream())!!
+            assertThat(issueList[0], isA(IssueInfo::class.java))
+        }
+
+        Fuel.get(mock.path("issues")).response { _: Request, response: Response, _: Result<ByteArray, FuelError> ->
+            val issueList = kotlinxDeserializerOf<List<IssueInfo>>().deserialize(response.body().toStream().reader())!!
+            assertThat(issueList[0], isA(IssueInfo::class.java))
+        }
+
+        Fuel.get(mock.path("issues")).response { _: Request, _: Response, result: Result<ByteArray, FuelError> ->
+            val issueList = kotlinxDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
+            assertThat(issueList[0], isA(IssueInfo::class.java))
+        }
+
         Fuel.get(mock.path("issues")).responseString { _: Request, _: Response, result: Result<String, FuelError> ->
             val issueList = kotlinxDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
             assertThat(issueList[0], isA(IssueInfo::class.java))
