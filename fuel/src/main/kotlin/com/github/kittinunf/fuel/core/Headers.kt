@@ -207,6 +207,7 @@ class Headers : MutableMap<String, HeaderValues> {
     override fun toString() = contents.toString()
 
     companion object {
+
         /**
          * Determines if a multiple values may be collapsed into an ordered list.
          *
@@ -229,12 +230,8 @@ class Headers : MutableMap<String, HeaderValues> {
          * @param header [HeaderName] the header to check
          * @return [Boolean] true if can be collapsed into a single value
          */
-        fun isCollapsible(header: HeaderName): Boolean {
-            return when (header) {
-                HeaderName(SET_COOKIE) -> false
-                else -> !isSingleValue(header)
-            }
-        }
+        fun isCollapsible(header: HeaderName) =
+            COLLAPSIBLE_HEADERS.getOrElse(header) { !isSingleValue(header) }
 
         /**
          * This function determines if a header is allowed to have multiple values.
@@ -251,18 +248,8 @@ class Headers : MutableMap<String, HeaderValues> {
          * @param header [HeaderName] the header to check
          * @return [Boolean] true if it is a single value, false otherwise
          */
-        fun isSingleValue(header: HeaderName): Boolean {
-            return when (header) {
-                HeaderName(AGE) -> true
-                HeaderName(CONTENT_TYPE) -> true
-                HeaderName(CONTENT_LENGTH) -> true
-                HeaderName(CONTENT_LOCATION) -> true
-                HeaderName(EXPECT) -> true
-                HeaderName(EXPIRES) -> true
-                HeaderName(LOCATION) -> true
-                else -> false
-            }
-        }
+        fun isSingleValue(header: HeaderName) =
+            SINGLE_VALUE_HEADERS[header] ?: false
 
         /**
          * This functions collapses multiple HeaderValues into a single value.
@@ -284,12 +271,8 @@ class Headers : MutableMap<String, HeaderValues> {
          * @param header [HeaderName] the header to check
          * @return [Boolean] true if it is a single value, false otherwise
          */
-        fun collapse(header: HeaderName, values: HeaderValues): String {
-            return when (header) {
-                HeaderName(COOKIE) -> values.joinToString("; ")
-                else -> values.joinToString(", ")
-            }
-        }
+        fun collapse(header: HeaderName, values: HeaderValues) =
+            values.joinToString { COLLAPSE_SEPARATOR[header] ?: ", " }
 
         fun isCollapsible(header: String) = isCollapsible(HeaderName(header))
         fun isSingleValue(header: String) = isSingleValue(HeaderName(header))
@@ -335,5 +318,30 @@ class Headers : MutableMap<String, HeaderValues> {
         const val EXPIRES = "Expires"
         const val LOCATION = "Location"
         const val SET_COOKIE = "Set-Cookie"
+
+        /**
+         * Below are lookup tables for various functions. The reason these are a map is that
+         * - lookup is O(1) instead of O(n) for a list
+         * - default value is `null`, making it easy to elvis to a non-null default
+         * - no if statements necessary (instead of if(list.contains) { logic } else { logic})
+         */
+
+        private val COLLAPSIBLE_HEADERS = mapOf(
+            HeaderName(SET_COOKIE) to false
+        )
+
+        private val SINGLE_VALUE_HEADERS = mapOf(
+            HeaderName(AGE) to true,
+            HeaderName(CONTENT_TYPE) to true,
+            HeaderName(CONTENT_LENGTH) to true,
+            HeaderName(CONTENT_LOCATION) to true,
+            HeaderName(EXPECT) to true,
+            HeaderName(EXPIRES) to true,
+            HeaderName(LOCATION) to true
+        )
+
+        private val COLLAPSE_SEPARATOR = mapOf(
+            HeaderName(COOKIE) to "; "
+        )
     }
 }
