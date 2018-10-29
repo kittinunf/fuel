@@ -28,5 +28,4 @@ class MainActivityTest {
         onView(withId(R.id.mainResultText))
                 .check(matches(not(withText(""))))
     }
-
 }

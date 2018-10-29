@@ -113,7 +113,7 @@ dependencies {
 #### Async mode
 
 * Kotlin
-``` Kotlin
+```kotlin
 //an extension over string (support GET, PUT, POST, DELETE with httpGet(), httpPut(), httpPost(), httpDelete())
 "https://httpbin.org/get".httpGet().responseString { request, response, result ->
   //do something with response
@@ -153,7 +153,7 @@ Fuel.get("https://httpbin.org/get").responseString { request, response, result -
 ```
 
 * Java
-``` Java
+```java
 //get
 Fuel.get("https://httpbin.org/get", params).responseString(new Handler<String>() {
     @Override
@@ -172,7 +172,7 @@ Fuel.get("https://httpbin.org/get", params).responseString(new Handler<String>()
 You can also wait for the response. It returns the same parameters as the async version, but it blocks the thread. It supports all the features of the async version.
 
 * Kotlin
-``` Kotlin
+```kotlin
 val (request, response, result) = "https://httpbin.org/get".httpGet().responseString() // result is Result<String, FuelError>
 ```
 
@@ -193,7 +193,7 @@ try {
 
 ### GET
 
-``` Kotlin
+```kotlin
 Fuel.get("https://httpbin.org/get").response { request, response, result ->
     println(request)
     println(response)
@@ -212,18 +212,18 @@ Fuel.get("https://httpbin.org/get").response { request, response, result ->
 * Working with result is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L324), [*destructure*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L266) as because it is just a [data class](https://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *Success* or *Failure*.
 
 ### Response
-``` Kotlin
+```kotlin
 fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit)
 ```
 
 ### Response in String
-``` Kotlin
+```kotlin
 fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit)
 ```
 
 ### Response in Json
 _requires the [android extension](#dependency---fuel-android)_
-``` Kotlin
+```kotlin
 fun responseJson(handler: (Request, Response, Result<Json, FuelError>) -> Unit)
 
 val jsonObject = json.obj() //JSONObject
@@ -231,13 +231,13 @@ val jsonArray = json.array() //JSONArray
 ```
 
 ### Response in T (object)
-``` Kotlin
+```kotlin
 fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit)
 ```
 
 ### POST
 
-``` Kotlin
+```kotlin
 Fuel.post("https://httpbin.org/post").response { request, response, result ->
 }
 
@@ -248,21 +248,21 @@ Fuel.post("https://httpbin.org/post").jsonBody("{ \"foo\" : \"bar\" }").response
 
 ### PUT
 
-``` Kotlin
+```kotlin
 Fuel.put("https://httpbin.org/put").response { request, response, result ->
 }
 ```
 
 ### DELETE
 
-``` Kotlin
+```kotlin
 Fuel.delete("https://httpbin.org/delete").response { request, response, result ->
 }
 ```
 
 ### HEAD
 
-``` Kotlin
+```kotlin
 Fuel.head("https://httpbin.org/get").response { request, response, result ->
    // request body should be empty.
 }
@@ -271,7 +271,7 @@ Fuel.head("https://httpbin.org/get").response { request, response, result ->
 ### PATCH
 * The default `client` is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html) does not support a [`PATCH`](https://download.java.net/jdk7/archive/b123/docs/api/java/net/HttpURLConnection.html#setRequestMethod(java.lang.String)) method. [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) converts `PATCH` requests to a `POST` request and adds a `X-HTTP-Method-Override: PATCH` header. While this is a semi-standard industry practice not all APIs are configured to accept this header by default.
 
-``` Kotlin
+```kotlin
 Fuel.patch("https://httpbin.org/patch").response { request, response, result ->
    // request body should be empty.
 }
@@ -283,7 +283,7 @@ Connect is not supported by the Java JVM via the regular HTTP clients, and is th
 ### OPTIONS
 There are no convenience methods for making an OPTIONS request, but you can still make one directly:
 
-``` Kotlin
+```kotlin
 Fuel.request(Method.OPTIONS, "https://httpbin.org/anything").response { request, response, result ->
 }
 ```
@@ -291,7 +291,7 @@ Fuel.request(Method.OPTIONS, "https://httpbin.org/anything").response { request,
 ### TRACE
 There are no convenience methods for making an TRACE request, but you can still make one directly:
 
-``` Kotlin
+```kotlin
 Fuel.request(Method.TRACE, "https://httpbin.org/anything").response { request, response, result ->
 }
 ```
@@ -300,7 +300,7 @@ Fuel.request(Method.TRACE, "https://httpbin.org/anything").response { request, r
 ### Debug Logging
 * Use `toString()` method to Log (request|response)
 
-``` Kotlin
+```kotlin
 Log.d("log", request.toString())
 ```
 
@@ -319,7 +319,7 @@ Log.d("log", request.toString())
 
 * Also support cUrl string to Log request, make it very easy to cUrl on command line
 
-``` Kotlin
+```kotlin
 Log.d("cUrl log", request.cUrlString())
 ```
 
@@ -332,8 +332,8 @@ curl -i -X POST -d "foo=foo&bar=bar&key=value" -H "Accept-Encoding:compress;q=0.
 
 * URL encoded style for GET & DELETE request
 
-``` Kotlin
-Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result -> {
+```kotlin
+Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
     //resolve to https://httpbin.org/get?foo=foo&bar=bar
 }
 
@@ -344,15 +344,15 @@ Fuel.delete("https://httpbin.org/delete", listOf("foo" to "foo", "bar" to "bar")
 
 * Array support for GET requests
 
-``` Kotlin
-Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey"))).response { request, response, result -> {
+```kotlin
+Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey"))).response { request, response, result ->
     //resolve to https://httpbin.org/get?foo=foo&dwarf[]=grumpy&dwarf[]=happy&dwarf[]=sleepy&dwarf[]=dopey
 }
 ```
 
 * Support x-www-form-urlencoded for PUT & POST
 
-``` Kotlin
+```kotlin
 Fuel.post("https://httpbin.org/post", listOf("foo" to "foo", "bar" to "bar")).response { request, response, result ->
     //http body includes foo=foo&bar=bar
 }
@@ -392,7 +392,7 @@ Fuel.get("https://httpbin.org/get", params).timeout(timeout).timeoutRead(timeout
 ```
 
 ### Download with or without progress handler
-``` Kotlin
+```kotlin
 Fuel.download("https://httpbin.org/bytes/32768").destination { response, url ->
     File.createTempFile("temp", ".tmp")
 }.response { req, res, result ->
@@ -409,7 +409,7 @@ Fuel.download("https://httpbin.org/bytes/32768").destination { response, url ->
 ```
 
 ### Upload with or without progress handler
-``` Kotlin
+```kotlin
 Fuel.upload("/post").source { request, url ->
     File.createTempFile("temp", ".tmp");
 }.responseString { request, response, result ->
@@ -446,24 +446,24 @@ Fuel.upload("/post").dataParts { request, url ->
 	DataPart(File.createTempFile("temp3", ".tmp"), "third-file", "image/jpeg") 
     ) 
 }.responseString { request, response, result ->
-    ... 
+    /* ... */ 
 }
 ```
 ### Upload a multipart form without a file
 
-``` Kotlin
+```kotlin
 val formData = listOf("Email" to "mail@example.com", "Name" to "Joe Smith" )
 Fuel.upload("/post", param = formData)
     //Upload normally requires a file, but we can give it an empty list of `DataPart`
     .dataParts { request, url -> listOf<DataPart>() } 
     .responseString { request, response, result ->
-        ...
+        /* ... */
     }
 ```
 	
 ### Upload from an `InputStream`
 
-``` Kotlin
+```kotlin
 Fuel.upload("/post").blob { request, url ->
     Blob("filename.png", someObject.length, { someObject.getInputStream() })
 }
@@ -472,7 +472,7 @@ Fuel.upload("/post").blob { request, url ->
 ### Authentication
 
 * Support Basic Authentication right off the box
-``` Kotlin
+```kotlin
 val username = "username"
 val password = "abcd1234"
 
@@ -487,7 +487,7 @@ Fuel.get("https://httpbin.org/basic-auth/$user/$password").authenticate(username
 ### Cancel
 
 * If one wants to cancel on-going request, one could call `cancel` on the request object
-``` Kotlin
+```kotlin
 val request = Fuel.get("https://httpbin.org/get").response { request, response, result ->
     // if request is cancelled successfully, response callback will not be called. Interrupt callback (if provided) will be called instead
 }
@@ -497,7 +497,7 @@ request.cancel() //this will cancel on-going request
 ```
 
 * Also, interrupt request can be further processed with interrupt callback
-``` Kotlin
+```kotlin
 val request = Fuel.get("https://httpbin.org/get").interrupt { request ->
     println("${request.url} was interrupted and cancelled")
 }.response { request, response, result ->
@@ -513,7 +513,7 @@ request.cancel()
 
 * Fuel provides built-in support for response deserialization. Here is how one might want to use Fuel together with [Gson](https://github.com/google/gson)
 
-``` Kotlin
+```kotlin
 
 //User Model
 data class User(val firstName: String = "",
@@ -541,7 +541,7 @@ data class User(val firstName: String = "",
 
 * Fuel also provides a built in support for Gson Deserialization. This is possible by including the [Gson](https://github.com/kittinunf/Fuel/tree/master/fuel-gson) module in your dependency block.
 
-``` Kotlin
+```kotlin
 
 data class HttpBinUserAgentModel(var userAgent: String = "")
 
@@ -597,7 +597,7 @@ Fuel.get("/user-agent").awaitResponseObject<HttpBinUserAgentModel>(kotlinxDeseri
 
 * There are 4 methods to support response deserialization depending on your needs (also depending on JSON parsing library of your choice), and you are required to implement only one of them.
 
-``` Kotlin
+```kotlin
 public fun deserialize(bytes: ByteArray): T?
 
 public fun deserialize(inputStream: InputStream): T?
@@ -622,42 +622,57 @@ object Windows1255StringDeserializer : ResponseDeserializable<String> {
 
 * `basePath` is used to manage common root path. Great usage is for your static API endpoint.
 
-``` Kotlin
+```kotlin
 FuelManager.instance.basePath = "https://httpbin.org"
 ```
 
-``` Kotlin
+```kotlin
 Fuel.get("/get").response { request, response, result ->
     //make request to https://httpbin.org/get because Fuel.{get|post|put|delete} use FuelManager.instance to make HTTP request
 }
 ```
 
-* `baseHeaders` is to manage common HTTP header pairs in format of `Map<String, String>>`.
+* `baseHeaders` is to manage common HTTP header pairs in format of `Map<String, String>`. 
+    - The base headers are only applied if the request does not have those headers set.
 
-``` Kotlin
+```kotlin
 FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
 ```
 
-* `Headers` can be add to a request via the methods `fun header(pairs: Map<String, Any>?): Request`
- or `fun header(vararg pairs: Pair<String, Any>?)`. 
- 
- * The latter method does support multiple values for the same key however as 
- `fun header(pairs: Map<String, Any>?): Request` takes a map this method can not support multiple
-  values for the same key as per the definition of the map.
+* `Headers` can be added to a request via various methods including
+    - `fun header(name: String, value: Any): Request`: `request.header("foo", "a")`
+    - `fun header(pairs: Map<String, Any>): Request`: `request.header(mapOf("foo" to "a"))`
+    - `fun header(vararg pairs: Pair<String, Any>): Request`: `request.header("foo" to "a")`
+    - `operator fun set(header: String, value: Collection<Any>): Request`: `request["foo"] = listOf("a", "b")`
+    - `operator fun set(header: String, value: Any): Request`: `request["foo"] = "a"`
+* By default, all subsequent calls overwrite earlier calls, but you may use the `appendHeader` variant to append values to existing values.
+    - In earlier versions a `mapOf` overwrote, and `varargs pair` did not, but this was confusing.
+* Some of the HTTP headers are defined under `Headers.Companion` and can be used instead of literal strings.
 
-``` Kotlin
-Fuel.get("/get").response { request, response, result ->
-    //make request to https://httpbin.org/get with global device header (Device : Android)
-}
+```kotlin
+Fuel.post("/my-post-path")
+    .header(Headers.ACCEPT, "text/html, */*; q=0.1")
+    .header(Headers.CONTENT_TYPE, "image/png")
+    .header(Headers.COOKIE to "basic=very")
+    .appendHeader(Headers.COOKIE to "value_1=foo", Headers.COOKIE to "value_2=bar", Headers.ACCEPT to "application/json")
+    .appendHeader("MyFoo" to "bar", "MyFoo" to "baz")
+    .response { /*...*/ }
+    
+ // => request with:
+ //    Headers:
+ //      Accept: "text/html, */*; q=0.1, application/json"
+ //      Content-Type: "image/png"
+ //      Cookie: "basic=very; value_1=foo; value_2=bar"
+ //      MyFoo: "bar, baz"
 ```
 
 * `baseParams` is used to manage common `key=value` query param, which will be automatically included in all of your subsequent requests in format of ` List<Pair<String, Any?>>` (`Any` is converted to `String` by `toString()` method)
 
-``` Kotlin
+```kotlin
 FuelManager.instance.baseParams = listOf("api_key" to "1234567890")
 ```
 
-``` Kotlin
+```kotlin
 Fuel.get("/get").response { request, response, result ->
     //make request to https://httpbin.org/get?api_key=1234567890
 }
@@ -673,7 +688,7 @@ Fuel.get("/get").response { request, response, result ->
 
 * `requestInterceptors` `responseInterceptors` is a side-effect to add to `Request` and/or `Response` objects. For example, one might wanna print cUrlString style for every request that hits server in DEBUG mode.
 
-``` Kotlin
+```kotlin
 val manager = FuelManager()
 if (BUILD_DEBUG) {
     manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
@@ -683,7 +698,7 @@ val (request, response, result) = manager.request(Method.GET, "https://httpbin.o
 
 * Another example is that you might wanna add data into your Database, you can achieve that with providing `responseInterceptors` such as
 
-``` Kotlin
+```kotlin
 inline fun <reified T> DbResponseInterceptor() =
         { next: (Request, Response) -> Response ->
             { req: Request, res: Response ->
@@ -704,7 +719,7 @@ manager.request(Method.GET, "https://www.example.com/api/dog/1").response() // D
 
 Testing asynchronized calls can be somehow hard without special care. That's why Fuel has a special test mode with make all the requests blocking, for tests.
 
-``` Kotlin
+```kotlin
 Fuel.testMode {
     timeout = 15000 // Optional feature, set all requests' timeout to this value.
 }
@@ -716,7 +731,7 @@ In order to disable test mode, just call `Fuel.regularMode()`
 
 * Fuel supports [RxJava](https://github.com/ReactiveX/RxJava) right off the box.
 
-``` Kotlin
+```kotlin
 "https://www.example.com/photos/1".httpGet().rx_object(Photo.Deserializer()).subscribe {
 	//do something
 }
@@ -724,7 +739,7 @@ In order to disable test mode, just call `Fuel.regularMode()`
 
 * There are 6 extensions over `Request` that provide RxJava 2.x `Single<Result<T, FuelError>>` as return type.
 
-``` Kotlin
+```kotlin
 fun Request.rx_response(): Single<Pair<Response, Result<ByteArray, FuelError>>>
 fun Request.rx_responseString(charset: Charset): Single<Pair<Response, Result<String, FuelError>>>
 fun <T : Any> Request.rx_responseObject(deserializable: Deserializable<T>): Single<Pair<Response, Result<T, FuelError>>>
@@ -738,7 +753,7 @@ fun <T : Any> Request.rx_object(deserializable: Deserializable<T>): Single<Resul
 
 * Fuel supports [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html)
 
-``` Kotlin
+```kotlin
 Fuel.get("www.example.com/get").liveDataResponse().observe(this) {
   //do something
 }
@@ -880,7 +895,7 @@ The Reactor module API provides functions starting with the prefix `mono` to han
 
 ```kotlin
 Fuel.get("https://icanhazdadjoke.com")
-    .header("Accept" to "text/plain")
+    .header(Headers.ACCEPT to "text/plain")
     .monoString()
     .subscribe(::println)
 ```

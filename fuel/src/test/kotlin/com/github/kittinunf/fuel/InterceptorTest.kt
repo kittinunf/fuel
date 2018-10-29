@@ -342,7 +342,9 @@ class InterceptorTest : MockHttpTestCase() {
 
         manager.baseHeaders = mapOf("User-Agent" to "Fuel")
 
-        val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).responseString(Charsets.UTF_8)
+        val (request, response, result) = manager.request(Method.GET, mock.path("redirect"))
+                .header("User-Agent" to "Fuel")
+                .responseString(Charsets.UTF_8)
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -382,7 +384,9 @@ class InterceptorTest : MockHttpTestCase() {
         val manager = FuelManager()
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
-        val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).responseString(Charsets.UTF_8)
+        val (request, response, result) = manager.request(Method.GET, mock.path("redirect"))
+                .header(mapOf("User-Agent" to "Fuel"))
+                .responseString(Charsets.UTF_8)
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -677,8 +681,8 @@ class InterceptorTest : MockHttpTestCase() {
         val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.GET))
     }
@@ -713,8 +717,8 @@ class InterceptorTest : MockHttpTestCase() {
         val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.GET))
     }
@@ -749,8 +753,8 @@ class InterceptorTest : MockHttpTestCase() {
         val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.GET))
     }
@@ -785,8 +789,8 @@ class InterceptorTest : MockHttpTestCase() {
         val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.POST))
     }
@@ -821,8 +825,8 @@ class InterceptorTest : MockHttpTestCase() {
         val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.POST))
     }
@@ -889,8 +893,8 @@ class InterceptorTest : MockHttpTestCase() {
                 .responseString()
 
         val (data, error) = result
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
     }
 
     @Test
@@ -931,10 +935,10 @@ class InterceptorTest : MockHttpTestCase() {
 
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
-        assertThat(requests[1].headers["Foo"], notNullValue())
-        assertThat(requests[1].headers["Authorization"], nullValue())
+        assertThat(data, notNullValue())
+        assertThat(requests[1]["Foo"], notNullValue())
+        assertThat(requests[1]["Authorization"].firstOrNull(), nullValue())
     }
 
     @Test

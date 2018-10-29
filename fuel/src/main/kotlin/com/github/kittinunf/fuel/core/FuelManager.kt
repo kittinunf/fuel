@@ -131,13 +131,19 @@ class FuelManager {
 
     private fun request(request: Request): Request {
         request.client = client
-        request.headers += baseHeaders.orEmpty()
+
+        // Sets base headers ONLY if they are not set
+        val unsetBaseHeaders = request.headers.keys.fold(Headers.from(baseHeaders.orEmpty())) {
+            result, it -> result.remove(it); result
+        }
+        request.header(unsetBaseHeaders)
+
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
         request.executor = createExecutor()
         request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
+        request.requestTransformer = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseTransformer = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 

@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.Request.Companion.toString
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
@@ -20,29 +21,23 @@ import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
+typealias RequestTransformer = (Request) -> Request
+typealias ResponseTransformer = (Request, Response) -> Response
+
 class Request(
     val method: Method,
     val path: String,
     val url: URL,
     var type: Type = Type.REQUEST,
-    val headers: MutableMap<String, String> = mutableMapOf(),
+    val headers: Headers = Headers(),
     val parameters: List<Pair<String, Any?>> = listOf(),
     var name: String = "",
     val names: MutableList<String> = mutableListOf(),
     val mediaTypes: MutableList<String> = mutableListOf(),
     var isAllowRedirects: Boolean = true,
-    var timeoutInMillisecond: Int,
-    var timeoutReadInMillisecond: Int
+    var timeoutInMillisecond: Int = 15_000,
+    var timeoutReadInMillisecond: Int = 15_000
 ) : Fuel.RequestConvertible {
-
-    @Deprecated(replaceWith = ReplaceWith("method"), message = "http naming is deprecated, use 'method' instead")
-    val httpMethod
-        get() = method
-
-    @Deprecated(replaceWith = ReplaceWith("headers"), message = "http naming is deprecated, use 'headers' instead")
-    val httpHeaders
-        get() = headers
-
     enum class Type {
         REQUEST,
         DOWNLOAD,
@@ -78,8 +73,8 @@ class Request(
     internal lateinit var callbackExecutor: Executor
 
     // interceptor
-    internal var requestInterceptor: ((Request) -> Request)? = null
-    internal var responseInterceptor: ((Request, Response) -> Response)? = null
+    internal lateinit var requestTransformer: RequestTransformer
+    internal lateinit var responseTransformer: ResponseTransformer
 
     // interfaces
     fun timeout(timeout: Int): Request {
@@ -93,46 +88,146 @@ class Request(
     }
 
     /**
-     *  <p> Note that your value, will be converted to a String via the toString() </p>
-     *  <p> Please note that header of the same key are supported and headers with the same key
-     *  will be sent in the format of `key` : [ value; value; value ] </p>
+     * Get the current values of the header, after normalisation of the header
+     * @param header [String] the header name
+     * @return the current values (or empty if none)
+     */
+    operator fun get(header: String): HeaderValues {
+        return headers[header]
+    }
+
+    /**
+     * Set the values of the header, overriding what's there, after normalisation of the header
      *
-     * @param pairs This all the key value pairs you wish to add to the headers
+     * @param header [String] the header name
+     * @param values [Collection<*>] the values to be transformed through #toString
+     * @return self
+     */
+    operator fun set(header: String, values: Collection<*>): Request {
+        headers[header] = values.map { it.toString() }
+        return this
+    }
+
+    /**
+     * Set the value of the header, overriding what's there, after normalisation of the header
      *
-     * @return the request supplied
-     *
-     * */
-    fun header(vararg pairs: Pair<String, Any>?): Request {
-        pairs.filterNotNull().forEach { (key, value) ->
-            if (!headers.containsKey(key)) {
-                headers += Pair(key, value.toString())
-            } else {
-                headers[key] = headers.getValue(key).let { "$it; $value" }
-            }
+     * @param header [String] the header name
+     * @param value [Any] the value to be transformed through #toString
+     */
+    operator fun set(header: String, value: Any): Request {
+        when (value) {
+            is Collection<*> -> this[header] = value
+            else -> headers[header] = value.toString()
         }
         return this
     }
 
     /**
-     *  <p> Note that your value, will be converted to a String via the toString() </p>
+     * Get the current values
      *
-     *  <p> Please note that header of the same key are supported however as this function take a map
-     *  multiple keys are not supported via this function as values assigned to the same key will be overwritten
-     *  hence the last value that is written to that key will be the one used </p>
-     *
-     * @param pairs This all the key value pair you wish to add to the headers
-     *
-     * @return the request supplied
-     *
-     * */
-    fun header(pairs: Map<String, Any>?): Request = header(pairs, true)
+     * @see get(header: String)
+     * @return [HeaderValues] the current values
+     */
+    fun header(header: String) = get(header)
 
-    internal fun header(pairs: Map<String, Any>?, replace: Boolean): Request {
-        pairs?.forEach {
-            if (replace || !headers.containsKey(it.key)) {
-                headers += Pair(it.key, it.value.toString())
-            }
-        }
+    /**
+     * Replace the headers with the map provided
+     *
+     * @note In earlier versions the mapOf variant of this function worked differently than the vararg pairs variant,
+     *  which has been changed to make any call to header(...) always overwrite the values and any call to
+     *  appendHeader(...) will try to append the value.
+     *
+     * @see set(header: String, values: Collection<*>)
+     * @see set(header: String, value: Any)
+     *
+     * @param map [Map<String, Any>] map of headers to replace. Value can be a list or single value
+     * @return [Request] the modified request
+     */
+    fun header(map: Map<String, Any>): Request {
+        headers.putAll(Headers.from(map))
+        return this
+    }
+
+    /**
+     * Replace the headers with the pairs provided
+     *
+     * @note In earlier versions the mapOf variant of this function worked differently than the vararg pairs variant,
+     *  which has been changed to make any call to header(...) always overwrite the values and any call to
+     *  appendHeader(...) will try to append the value.
+     *
+     * @see set(header: String, values: Collection<*>)
+     * @see set(header: String, value: Any)
+     *
+     * @param pairs [Pair<String, Any>] map of headers to replace. Value can be a list or single value
+     * @return [Request] the modified request
+     */
+    fun header(vararg pairs: Pair<String, Any>): Request {
+        headers.putAll(Headers.from(*pairs))
+        return this
+    }
+
+    /**
+     * Replace the header with the provided values
+     *
+     * @see set(header: String, values: Collection<*>)
+     *
+     * @param header [String] the header to set
+     * @param values [List<Any>] the values to set the header to
+     * @return [Request] the modified request
+     */
+    fun header(header: String, values: Collection<*>) = set(header, values)
+
+    /**
+     * Replace the header with the provided value
+     *
+     * @see set(header: String, values: List<Any>)
+     *
+     * @param header [String] the header to set
+     * @param value [Any] the value to set the header to
+     * @return [Request] the modified request
+     */
+    fun header(header: String, value: Any): Request = set(header, value)
+
+    /**
+     * Replace the header with the provided values
+     *
+     * @see set(header: String, values: List<Any>)
+     *
+     * @param header [String] the header to set
+     * @param values [Any] the values to set the header to
+     * @return [Request] the modified request
+     */
+    fun header(header: String, vararg values: Any) = set(header, values.toList())
+
+    /**
+     * Appends the value to the header or sets it if there was none yet
+     *
+     * @param header [String] the header name to append to
+     * @param value [Any] the value to be transformed through #toString
+     */
+    fun appendHeader(header: String, value: Any): Request {
+        headers.append(header, value)
+        return this
+    }
+
+    /**
+     * Appends the value to the header or sets it if there was none yet
+     *
+     * @param header [String] the header name to append to
+     * @param values [Any] the value to be transformed through #toString
+     */
+    fun appendHeader(header: String, vararg values: Any): Request {
+        headers.append(header, values.toList())
+        return this
+    }
+
+    /**
+     * Append each pair, using the key as header name and value as header content
+     *
+     * @param pairs [Pair<String, Any>]
+     */
+    fun appendHeader(vararg pairs: Pair<String, Any>): Request {
+        pairs.forEach { pair -> appendHeader(pair.first, pair.second) }
         return this
     }
 
@@ -147,14 +242,8 @@ class Request(
     fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
 
     fun jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request {
-        headers["Content-Type"] = "application/json"
+        this[Headers.CONTENT_TYPE] = "application/json"
         return body(body, charset)
-    }
-
-    fun authenticate(username: String, password: String): Request {
-        val auth = "$username:$password"
-        val encodedAuth = auth.encodeBase64ToString()
-        return header("Authorization" to "Basic $encodedAuth")
     }
 
     fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
@@ -168,20 +257,32 @@ class Request(
             }
             else -> throw IllegalStateException("progress is only used with RequestType.DOWNLOAD or RequestType.UPLOAD")
         }
-
         return this
     }
 
+    /**
+     *  Replace each pair, using the key as header name and value as header content
+     */
     fun blobs(blobs: (Request, URL) -> Iterable<Blob>): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest
                 ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
         uploadTaskRequest.sourceCallback = blobs
-
         return this
     }
 
-    fun blob(blob: (Request, URL) -> Blob): Request {
-        blobs { request, _ -> listOf(blob(request, request.url)) }
+    fun blob(blob: (Request, URL) -> Blob) = blobs { request, _ -> listOf(blob(request, request.url)) }
+
+    fun authenticate(username: String, password: String) = basicAuthentication(username, password)
+
+    fun basicAuthentication(username: String, password: String): Request {
+        val auth = "$username:$password"
+        val encodedAuth = auth.encodeBase64ToString()
+        this[Headers.AUTHORIZATION] = "Basic $encodedAuth"
+        return this
+    }
+
+    fun bearerAuthentication(bearerToken: String): Request {
+        this[Headers.AUTHORIZATION] = "Bearer $bearerToken"
         return this
     }
 
@@ -269,32 +370,56 @@ class Request(
         taskFuture?.cancel(true)
     }
 
-    override val request: Request
-        get() = this
+    override val request: Request get() = this
 
+    /**
+     * Returns a string representation of the request.
+     *
+     * @see httpString
+     * @see cUrlString
+     *
+     * @return [String] the string representation
+     */
     override fun toString(): String = buildString {
         appendln("--> $url")
         appendln("\"Body : ${if (getHttpBody().isNotEmpty()) String(getHttpBody()) else "(empty)"}\"")
         appendln("\"Headers : (${headers.size})\"")
-        for ((key, value) in headers) {
-            appendln("$key : $value")
-        }
+
+        val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
+        headers.transformIterate(appendHeaderWithValue)
     }
 
+    /**
+     * Returns a representation that can be used over the HTTP protocol
+     *
+     * @see toString
+     * @see cUrlString
+     *
+     * @return [String] the string representation
+     */
     fun httpString(): String = buildString {
         // url
         val params = parameters.joinToString(separator = "&", prefix = "?") { "${it.first}=${it.second}" }
         appendln("${method.value} $url$params")
         appendln()
         // headers
-        for ((key, value) in headers) {
-            appendln("$key : $value")
-        }
+
+        val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
+        headers.transformIterate(appendHeaderWithValue)
+
         // body
         appendln()
         appendln(String(getHttpBody()))
     }
 
+    /**
+     * Returns a representation that can be used with cURL
+     *
+     * @see toString
+     * @see httpString
+     *
+     * @return [String] the string representation
+     */
     fun cUrlString(): String = buildString {
         append("$ curl -i")
 
@@ -310,9 +435,8 @@ class Request(
         }
 
         // headers
-        for ((key, value) in headers) {
-            append(" -H \"$key:$value\"")
-        }
+        val appendHeaderWithValue = { key: String, value: String -> append(" -H \"$key:$value\"") }
+        headers.transformIterate(appendHeaderWithValue)
 
         // url
         append(" $url")

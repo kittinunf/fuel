@@ -115,7 +115,6 @@ class MainActivity : AppCompatActivity() {
                 }
     }
 
-
     private fun httpListResponseObject() {
         "https://api.github.com/repos/kittinunf/Fuel/issues".httpGet()
                 .responseObject(Issue.ListDeserializer()) { _, _, result ->
@@ -156,7 +155,6 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, request.toString())
                     update(result)
                 }
-
     }
 
     private fun httpPost() {
@@ -171,7 +169,6 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, request.toString())
                     update(result)
                 }
-
     }
 
     private fun httpDelete() {
@@ -186,7 +183,6 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, request.toString())
                     update(result)
                 }
-
     }
 
     private fun httpDownload() {
@@ -207,7 +203,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun httpUpload() {
         Fuel.upload("/post").source { _, _ ->
-            //create random file with some non-sense string
+            // create random file with some non-sense string
             val file = File(filesDir, "out.tmp")
             file.writer().use { writer ->
                 repeat(100) {
@@ -267,9 +263,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     data class Issue(
-            val id: Int = 0,
-            val title: String = "",
-            val url: String = ""
+        val id: Int = 0,
+        val title: String = "",
+        val url: String = ""
     ) {
         class Deserializer : ResponseDeserializable<Issue> {
             override fun deserialize(reader: Reader) = Gson().fromJson(reader, Issue::class.java)!!
@@ -282,5 +278,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 }
