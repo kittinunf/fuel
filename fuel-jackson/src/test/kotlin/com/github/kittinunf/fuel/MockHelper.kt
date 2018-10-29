@@ -158,7 +158,6 @@ class MockHelper {
     }
 }
 
-
 data class MockReflected(
     val method: String,
     val path: String,
@@ -170,7 +169,6 @@ data class MockReflected(
 ) {
     operator fun get(key: String) = headers[key]
 }
-
 
 data class MockReflectedBody(
     val type: String,
