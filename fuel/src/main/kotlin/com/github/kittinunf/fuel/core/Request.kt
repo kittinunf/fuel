@@ -490,7 +490,7 @@ class Request(
      * @return [String] the string representation
      */
     fun cUrlString(): String = buildString {
-        append("$ curl -i")
+        append("curl -i")
 
         // method
         if (method != Method.GET) {
