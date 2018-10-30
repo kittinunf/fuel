@@ -24,7 +24,7 @@ internal class DownloadTaskRequest(request: Request) : TaskRequest(request) {
                 // The Content-Length can *ONLY* be used if it's present, which it is not if the response is chunked or
                 // encoded (e.g. gzipped). We can opt to not send progress reports, send -1 or act as if it's at 100%
                 // constantly.
-                totalBytes = if (response.contentLength > 0) { response.contentLength } else { readBytes }
+                totalBytes = if (response.contentLength > 0) response.contentLength else readBytes
                 progressCallback?.invoke(readBytes, totalBytes)
             })
         }
