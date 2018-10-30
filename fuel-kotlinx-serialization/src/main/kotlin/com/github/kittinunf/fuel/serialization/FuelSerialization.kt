@@ -36,17 +36,9 @@ inline fun <reified T : Any> Request.responseObject(
 
 @ImplicitReflectionSerializer
 inline fun <reified T : Any> kotlinxDeserializerOf(loader: DeserializationStrategy<T> = T::class.serializer(), json: JSON = JSON.plain) = object : ResponseDeserializable<T> {
-    override fun deserialize(content: String): T? {
-        return json.parse(loader, content)
-    }
-
-    override fun deserialize(reader: Reader): T? {
-        return deserialize(reader.readText())
-    }
-
-    override fun deserialize(bytes: ByteArray): T? {
-        return deserialize(String(bytes))
-    }
+    override fun deserialize(content: String): T? = json.parse(loader, content)
+    override fun deserialize(reader: Reader): T? = deserialize(reader.readText())
+    override fun deserialize(bytes: ByteArray): T? = deserialize(String(bytes))
 
     override fun deserialize(inputStream: InputStream): T? {
         inputStream.bufferedReader().use {

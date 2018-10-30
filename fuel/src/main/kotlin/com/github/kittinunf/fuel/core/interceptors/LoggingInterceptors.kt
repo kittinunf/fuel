@@ -6,7 +6,7 @@ import com.github.kittinunf.fuel.core.Response
 fun <T> loggingRequestInterceptor() =
         { next: (T) -> T ->
             { t: T ->
-                println(t.toString())
+                println(t)
                 next(t)
             }
         }
@@ -20,8 +20,7 @@ fun cUrlLoggingRequestInterceptor() =
         }
 
 fun loggingResponseInterceptor(): (Request, Response) -> Response =
-        { request: Request, response: Response ->
-            println(request.toString())
-            println(response.toString())
+        { _: Request, response: Response ->
+            println(response)
             response
         }

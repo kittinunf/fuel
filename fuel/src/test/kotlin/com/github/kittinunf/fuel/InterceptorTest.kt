@@ -109,12 +109,6 @@ class InterceptorTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        // TODO: remove request from response logger
-        //   currently the response logger actually logs both request and response, after the
-        //   response comes back. Preferably the requestLogger logs the request as it goes out and
-        //   the responseLogger logs the response as it comes in.
-
-        assertThat("Expected request to be logged", outContent.toString(), containsString(request.toString()))
         assertThat("Expected response to be logged", outContent.toString(), containsString(response.toString()))
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))

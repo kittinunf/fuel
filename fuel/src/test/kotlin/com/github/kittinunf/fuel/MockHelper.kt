@@ -1,20 +1,29 @@
 package com.github.kittinunf.fuel
 
+import com.github.kittinunf.fuel.core.Headers
+import com.github.kittinunf.fuel.core.Parameters
+import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.util.decodeBase64
+import org.json.JSONArray
+import org.json.JSONObject
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.matchers.Times
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.HttpTemplate
+import org.slf4j.event.Level
 
 @Suppress("MemberVisibilityCanBePrivate")
 class MockHelper {
 
     private lateinit var mockServer: ClientAndServer
 
-    fun setup() {
+    fun setup(logLevel: Level = Level.WARN) {
         // This is not placed in a @BeforeClass / @BeforeAll so that the tests may have parallel
         // execution. When there is no port given as first argument, it will grab a free port
         this.mockServer = ClientAndServer.startClientAndServer()
+
+        System.setProperty("mockserver.logLevel", logLevel.name)
     }
 
     fun tearDown() {
@@ -145,10 +154,113 @@ class MockHelper {
                         body: request.body,
                         headers: request.headers,
                         reflect: true,
-                        userAgent: request.headers['user-agent']
-                    }
+                        userAgent: (request.headers['user-agent'] || request.headers['User-Agent'] || [])[0]                    }
                 )
             };
         """
+    }
+}
+
+data class MockReflected(
+    val method: String,
+    val path: String,
+    val query: Parameters = listOf(),
+    val body: MockReflectedBody? = null,
+    val headers: Headers = Headers(),
+    val reflect: Boolean = true,
+    val userAgent: String? = null
+) {
+
+    operator fun get(key: String) = headers[key]
+
+    class Deserializer : ResponseDeserializable<MockReflected> {
+        override fun deserialize(content: String) = MockReflected.from(JSONObject(content))
+    }
+
+    companion object {
+        fun from(json: JSONObject): MockReflected {
+            val base = MockReflected(
+                method = json.getString("method"),
+                path = json.getString("path")
+            )
+
+            return json.keySet().fold(base) { current, key ->
+
+                if (json.isNull(key)) {
+                    current
+                } else {
+                    when (key) {
+                        "query" -> {
+                            val queryObject = json.getJSONObject(key)
+                            current.copy(
+                                query = queryObject.keySet().fold(listOf()) { query, parameter ->
+                                    if (queryObject.isNull(parameter)) {
+                                        query.plus(Pair(parameter, null))
+                                    } else {
+                                        val values = queryObject.get(parameter)
+                                        when (values) {
+                                            is JSONArray -> query.plus(Pair(parameter, values.toList()))
+                                            else -> query.plus(Pair(parameter, values.toString()))
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                        "body" -> current.copy(body = MockReflectedBody.from(json.getJSONObject(key)))
+                        "headers" -> current.copy(headers = Headers.from(json.getJSONObject(key).toMap()))
+                        "reflect" -> current.copy(reflect = json.getBoolean(key))
+                        "userAgent" -> current.copy(userAgent = json.getString("userAgent"))
+                        else -> current
+                    }
+                }
+            }
+        }
+    }
+}
+
+data class MockReflectedBody(
+    val type: String,
+    val string: String? = null,
+    val binary: ByteArray? = null,
+    val contentType: String? = null
+) {
+    companion object {
+        fun from(json: JSONObject): MockReflectedBody {
+            val base = MockReflectedBody(
+                type = json.getString("type"),
+                contentType = json.optString("contentType")
+            )
+
+            return when (base.type) {
+                "STRING" -> base.copy(string = json.getString("string"))
+                "BINARY" -> base.copy(binary = json.getString("binary").decodeBase64())
+                else -> base
+            }
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MockReflectedBody
+
+        if (type != other.type) return false
+        if (string != other.string) return false
+        if (binary != null) {
+            if (other.binary == null) return false
+            if (!binary.contentEquals(other.binary)) return false
+        } else if (other.binary != null) return false
+        if (contentType != other.contentType) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = type.hashCode()
+        result = 31 * result + (string?.hashCode() ?: 0)
+        result = 31 * result + (binary?.contentHashCode() ?: 0)
+        result = 31 * result + contentType.hashCode()
+        return result
     }
 }

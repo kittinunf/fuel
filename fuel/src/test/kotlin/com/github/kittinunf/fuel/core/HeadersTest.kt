@@ -1,11 +1,11 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.BaseTestCase
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class HeadersTest : BaseTestCase() {
 
@@ -14,9 +14,9 @@ class HeadersTest : BaseTestCase() {
         val left = HeaderName("my-case-insensitive-header")
         val right = HeaderName("My-Case-Insensitive-Header")
 
-        assertThat(left, isEqualTo(left))
-        assertThat(left, isEqualTo(right))
-        assertThat(left, not(isEqualTo(HeaderName("OtherHeader"))))
+        assertThat(left, equalTo(left))
+        assertThat(left, equalTo(right))
+        assertThat(left, not(equalTo(HeaderName("OtherHeader"))))
     }
 
     @Test
@@ -24,8 +24,8 @@ class HeadersTest : BaseTestCase() {
         val input = "My-Case-Insensitive-Header"
         val headerName = HeaderName(input)
 
-        assertThat(headerName.toString(), isEqualTo(input))
-        assertThat(headerName.name, isEqualTo(input))
+        assertThat(headerName.toString(), equalTo(input))
+        assertThat(headerName.name, equalTo(input))
     }
 
     @Test
@@ -37,8 +37,8 @@ class HeadersTest : BaseTestCase() {
 
         headers[header] = value
 
-        assertThat("Expected $header to exist", headers.containsKey(header), isEqualTo(true))
-        assertThat("Expected $testKey to exist", headers.containsKey(testKey), isEqualTo(true))
+        assertThat("Expected $header to exist", headers.containsKey(header), equalTo(true))
+        assertThat("Expected $testKey to exist", headers.containsKey(testKey), equalTo(true))
     }
 
     @Test
@@ -53,8 +53,8 @@ class HeadersTest : BaseTestCase() {
         headers[testKey] = newValue
 
         val values = headers[header]
-        assertThat(values.first(), isEqualTo(newValue))
-        assertThat(values.size, isEqualTo(1))
+        assertThat(values.first(), equalTo(newValue))
+        assertThat(values.size, equalTo(1))
     }
 
     @Test
@@ -66,8 +66,8 @@ class HeadersTest : BaseTestCase() {
 
         headers[header] = value
 
-        assertThat(headers[header].first(), isEqualTo(value))
-        assertThat(headers[testKey].first(), isEqualTo(value))
+        assertThat(headers[header].first(), equalTo(value))
+        assertThat(headers[testKey].first(), equalTo(value))
     }
 
     @Test
@@ -81,8 +81,8 @@ class HeadersTest : BaseTestCase() {
         headers[header] = newValue
 
         val values = headers[header]
-        assertThat(values.first(), isEqualTo(newValue))
-        assertThat(values.size, isEqualTo(1))
+        assertThat(values.first(), equalTo(newValue))
+        assertThat(values.size, equalTo(1))
     }
 
     @Test
@@ -96,9 +96,9 @@ class HeadersTest : BaseTestCase() {
         headers.append(header, newValue)
 
         val values = headers[header]
-        assertThat(values.first(), isEqualTo(originalValue))
-        assertThat(values.last(), isEqualTo(newValue))
-        assertThat(values.size, isEqualTo(2))
+        assertThat(values.first(), equalTo(originalValue))
+        assertThat(values.last(), equalTo(newValue))
+        assertThat(values.size, equalTo(2))
     }
 
     @Test
@@ -112,8 +112,8 @@ class HeadersTest : BaseTestCase() {
         headers.append(header, newValue)
 
         val values = headers[header]
-        assertThat(values.last(), isEqualTo(newValue))
-        assertThat(values.size, isEqualTo(1))
+        assertThat(values.last(), equalTo(newValue))
+        assertThat(values.size, equalTo(1))
     }
 
     @Test
@@ -127,7 +127,7 @@ class HeadersTest : BaseTestCase() {
         headers.remove(testKey)
 
         val values = headers[originalKey]
-        assertThat(values.size, isEqualTo(0))
+        assertThat(values.size, equalTo(0))
     }
 
     @Test
@@ -136,7 +136,7 @@ class HeadersTest : BaseTestCase() {
         assertThat(
             "Expected SET_COOKIE to not be collapsible",
             Headers.isCollapsible(Headers.SET_COOKIE),
-            isEqualTo(false)
+            equalTo(false)
         )
     }
 
@@ -152,7 +152,7 @@ class HeadersTest : BaseTestCase() {
             assertThat(
                 "Expected $it to be a single value",
                 Headers.isSingleValue(it),
-                isEqualTo(true)
+                equalTo(true)
             )
         }
     }
@@ -164,7 +164,7 @@ class HeadersTest : BaseTestCase() {
 
         // RFC specific, Cookie collapses with a semi-colon
         val collapsed = Headers.collapse(header, values)
-        assertThat(collapsed, isEqualTo(values.joinToString("; ")))
+        assertThat(collapsed, equalTo(values.joinToString("; ")))
     }
 
     @Test
@@ -172,7 +172,7 @@ class HeadersTest : BaseTestCase() {
         val header = HeaderName(Headers.ACCEPT_ENCODING)
         val values = listOf("gzip", "identity; q=0.1")
         val collapsed = Headers.collapse(header, values)
-        assertThat(collapsed, isEqualTo(values.joinToString(", ")))
+        assertThat(collapsed, equalTo(values.joinToString(", ")))
     }
 
     @Test
@@ -196,7 +196,7 @@ class HeadersTest : BaseTestCase() {
 
         val setCookieAdds = recordAdd[Headers.SET_COOKIE]
         assertThat("Expected SET_COOKIE to be added via 'add'", setCookieAdds, notNullValue())
-        assertThat(setCookieAdds!!.size, isEqualTo(2))
+        assertThat(setCookieAdds!!.size, equalTo(2))
 
         val acceptEncodingSets = recordSet[Headers.ACCEPT_ENCODING]
         val expectedCollapsedAcceptEncoding = Headers.collapse(
@@ -204,15 +204,15 @@ class HeadersTest : BaseTestCase() {
             headers[Headers.ACCEPT_ENCODING]
         )
         assertThat("Expected ACCEPT_ENCODING to be added via 'set'", acceptEncodingSets, notNullValue())
-        assertThat(acceptEncodingSets, isEqualTo(expectedCollapsedAcceptEncoding))
+        assertThat(acceptEncodingSets, equalTo(expectedCollapsedAcceptEncoding))
 
         val contentTypeSets = recordSet[Headers.CONTENT_TYPE]
         val expectedContentType = headers[Headers.CONTENT_TYPE].last()
 
         assertThat("Expected CONTENT_TYPE to be added via 'set'", contentTypeSets, notNullValue())
-        assertThat(contentTypeSets, isEqualTo(expectedContentType))
+        assertThat(contentTypeSets, equalTo(expectedContentType))
 
-        assertThat(recordSet.size, isEqualTo(2))
-        assertThat(recordAdd.size, isEqualTo(1))
+        assertThat(recordSet.size, equalTo(2))
+        assertThat(recordAdd.size, equalTo(1))
     }
 }

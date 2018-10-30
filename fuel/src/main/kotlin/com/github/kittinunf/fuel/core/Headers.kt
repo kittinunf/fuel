@@ -308,8 +308,12 @@ class Headers : MutableMap<String, HeaderValues> {
         const val ACCEPT = "Accept"
         const val ACCEPT_ENCODING = "Accept-Encoding"
         const val ACCEPT_LANGUAGE = "Accept-Language"
+        const val ACCEPT_TRANSFER_ENCODING = "TE"
         const val AGE = "Age"
         const val AUTHORIZATION = "Authorization"
+        const val CACHE_CONTROL = "Cache-Control"
+        const val CONTENT_DISPOSITION = "Content-Disposition"
+        const val CONTENT_ENCODING = "Content-Encoding"
         const val CONTENT_LENGTH = "Content-Length"
         const val CONTENT_LOCATION = "Content-Location"
         const val CONTENT_TYPE = "Content-Type"
@@ -318,6 +322,7 @@ class Headers : MutableMap<String, HeaderValues> {
         const val EXPIRES = "Expires"
         const val LOCATION = "Location"
         const val SET_COOKIE = "Set-Cookie"
+        const val TRANSFER_ENCODING = "Transfer-Encoding"
 
         /**
          * Below are lookup tables for various functions. The reason these are a map is that
@@ -332,9 +337,10 @@ class Headers : MutableMap<String, HeaderValues> {
 
         private val SINGLE_VALUE_HEADERS = mapOf(
             HeaderName(AGE) to true,
-            HeaderName(CONTENT_TYPE) to true,
+            HeaderName(CONTENT_ENCODING) to true,
             HeaderName(CONTENT_LENGTH) to true,
             HeaderName(CONTENT_LOCATION) to true,
+            HeaderName(CONTENT_TYPE) to true,
             HeaderName(EXPECT) to true,
             HeaderName(EXPIRES) to true,
             HeaderName(LOCATION) to true

@@ -1,20 +1,25 @@
 package com.github.kittinunf.fuel
 
+import com.github.kittinunf.fuel.core.Headers
+import com.github.kittinunf.fuel.core.Parameters
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.matchers.Times
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.HttpTemplate
+import org.slf4j.event.Level
 
 @Suppress("MemberVisibilityCanBePrivate")
 class MockHelper {
 
     private lateinit var mockServer: ClientAndServer
 
-    fun setup() {
+    fun setup(logLevel: Level = Level.WARN) {
         // This is not placed in a @BeforeClass / @BeforeAll so that the tests may have parallel
         // execution. When there is no port given as first argument, it will grab a free port
-        this.mockServer = ClientAndServer.startClientAndServer()
+        mockServer = ClientAndServer.startClientAndServer()
+
+        System.setProperty("mockserver.logLevel", logLevel.name)
     }
 
     fun tearDown() {
@@ -152,3 +157,22 @@ class MockHelper {
         """
     }
 }
+
+data class MockReflected(
+    val method: String,
+    val path: String,
+    val query: Parameters = listOf(),
+    val body: MockReflectedBody? = null,
+    val headers: Headers = Headers(),
+    val reflect: Boolean = true,
+    val userAgent: String? = null
+) {
+    operator fun get(key: String) = headers[key]
+}
+
+data class MockReflectedBody(
+    val type: String,
+    val string: String? = null,
+    val binary: ByteArray? = null,
+    val contentType: String? = null
+)
