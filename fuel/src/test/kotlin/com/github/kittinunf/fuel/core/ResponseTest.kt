@@ -1,10 +1,10 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.BaseTestCase
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.net.URL
-import org.hamcrest.CoreMatchers.`is` as equalTo
 
 class ResponseTest : BaseTestCase() {
     @Test
