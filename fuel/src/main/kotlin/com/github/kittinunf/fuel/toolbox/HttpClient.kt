@@ -217,10 +217,6 @@ internal class HttpClient(
     companion object {
         val SUPPORTED_DECODING = listOf("gzip", "deflate; q=0.5")
 
-        fun coerceMethod(method: Method): Method {
-            if (method == Method.PATCH)
-                return Method.POST
-            return method
-        }
+        private fun coerceMethod(method: Method) = if (method == Method.PATCH) Method.POST else method
     }
 }
