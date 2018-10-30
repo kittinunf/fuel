@@ -697,7 +697,7 @@ Fuel.get("/user-agent")
      //      MyFoo: "bar, baz"
     ```
 
-* `baseParams` is used to manage common `key=value` query param, which will be automatically included in all of your subsequent requests in format of ` List<Pair<String, Any?>>` (`Any` is converted to `String` by `toString()` method)
+* `baseParams` is used to manage common `key=value` query param, which will be automatically included in all of your subsequent requests in format of ` Parameters` (`Any` is converted to `String` by `toString()` method)
     ```kotlin
     FuelManager.instance.baseParams = listOf("api_key" to "1234567890")
     
@@ -810,7 +810,7 @@ sealed class WeatherApi: FuelRouting {
             }
         }
 
-    override val params: List<Pair<String, Any?>>?
+    override val params: Parameters?
         get() {
             return when(this) {
                 is weatherFor -> listOf("query" to this.location)

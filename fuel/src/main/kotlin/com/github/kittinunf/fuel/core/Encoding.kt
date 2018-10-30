@@ -12,12 +12,12 @@ class Encoding(
     val urlString: String,
     val requestType: Request.Type = Request.Type.REQUEST,
     val baseUrlString: String? = null,
-    val parameters: List<Pair<String, Any?>>? = null,
+    val parameters: Parameters? = null,
     val timeoutInMillisecond: Int = 15000,
     val timeoutReadInMillisecond: Int = timeoutInMillisecond
 ) : Fuel.RequestConvertible {
 
-    private val encoder: (Method, String, List<Pair<String, Any?>>?) -> Request = { method, path, parameters ->
+    private val encoder: (Method, String, Parameters?) -> Request = { method, path, parameters ->
         var modifiedPath = path
         var data: String? = null
         val headerPairs = Headers.from(defaultHeaders)
@@ -82,7 +82,7 @@ class Encoding(
         else -> false
     }
 
-    private fun queryFromParameters(params: List<Pair<String, Any?>>?): String = params.orEmpty()
+    private fun queryFromParameters(params: Parameters?): String = params.orEmpty()
             .filterNot { it.second == null }
             .map { (key, value) -> URLEncoder.encode(key, "UTF-8") to URLEncoder.encode("$value", "UTF-8") }
             .joinToString("&") { (key, value) -> "$key=$value" }

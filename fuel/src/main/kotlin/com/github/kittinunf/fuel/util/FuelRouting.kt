@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Encoding
 import com.github.kittinunf.fuel.core.HeaderValues
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Parameters
 import com.github.kittinunf.fuel.core.Request
 
 /**
@@ -26,7 +27,7 @@ interface FuelRouting : Fuel.RequestConvertible {
      * Parameters for the remote call.
      * It uses a pair with String, Any.
      */
-    val params: List<Pair<String, Any?>>?
+    val params: Parameters?
     /**
      * Body to handle binary type of request (e.g. application/octet-stream )
      */

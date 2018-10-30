@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Parameters
 import com.github.kittinunf.fuel.core.Request
 import org.junit.After
 import org.junit.Before
@@ -32,7 +33,7 @@ abstract class MockHttpTestCase {
     fun reflectedRequest(
         method: Method,
         path: String,
-        parameters: List<Pair<String, Any?>>? = null,
+        parameters: Parameters? = null,
         manager: FuelManager = FuelManager.instance
     ): Request {
         mock.chain(
