@@ -14,7 +14,7 @@ import java.nio.charset.Charset
 
 private fun <T : Any> Request.monoResult(block: Request.(MonoSink<T>) -> Unit): Mono<T> =
     Mono.create<T> { sink ->
-        sink.onCancel(this::cancel)
+        sink.onCancel { cancel() }
         block(sink)
     }
 

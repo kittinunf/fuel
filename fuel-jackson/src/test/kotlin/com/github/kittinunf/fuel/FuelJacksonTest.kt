@@ -13,34 +13,13 @@ import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
-import org.junit.After
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import org.mockserver.matchers.Times
 import java.net.HttpURLConnection
 
-class FuelJacksonTest {
-
-    init {
-        Fuel.testMode {
-            timeout = 15000
-        }
-    }
-
-    private lateinit var mock: MockHelper
-
-    @Before
-    fun setup() {
-        this.mock = MockHelper()
-        this.mock.setup()
-    }
-
-    @After
-    fun tearDown() {
-        this.mock.tearDown()
-    }
+class FuelJacksonTest : MockHttpTestCase() {
 
     // Model
     data class HttpBinUserAgentModel(var userAgent: String = "")
@@ -201,16 +180,26 @@ class FuelJacksonTest {
             times = Times.exactly(2)
         )
 
-        Fuel.get(mock.path("issues")).response { _: Request, response: Response, result: Result<ByteArray, FuelError> ->
-            var issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response)
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-            issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response.dataStream)!!
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-            issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response.dataStream.reader())!!
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-            issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
+        Fuel.get(mock.path("issues")).response { _: Request, response: Response, _ ->
+            val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response)
             assertThat(issueList[0], isA(IssueInfo::class.java))
         }
+
+        Fuel.get(mock.path("issues")).response { _: Request, response: Response, _ ->
+            val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response.body().toStream())!!
+            assertThat(issueList[0], isA(IssueInfo::class.java))
+        }
+
+        Fuel.get(mock.path("issues")).response { _: Request, response: Response, _ ->
+            val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response.body().toStream().reader())!!
+            assertThat(issueList[0], isA(IssueInfo::class.java))
+        }
+
+        Fuel.get(mock.path("issues")).response { _: Request, _, result: Result<ByteArray, FuelError> ->
+            val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
+            assertThat(issueList[0], isA(IssueInfo::class.java))
+        }
+
         Fuel.get(mock.path("issues")).responseString { _: Request, _: Response, result: Result<String, FuelError> ->
             val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
             assertThat(issueList[0], isA(IssueInfo::class.java))

@@ -1,43 +1,19 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.util.readWriteLazy
 import java.io.ByteArrayInputStream
-import java.io.IOException
-import java.io.InputStream
 import java.net.URL
 import java.net.URLConnection
 
-class Response(
+data class Response(
     val url: URL,
     val statusCode: Int = -1,
     val responseMessage: String = "",
     val headers: Headers = Headers(),
     val contentLength: Long = 0L,
-    val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
+    internal var body: Body = DefaultBody()
 ) {
-    @Deprecated(replaceWith = ReplaceWith("contentLength"), message = "http naming is deprecated, use 'contentLength' instead")
-    val httpContentLength
-        get() = contentLength
-
-    @Deprecated(replaceWith = ReplaceWith("responseMessage"), message = "http naming is deprecated, use 'responseMessage' instead")
-    val httpResponseMessage
-        get() = responseMessage
-
-    @Deprecated(replaceWith = ReplaceWith("statusCode"), message = "http naming is deprecated, use 'statusCode' instead")
-    val httpStatusCode
-        get() = statusCode
-
-    @Deprecated(replaceWith = ReplaceWith("headers"), message = "http naming is deprecated, use 'headers' instead")
-    val httpResponseHeaders
-        get() = headers
-
-    var data: ByteArray by readWriteLazy {
-        try {
-            dataStream.readBytes()
-        } catch (ex: IOException) { // If dataStream closed by deserializer
-            ByteArray(0)
-        }
-    }
+    fun body(): Body = body
+    val data get() = body.toByteArray()
 
     /**
      * Get the current values of the header, after normalisation of the header
@@ -52,13 +28,18 @@ class Response(
 
     override fun toString(): String {
         val contentType = guessContentType()
-        val dataString = processBody(contentType, data)
+
+        val bodyString = when {
+            body.isEmpty() -> "empty"
+            body.isConsumed() -> "consumed"
+            else -> processBody(contentType, body.toByteArray())
+        }
 
         return buildString {
             appendln("<-- $statusCode ($url)")
             appendln("Response : $responseMessage")
             appendln("Length : $contentLength")
-            appendln("Body : ($dataString)")
+            appendln("Body : ($bodyString)")
             appendln("Headers : (${headers.size})")
 
             val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }

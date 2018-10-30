@@ -25,7 +25,7 @@ class FuelManager {
     var timeoutReadInMillisecond: Int = timeoutInMillisecond
 
     var baseHeaders: Map<String, String>? = null
-    var baseParams: List<Pair<String, Any?>> = emptyList()
+    var baseParams: Parameters = emptyList()
 
     var keystore: KeyStore? = null
     var socketFactory: SSLSocketFactory by readWriteLazy {
@@ -62,43 +62,43 @@ class FuelManager {
     // callback executor
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
-    fun request(method: Method, path: String, param: List<Pair<String, Any?>>? = null): Request {
+    fun request(method: Method, path: String, param: Parameters? = null): Request {
         val request = request(Encoding(
-                httpMethod = method,
-                urlString = path,
-                baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param,
-                timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond
+            httpMethod = method,
+            urlString = path,
+            baseUrlString = basePath,
+            parameters = if (param == null) baseParams else baseParams + param,
+            timeoutInMillisecond = timeoutInMillisecond,
+            timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request)
         return request(request)
     }
 
-    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request =
+    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: Parameters? = null): Request =
             request(method, convertible.path, param)
 
-    fun download(path: String, param: List<Pair<String, Any?>>? = null): Request {
+    fun download(path: String, param: Parameters? = null): Request {
         val request = Encoding(
-                httpMethod = Method.GET,
-                urlString = path,
-                requestType = Request.Type.DOWNLOAD,
-                baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param,
-                timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond
+            httpMethod = Method.GET,
+            urlString = path,
+            requestType = Request.Type.DOWNLOAD,
+            baseUrlString = basePath,
+            parameters = if (param == null) baseParams else baseParams + param,
+            timeoutInMillisecond = timeoutInMillisecond,
+            timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request
         return request(request)
     }
 
-    fun upload(path: String, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
+    fun upload(path: String, method: Method = Method.POST, param: Parameters? = null): Request {
         val request = Encoding(
-                httpMethod = method,
-                urlString = path,
-                requestType = Request.Type.UPLOAD,
-                baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param,
-                timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond
+            httpMethod = method,
+            urlString = path,
+            requestType = Request.Type.UPLOAD,
+            baseUrlString = basePath,
+            parameters = if (param == null) baseParams else baseParams + param,
+            timeoutInMillisecond = timeoutInMillisecond,
+            timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request
         return request(request)
     }

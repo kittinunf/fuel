@@ -1,17 +1,17 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.Request.Companion.toString
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
 import com.github.kittinunf.fuel.core.requests.TaskRequest
+import com.github.kittinunf.fuel.core.requests.UploadSourceCallback
 import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
 import com.github.kittinunf.fuel.util.encodeBase64ToString
-import com.github.kittinunf.result.Result
-import java.io.ByteArrayOutputStream
+import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.OutputStream
+import java.io.FileInputStream
+import java.io.InputStream
 import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.Callable
@@ -21,8 +21,9 @@ import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
-typealias RequestTransformer = (Request) -> Request
-typealias ResponseTransformer = (Request, Response) -> Response
+private typealias RequestTransformer = (Request) -> Request
+private typealias ResponseTransformer = (Request, Response) -> Response
+typealias Parameters = List<Pair<String, Any?>>
 
 class Request(
     val method: Method,
@@ -30,13 +31,16 @@ class Request(
     val url: URL,
     var type: Type = Type.REQUEST,
     val headers: Headers = Headers(),
-    val parameters: List<Pair<String, Any?>> = listOf(),
-    var name: String = "",
+    val parameters: Parameters = listOf(),
+    var name: String = "file",
     val names: MutableList<String> = mutableListOf(),
     val mediaTypes: MutableList<String> = mutableListOf(),
     var isAllowRedirects: Boolean = true,
+    var useHttpCache: Boolean? = null,
+    var decodeContent: Boolean? = null,
     var timeoutInMillisecond: Int = 15_000,
-    var timeoutReadInMillisecond: Int = 15_000
+    var timeoutReadInMillisecond: Int = 15_000,
+    internal var body: Body = DefaultBody()
 ) : Fuel.RequestConvertible {
     enum class Type {
         REQUEST,
@@ -44,14 +48,8 @@ class Request(
         UPLOAD
     }
 
-    // body
-    var bodyCallback: ((Request, OutputStream?, Long) -> Long)? = null
-
-    private fun getHttpBody(): ByteArray = ByteArrayOutputStream().apply {
-        bodyCallback?.invoke(request, this, 0)
-    }.toByteArray()
-
     internal lateinit var client: Client
+    fun body(): Body = body
 
     // underlying task request
     internal val taskRequest: TaskRequest by lazy {
@@ -231,22 +229,86 @@ class Request(
         return this
     }
 
-    fun body(body: ByteArray): Request {
-        bodyCallback = { _, outputStream, _ ->
-            outputStream?.write(body)
-            body.size.toLong()
-        }
+    /**
+     * Sets the body to be read from a generic body source.
+     *
+     * @note in earlier versions the body callback would be called multiple times in order to maybe get the size. But
+     *  that would lead to closed streams being unable to be read. If the size is known, set it before anything else.
+     *
+     * @param openStream [BodySource] a function that yields a stream
+     * @param calculateLength [Number?] size in +bytes+ if it is known
+     * @param charset [Charset] the charset to write with
+     *
+     * @return [Request] the request
+     */
+    fun body(openStream: BodySource, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request {
+        this.body = DefaultBody.from(openStream = openStream, calculateLength = calculateLength, charset = charset)
         return this
     }
 
-    fun body(body: String, charset: Charset = Charsets.UTF_8): Request = body(body.toByteArray(charset))
+    /**
+     * Sets the body from a generic stream
+     *
+     * @note the stream will be read from the position it's at. Make sure you rewind it if you want it to be read from
+     *  the start.
+     *
+     * @param stream [InputStream] a stream to read from
+     * @param calculateLength [Number?] size in bytes if it is known
+     * @param charset [Charset] the charset to write with
+     *
+     * @return [Request] the request
+     */
+    fun body(stream: InputStream, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8) =
+        body({ stream }, calculateLength, charset)
 
+    /**
+     * Sets the body from a byte array
+     *
+     * @param bytes [ByteArray] the bytes to write
+     * @param charset [Charset] the charset to write with
+     * @return [Request] the request
+     */
+    fun body(bytes: ByteArray, charset: Charset = Charsets.UTF_8) =
+        body(ByteArrayInputStream(bytes), { bytes.size.toLong() }, charset)
+
+    /**
+     * Sets the body from a string
+     *
+     * @param body [String] the string to write
+     * @param charset [Charset] the charset to write with
+     * @return [Request] the request
+     */
+    fun body(body: String, charset: Charset = Charsets.UTF_8): Request =
+        body(body.toByteArray(charset), charset)
+
+    /**
+     * Sets the body to the contents of a file.
+     *
+     * @note this does *NOT* make this a multipart upload. For that you can use the upload request. This function can be
+     *  used if you want to upload the single contents of a text based file as an inline body.
+     *
+     * @note when charset is not UTF-8, this forces the client to use chunked encoding, because file.length() gives the
+     *  length of the file in bytes without considering the charset. If the charset is to be considered, the file needs
+     *  to be read in its entirety which defeats the purpose of using a file.
+     *
+     * @param file [File] the file to write to the body
+     * @param charset [Charset] the charset to write with
+     * @return [Request] the request
+     */
+    fun body(file: File, charset: Charset = Charsets.UTF_8): Request = when (charset) {
+        Charsets.UTF_8 -> body({ FileInputStream(file) }, { file.length() }, charset)
+        else -> body({ FileInputStream(file) }, null, charset)
+    }
+
+    /**
+     * Set the body to a JSON string and automatically set the json content type
+     */
     fun jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request {
         this[Headers.CONTENT_TYPE] = "application/json"
         return body(body, charset)
     }
 
-    fun progress(handler: (readBytes: Long, totalBytes: Long) -> Unit): Request {
+    fun progress(handler: ProgressCallback): Request {
         val taskRequest = taskRequest
         when (taskRequest) {
             is DownloadTaskRequest -> {
@@ -263,7 +325,7 @@ class Request(
     /**
      *  Replace each pair, using the key as header name and value as header content
      */
-    fun blobs(blobs: (Request, URL) -> Iterable<Blob>): Request {
+    fun blobs(blobs: UploadSourceCallback): Request {
         val uploadTaskRequest = taskRequest as? UploadTaskRequest
                 ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
         uploadTaskRequest.sourceCallback = blobs
@@ -361,13 +423,12 @@ class Request(
     }
 
     fun callback(f: () -> Unit) {
-        callbackExecutor.execute {
-            f.invoke()
-        }
+        callbackExecutor.execute { f() }
     }
 
-    fun cancel() {
+    fun cancel(): Request {
         taskFuture?.cancel(true)
+        return this
     }
 
     override val request: Request get() = this
@@ -381,8 +442,15 @@ class Request(
      * @return [String] the string representation
      */
     override fun toString(): String = buildString {
+
+        val bodyString = when {
+            body.isEmpty() -> "(empty)"
+            body.isConsumed() -> "(consumed)"
+            else -> String(body.toByteArray())
+        }
+
         appendln("--> $url")
-        appendln("\"Body : ${if (getHttpBody().isNotEmpty()) String(getHttpBody()) else "(empty)"}\"")
+        appendln("\"Body : $bodyString\"")
         appendln("\"Headers : (${headers.size})\"")
 
         val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
@@ -409,7 +477,7 @@ class Request(
 
         // body
         appendln()
-        appendln(String(getHttpBody()))
+        appendln(String(body.toByteArray()))
     }
 
     /**
@@ -421,7 +489,7 @@ class Request(
      * @return [String] the string representation
      */
     fun cUrlString(): String = buildString {
-        append("$ curl -i")
+        append("curl -i")
 
         // method
         if (method != Method.GET) {
@@ -429,7 +497,7 @@ class Request(
         }
 
         // body
-        val escapedBody = String(getHttpBody()).replace("\"", "\\\"")
+        val escapedBody = String(body.toByteArray()).replace("\"", "\\\"")
         if (escapedBody.isNotEmpty()) {
             append(" -d \"$escapedBody\"")
         }
@@ -442,35 +510,28 @@ class Request(
         append(" $url")
     }
 
-    // byte array
-    fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit) =
-            response(byteArrayDeserializer(), handler)
+    fun response(handler: HandlerWithResult<ByteArray>) =
+        response(ByteArrayDeserializer(), handler)
+    fun response(handler: Handler<ByteArray>) =
+        response(ByteArrayDeserializer(), handler)
+    fun response() =
+        response(ByteArrayDeserializer())
 
-    fun response(handler: Handler<ByteArray>) = response(byteArrayDeserializer(), handler)
-
-    fun response() = response(byteArrayDeserializer())
-
-    // string
-    fun responseString(charset: Charset = Charsets.UTF_8, handler: (Request, Response, Result<String, FuelError>) -> Unit) =
-            response(stringDeserializer(charset), handler)
-
-    fun responseString(charset: Charset, handler: Handler<String>) = response(stringDeserializer(charset), handler)
-
-    fun responseString(handler: Handler<String>) = response(stringDeserializer(), handler)
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: HandlerWithResult<String>) =
+        response(StringDeserializer(charset), handler)
+    fun responseString(charset: Charset, handler: Handler<String>) =
+        response(StringDeserializer(charset), handler)
+    fun responseString(handler: Handler<String>) =
+        response(StringDeserializer(), handler)
 
     @JvmOverloads
-    fun responseString(charset: Charset = Charsets.UTF_8) = response(stringDeserializer(charset))
+    fun responseString(charset: Charset = Charsets.UTF_8) =
+        response(StringDeserializer(charset))
 
-    // object
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit) = response(deserializer, handler)
-
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) = response(deserializer, handler)
-
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) = response(deserializer)
-
-    companion object {
-        fun byteArrayDeserializer() = ByteArrayDeserializer()
-
-        fun stringDeserializer(charset: Charset = Charsets.UTF_8) = StringDeserializer(charset)
-    }
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: HandlerWithResult<T>) =
+        response(deserializer, handler)
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) =
+        response(deserializer, handler)
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) =
+            response(deserializer)
 }

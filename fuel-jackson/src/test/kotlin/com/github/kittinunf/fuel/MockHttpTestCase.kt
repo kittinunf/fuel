@@ -8,9 +8,15 @@ import org.junit.After
 import org.junit.Before
 import org.slf4j.event.Level
 
-abstract class MockHttpTestCase : BaseTestCase() {
+abstract class MockHttpTestCase {
 
     protected lateinit var mock: MockHelper
+
+    init {
+        Fuel.testMode {
+            timeout = 15000
+        }
+    }
 
     @Before
     fun setup() {

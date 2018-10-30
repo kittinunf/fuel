@@ -6,7 +6,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.requests.retrieveBoundaryInfo
+import com.github.kittinunf.fuel.core.requests.UploadBody
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.isA
@@ -206,8 +206,8 @@ class RequestUploadTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val string = data as String
-        assertThat(string, containsString("file-name1"))
-        assertThat(string, containsString("file-name2"))
+        assertThat(string, containsString("file-name_1"))
+        assertThat(string, containsString("file-name_2"))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response.statusCode, isEqualTo(statusCode))
@@ -340,7 +340,7 @@ class RequestUploadTest : MockHttpTestCase() {
                 timeoutReadInMillisecond = 15000)
         request.header(Pair(Headers.CONTENT_TYPE, "multipart/form-data; boundary=160f77ec3eff"))
 
-        val boundary = retrieveBoundaryInfo(request)
+        val boundary = UploadBody.retrieveBoundaryInfo(request)
 
         assertThat(boundary, equalTo("160f77ec3eff"))
     }
@@ -350,7 +350,7 @@ class RequestUploadTest : MockHttpTestCase() {
         val request = Request(Method.POST, "", URL("http://httpbin.org"),
                 timeoutInMillisecond = 15000,
                 timeoutReadInMillisecond = 15000)
-        val boundary = retrieveBoundaryInfo(request)
+        val boundary = UploadBody.retrieveBoundaryInfo(request)
 
         assertThat(boundary, notNullValue())
     }

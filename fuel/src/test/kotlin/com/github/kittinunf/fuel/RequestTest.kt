@@ -607,37 +607,44 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetCurlString() {
-        val request = Request(method = Method.GET,
-                path = "",
-                url = URL("http://httpbin.org/get"),
-                headers = Headers.from("Authentication" to "Bearer xxx"),
-                parameters = listOf("foo" to "xxx"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000)
+        val request = Request(
+            method = Method.GET,
+            path = "",
+            url = URL("http://httpbin.org/get"),
+            headers = Headers.from("Authentication" to "Bearer xxx"),
+            parameters = listOf("foo" to "xxx"),
+            timeoutInMillisecond = 15000,
+            timeoutReadInMillisecond = 15000
+        )
 
-        assertThat(request.cUrlString(), isEqualTo("$ curl -i -H \"Authentication:Bearer xxx\" http://httpbin.org/get"))
+        assertThat(request.cUrlString(), isEqualTo("curl -i -H \"Authentication:Bearer xxx\" http://httpbin.org/get"))
     }
 
     @Test
     fun httpPostCurlString() {
-        val request = Request(method = Method.POST,
-                path = "",
-                url = URL("http://httpbin.org/post"),
-                headers = Headers.from("Authentication" to "Bearer xxx"),
-                parameters = listOf("foo" to "xxx"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000)
+        val request = Request(
+            method = Method.POST,
+            path = "",
+            url = URL("http://httpbin.org/post"),
+            headers = Headers.from("Authentication" to "Bearer xxx"),
+            parameters = listOf("foo" to "xxx"),
+            timeoutInMillisecond = 15000,
+            timeoutReadInMillisecond = 15000
+        )
 
-        assertThat(request.cUrlString(), isEqualTo("$ curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
+        assertThat(request.cUrlString(), isEqualTo("curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
     }
 
     @Test
     fun httpStringWithOutParams() {
-        val request = Request(Method.GET, "",
-                url = URL("http://httpbin.org/post"),
-                headers = Headers.from("Content-Type" to "text/html"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000)
+        val request = Request(
+            Method.GET,
+            "",
+            url = URL("http://httpbin.org/post"),
+            headers = Headers.from("Content-Type" to "text/html"),
+            timeoutInMillisecond = 15000,
+            timeoutReadInMillisecond = 15000
+        )
 
         assertThat(request.httpString(), startsWith("GET http"))
         assertThat(request.httpString(), containsString("Content-Type"))
@@ -645,12 +652,15 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpStringWithParams() {
-        val request = Request(Method.POST, "",
-                url = URL("http://httpbin.org/post"),
-                headers = Headers.from("Content-Type" to "text/html"),
-                parameters = listOf("foo" to "xxx"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000).body("it's a body")
+        val request = Request(
+            Method.POST,
+            "",
+            url = URL("http://httpbin.org/post"),
+            headers = Headers.from("Content-Type" to "text/html"),
+            parameters = listOf("foo" to "xxx"),
+            timeoutInMillisecond = 15000,
+            timeoutReadInMillisecond = 15000
+        ).body("it's a body")
 
         assertThat(request.httpString(), startsWith("POST http"))
         assertThat(request.httpString(), containsString("Content-Type"))
