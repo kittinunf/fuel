@@ -46,7 +46,7 @@ internal data class UploadBody(
             // The entire body is now in memory, and can act as a regular body
             request.body = DefaultBody.from(
                 { ByteArrayInputStream(this) },
-                { this.size }
+                { this.size.toLong() }
             )
         }
     }
@@ -60,7 +60,7 @@ internal data class UploadBody(
 
         val sourceCallback = taskRequest.sourceCallback
         val progressCallback = taskRequest.progressCallback
-        val expectedLength = length!!.toLong()
+        val expectedLength = length!!
 
         outputStream.buffered().apply {
             // Parameters
@@ -99,7 +99,7 @@ internal data class UploadBody(
         inputAvailable = false
     }
 
-    override val length: Number? by lazy {
+    override val length: Long? by lazy {
         (
             // Parameters size
             request.parameters.sumByDouble { (name, data) ->

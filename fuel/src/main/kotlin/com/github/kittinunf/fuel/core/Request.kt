@@ -269,7 +269,7 @@ class Request(
      * @return [Request] the request
      */
     fun body(bytes: ByteArray, charset: Charset = Charsets.UTF_8) =
-        body(ByteArrayInputStream(bytes), { bytes.size }, charset)
+        body(ByteArrayInputStream(bytes), { bytes.size.toLong() }, charset)
 
     /**
      * Sets the body from a string

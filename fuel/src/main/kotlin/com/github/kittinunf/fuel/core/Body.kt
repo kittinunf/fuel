@@ -7,7 +7,7 @@ import java.io.OutputStream
 import java.nio.charset.Charset
 
 typealias BodySource = (() -> InputStream)
-typealias BodyLength = (() -> Number)
+typealias BodyLength = (() -> Long)
 
 interface Body {
     /**
@@ -56,9 +56,9 @@ interface Body {
 
     /**
      * Returns the length of the body in bytes
-     * @return [Number?] the length in bytes, null if it is unknown
+     * @return [Long?] the length in bytes, null if it is unknown
      */
-    val length: Number?
+    val length: Long?
 }
 
 data class DefaultBody(
@@ -77,7 +77,7 @@ data class DefaultBody(
             it.toByteArray()
         }.apply {
             openStream = { ByteArrayInputStream(this) }
-            calculateLength = { this.size }
+            calculateLength = { this.size.toLong() }
         }
     }
 
@@ -102,12 +102,12 @@ data class DefaultBody(
         }
     }
 
-    override fun isEmpty() = openStream === EMPTY_STREAM || (length?.toLong() == 0L)
+    override fun isEmpty() = openStream === EMPTY_STREAM || (length == 0L)
     override fun isConsumed() = openStream === CONSUMED_STREAM
 
-    override val length: Number? by lazy {
+    override val length: Long? by lazy {
         calculateLength?.invoke()?.let {
-            if (it.toLong() == -1L) { null } else { it }
+            if (it == -1L) { null } else { it }
         }
     }
 

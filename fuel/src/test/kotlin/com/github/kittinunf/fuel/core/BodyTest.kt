@@ -114,7 +114,7 @@ class BodyTest : BaseTestCase() {
     @Test
     fun bodyToByteArrayLoadsItIntoMemory() {
         val value = "String Body ${Math.random()}"
-        val body = DefaultBody.from({ ByteArrayInputStream(value.toByteArray()) }, { value.length })
+        val body = DefaultBody.from({ ByteArrayInputStream(value.toByteArray()) }, { value.length.toLong() })
         body.toByteArray()
 
         val output = ByteArrayOutputStream(value.length)
