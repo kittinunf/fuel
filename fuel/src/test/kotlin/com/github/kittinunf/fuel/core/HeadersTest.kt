@@ -1,11 +1,11 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.BaseTestCase
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.hamcrest.CoreMatchers.`is` as equalTo
 
 class HeadersTest : BaseTestCase() {
 
