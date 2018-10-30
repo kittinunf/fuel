@@ -1,6 +1,6 @@
 # Fuel
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0.rc.146-blue.svg)](https://kotlinlang.org) 
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0-blue.svg)](https://kotlinlang.org) 
 [![bintray](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg)](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) 
 [![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
 [![Codecov](https://codecov.io/github/kittinunf/Fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/Fuel)
@@ -22,7 +22,7 @@ The easiest HTTP networking library for Kotlin/Android.
 - [x] Special test mode for easier testing
 - [x] Support for reactive programming via RxJava 2.x and Project Reactor 3.x
 - [x] Google Components [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) support
-- [x] Built-in object serialization module (Gson, Jackson, Moshi, Forge) :sparkles:
+- [x] Built-in object serialization module (kotlinx-serialization, Gson, Jackson, Moshi, Forge) :sparkles:
 - [x] Support Kotlin's [Coroutines](https://github.com/Kotlin/kotlinx.coroutines) module
 - [x] API Routing
 
