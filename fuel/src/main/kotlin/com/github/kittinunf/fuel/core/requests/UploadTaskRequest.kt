@@ -139,7 +139,7 @@ internal data class UploadBody(
 
             blob.inputStream().use {
                 it.copyTo(this, PROGRESS_BUFFER_SIZE, progress = { writtenBytes ->
-                    progress.invoke(headerLength + writtenBytes, headerLength + blob.length)
+                    progress(headerLength + writtenBytes, headerLength + blob.length)
                 })
             }
 

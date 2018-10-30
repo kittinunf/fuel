@@ -423,13 +423,12 @@ class Request(
     }
 
     fun callback(f: () -> Unit) {
-        callbackExecutor.execute {
-            f.invoke()
-        }
+        callbackExecutor.execute { f() }
     }
 
-    fun cancel() {
+    fun cancel(): Request {
         taskFuture?.cancel(true)
+        return this
     }
 
     override val request: Request get() = this

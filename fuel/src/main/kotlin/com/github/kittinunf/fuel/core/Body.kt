@@ -81,7 +81,7 @@ data class DefaultBody(
         }
     }
 
-    override fun toStream(): InputStream = openStream.invoke().buffered().apply {
+    override fun toStream(): InputStream = openStream().buffered().apply {
         // The caller is now responsible for this stream. This make sure that you can't call this twice without handling
         // it. The caller must still call `.close()` on the returned value when done.
         openStream = CONSUMED_STREAM
@@ -89,7 +89,7 @@ data class DefaultBody(
 
     override fun writeTo(outputStream: OutputStream) {
         outputStream.apply {
-            val reader = openStream.invoke()
+            val reader = openStream()
             // `copyTo` writes efficiently using a buffer. Reading ensured to be buffered by calling `.buffered`
             reader.buffered().copyTo(this)
             reader.close()
