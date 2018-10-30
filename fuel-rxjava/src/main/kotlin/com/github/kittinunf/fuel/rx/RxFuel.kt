@@ -11,33 +11,89 @@ import com.github.kittinunf.result.Result
 import io.reactivex.Single
 import java.nio.charset.Charset
 
-fun Request.rx_response() = rx_response(ByteArrayDeserializer())
+private fun <T : Any> Request.rxResponse(deserializable: Deserializable<T>): Single<Pair<Response, Result<T, FuelError>>> =
+    rx {
+        val (_, response, result) = response(deserializable)
+        response to result
+    }
 
-fun Request.rx_responseString(charset: Charset = Charsets.UTF_8) = rx_response(StringDeserializer(charset))
+private fun <T : Any> Request.rxResult(deserializable: Deserializable<T>): Single<Result<T, FuelError>> =
+    rx {
+        val (_, _, result) = response(deserializable)
+        result
+    }
 
-fun <T : Any> Request.rx_responseObject(deserializable: Deserializable<T>) = rx_response(deserializable)
+/**
+ * Returns a reactive stream for a [Single] value response [ByteArray]
+ *
+ * @see rxBytes
+ * @return [Single<Pair<Response, Result<ByteArray, FuelError>>>] the [ByteArray] wrapped into a [Pair] and [Result]
+ */
+fun Request.rxResponse() =
+    rxResponse(ByteArrayDeserializer())
 
-private fun <T : Any> Request.rx_response(deserializable: Deserializable<T>): Single<Pair<Response, Result<T, FuelError>>> =
-        rx {
-            val (_, response, result) = response(deserializable)
-            response to result
-        }
+/**
+ * Returns a reactive stream for a [Single] value response [String]
+ *
+ * @see rxString
+ *
+ * @param charset [Charset] the character set to deserialize with
+ * @return [Single<Pair<Response, Result<String, FuelError>>>] the [String] wrapped into a [Pair] and [Result]
+ */
+fun Request.rxResponseString(charset: Charset = Charsets.UTF_8) =
+    rxResponse(StringDeserializer(charset))
 
-fun Request.rx_bytes() = rx_result(ByteArrayDeserializer())
+/**
+ * Returns a reactive stream for a [Single] value response object [T]
+ *
+ * @see rxObject
+ *
+ * @param deserializable [Deserializable<T>] something that can deserialize the [Response] to a [T]
+ * @return [Single<Pair<Response, Result<T, FuelError>>>] the [T] wrapped into a [Pair] and [Result]
+ */
+fun <T : Any> Request.rxResponseObject(deserializable: Deserializable<T>) =
+    rxResponse(deserializable)
 
-fun Request.rx_string(charset: Charset = Charsets.UTF_8) = rx_result(StringDeserializer(charset))
+/**
+ * Returns a reactive stream for a [Single] value response [ByteArray]
+ *
+ * @see rxResponse
+ * @return [Single<Result<ByteArray, FuelError>>] the [ByteArray] wrapped into a [Result]
+ */
+fun Request.rxBytes() =
+    rxResult(ByteArrayDeserializer())
 
-fun <T : Any> Request.rx_object(deserializable: Deserializable<T>) = rx_result(deserializable)
+/**
+ * Returns a reactive stream for a [Single] value response [ByteArray]
+ *
+ * @see rxResponseString
+ *
+ * @param charset [Charset] the character set to deserialize with
+ * @return [Single<Result<String, FuelError>>] the [String] wrapped into a [Result]
+ */
+fun Request.rxString(charset: Charset = Charsets.UTF_8) =
+    rxResult(StringDeserializer(charset))
 
-private fun <T : Any> Request.rx_result(deserializable: Deserializable<T>): Single<Result<T, FuelError>> =
-        rx {
-            val (_, _, result) = response(deserializable)
-            result
-        }
+/**
+ * Returns a reactive stream for a [Single] value response [T]
+ *
+ * @see rxResponseObject
+ *
+ * @param deserializable [Deserializable<T>] something that can deserialize the [Response] to a [T]
+ * @return [Single<Result<T, FuelError>>] the [T] wrapped into a [Result]
+ */
+fun <T : Any> Request.rxObject(deserializable: Deserializable<T>) =
+    rxResult(deserializable)
 
-fun <R : Any> Request.rx(resultBlock: Request.() -> R): Single<R> =
-        Single.create { emitter ->
-            val result = resultBlock()
-            emitter.onSuccess(result)
-            emitter.setCancellable { this.cancel() }
-        }
+/**
+ * Generic [Single] wrapper that executes [resultBlock] and emits its result [R] to the [Single]
+ *
+ * @param resultBlock [() -> R] function that returns [R]
+ * @return [Single] the reactive stream for a [Single] with response [R]
+ */
+fun <R : Any> Request.rx(resultBlock: () -> R): Single<R> =
+    Single.create { emitter ->
+        val result = resultBlock()
+        emitter.onSuccess(result)
+        emitter.setCancellable { this.cancel() }
+    }
