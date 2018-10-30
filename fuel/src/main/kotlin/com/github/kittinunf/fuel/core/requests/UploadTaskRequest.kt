@@ -5,10 +5,8 @@ import com.github.kittinunf.fuel.core.Body
 import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
-import com.github.kittinunf.fuel.core.ProgressCallback
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.requests.UploadBody.Companion.DEFAULT_CHARSET
-import com.github.kittinunf.fuel.util.copyTo
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -17,7 +15,6 @@ import java.net.URL
 import java.net.URLConnection
 import java.nio.charset.Charset
 
-typealias BlobProgressCallback = (Long, Long) -> Any?
 typealias UploadSourceCallback = (Request, URL) -> Iterable<Blob>
 
 internal data class UploadBody(
@@ -38,65 +35,52 @@ internal data class UploadBody(
     }
 
     override fun toByteArray(): ByteArray {
-        return ByteArrayOutputStream(length?.toInt() ?: 32).let {
-            writeTo(it)
-            it.close()
-            it.toByteArray()
-        }.apply {
-            // The entire body is now in memory, and can act as a regular body
-            request.body = DefaultBody.from(
-                { ByteArrayInputStream(this) },
-                { this.size.toLong() }
-            )
-        }
+        return ByteArrayOutputStream(length?.toInt() ?: 32)
+            .use { stream ->
+                writeTo(stream)
+                stream.toByteArray()
+            }
+            .also { result ->
+                // The entire body is now in memory, and can act as a regular body
+                request._body = DefaultBody.from(
+                    { ByteArrayInputStream(result) },
+                    { result.size.toLong() }
+                )
+            }
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeTo(outputStream: OutputStream): Long {
         if (!inputAvailable) {
             throw FuelError(IllegalStateException(
                 "The inputs have already been written to an output stream and can not be consumed again."
             ))
         }
 
+        inputAvailable = false
         val sourceCallback = taskRequest.sourceCallback
-        val progressCallback = taskRequest.progressCallback
-        val expectedLength = length!!
 
-        outputStream.buffered().apply {
+        return outputStream.buffered().let { stream ->
             // Parameters
             val parameterLength = request.parameters.sumByDouble { (name, data) ->
-                writeParameter(this, name, data).toDouble()
+                writeParameter(stream, name, data).toDouble()
             }
 
             // Blobs / Files
-            var previousLastProgress = parameterLength
             val files = sourceCallback(request, request.url)
             val filesWithHeadersLength = files.withIndex().sumByDouble { (i, blob) ->
-                val blobLength = writeBlob(this, i, blob, progress = { blobProgress, _ ->
-                    progressCallback?.invoke(
-                        (previousLastProgress + blobProgress).toLong(),
-                        (expectedLength)
-                    )
-                })
-
-                previousLastProgress += blobLength
-                blobLength.toDouble()
+                writeBlob(stream, i, blob).toDouble()
             }
 
             // Sum and Trailer
             val writtenLength = 0L +
                 parameterLength +
                 filesWithHeadersLength +
-                writeString("--$boundary--") +
-                writeBytes(CRLF)
-
-            progressCallback?.invoke(writtenLength.toLong(), expectedLength)
+                stream.writeString("--$boundary--") +
+                stream.writeBytes(CRLF)
 
             // This is a buffered stream, so flush what's remaining
-            flush()
+            writtenLength.toLong().also { stream.flush() }
         }
-
-        inputAvailable = false
     }
 
     override val length: Long? by lazy {
@@ -133,14 +117,12 @@ internal data class UploadBody(
         }
     }
 
-    private fun writeBlob(outputStream: OutputStream, index: Int, blob: Blob, progress: BlobProgressCallback): Long {
+    private fun writeBlob(outputStream: OutputStream, index: Int, blob: Blob): Long {
         outputStream.apply {
             val headerLength = writeBlobHeader(outputStream, index, blob)
 
             blob.inputStream().use {
-                it.copyTo(this, PROGRESS_BUFFER_SIZE, progress = { writtenBytes ->
-                    progress(headerLength + writtenBytes, headerLength + blob.length)
-                })
+                it.copyTo(this)
             }
 
             return headerLength + blob.length + writeBytes(CRLF)
@@ -167,7 +149,6 @@ internal data class UploadBody(
     companion object {
         val DEFAULT_CHARSET = Charsets.UTF_8
         private const val GENERIC_BYTE_CONTENT = "application/octet-stream"
-        private const val PROGRESS_BUFFER_SIZE = 1024
         private val CRLF = "\r\n".toByteArray(DEFAULT_CHARSET)
 
         fun retrieveBoundaryInfo(request: Request): String {
@@ -192,20 +173,19 @@ internal data class UploadBody(
 
 internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
     lateinit var sourceCallback: UploadSourceCallback
-    var progressCallback: ProgressCallback? = null
 
     init {
-        request.body = UploadBody.from(this, request)
+        request._body = UploadBody.from(this, request)
     }
 }
 
-private fun OutputStream.writeString(string: String, charset: Charset = DEFAULT_CHARSET): Int {
+private fun OutputStream.writeString(string: String, charset: Charset = DEFAULT_CHARSET): Long {
     val bytes = string.toByteArray(charset)
     write(bytes)
-    return bytes.size
+    return bytes.size.toLong()
 }
 
-private fun OutputStream.writeBytes(bytes: ByteArray): Int {
+private fun OutputStream.writeBytes(bytes: ByteArray): Long {
     write(bytes)
-    return bytes.size
+    return bytes.size.toLong()
 }
