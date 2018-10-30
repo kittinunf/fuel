@@ -91,7 +91,7 @@ fun <T : Any> Request.rxObject(deserializable: Deserializable<T>) =
  * @param resultBlock [() -> R] function that returns [R]
  * @return [Single] the reactive stream for a [Single] with response [R]
  */
-fun <R : Any> Request.rx(resultBlock: () -> R): Single<R> =
+fun <R : Any> Request.rx(resultBlock: Request.() -> R): Single<R> =
     Single.create { emitter ->
         val result = resultBlock()
         emitter.onSuccess(result)
