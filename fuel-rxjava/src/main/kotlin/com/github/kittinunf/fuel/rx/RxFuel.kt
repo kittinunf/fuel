@@ -1,3 +1,4 @@
+
 package com.github.kittinunf.fuel.rx
 
 import com.github.kittinunf.fuel.core.Deserializable
@@ -97,3 +98,51 @@ fun <R : Any> Request.rx(resultBlock: Request.() -> R): Single<R> =
         emitter.onSuccess(result)
         emitter.setCancellable { this.cancel() }
     }
+
+@Suppress("FunctionName")
+@Deprecated(
+    "Use Request.rxResponse",
+    replaceWith = ReplaceWith("rxResponse()"),
+    level = DeprecationLevel.ERROR
+)
+fun Request.rx_response() = rxResponse()
+
+@Suppress("FunctionName")
+@Deprecated(
+    "Use Request.rxResponseString",
+    replaceWith = ReplaceWith("rxResponseString(charset)"),
+    level = DeprecationLevel.ERROR
+)
+fun Request.rx_responseString(charset: Charset = Charsets.UTF_8) = rxResponseString(charset)
+
+@Suppress("FunctionName")
+@Deprecated(
+    "Use Request.rxResponseObject",
+    replaceWith = ReplaceWith("rxResponseObject(deserializable)"),
+    level = DeprecationLevel.ERROR
+)
+fun <T: Any> Request.rx_responseObject(deserializable: Deserializable<T>) = rxResponseObject(deserializable)
+
+@Suppress("FunctionName")
+@Deprecated(
+    "Use Request.rxBytes",
+    replaceWith = ReplaceWith("rxBytes()"),
+    level = DeprecationLevel.ERROR
+)
+fun Request.rx_bytes() = rxBytes()
+
+@Suppress("FunctionName")
+@Deprecated(
+    "Use Request.rxString",
+    replaceWith = ReplaceWith("rxString(charset)"),
+    level = DeprecationLevel.ERROR
+)
+fun Request.rx_string(charset: Charset = Charsets.UTF_8) = rxString(charset)
+
+@Suppress("FunctionName")
+@Deprecated(
+    "Use Request.rxObject",
+    replaceWith = ReplaceWith("rxObject(deserializable)"),
+    level = DeprecationLevel.ERROR
+)
+fun <T: Any> Request.rx_object(deserializable: Deserializable<T>) = rxObject(deserializable)
