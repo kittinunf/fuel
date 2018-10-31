@@ -121,7 +121,7 @@ fun Request.rx_responseString(charset: Charset = Charsets.UTF_8) = rxResponseStr
     replaceWith = ReplaceWith("rxResponseObject(deserializable)"),
     level = DeprecationLevel.ERROR
 )
-fun <T: Any> Request.rx_responseObject(deserializable: Deserializable<T>) = rxResponseObject(deserializable)
+fun <T : Any> Request.rx_responseObject(deserializable: Deserializable<T>) = rxResponseObject(deserializable)
 
 @Suppress("FunctionName")
 @Deprecated(
@@ -145,4 +145,4 @@ fun Request.rx_string(charset: Charset = Charsets.UTF_8) = rxString(charset)
     replaceWith = ReplaceWith("rxObject(deserializable)"),
     level = DeprecationLevel.ERROR
 )
-fun <T: Any> Request.rx_object(deserializable: Deserializable<T>) = rxObject(deserializable)
+fun <T : Any> Request.rx_object(deserializable: Deserializable<T>) = rxObject(deserializable)
