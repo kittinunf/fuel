@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Client
 import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HeaderName
 import com.github.kittinunf.fuel.core.HeaderValues
 import com.github.kittinunf.fuel.core.Headers
@@ -117,6 +118,8 @@ internal class HttpClient(
         // Since the transfer encoding will be undone by decodeTransfer
         headers.remove(Headers.TRANSFER_ENCODING)
 
+        // The input and output streams returned by connection are not buffered. In order to give consistent progress
+        // reporting, by means of flushing, the input stream here is buffered.
         return Response(
             url = request.url,
             headers = headers,
@@ -134,7 +137,7 @@ internal class HttpClient(
                         onProgress = { readBytes ->
                             request.responseProgress(readBytes, contentLength ?: readBytes)
                         }
-                    )
+                    ).buffered(FuelManager.progressBufferSize)
                 },
                 { contentLength ?: -1 }
             )
@@ -212,15 +215,15 @@ internal class HttpClient(
 
         val totalBytes = if ((contentLength ?: -1L).toLong() > 0) { contentLength!!.toLong() } else { null }
 
-        // The input and output streams returned by this class are not buffered. Most body implementations should wrap
-        // the input stream with BufferedOutputStream. Bulk implementations may forgo this.
+        // The input and output streams returned by connection are not buffered. In order to give consistent progress
+        // reporting, by means of flushing, the output stream here is buffered.
         body.writeTo(
             ProgressOutputStream(
                 connection.outputStream,
                 onProgress = { writtenBytes ->
                     request.requestProgress(writtenBytes, totalBytes ?: writtenBytes)
                 }
-            )
+            ).buffered(FuelManager.progressBufferSize)
         )
 
         connection.outputStream.flush()

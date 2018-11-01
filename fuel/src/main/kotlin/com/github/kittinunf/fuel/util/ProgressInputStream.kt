@@ -1,6 +1,6 @@
 package com.github.kittinunf.fuel.util
 
-import java.io.BufferedInputStream
+import java.io.FilterInputStream
 import java.io.InputStream
 
 typealias ReadProgress = (Long) -> Unit
@@ -17,13 +17,18 @@ typealias ReadProgress = (Long) -> Unit
  * @param stream [InputStream] the stream that should have progress reporting
  * @param onProgress [ReadProgress] the progress callback
  */
-class ProgressInputStream(stream: InputStream, val onProgress: ReadProgress) : BufferedInputStream(stream) {
+class ProgressInputStream(stream: InputStream, val onProgress: ReadProgress) : FilterInputStream(stream) {
     private var position = 0L
+    private var markedPosition = -1L
+
+    override fun mark(readlimit: Int) {
+        super.mark(readlimit)
+        markedPosition = position
+    }
 
     override fun reset() {
         super.reset()
-        // Going back at most current buffer position - marked buffer position
-        position -= (pos - markpos)
+        position = markedPosition
     }
 
     override fun skip(n: Long): Long {
@@ -32,7 +37,7 @@ class ProgressInputStream(stream: InputStream, val onProgress: ReadProgress) : B
         }
     }
 
-    // Report progress if the consumer is efficient.
+    // Report progress if the consumer is reading multiple bytes.
     //
     // This means that the amount of times the progress is reported, ties exactly into the number of times the `read`
     // function is called, instead of relying on some arbitrary, but fake, progress.

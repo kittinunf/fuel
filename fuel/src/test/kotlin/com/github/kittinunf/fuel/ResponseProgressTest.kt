@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel
 
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.google.common.net.MediaType
 import org.hamcrest.CoreMatchers.equalTo
@@ -12,14 +13,12 @@ import java.io.File
 import java.util.Random
 
 class ResponseProgressTest : MockHttpTestCase() {
-    private val currentDir: File by lazy {
-        val dir = System.getProperty("user.dir")
-        File(dir, "src/test/assets")
-    }
+
+    private val threadSafeFuel = FuelManager()
 
     @Test
     fun reportsResponseProgressWithDownload() {
-        val length = DEFAULT_BUFFER_SIZE * 8
+        val length = threadSafeFuel.progressBufferSize * 8
         val file = File.createTempFile(length.toString(), null)
         val downloadData = ByteArray(length).apply { Random().nextBytes(this) }
 
@@ -30,8 +29,8 @@ class ResponseProgressTest : MockHttpTestCase() {
 
         var progressCalls = 0
 
-        val (request, response, result) = Fuel.download(mock.path("download"))
-            .destination { _, _ -> file.also { println("Downloading $length bytes") } }
+        val (request, response, result) = threadSafeFuel.download(mock.path("download"))
+            .destination { _, _ -> file.also { println("Downloading $length bytes to file") } }
             .progress { _, _ -> progressCalls += 1 }
             .responseString()
 
@@ -43,14 +42,14 @@ class ResponseProgressTest : MockHttpTestCase() {
 
         // Probably around 9 (8 times a buffer write, and the final closing -1 write)
         assertThat("Expected progress to be called at least (total size/buffer size), actual $progressCalls calls",
-            progressCalls > 1,
+            progressCalls > length / threadSafeFuel.progressBufferSize,
             equalTo(true)
         )
     }
 
     @Test
     fun reportsResponseProgressWithGenericGet() {
-        val length = DEFAULT_BUFFER_SIZE * 8 - 200
+        val length = threadSafeFuel.progressBufferSize * 8 - 200
         val downloadData = ByteArray(length).apply { Random().nextBytes(this) }
 
         mock.chain(
@@ -60,8 +59,9 @@ class ResponseProgressTest : MockHttpTestCase() {
 
         var progressCalls = 0
 
-        val (request, response, result) = Fuel.get(mock.path("download"))
+        val (request, response, result) = threadSafeFuel.request(Method.GET, mock.path("download"))
             .responseProgress { _, _ -> progressCalls += 1 }
+            .also { println("Downloading $length bytes to memory") }
             .responseString()
 
         val (data, error) = result
@@ -72,10 +72,8 @@ class ResponseProgressTest : MockHttpTestCase() {
 
         // Probably around 9 (8 times a buffer write, and the final closing -1 write)
         assertThat("Expected progress to be called at least (total size/buffer size), actual $progressCalls calls",
-            progressCalls > 1,
+            progressCalls > length / threadSafeFuel.progressBufferSize,
             equalTo(true)
         )
-
-        println(progressCalls)
     }
 }

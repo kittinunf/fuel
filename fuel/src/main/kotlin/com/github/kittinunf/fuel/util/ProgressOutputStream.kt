@@ -1,7 +1,6 @@
 package com.github.kittinunf.fuel.util
 
-import com.github.kittinunf.fuel.core.FuelManager
-import java.io.BufferedOutputStream
+import java.io.FilterOutputStream
 import java.io.OutputStream
 
 typealias WriteProgress = (Long) -> Unit
@@ -18,13 +17,10 @@ typealias WriteProgress = (Long) -> Unit
  * @param stream [OutputStream] the stream that should have progress reporting
  * @param onProgress [WriteProgress] the progress callback
  */
-class ProgressOutputStream(
-    stream: OutputStream,
-    val onProgress: WriteProgress
-) : BufferedOutputStream(stream, FuelManager.progressBufferSize) {
+class ProgressOutputStream(stream: OutputStream, val onProgress: WriteProgress) : FilterOutputStream(stream) {
     var position = 0L
 
-    // Report progress if the producer is efficient.
+    // Report progress if the producer is writing multiple bytes.
     //
     // This means that the amount of times the progress is reported, ties exactly into the number of times the `write`
     // function is called, instead of relying on some arbitrary, but fake, progress.
