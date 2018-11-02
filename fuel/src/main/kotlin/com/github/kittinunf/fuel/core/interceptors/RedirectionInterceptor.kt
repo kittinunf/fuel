@@ -18,37 +18,41 @@ private val redirectStatusWithGets = listOf(
 )
 
 fun redirectResponseInterceptor(manager: FuelManager) =
-        { next: (Request, Response) -> Response ->
-            inner@{ request: Request, response: Response ->
-                if (!response.isStatusRedirection || !request.isAllowRedirects) {
-                    return@inner next(request, response)
-                }
-
-                val redirectedUrl = response[Headers.LOCATION].ifEmpty { response[Headers.CONTENT_LOCATION] }.lastOrNull()
-                if (redirectedUrl.isNullOrEmpty()) {
-                    return@inner next(request, response)
-                }
-
-                val newUrl = if (URI(redirectedUrl).isAbsolute) {
-                    URL(redirectedUrl)
-                } else {
-                    URL(request.url, redirectedUrl)
-                }
-                val newHeaders = Headers.from(request.headers)
-
-                val newMethod = when {
-                    response.statusCode in redirectStatusWithGets -> Method.GET
-                    else -> request.method
-                }
-
-                val encoding = Encoding(httpMethod = newMethod, urlString = newUrl.toString())
-
-                // check whether it is the same host or not
-                if (newUrl.host != request.url.host) {
-                    newHeaders.remove(Headers.AUTHORIZATION)
-                }
-
-                // redirect
-                next(request, manager.request(encoding).header(newHeaders).response().second)
+    { next: (Request, Response) -> Response ->
+        inner@{ request: Request, response: Response ->
+            if (!response.isStatusRedirection || !request.isAllowRedirects) {
+                return@inner next(request, response)
             }
+
+            val redirectedUrl = response[Headers.LOCATION]
+                .ifEmpty { response[Headers.CONTENT_LOCATION] }
+                .lastOrNull()
+
+            if (redirectedUrl.isNullOrEmpty()) {
+                return@inner next(request, response)
+            }
+
+            val newUrl = if (URI(redirectedUrl).isAbsolute) URL(redirectedUrl) else URL(request.url, redirectedUrl)
+
+            val newMethod = when {
+                response.statusCode in redirectStatusWithGets -> Method.GET
+                else -> request.method
+            }
+
+            val encoding = Encoding(httpMethod = newMethod, urlString = newUrl.toString())
+
+            // Check whether it is the same host or not
+            val newHeaders = Headers.from(request.headers)
+            if (newUrl.host != request.url.host) {
+                newHeaders.remove(Headers.AUTHORIZATION)
+            }
+
+            val newRequest = manager.request(encoding)
+                .header(newHeaders)
+                .requestProgress(request.requestProgress)
+                .responseProgress(request.responseProgress)
+
+            // Redirect
+            next(request, newRequest.response().second)
         }
+    }

@@ -39,8 +39,9 @@ interface Body {
      * @note implementations are recommended to buffer the output stream if they can't ensure bulk writing.
      *
      * @param outputStream [OutputStream] the stream to write to
+     * @return [Long] the number of bytes written
      */
-    fun writeTo(outputStream: OutputStream)
+    fun writeTo(outputStream: OutputStream): Long
 
     /**
      * Returns the body emptiness.
@@ -72,13 +73,15 @@ data class DefaultBody(
             return ByteArray(0)
         }
 
-        return ByteArrayOutputStream(length?.toInt() ?: 32).use {
-            writeTo(it)
-            it.toByteArray()
-        }.apply {
-            openStream = { ByteArrayInputStream(this) }
-            calculateLength = { this.size.toLong() }
-        }
+        return ByteArrayOutputStream(length?.toInt() ?: 32)
+            .use { stream ->
+                writeTo(stream)
+                stream.toByteArray()
+            }
+            .also { result ->
+                openStream = { ByteArrayInputStream(result) }
+                calculateLength = { result.size.toLong() }
+            }
     }
 
     override fun toStream(): InputStream = openStream().buffered().apply {
@@ -87,19 +90,18 @@ data class DefaultBody(
         openStream = CONSUMED_STREAM
     }
 
-    override fun writeTo(outputStream: OutputStream) {
-        outputStream.apply {
-            val reader = openStream()
-            // `copyTo` writes efficiently using a buffer. Reading ensured to be buffered by calling `.buffered`
-            reader.buffered().copyTo(this)
-            reader.close()
+    override fun writeTo(outputStream: OutputStream): Long {
+        val inputStream = openStream()
+        // `copyTo` writes efficiently using a buffer. Reading ensured to be buffered by calling `.buffered`
+        return inputStream.buffered()
+            .use { it.copyTo(outputStream) }
+            .also {
+                // The outputStream could be buffered, but we are done reading, so it's time to flush what's left
+                outputStream.flush()
 
-            // The outputStream could be buffered, but we are done reading, so it's time to flush what's left
-            flush()
-
-            // This prevents implementations from consuming the input stream twice
-            openStream = CONSUMED_STREAM
-        }
+                // This prevents implementations from consuming the input stream twice
+                openStream = CONSUMED_STREAM
+            }
     }
 
     override fun isEmpty() = openStream === EMPTY_STREAM || (length == 0L)
