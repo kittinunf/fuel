@@ -171,6 +171,8 @@ internal class HttpClient(
             "gzip" -> GZIPInputStream(stream)
             "deflate" -> InflaterInputStream(stream)
             "identity" -> stream
+            // the underlying HttpClient handles chunked, but does not remove the Transfer-Encoding Header
+            "chunked" -> stream
             "" -> stream
             else -> throw UnsupportedOperationException("Decoding $encoding is not supported. $SUPPORTED_DECODING are.")
         }
