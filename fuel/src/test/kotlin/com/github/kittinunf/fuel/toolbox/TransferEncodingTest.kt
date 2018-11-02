@@ -15,6 +15,41 @@ import java.util.zip.DeflaterOutputStream
 import java.util.zip.GZIPOutputStream
 
 class TransferEncodingTest : MockHttpTestCase() {
+
+    @Test
+    fun identityTransferEncodingTest() {
+        val value = ByteArray(32).apply {
+            for (i in 0..(this.size - 1)) {
+                this[i] = ('A'..'z').random().toByte()
+            }
+        }
+
+        val output = ByteArrayOutputStream(value.size)
+        output.write(value)
+        val identity = output.toByteArray()
+
+        mock.chain(
+            request = mock.request()
+                .withMethod(Method.POST.value)
+                .withPath("/identity")
+                .withHeader(Header.header(Headers.ACCEPT_TRANSFER_ENCODING, HttpClient.SUPPORTED_DECODING.joinToString(", "))),
+            response = mock.response()
+                .withHeaders(
+                    Header.header(Headers.TRANSFER_ENCODING, "identity"),
+                    Header.header(Headers.CONTENT_LENGTH, value.size.toString())
+                )
+                .withBody(identity)
+        )
+
+        val (_, result, response) = Fuel.request(Method.POST, mock.path("identity"))
+            .body(value)
+            .response()
+
+        assertArrayEquals(value, response.component1())
+        assertThat(result[Headers.CONTENT_ENCODING].lastOrNull(), nullValue())
+        assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), equalTo(value.size.toString()))
+    }
+
     @Test
     fun gzipTransferEncodingTest() {
         val value = ByteArray(32).apply {
@@ -50,7 +85,7 @@ class TransferEncodingTest : MockHttpTestCase() {
 
         assertArrayEquals(value, response.component1())
         assertThat(result[Headers.CONTENT_ENCODING].lastOrNull(), nullValue())
-        assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), equalTo(value.size.toString()))
+        assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), nullValue())
     }
 
     @Test
@@ -88,7 +123,7 @@ class TransferEncodingTest : MockHttpTestCase() {
 
         assertArrayEquals(value, response.component1())
         assertThat(result[Headers.CONTENT_ENCODING].lastOrNull(), nullValue())
-        assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), equalTo(value.size.toString()))
+        assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), nullValue())
     }
 
     @Test
@@ -131,6 +166,6 @@ class TransferEncodingTest : MockHttpTestCase() {
 
         assertArrayEquals(value, response.component1())
         assertThat(result[Headers.CONTENT_ENCODING].lastOrNull(), nullValue())
-        assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), equalTo(value.size.toString()))
+        assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), nullValue())
     }
 }
