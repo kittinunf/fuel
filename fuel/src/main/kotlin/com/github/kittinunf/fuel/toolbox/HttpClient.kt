@@ -4,12 +4,15 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Client
 import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HeaderName
 import com.github.kittinunf.fuel.core.HeaderValues
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.util.ProgressInputStream
+import com.github.kittinunf.fuel.util.ProgressOutputStream
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -30,8 +33,8 @@ internal class HttpClient(
     var decodeContent: Boolean = true
 ) : Client {
     override fun executeRequest(request: Request): Response {
-        try {
-            return doRequest(request)
+        return try {
+            doRequest(request)
         } catch (exception: Exception) {
             throw FuelError(exception, ByteArray(0), Response(request.url))
         } finally {
@@ -98,7 +101,7 @@ internal class HttpClient(
         val headers = Headers.from(connection.headerFields)
         val transferEncoding = headers[Headers.TRANSFER_ENCODING].flatMap { it.split(',') }.map { it.trim() }
         val contentEncoding = headers[Headers.CONTENT_ENCODING].lastOrNull()
-        var contentLength = headers[Headers.CONTENT_LENGTH].lastOrNull()?.toLong() ?: -1
+        var contentLength = headers[Headers.CONTENT_LENGTH].lastOrNull()?.toLong()
         val shouldDecode = (request.decodeContent ?: decodeContent) && contentEncoding != null && contentEncoding != "identity"
 
         if (shouldDecode) {
@@ -109,27 +112,34 @@ internal class HttpClient(
             headers.remove(Headers.CONTENT_ENCODING)
             headers.remove(Headers.CONTENT_LENGTH)
 
-            contentLength = -1
+            contentLength = null
         }
 
         // Since the transfer encoding will be undone by decodeTransfer
         headers.remove(Headers.TRANSFER_ENCODING)
 
+        // The input and output streams returned by connection are not buffered. In order to give consistent progress
+        // reporting, by means of flushing, the input stream here is buffered.
         return Response(
             url = request.url,
             headers = headers,
-            contentLength = contentLength,
+            contentLength = contentLength ?: -1,
             statusCode = connection.responseCode,
             responseMessage = connection.responseMessage.orEmpty(),
             body = DefaultBody.from(
                 {
-                    decodeContent(
-                        stream = decodeTransfer(safeDataStream(connection), transferEncoding),
-                        encoding = contentEncoding,
-                        shouldDecode = shouldDecode
-                    )
+                    ProgressInputStream(
+                        decodeContent(
+                            stream = decodeTransfer(safeDataStream(connection), transferEncoding),
+                            encoding = contentEncoding,
+                            shouldDecode = shouldDecode
+                        ),
+                        onProgress = { readBytes ->
+                            request.responseProgress(readBytes, contentLength ?: readBytes)
+                        }
+                    ).buffered(FuelManager.progressBufferSize)
                 },
-                { contentLength }
+                { contentLength ?: -1 }
             )
         )
     }
@@ -205,9 +215,19 @@ internal class HttpClient(
             connection.setChunkedStreamingMode(4096)
         }
 
-        // The input and output streams returned by this class are not buffered. Most body implementations should wrap
-        // the input stream with BufferedOutputStream. Bulk implementations may forgo this.
-        body.writeTo(connection.outputStream)
+        val totalBytes = if ((contentLength ?: -1L).toLong() > 0) { contentLength!!.toLong() } else { null }
+
+        // The input and output streams returned by connection are not buffered. In order to give consistent progress
+        // reporting, by means of flushing, the output stream here is buffered.
+        body.writeTo(
+            ProgressOutputStream(
+                connection.outputStream,
+                onProgress = { writtenBytes ->
+                    request.requestProgress(writtenBytes, totalBytes ?: writtenBytes)
+                }
+            ).buffered(FuelManager.progressBufferSize)
+        )
+
         connection.outputStream.flush()
     }
 

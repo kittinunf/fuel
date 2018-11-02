@@ -23,6 +23,7 @@ class FuelManager {
     var basePath: String? = null
     var timeoutInMillisecond: Int = 15000
     var timeoutReadInMillisecond: Int = timeoutInMillisecond
+    var progressBufferSize: Int = DEFAULT_BUFFER_SIZE
 
     var baseHeaders: Map<String, String>? = null
     var baseParams: Parameters = emptyList()
@@ -150,5 +151,6 @@ class FuelManager {
     companion object {
         // manager
         var instance by readWriteLazy { FuelManager() }
+        val progressBufferSize: Int get() = instance.progressBufferSize
     }
 }

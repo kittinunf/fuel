@@ -40,7 +40,9 @@ class Request(
     var decodeContent: Boolean? = null,
     var timeoutInMillisecond: Int = 15_000,
     var timeoutReadInMillisecond: Int = 15_000,
-    internal var body: Body = DefaultBody()
+    private val _responseProgress: Progress = Progress(),
+    private val _requestProgress: Progress = Progress(),
+    internal var _body: Body = DefaultBody()
 ) : Fuel.RequestConvertible {
     enum class Type {
         REQUEST,
@@ -49,7 +51,10 @@ class Request(
     }
 
     internal lateinit var client: Client
-    fun body(): Body = body
+
+    val body: Body get() = _body
+    val requestProgress: Progress get() = _requestProgress
+    val responseProgress: Progress get() = _responseProgress
 
     // underlying task request
     internal val taskRequest: TaskRequest by lazy {
@@ -242,7 +247,7 @@ class Request(
      * @return [Request] the request
      */
     fun body(openStream: BodySource, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request {
-        this.body = DefaultBody.from(openStream = openStream, calculateLength = calculateLength, charset = charset)
+        _body = DefaultBody.from(openStream = openStream, calculateLength = calculateLength, charset = charset)
         return this
     }
 
@@ -310,18 +315,22 @@ class Request(
 
     fun progress(handler: ProgressCallback): Request {
         val taskRequest = taskRequest
-        when (taskRequest) {
-            is DownloadTaskRequest -> {
-                taskRequest.progressCallback = handler
-            }
-            is UploadTaskRequest -> {
-                taskRequest.progressCallback = handler
-            }
-            else -> throw IllegalStateException("progress is only used with RequestType.DOWNLOAD or RequestType.UPLOAD")
+        return when (taskRequest) {
+            is DownloadTaskRequest -> responseProgress(handler)
+            is UploadTaskRequest -> requestProgress(handler)
+            else -> throw UnsupportedOperationException("Use requestProgress(handler) or responseProgress(handler)")
         }
+    }
+
+    fun requestProgress(handler: ProgressCallback): Request {
+        _requestProgress += handler
         return this
     }
 
+    fun responseProgress(handler: ProgressCallback): Request {
+        _responseProgress += handler
+        return this
+    }
     /**
      *  Replace each pair, using the key as header name and value as header content
      */

@@ -16,7 +16,7 @@ abstract class MockHttpTestCase : BaseTestCase() {
     fun setup() {
         // You can set the log level to INFO or TRACE to see all the mocking logging
         this.mock = MockHelper()
-        this.mock.setup(Level.INFO)
+        this.mock.setup(Level.WARN)
     }
 
     @After
