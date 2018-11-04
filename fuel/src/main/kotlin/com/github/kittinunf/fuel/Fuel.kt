@@ -16,7 +16,7 @@ class Fuel {
     }
 
     companion object {
-        internal var testConfiguration = TestConfiguration(timeout = null, blocking = false)
+        internal var testConfiguration = TestConfiguration(timeout = null, timeoutRead = null)
 
         @JvmStatic
         @JvmOverloads
@@ -25,7 +25,7 @@ class Fuel {
         }
 
         @JvmStatic
-        fun regularMode() = testMode { timeout = null; blocking = false }
+        fun regularMode() = testMode { timeout = null; timeoutRead = null}
 
         // convenience methods
         // get

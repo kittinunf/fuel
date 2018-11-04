@@ -4,7 +4,6 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import com.github.kittinunf.fuel.toolbox.HttpClient
-import com.github.kittinunf.fuel.util.SameThreadExecutorService
 import com.github.kittinunf.fuel.util.readWriteLazy
 import java.net.Proxy
 import java.security.KeyStore
@@ -57,8 +56,6 @@ class FuelManager {
             mutableListOf()
     private val responseInterceptors: MutableList<((Request, Response) -> Response) -> ((Request, Response) -> Response)> =
             mutableListOf(redirectResponseInterceptor(this), validatorResponseInterceptor(200..299))
-
-    private fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
 
     // callback executor
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
@@ -141,7 +138,7 @@ class FuelManager {
 
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
+        request.executor = executor
         request.callbackExecutor = callbackExecutor
         request.requestTransformer = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
         request.responseTransformer = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
