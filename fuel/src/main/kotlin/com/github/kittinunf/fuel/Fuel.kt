@@ -25,7 +25,7 @@ class Fuel {
         }
 
         @JvmStatic
-        fun regularMode() = testMode { timeout = null; timeoutRead = null}
+        fun regularMode() = testMode { timeout = null; timeoutRead = null }
 
         // convenience methods
         // get
