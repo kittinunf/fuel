@@ -14,7 +14,7 @@ class SuspendingRequest(private val request: Request) {
         val modifiedRequest = request.requestTransformer(request)
         val response = request.client.awaitRequest(modifiedRequest)
 
-        return Result.of<Response, FuelError> {
+        return Result.of<Response, Exception> {
             request.responseTransformer(modifiedRequest, response)
         }.mapError { e ->
             val error = e as? FuelError ?: FuelError(e)
