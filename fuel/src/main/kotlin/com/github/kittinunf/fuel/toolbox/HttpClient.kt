@@ -105,18 +105,42 @@ internal class HttpClient(
         val shouldDecode = (request.decodeContent ?: decodeContent) && contentEncoding != null && contentEncoding != "identity"
 
         if (shouldDecode) {
+            // `decodeContent` decodes the response, so the final response has no more `Content-Encoding`
+            headers.remove(Headers.CONTENT_ENCODING)
+
             // URLConnection.getContentLength() returns the number of bytes transmitted and cannot be used to predict
             // how many bytes can be read from URLConnection.getInputStream() for compressed streams. Therefore if the
             // stream will be decoded, the length becomes unknown
             //
-            headers.remove(Headers.CONTENT_ENCODING)
             headers.remove(Headers.CONTENT_LENGTH)
 
             contentLength = null
         }
 
-        // Since the transfer encoding will be undone by decodeTransfer
+        // `decodeTransfer` decodes the response, so the final response has no more Transfer-Encoding
         headers.remove(Headers.TRANSFER_ENCODING)
+
+        // [RFC 7230, 3.3.2](https://tools.ietf.org/html/rfc7230#section-3.3.2)
+        //
+        // When a message does not have a Transfer-Encoding header field, a
+        //   Content-Length header field can provide the anticipated size, as a
+        //   decimal number of octets, for a potential payload body.
+        //
+        //   A sender MUST NOT send a Content-Length header field in any message
+        //   that contains a Transfer-Encoding header field.
+        //
+        // [RFC 7230, 3.3.3](https://tools.ietf.org/html/rfc7230#section-3.3.3)
+        //
+        // Any 2xx (Successful) response to a CONNECT request implies that
+        //   the connection will become a tunnel immediately after the empty
+        //   line that concludes the header fields.  A client MUST ignore any
+        //   Content-Length or Transfer-Encoding header fields received in
+        //   such a message.
+        //
+        if (transferEncoding.any { encoding -> encoding.isNotBlank() && encoding != "identity" }) {
+            headers.remove(Headers.CONTENT_LENGTH)
+            contentLength = -1
+        }
 
         // The input and output streams returned by connection are not buffered. In order to give consistent progress
         // reporting, by means of flushing, the input stream here is buffered.
@@ -181,7 +205,7 @@ internal class HttpClient(
             "gzip" -> GZIPInputStream(stream)
             "deflate" -> InflaterInputStream(stream)
             "identity" -> stream
-            // the underlying HttpClient handles chunked, but does not remove the Transfer-Encoding Header
+            // The underlying HttpClient handles chunked, but does not remove the Transfer-Encoding Header
             "chunked" -> stream
             "" -> stream
             else -> throw UnsupportedOperationException("Decoding $encoding is not supported. $SUPPORTED_DECODING are.")
