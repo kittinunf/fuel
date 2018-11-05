@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.decodeBase64
 import com.google.common.net.MediaType
 import junit.framework.TestCase.assertEquals
@@ -557,7 +558,6 @@ class RequestTest : MockHttpTestCase() {
     // @Test
     // TODO turn on when it works reliably
     fun httpGetRequestCancel() {
-        regularMode {
             /*
                 TODO: turn into mocked request. This one is failing because the mock server probably
                     doesn't allow for streamed responses. Or maybe something else. Does show the
@@ -602,7 +602,6 @@ class RequestTest : MockHttpTestCase() {
             assertThat(response.contentLength, isEqualTo(-1L)) // this is true
             assertThat(data, nullValue()) // but then this is not
             assertThat(error, nullValue())
-        }
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.serialization.kotlinxDeserializerOf
 import com.github.kittinunf.fuel.serialization.responseObject
+import com.github.kittinunf.fuel.test.MockHelper
 import com.github.kittinunf.result.Result
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.Serializable
