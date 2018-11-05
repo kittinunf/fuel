@@ -1,10 +1,11 @@
 package com.github.kittinunf.fuel.issues
 
-import com.github.kittinunf.fuel.MockReflected
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.jackson.jacksonDeserializerOf
+import com.github.kittinunf.fuel.test.MockHttpTestCase
+import com.github.kittinunf.fuel.test.MockReflected
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
