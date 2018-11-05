@@ -9,6 +9,7 @@ import com.github.kittinunf.fuel.rx.rxResponse
 import com.github.kittinunf.fuel.rx.rxResponseObject
 import com.github.kittinunf.fuel.rx.rxResponseString
 import com.github.kittinunf.fuel.rx.rxString
+import com.github.kittinunf.fuel.test.MockHelper
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue

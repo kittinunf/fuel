@@ -5,5 +5,5 @@ plugins {
 dependencies {
     implementation(project(":fuel"))
     implementation(Moshi.dependency)
-    testCompile(MockServer.dependency)
+    testCompile(project(":fuel-test"))
 }

@@ -1,6 +1,5 @@
 package com.github.kittinunf.fuel.issues
 
-import com.github.kittinunf.fuel.MockHttpTestCase
 import com.github.kittinunf.fuel.MockReflected
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method

@@ -8,6 +8,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.test.MockHelper
 import com.github.kittinunf.result.Result
 import org.junit.After
 import org.junit.Assert.assertEquals

@@ -1,4 +1,4 @@
-package com.github.kittinunf.fuel
+package com.github.kittinunf.fuel.test
 
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Parameters
@@ -13,7 +13,6 @@ import org.mockserver.model.HttpResponse
 import org.mockserver.model.HttpTemplate
 import org.slf4j.event.Level
 
-@Suppress("MemberVisibilityCanBePrivate")
 class MockHelper {
 
     private lateinit var mockServer: ClientAndServer

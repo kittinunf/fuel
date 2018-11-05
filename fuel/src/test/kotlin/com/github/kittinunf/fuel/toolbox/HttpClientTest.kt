@@ -1,10 +1,10 @@
 package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.MockHttpTestCase
-import com.github.kittinunf.fuel.MockReflected
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.test.MockHttpTestCase
+import com.github.kittinunf.fuel.test.MockReflected
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.not

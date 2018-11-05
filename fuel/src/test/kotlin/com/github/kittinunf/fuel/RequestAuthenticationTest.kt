@@ -1,7 +1,8 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue

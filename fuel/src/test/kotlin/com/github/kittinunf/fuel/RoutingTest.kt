@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HeaderValues
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Parameters
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.FuelRouting
 import com.github.kittinunf.fuel.util.decodeBase64ToString
 import com.github.kittinunf.fuel.util.encodeBase64
