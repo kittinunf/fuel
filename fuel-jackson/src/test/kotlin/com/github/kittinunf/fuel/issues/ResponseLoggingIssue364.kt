@@ -58,7 +58,7 @@ class ResponseLoggingIssue364 : MockHttpTestCase() {
         val request = reflectedRequest(Method.POST, "logged-response-body", manager = threadSafeManager)
                 .body(value)
 
-        val (_, response, result) = request.responseObject(jacksonDeserializerOf<MockReflected>())
+        val (_, _, result) = request.responseObject(jacksonDeserializerOf<MockReflected>())
         val (reflected, error) = result
 
         assertThat(error, CoreMatchers.nullValue())

@@ -9,6 +9,5 @@ import java.nio.charset.Charset
  */
 fun Request.jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request {
     this[Headers.CONTENT_TYPE] = "application/json"
-    println("body $body")
     return body(body, charset)
 }

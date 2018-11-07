@@ -32,7 +32,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                 return@inner next(request, response)
             }
 
-            val newUrl = if (URI(redirectedUrl).isAbsolute) URL(redirectedUrl) else URL(request.url, redirectedUrl)
+            val newUrl = if (URI(redirectedUrl.split('?').first()).isAbsolute) URL(redirectedUrl) else URL(request.url, redirectedUrl)
 
             val newMethod = when {
                 response.statusCode in redirectStatusWithGets -> Method.GET

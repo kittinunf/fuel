@@ -99,28 +99,34 @@ class FuelManager {
 
     fun request(convertible: Fuel.RequestConvertible): Request = request(convertible.request)
 
-    fun addRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)) {
+    fun addRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)): FuelManager {
         requestInterceptors += interceptor
+        return this
     }
 
-    fun addResponseInterceptor(interceptor: ((Request, Response) -> Response) -> ((Request, Response) -> Response)) {
+    fun addResponseInterceptor(interceptor: ((Request, Response) -> Response) -> ((Request, Response) -> Response)): FuelManager {
         responseInterceptors += interceptor
+        return this
     }
 
-    fun removeRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)) {
+    fun removeRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)): FuelManager {
         requestInterceptors -= interceptor
+        return this
     }
 
-    fun removeResponseInterceptor(interceptor: ((Request, Response) -> Response) -> ((Request, Response) -> Response)) {
+    fun removeResponseInterceptor(interceptor: ((Request, Response) -> Response) -> ((Request, Response) -> Response)): FuelManager {
         responseInterceptors -= interceptor
+        return this
     }
 
-    fun removeAllRequestInterceptors() {
+    fun removeAllRequestInterceptors(): FuelManager {
         requestInterceptors.clear()
+        return this
     }
 
-    fun removeAllResponseInterceptors() {
+    fun removeAllResponseInterceptors(): FuelManager {
         responseInterceptors.clear()
+        return this
     }
 
     private fun request(request: Request): Request {

@@ -12,6 +12,7 @@ import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.HttpTemplate
 import org.slf4j.event.Level
+import java.net.URL
 
 class MockHelper {
 
@@ -134,7 +135,7 @@ class MockHelper {
      * @param path [String] the relative path
      * @return [String] the full path
      */
-    fun path(path: String): String = "http://localhost:${server().localPort}/$path"
+    fun path(path: String): String = URL("http://localhost:${server().localPort}/$path").toString()
 
     companion object {
         const val REFLECT_TEMPLATE = """

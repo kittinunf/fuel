@@ -323,6 +323,7 @@ class Headers : MutableMap<String, HeaderValues> {
         const val LOCATION = "Location"
         const val SET_COOKIE = "Set-Cookie"
         const val TRANSFER_ENCODING = "Transfer-Encoding"
+        const val USER_AGENT = "User-Agent"
 
         /**
          * Below are lookup tables for various functions. The reason these are a map is that
@@ -343,7 +344,8 @@ class Headers : MutableMap<String, HeaderValues> {
             HeaderName(CONTENT_TYPE) to true,
             HeaderName(EXPECT) to true,
             HeaderName(EXPIRES) to true,
-            HeaderName(LOCATION) to true
+            HeaderName(LOCATION) to true,
+            HeaderName(USER_AGENT) to true
         )
 
         private val COLLAPSE_SEPARATOR = mapOf(

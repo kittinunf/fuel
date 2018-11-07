@@ -1,13 +1,10 @@
 package com.github.kittinunf.fuel
 
-import com.github.kittinunf.fuel.core.DefaultRequest
 import com.github.kittinunf.fuel.core.Encoding
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.extensions.cUrlString
-import com.github.kittinunf.fuel.core.extensions.httpString
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.decodeBase64
@@ -17,14 +14,12 @@ import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
-import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Test
 import org.mockserver.model.BinaryBody
 import java.net.HttpURLConnection
-import java.net.URL
 import java.util.Random
 
 class RequestTest : MockHttpTestCase() {
@@ -605,56 +600,6 @@ class RequestTest : MockHttpTestCase() {
             assertThat(response.contentLength, equalTo(-1L)) // this is true
             assertThat(data, nullValue()) // but then this is not
             assertThat(error, nullValue())
-    }
-
-    @Test
-    fun httpGetCurlString() {
-        val request = DefaultRequest(
-            method = Method.GET,
-            url = URL("http://httpbin.org/get"),
-            headers = Headers.from("Authentication" to "Bearer xxx"),
-            parameters = listOf("foo" to "xxx")
-        )
-
-        assertThat(request.cUrlString(), equalTo("curl -i -H \"Authentication:Bearer xxx\" http://httpbin.org/get"))
-    }
-
-    @Test
-    fun httpPostCurlString() {
-        val request = DefaultRequest(
-            method = Method.POST,
-            url = URL("http://httpbin.org/post"),
-            headers = Headers.from("Authentication" to "Bearer xxx"),
-            parameters = listOf("foo" to "xxx")
-        )
-
-        assertThat(request.cUrlString(), equalTo("curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
-    }
-
-    @Test
-    fun httpStringWithOutParams() {
-        val request = DefaultRequest(
-            Method.GET,
-            url = URL("http://httpbin.org/post"),
-            headers = Headers.from("Content-Type" to "text/html")
-        )
-
-        assertThat(request.httpString(), startsWith("GET http"))
-        assertThat(request.httpString(), containsString("Content-Type"))
-    }
-
-    @Test
-    fun httpStringWithParams() {
-        val request = DefaultRequest(
-            Method.POST,
-            url = URL("http://httpbin.org/post"),
-            headers = Headers.from("Content-Type" to "text/html"),
-            parameters = listOf("foo" to "xxx")
-        ).body("it's a body")
-
-        assertThat(request.httpString(), startsWith("POST http"))
-        assertThat(request.httpString(), containsString("Content-Type"))
-        assertThat(request.httpString(), containsString("body"))
     }
 
     @Test
