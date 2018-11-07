@@ -6,15 +6,16 @@ import com.github.kittinunf.fuel.core.Response
 import java.io.InterruptedIOException
 import java.util.concurrent.Callable
 
-internal fun Request.toTask(): Callable<Response> = TaskRequest(this)
+internal fun Request.toTask(): Callable<Response> = RequestTask(this)
 
-internal open class TaskRequest(internal val request: Request) : Callable<Response> {
+internal class RequestTask(internal val request: Request) : Callable<Response> {
     private val interruptCallback: ((Request) -> Unit)? by lazy { executor.interruptCallback }
     private val executor by lazy { request.executionOptions }
+    private val client by lazy { executor.client }
 
     override fun call(): Response = runCatching {
         val modifiedRequest = executor.requestTransformer(request)
-        executor.responseTransformer(modifiedRequest, executor.client.executeRequest(modifiedRequest))
+        executor.responseTransformer(modifiedRequest, client.executeRequest(modifiedRequest))
     }.fold(
         onSuccess = { response: Response -> response },
         onFailure = { error: Throwable ->
