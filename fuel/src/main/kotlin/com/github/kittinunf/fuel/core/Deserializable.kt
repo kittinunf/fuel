@@ -11,8 +11,6 @@ import com.github.kittinunf.result.mapError
 import java.io.InputStream
 import java.io.Reader
 
-typealias HandlerWithResult<T> = (Request, Response, Result<T, FuelError>) -> Unit
-
 interface Deserializable<out T : Any> {
     fun deserialize(response: Response): T
 }
@@ -47,16 +45,28 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     fun deserialize(content: String): T? = null
 }
 
-fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: HandlerWithResult<T>): CancellableRequest =
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: ResponseResultHandler<T>): CancellableRequest =
     response(deserializable,
         { _, response, value -> handler(this@response, response, Result.Success(value)) },
         { _, response, error -> handler(this@response, response, Result.Failure(error)) }
     )
 
-fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>): CancellableRequest =
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: ResultHandler<T>): CancellableRequest =
+    response(deserializable,
+        { _, _, value -> handler(Result.Success(value)) },
+        { _, _, error -> handler(Result.Failure(error)) }
+    )
+
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: ResponseHandler<T>): CancellableRequest =
     response(deserializable,
         { request, response, value -> handler.success(request, response, value) },
         { request, response, error -> handler.failure(request, response, error) }
+    )
+
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>): CancellableRequest =
+    response(deserializable,
+        { _, _, value -> handler.success(value) },
+        { _, _, error -> handler.failure(error) }
     )
 
 private fun <T : Any, U : Deserializable<T>> Request.response(

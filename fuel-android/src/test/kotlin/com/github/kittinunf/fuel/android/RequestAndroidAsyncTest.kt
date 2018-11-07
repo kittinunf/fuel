@@ -6,7 +6,7 @@ import com.github.kittinunf.fuel.android.core.Json
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
@@ -160,7 +160,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
             response = mock.reflect()
         )
 
-        Fuel.get(mock.path("user-agent")).responseJson(object : Handler<Json> {
+        Fuel.get(mock.path("user-agent")).responseJson(object : ResponseHandler<Json> {
             override fun success(request: Request, response: Response, value: Json) {
                 req = request
                 res = response
@@ -235,7 +235,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        Fuel.get(mock.path("404")).responseJson(object : Handler<Json> {
+        Fuel.get(mock.path("404")).responseJson(object : ResponseHandler<Json> {
             override fun success(request: Request, response: Response, value: Json) {
                 data = value
 
@@ -309,7 +309,7 @@ class RequestAndroidAsyncTest : BaseTestCase() {
             response = mock.reflect()
         )
 
-        Fuel.get(mock.path("headers")).responseObject(HttpBinHeadersDeserializer(), object : Handler<HttpBinHeadersModel> {
+        Fuel.get(mock.path("headers")).responseObject(HttpBinHeadersDeserializer(), object : ResponseHandler<HttpBinHeadersModel> {
 
             override fun success(request: Request, response: Response, value: HttpBinHeadersModel) {
                 req = request

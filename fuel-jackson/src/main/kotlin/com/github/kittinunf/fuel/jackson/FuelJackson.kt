@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
@@ -21,7 +21,7 @@ inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, 
     response(jacksonDeserializerOf(), handler)
 }
 
-inline fun <reified T : Any> Request.responseObject(handler: Handler<T>) = response(jacksonDeserializerOf(), handler)
+inline fun <reified T : Any> Request.responseObject(handler: ResponseHandler<T>) = response(jacksonDeserializerOf(), handler)
 
 inline fun <reified T : Any> Request.responseObject() = response(jacksonDeserializerOf<T>())
 

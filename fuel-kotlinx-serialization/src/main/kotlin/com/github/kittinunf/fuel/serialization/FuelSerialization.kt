@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel.serialization
 
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
@@ -27,15 +27,15 @@ inline fun <reified T : Any> Request.responseObject(
 ) = responseObject(T::class.serializer(), json, deserializer)
 
 inline fun <reified T : Any> Request.responseObject(
-    deserializer: Handler<T>,
-    loader: DeserializationStrategy<T>,
-    json: JSON = JSON.plain
+        deserializer: ResponseHandler<T>,
+        loader: DeserializationStrategy<T>,
+        json: JSON = JSON.plain
 ) = response(kotlinxDeserializerOf(loader, json), deserializer)
 
 @ImplicitReflectionSerializer
 inline fun <reified T : Any> Request.responseObject(
-    deserializer: Handler<T>,
-    json: JSON = JSON.plain
+        deserializer: ResponseHandler<T>,
+        json: JSON = JSON.plain
 ) = responseObject(deserializer, T::class.serializer(), json)
 
 inline fun <reified T : Any> Request.responseObject(

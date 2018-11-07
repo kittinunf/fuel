@@ -166,13 +166,21 @@ interface Request : Fuel.RequestConvertible {
      */
     fun appendHeader(vararg pairs: Pair<String, Any>): Request
 
-    fun response(handler: HandlerWithResult<ByteArray>): CancellableRequest
+    fun response(handler: ResponseResultHandler<ByteArray>): CancellableRequest
+    fun response(handler: ResultHandler<ByteArray>): CancellableRequest
+    fun response(handler: ResponseHandler<ByteArray>): CancellableRequest
     fun response(handler: Handler<ByteArray>): CancellableRequest
-    fun responseString(handler: HandlerWithResult<String>): CancellableRequest
-    fun responseString(charset: Charset = Charsets.UTF_8, handler: HandlerWithResult<String>): CancellableRequest
-    fun responseString(charset: Charset = Charsets.UTF_8, handler: Handler<String>): CancellableRequest
+    fun responseString(handler: ResponseResultHandler<String>): CancellableRequest
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: ResponseResultHandler<String>): CancellableRequest
+    fun responseString(handler: ResultHandler<String>): CancellableRequest
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: ResultHandler<String>): CancellableRequest
+    fun responseString(handler: ResponseHandler<String>): CancellableRequest
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: ResponseHandler<String>): CancellableRequest
     fun responseString(handler: Handler<String>): CancellableRequest
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: HandlerWithResult<T>): CancellableRequest
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: Handler<String>): CancellableRequest
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResponseResultHandler<T>): CancellableRequest
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResponseHandler<T>): CancellableRequest
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResultHandler<T>): CancellableRequest
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): CancellableRequest
 
     fun response(): ResponseResultOf<ByteArray>
@@ -575,17 +583,29 @@ data class DefaultRequest(
         headers.transformIterate(appendHeaderWithValue)
     }
 
-    override fun response(handler: HandlerWithResult<ByteArray>) =
+    override fun response(handler: ResponseResultHandler<ByteArray>) =
+        response(ByteArrayDeserializer(), handler)
+    override fun response(handler: ResultHandler<ByteArray>) =
+        response(ByteArrayDeserializer(), handler)
+    override fun response(handler: ResponseHandler<ByteArray>) =
         response(ByteArrayDeserializer(), handler)
     override fun response(handler: Handler<ByteArray>) =
         response(ByteArrayDeserializer(), handler)
     override fun response() =
         response(ByteArrayDeserializer())
 
-    override fun responseString(charset: Charset, handler: HandlerWithResult<String>) =
+    override fun responseString(charset: Charset, handler: ResponseResultHandler<String>) =
         response(StringDeserializer(charset), handler)
-    override fun responseString(handler: HandlerWithResult<String>) =
+    override fun responseString(handler: ResponseResultHandler<String>) =
         responseString(Charsets.UTF_8, handler)
+    override fun responseString(charset: Charset, handler: ResultHandler<String>) =
+        response(StringDeserializer(charset), handler)
+    override fun responseString(handler: ResultHandler<String>) =
+            responseString(Charsets.UTF_8, handler)
+    override fun responseString(charset: Charset, handler: ResponseHandler<String>) =
+        response(StringDeserializer(charset), handler)
+    override fun responseString(handler: ResponseHandler<String>) =
+        response(StringDeserializer(), handler)
     override fun responseString(charset: Charset, handler: Handler<String>) =
         response(StringDeserializer(charset), handler)
     override fun responseString(handler: Handler<String>) =
@@ -595,7 +615,11 @@ data class DefaultRequest(
     override fun responseString() =
         response(StringDeserializer(Charsets.UTF_8))
 
-    override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: HandlerWithResult<T>) =
+    override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResponseResultHandler<T>) =
+        response(deserializer, handler)
+    override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResultHandler<T>) =
+        response(deserializer, handler)
+    override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResponseHandler<T>) =
         response(deserializer, handler)
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) =
         response(deserializer, handler)

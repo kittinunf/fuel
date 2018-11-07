@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
@@ -167,7 +167,7 @@ class FuelGsonTest : MockHttpTestCase() {
         var isAsync = false
         val running = reflectedRequest(Method.GET, "user-agent")
             .responseObject(
-                object : Handler<HttpBinUserAgentModel> {
+                object : ResponseHandler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                         assertThat(value, notNullValue())
                         assertThat("Expected value to have a user agent", value.userAgent, notNullValue())
@@ -196,7 +196,7 @@ class FuelGsonTest : MockHttpTestCase() {
 
         var isAsync = false
         val running = Fuel.get(mock.path("user-agent"))
-            .responseObject(object : Handler<HttpBinUserAgentModel> {
+            .responseObject(object : ResponseHandler<HttpBinUserAgentModel> {
                 override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                     fail("Expected request to fail, actual $value")
                 }

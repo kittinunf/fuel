@@ -10,7 +10,7 @@ import android.view.View;
 import com.example.fuel.databinding.ActivityMainBinding;
 import com.github.kittinunf.fuel.Fuel;
 import com.github.kittinunf.fuel.core.FuelError;
-import com.github.kittinunf.fuel.core.Handler;
+import com.github.kittinunf.fuel.core.ResponseHandler;
 import com.github.kittinunf.fuel.core.Request;
 import com.github.kittinunf.fuel.core.Response;
 
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void httpGet() {
-        Fuel.get("http://httpbin.org/get", params).responseString(new Handler<String>() {
+        Fuel.get("http://httpbin.org/get", params).responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void httpPut() {
         //put
-        Fuel.put("http://httpbin.org/put").responseString(new Handler<String>() {
+        Fuel.put("http://httpbin.org/put").responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void httpPost() {
         //post
-        Fuel.post("http://httpbin.org/post", params).responseString(new Handler<String>() {
+        Fuel.post("http://httpbin.org/post", params).responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void httpDelete() {
         //delete
-        Fuel.delete("http://httpbin.org/delete").responseString(new Handler<String>() {
+        Fuel.delete("http://httpbin.org/delete").responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 location.mkdir();
                 return new File(location, "test-java.tmp");
             }
-        }).responseString(new Handler<String>() {
+        }).responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 location.mkdir();
                 return new File(location, "test-java.tmp");
             }
-        }).responseString(new Handler<String>() {
+        }).responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
             Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password),
             username,
             password
-        ).responseString(new Handler<String>() {
+        ).responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);

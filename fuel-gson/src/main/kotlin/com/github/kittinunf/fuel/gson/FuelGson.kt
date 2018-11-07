@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel.gson
 
-import com.github.kittinunf.fuel.core.Handler
-import com.github.kittinunf.fuel.core.HandlerWithResult
+import com.github.kittinunf.fuel.core.ResponseHandler
+import com.github.kittinunf.fuel.core.ResponseResultHandler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.extensions.jsonBody
@@ -14,10 +14,10 @@ import java.io.Reader
 /**
  * Asynchronously gets a response object of [T] wrapped in [Result] via [handler]
  *
- * @param handler [HandlerWithResult<T>] the handler that is called upon success
+ * @param handler [ResponseResultHandler<T>] the handler that is called upon success
  * @return [CancellableRequest] request that can be cancelled
  */
-inline fun <reified T : Any> Request.responseObject(noinline handler: HandlerWithResult<T>) =
+inline fun <reified T : Any> Request.responseObject(noinline handler: ResponseResultHandler<T>) =
     response(gsonDeserializer(), handler)
 
 /**
@@ -26,7 +26,7 @@ inline fun <reified T : Any> Request.responseObject(noinline handler: HandlerWit
  * @param handler [Handle<T>] the handler that is called upon success
  * @return [CancellableRequest] request that can be cancelled
  */
-inline fun <reified T : Any> Request.responseObject(handler: Handler<T>) =
+inline fun <reified T : Any> Request.responseObject(handler: ResponseHandler<T>) =
     response(gsonDeserializer(), handler)
 
 /**

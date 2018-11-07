@@ -2,10 +2,10 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
@@ -31,10 +31,10 @@ class RequestHandlerTest : MockHttpTestCase() {
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/http-get"),
-            response = mock.reflect().withDelay(TimeUnit.MILLISECONDS, 200)
+            response = mock.reflect().withDelay(TimeUnit.MILLISECONDS, 1_000)
         )
 
-        val running = mock.path("http-get").httpGet().response(object : Handler<ByteArray> {
+        val running = mock.path("http-get").httpGet().response(object : ResponseHandler<ByteArray> {
             override fun success(request: Request, response: Response, value: ByteArray) {
                 assertThat(request, notNullValue())
                 assertThat(response, notNullValue())
@@ -66,7 +66,7 @@ class RequestHandlerTest : MockHttpTestCase() {
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/http-get"),
-            response = mock.reflect().withDelay(TimeUnit.MILLISECONDS, 200)
+            response = mock.reflect().withDelay(TimeUnit.MILLISECONDS, 1_000)
         )
 
         val running = mock.path("http-get")
@@ -100,12 +100,12 @@ class RequestHandlerTest : MockHttpTestCase() {
             request = mock.request().withMethod(Method.GET.value).withPath("/not-found"),
             response = mock.response()
                 .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
-                .withDelay(TimeUnit.MILLISECONDS, 200)
+                .withDelay(TimeUnit.MILLISECONDS, 1_000)
         )
 
         val running = mock.path("not-found")
             .httpGet()
-            .response(object : Handler<ByteArray> {
+            .response(object : ResponseHandler<ByteArray> {
                 override fun success(request: Request, response: Response, value: ByteArray) {
                     fail("Expected not to hit success path")
                 }
@@ -140,12 +140,12 @@ class RequestHandlerTest : MockHttpTestCase() {
 
         mock.chain(
             request = mock.request().withMethod(Method.POST.value).withPath("/http-post"),
-            response = mock.reflect().withDelay(TimeUnit.MILLISECONDS, 200)
+            response = mock.reflect().withDelay(TimeUnit.MILLISECONDS, 1_000)
         )
 
         val running = mock.path("http-post")
             .httpPost(listOf(paramKey to paramValue))
-            .responseString(object : Handler<String> {
+            .responseString(object : ResponseHandler<String> {
                 override fun success(request: Request, response: Response, value: String) {
                     assertThat(request, notNullValue())
                     assertThat(response, notNullValue())
