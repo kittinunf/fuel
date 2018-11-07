@@ -6,7 +6,7 @@ import com.github.kittinunf.fuel.core.Response
 import java.io.InterruptedIOException
 import java.util.concurrent.Callable
 
-internal fun Request.toTask() : Callable<Response> = TaskRequest(this)
+internal fun Request.toTask(): Callable<Response> = TaskRequest(this)
 
 internal open class TaskRequest(internal val request: Request) : Callable<Response> {
     private val interruptCallback: ((Request) -> Unit)? by lazy { executor.interruptCallback }

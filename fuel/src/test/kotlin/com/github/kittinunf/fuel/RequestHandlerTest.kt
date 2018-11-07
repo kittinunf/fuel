@@ -28,7 +28,7 @@ class RequestHandlerTest : MockHttpTestCase() {
     fun httpGetRequestValid() {
         var isAsync = false
         var isHandled = false
-        
+
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/http-get"),
             response = mock.reflect().withDelay(TimeUnit.MILLISECONDS, 200)

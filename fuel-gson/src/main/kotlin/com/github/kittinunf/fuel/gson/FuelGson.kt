@@ -47,7 +47,7 @@ inline fun <reified T : Any> gsonDeserializerOf(clazz: Class<T>) = object : Resp
 }
 
 inline fun <reified T : Any> gsonDeserializer() = object : ResponseDeserializable<T> {
-    override fun deserialize(reader: Reader): T? = Gson().fromJson<T>(reader, object: TypeToken<T>() {}.type)
+    override fun deserialize(reader: Reader): T? = Gson().fromJson<T>(reader, object : TypeToken<T>() {}.type)
 }
 
 /**
@@ -57,4 +57,4 @@ inline fun <reified T : Any> gsonDeserializer() = object : ResponseDeserializabl
  * @return [Request] the modified request
  */
 inline fun <reified T : Any> Request.jsonBody(src: T) =
-    this.jsonBody(Gson().toJson(src, object: TypeToken<T>() {}.type).also { println("serialized $it" )} as String)
+    this.jsonBody(Gson().toJson(src, object : TypeToken<T>() {}.type).also { println("serialized $it") } as String)

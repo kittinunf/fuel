@@ -126,7 +126,6 @@ class TransferEncodingTest : MockHttpTestCase() {
             .body(value)
             .response()
 
-
         val (data, error) = response
         assertThat("Expected data, actual error $error", data, notNullValue())
         assertArrayEquals(value, data)

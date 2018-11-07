@@ -46,7 +46,7 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     fun deserialize(content: String): T? = null
 }
 
-fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: HandlerWithResult<T>): CancellableRequest  =
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: HandlerWithResult<T>): CancellableRequest =
     response(deserializable, { _, response, value ->
         handler(this@response, response, Result.Success(value))
     }, { _, response, error ->

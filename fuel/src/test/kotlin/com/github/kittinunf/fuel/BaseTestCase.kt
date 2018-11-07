@@ -1,5 +1,3 @@
 package com.github.kittinunf.fuel
 
-abstract class BaseTestCase {
-
-}
+abstract class BaseTestCase

@@ -36,4 +36,4 @@ fun InputStream.decode(encoding: String, unsupported: DecodeFallbackCallback = U
  * @return [InputStream] the wrapped [InputStream] that is decoded when it's being read
  */
 fun InputStream.decode(encodings: Iterable<String>, unsupported: DecodeFallbackCallback = UNSUPPORTED_DECODE_ENCODING) =
-    encodings.fold(this) { stream, encoding -> stream.decode(encoding, unsupported)}
+    encodings.fold(this) { stream, encoding -> stream.decode(encoding, unsupported) }

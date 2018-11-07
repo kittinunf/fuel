@@ -16,7 +16,7 @@ fun OutputStream.encode(
     unsupported: (OutputStream, String) -> OutputStream = { _, _ ->
         throw UnsupportedOperationException("Encoding $encoding is not supported. Expected one of gzip, deflate, identity.")
     }
-) = when(encoding.trim()) {
+) = when (encoding.trim()) {
     "gzip" -> GZIPOutputStream(this)
     "deflate", "inflate" -> DeflaterOutputStream(this)
     // HTTPClient handles chunked

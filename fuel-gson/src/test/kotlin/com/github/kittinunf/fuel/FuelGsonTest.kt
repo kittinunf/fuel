@@ -112,7 +112,7 @@ class FuelGsonTest : MockHttpTestCase() {
     fun gsonTestResponseDeserializerObjectAsync() {
         var isAsync = false
         val running = reflectedRequest(Method.GET, "user-agent")
-            .responseObject<FuelGsonTest.HttpBinUserAgentModel>()  { _, _, result ->
+            .responseObject<FuelGsonTest.HttpBinUserAgentModel>() { _, _, result ->
                 val (data, error) = result
                 assertThat("Expected data, actual error $error", data, notNullValue())
                 assertThat("Expected data to have a user agent", data!!.userAgent, notNullValue())
@@ -247,7 +247,7 @@ class FuelGsonTest : MockHttpTestCase() {
             .responseObject<MockReflected>()
 
         val (reflected, error) = result
-        val issues: IssuesList = Gson().fromJson(reflected!!.body!!.string!!, object: TypeToken<IssuesList>() {}.type)
+        val issues: IssuesList = Gson().fromJson(reflected!!.body!!.string!!, object : TypeToken<IssuesList>() {}.type)
         assertThat("Expected issues, actual error $error", issues, notNullValue())
         assertThat(issues.size, equalTo(data.size))
         assertThat(issues.first().specialMethod(), equalTo("1: issue 1"))

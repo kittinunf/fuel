@@ -184,7 +184,6 @@ private fun OutputStream.writeBytes(bytes: ByteArray): Long {
     return bytes.size.toLong()
 }
 
-
 data class UploadRequest(private val wrapped: Request) : Request by wrapped {
     internal var name: String = "file"
     internal val names: MutableList<String> = mutableListOf()
@@ -267,6 +266,5 @@ data class UploadRequest(private val wrapped: Request) : Request by wrapped {
             } as UploadRequest
     }
 }
-
 
 fun Request.upload(): UploadRequest = UploadRequest.enableFor(this)

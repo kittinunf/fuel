@@ -257,7 +257,7 @@ class RequestUploadTest : MockHttpTestCase() {
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
             .name { "coolblob" }
-            .blob { _, _ ->  Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name) }
+            .blob { _, _ -> Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name) }
             .responseString()
         val (data, error) = result
 

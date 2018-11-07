@@ -28,8 +28,8 @@ interface Request : Fuel.RequestConvertible {
     val url: URL
     val headers: Headers
     val parameters: Parameters
-    var executionOptions : RequestExecutionOptions
-    val body : Body
+    var executionOptions: RequestExecutionOptions
+    val body: Body
     val enabledFeatures: RequestFeatures
 
     fun requestProgress(handler: ProgressCallback): Request
@@ -275,9 +275,9 @@ data class RequestExecutionOptions(
     fun callback(f: () -> Unit) = callbackExecutor.execute(f)
     fun <T> submit(task: Callable<T>): Future<T> = executorService.submit(task)
 
-    fun transformResponse(next: ResponseTransformer) : RequestExecutionOptions {
+    fun transformResponse(next: ResponseTransformer): RequestExecutionOptions {
         val previous = responseTransformer
-        responseTransformer = { request, response ->  next(request, previous(request, response)) }
+        responseTransformer = { request, response -> next(request, previous(request, response)) }
         return this
     }
 }

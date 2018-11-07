@@ -42,7 +42,6 @@ fun Request.monoResponse(): Mono<Response> =
         response { _, res, _ -> sink.success(res) }
     }
 
-
 /**
  * Get a single [ByteArray] via a [MonoSink.success], or any [FuelError] via [MonoSink.error]
  *
@@ -77,8 +76,8 @@ fun <T : Any> Request.monoObject(mapper: Deserializable<T>): Mono<T> = monoResul
  * @see monoBytes
  * @return [Mono<Result<ByteArray, FuelError>>] the [Mono]
  */
-fun Request.monoResultBytes(): Mono<Result<ByteArray, FuelError>>
-    = monoResultUnFolded(ByteArrayDeserializer())
+fun Request.monoResultBytes(): Mono<Result<ByteArray, FuelError>> =
+    monoResultUnFolded(ByteArrayDeserializer())
 
 /**
  * Get a single [String] or [FuelError] via [Result]
