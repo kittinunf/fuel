@@ -2,7 +2,7 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.extensions.authenticate
+import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 import org.hamcrest.CoreMatchers.notNullValue
@@ -39,7 +39,7 @@ class RequestAuthenticationTest : MockHttpTestCase() {
         mock.chain(request = incorrectRequest, response = incorrectResponse)
 
         val (request, response, result) = manager.request(Method.GET, mock.path("authenticate"))
-                .authenticate("invalid", "authentication")
+                .authentication().basic("invalid", "authentication")
                 .response()
         val (data, error) = result
 
@@ -75,7 +75,7 @@ class RequestAuthenticationTest : MockHttpTestCase() {
         mock.chain(request = incorrectRequest, response = incorrectResponse)
 
         val (request, response, result) = manager.request(Method.GET, mock.path("authenticate"))
-                .authenticate(user, password)
+                .authentication().basic(user, password)
                 .response()
         val (data, error) = result
 

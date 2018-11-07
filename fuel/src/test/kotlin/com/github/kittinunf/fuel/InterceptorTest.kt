@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.extensions.authenticate
+import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
@@ -888,7 +889,7 @@ class InterceptorTest : MockHttpTestCase() {
 
         val (_, _, result) = manager.request(Method.GET, mock.path("redirect"))
                 .header("Foo" to "bar")
-                .authenticate(username, password)
+                .authentication().basic(username, password)
                 .responseString()
 
         val (data, error) = result
@@ -929,7 +930,7 @@ class InterceptorTest : MockHttpTestCase() {
 
         val (_, _, result) = manager.request(Method.GET, mock.path("redirect"))
                 .header("Foo" to "bar")
-                .authenticate(username, password)
+                .authentication().basic(username, password)
                 .responseString()
 
         val (data, error) = result
