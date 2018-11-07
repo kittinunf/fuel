@@ -6,15 +6,15 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-
 import com.example.fuel.databinding.ActivityMainBinding;
 import com.github.kittinunf.fuel.Fuel;
 import com.github.kittinunf.fuel.core.FuelError;
-import com.github.kittinunf.fuel.core.ResponseHandler;
 import com.github.kittinunf.fuel.core.Request;
 import com.github.kittinunf.fuel.core.Response;
-
+import com.github.kittinunf.fuel.core.ResponseHandler;
 import com.github.kittinunf.fuel.core.extensions.AuthenticationKt;
+import kotlin.Pair;
+import kotlin.jvm.functions.Function2;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -22,16 +22,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import kotlin.Pair;
-import kotlin.jvm.functions.Function2;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main";
 
     private final List<Pair<String, String>> params = new ArrayList<Pair<String, String>>() {{
-        add(new Pair<String, String>("foo1", "bar1"));
-        add(new Pair<String, String>("foo2", "bar2"));
+        add(new Pair<>("foo1", "bar1"));
+        add(new Pair<>("foo2", "bar2"));
     }};
 
     ActivityMainBinding binding;
@@ -178,21 +175,19 @@ public class MainActivity extends AppCompatActivity {
     private void httpBasicAuthentication() {
         String username = "username";
         String password = "P@s$vv0|2|)";
-        AuthenticationKt.authenticate(
-            Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password),
-            username,
-            password
-        ).responseString(new ResponseHandler<String>() {
-            @Override
-            public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
-                updateUI(error, null);
-            }
+        AuthenticationKt.authentication(Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password))
+            .basic(username, password)
+            .responseString(new ResponseHandler<String>() {
+                @Override
+                public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
+                    updateUI(error, null);
+                }
 
-            @Override
-            public void success(@NotNull Request request, @NotNull Response response, String data) {
-                updateUI(null, data);
-            }
-        });
+                @Override
+                public void success(@NotNull Request request, @NotNull Response response, String data) {
+                    updateUI(null, data);
+                }
+            });
     }
 
     private void updateUI(final FuelError error, final String result) {

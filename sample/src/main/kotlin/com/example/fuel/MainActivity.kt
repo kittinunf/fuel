@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import awaitStringResult
+import awaitStringResponseResult
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.core.extensions.authenticate
+import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpDelete
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun httpGetCoroutine() {
-        val (request, response, result) = Fuel.get("/get", listOf("userId" to "123")).awaitStringResult()
+        val (request, response, result) = Fuel.get("/get", listOf("userId" to "123")).awaitStringResponseResult()
         Log.d(TAG, response.toString())
         Log.d(TAG, request.toString())
         update(result)
@@ -224,17 +224,19 @@ class MainActivity : AppCompatActivity() {
     private fun httpBasicAuthentication() {
         val username = "U$3|2|\\|@me"
         val password = "P@$\$vv0|2|)"
-        Fuel.get("/basic-auth/$username/$password").authenticate(username, password)
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        Fuel.get("/basic-auth/$username/$password")
+            .authentication().basic(username, password)
+            .responseString { request, _, result ->
+                Log.d(TAG, request.toString())
+                update(result)
+            }
 
-        "/basic-auth/$username/$password".httpGet().authenticate(username, password)
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        "/basic-auth/$username/$password".httpGet()
+            .authentication().basic(username, password)
+            .responseString { request, _, result ->
+                Log.d(TAG, request.toString())
+                update(result)
+            }
     }
 
     private fun httpRxSupport() {
