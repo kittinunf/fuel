@@ -114,7 +114,7 @@ suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deserializabl
     val res =
         r.map {
             deserializable.deserialize(it)
-        }.mapError {
+        }.mapError <T, Exception, FuelError> {
             it as? FuelError ?: FuelError(it)
         }
 
