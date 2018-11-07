@@ -11,6 +11,8 @@ import java.net.URL
 
 class DownloadRequest(private val wrapped: Request) : Request by wrapped {
     override val request: DownloadRequest = this
+    override fun toString() = "Download[\n\r\t$request\n\r]"
+
     internal lateinit var destinationCallback: ((Response, URL) -> File)
 
     init {

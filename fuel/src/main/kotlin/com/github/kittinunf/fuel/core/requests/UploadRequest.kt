@@ -185,9 +185,14 @@ private fun OutputStream.writeBytes(bytes: ByteArray): Long {
 }
 
 data class UploadRequest(private val wrapped: Request) : Request by wrapped {
+    override val request: UploadRequest = this
+    lateinit var sourceCallback: UploadSourceCallback
+
     internal var name: String = "file"
     internal val names: MutableList<String> = mutableListOf()
     internal val mediaTypes: MutableList<String> = mutableListOf()
+
+    override fun toString() = "Upload[\n\r\t$request\n\r]"
 
     /**
      *  Replace each pair, using the key as header name and value as header content
@@ -249,9 +254,6 @@ data class UploadRequest(private val wrapped: Request) : Request by wrapped {
     }
 
     fun progress(progress: ProgressCallback) = requestProgress(progress)
-
-    override val request: UploadRequest = this
-    lateinit var sourceCallback: UploadSourceCallback
 
     companion object {
         fun enableFor(request: Request) = request.enabledFeatures
