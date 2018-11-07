@@ -6,16 +6,17 @@ import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
+import com.github.kittinunf.fuel.core.requests.CancellableRequest
 import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
 import java.nio.charset.Charset
 
-private fun <T : Any> Request.monoResult(block: Request.(MonoSink<T>) -> Unit): Mono<T> =
+private fun <T : Any> Request.monoResult(async: Request.(MonoSink<T>) -> CancellableRequest): Mono<T> =
     Mono.create<T> { sink ->
-        sink.onCancel { cancel() }
-        block(sink)
+        val cancellableRequest = async(sink)
+        sink.onCancel { cancellableRequest.cancel() }
     }
 
 private fun <T : Any> Request.monoResultFold(mapper: Deserializable<T>): Mono<T> =
