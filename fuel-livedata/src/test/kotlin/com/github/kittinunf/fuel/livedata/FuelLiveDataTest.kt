@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.livedata
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.test.MockHelper
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.notNullValue

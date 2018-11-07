@@ -1,4 +1,4 @@
-package com.github.kittinunf.fuel
+package com.github.kittinunf.fuel.test
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
@@ -8,21 +8,16 @@ import org.junit.After
 import org.junit.Before
 import org.slf4j.event.Level
 
+@Suppress("unused")
 abstract class MockHttpTestCase {
 
     protected lateinit var mock: MockHelper
-
-    init {
-        Fuel.testMode {
-            timeout = 15000
-        }
-    }
 
     @Before
     fun setup() {
         // You can set the log level to INFO or TRACE to see all the mocking logging
         this.mock = MockHelper()
-        this.mock.setup(Level.INFO)
+        this.mock.setup(Level.WARN)
     }
 
     @After

@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.containsString
@@ -25,11 +26,6 @@ class RequestHandlerTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestValid() {
-        var req: Request? = null
-        var res: Response? = null
-        var data: Any? = null
-        val err: FuelError? = null
-
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/http-get"),
             response = mock.reflect()
@@ -37,23 +33,18 @@ class RequestHandlerTest : MockHttpTestCase() {
 
         mock.path("http-get").httpGet().response(object : Handler<ByteArray> {
             override fun success(request: Request, response: Response, value: ByteArray) {
-                req = request
-                res = response
-                data = value
+                assertThat(request, notNullValue())
+                assertThat(response, notNullValue())
+                assertThat(value, notNullValue())
+
+                val statusCode = HttpURLConnection.HTTP_OK
+                assertThat(response.statusCode, isEqualTo(statusCode))
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
                 fail("Expected to not hit failure path")
             }
         })
-
-        assertThat(req, notNullValue())
-        assertThat(res, notNullValue())
-        assertThat(err, nullValue())
-        assertThat(data, notNullValue())
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(res?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
@@ -73,10 +64,7 @@ class RequestHandlerTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestInvalid() {
-        var req: Request? = null
-        var res: Response? = null
         val data: Any? = null
-        var err: FuelError? = null
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/not-found"),
@@ -90,26 +78,20 @@ class RequestHandlerTest : MockHttpTestCase() {
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
-                req = request
-                res = response
-                err = error
+                assertThat(request, notNullValue())
+                assertThat(response, notNullValue())
+                assertThat(error, notNullValue())
+
+                val statusCode = HttpURLConnection.HTTP_NOT_FOUND
+                assertThat(response.statusCode, isEqualTo(statusCode))
             }
         })
 
-        assertThat(req, notNullValue())
-        assertThat(res, notNullValue())
-        assertThat(err, notNullValue())
         assertThat(data, nullValue())
-
-        val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(res?.statusCode, isEqualTo(statusCode))
     }
 
     @Test
     fun httpPostRequestWithParameters() {
-        var req: Request? = null
-        var res: Response? = null
-        var data: Any? = null
         val err: FuelError? = null
 
         val paramKey = "foo"
@@ -122,9 +104,15 @@ class RequestHandlerTest : MockHttpTestCase() {
 
         mock.path("http-post").httpPost(listOf(paramKey to paramValue)).responseString(object : Handler<String> {
             override fun success(request: Request, response: Response, value: String) {
-                req = request
-                res = response
-                data = value
+                assertThat(request, notNullValue())
+                assertThat(response, notNullValue())
+                assertThat(value, notNullValue())
+
+                val statusCode = HttpURLConnection.HTTP_OK
+                assertThat(response.statusCode, isEqualTo(statusCode))
+
+                assertThat(value, containsString(paramKey))
+                assertThat(value, containsString(paramValue))
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
@@ -132,17 +120,6 @@ class RequestHandlerTest : MockHttpTestCase() {
             }
         })
 
-        val string = data as String
-
-        assertThat(req, notNullValue())
-        assertThat(res, notNullValue())
         assertThat(err, nullValue())
-        assertThat(data, notNullValue())
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(res?.statusCode, isEqualTo(statusCode))
-
-        assertThat(string, containsString(paramKey))
-        assertThat(string, containsString(paramValue))
     }
 }

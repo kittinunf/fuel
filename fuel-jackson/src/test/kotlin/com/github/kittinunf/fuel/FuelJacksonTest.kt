@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.jackson.jacksonDeserializerOf
 import com.github.kittinunf.fuel.jackson.responseObject
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf

@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.android
 
+import com.github.kittinunf.fuel.test.MockHelper
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith

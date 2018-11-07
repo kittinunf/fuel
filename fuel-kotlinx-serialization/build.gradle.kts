@@ -10,5 +10,5 @@ repositories {
 dependencies {
     compile(project(":fuel"))
     compile(KotlinX.Serialization.dependency)
-    testCompile(MockServer.dependency)
+    testCompile(project(":fuel-test"))
 }

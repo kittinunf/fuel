@@ -1,9 +1,9 @@
 package com.github.kittinunf.fuel.issues
 
-import com.github.kittinunf.fuel.MockHttpTestCase
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.google.common.net.MediaType
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue

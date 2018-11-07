@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.not
