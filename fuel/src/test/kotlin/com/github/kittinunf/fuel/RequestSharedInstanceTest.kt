@@ -6,13 +6,13 @@ import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
-import org.junit.Assert.assertThat
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
-import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestSharedInstanceTest : MockHttpTestCase() {
 
@@ -53,7 +53,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         val string = data as String
 
@@ -82,7 +82,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string.toLowerCase(), containsString("foo"))
         assertThat(string.toLowerCase(), containsString("bar"))
@@ -109,7 +109,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string.toLowerCase(), containsString("foo"))
         assertThat(string.toLowerCase(), containsString("bar"))
@@ -136,7 +136,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string.toLowerCase(), containsString("foo"))
         assertThat(string.toLowerCase(), containsString("bar"))
@@ -163,7 +163,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString("Fuel/get"))
     }
@@ -185,7 +185,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString("Fuel/post"))
     }
@@ -207,7 +207,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString("Fuel/put"))
     }
@@ -229,7 +229,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString("Fuel/delete"))
     }
@@ -249,7 +249,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
     }
 
     @Test
@@ -267,7 +267,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
     }
 
     @Test
@@ -285,7 +285,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
     }
 
     @Test
@@ -302,7 +302,7 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
     }
 
     @Test
@@ -331,9 +331,9 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
-        assertThat(read == total && read != -1L && total != -1L, isEqualTo(true))
+        assertThat(read == total && read != -1L && total != -1L, equalTo(true))
     }
 
     @Test
@@ -361,8 +361,8 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
-        assertThat(read, isEqualTo(total))
+        assertThat(read, equalTo(total))
     }
 }

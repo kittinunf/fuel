@@ -140,10 +140,10 @@ class RequestDownloadTest : MockHttpTestCase() {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
-                        file
-        }.progress { _, _ ->
-        }.responseString()
+        val (request, response, result) = manager.download(mock.path("bytes"))
+            .destination { _, _ -> file }
+            .progress { _, _ -> }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -165,11 +165,13 @@ class RequestDownloadTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
-            val dir = System.getProperty("user.dir")
+        val (request, response, result) = manager.download(mock.path("bytes"))
+            .destination { _, _ ->
+                val dir = System.getProperty("user.dir")
             File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
-        }.progress { _, _ ->
-        }.responseString()
+            }
+            .progress { _, _ -> }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())

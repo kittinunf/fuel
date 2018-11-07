@@ -3,13 +3,13 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.DefaultRequest
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.fail
 import org.junit.Test
 import java.net.URL
-import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestHeadersTest : BaseTestCase() {
+class RequestHeadersTest {
     @Test
     fun requestHeadersFromReadmeIntegrity() {
         val request = DefaultRequest(method = Method.POST, url = URL("https://test.fuel.com/my-post-path"))
@@ -26,10 +26,10 @@ class RequestHeadersTest : BaseTestCase() {
             { k, v -> fail("Expected only header `set` and `add` with $k and $v") }
         )
 
-        assertThat(recordedSets[Headers.ACCEPT], isEqualTo("text/html, */*; q=0.1, application/json"))
-        assertThat(recordedSets[Headers.CONTENT_TYPE], isEqualTo("image/png"))
-        assertThat(recordedSets[Headers.COOKIE], isEqualTo("basic=very; value_1=foo; value_2=bar"))
-        assertThat(recordedSets["MyFoo"], isEqualTo("bar, baz"))
+        assertThat(recordedSets[Headers.ACCEPT], equalTo("text/html, */*; q=0.1, application/json"))
+        assertThat(recordedSets[Headers.CONTENT_TYPE], equalTo("image/png"))
+        assertThat(recordedSets[Headers.COOKIE], equalTo("basic=very; value_1=foo; value_2=bar"))
+        assertThat(recordedSets["MyFoo"], equalTo("bar, baz"))
     }
 
     @Test
@@ -38,8 +38,8 @@ class RequestHeadersTest : BaseTestCase() {
             .header(Headers.CONTENT_TYPE, "text/html")
 
         val values = request[Headers.CONTENT_TYPE]
-        assertThat(values, isEqualTo(request.header(Headers.CONTENT_TYPE)))
-        assertThat(values.lastOrNull(), isEqualTo("text/html"))
+        assertThat(values, equalTo(request.header(Headers.CONTENT_TYPE)))
+        assertThat(values.lastOrNull(), equalTo("text/html"))
     }
 
     @Test
@@ -48,8 +48,8 @@ class RequestHeadersTest : BaseTestCase() {
         request[Headers.CONTENT_TYPE] = "text/html"
 
         val values = request.header(Headers.CONTENT_TYPE)
-        assertThat(values.lastOrNull(), isEqualTo("text/html"))
-        assertThat(values.size, isEqualTo(1))
+        assertThat(values.lastOrNull(), equalTo("text/html"))
+        assertThat(values.size, equalTo(1))
     }
 
     @Test
@@ -60,8 +60,8 @@ class RequestHeadersTest : BaseTestCase() {
         request[Headers.CONTENT_TYPE] = "text/plain"
 
         val values = request.header(Headers.CONTENT_TYPE)
-        assertThat(values.lastOrNull(), isEqualTo("text/plain"))
-        assertThat(values.size, isEqualTo(1))
+        assertThat(values.lastOrNull(), equalTo("text/plain"))
+        assertThat(values.size, equalTo(1))
     }
 
     @Test
@@ -72,8 +72,8 @@ class RequestHeadersTest : BaseTestCase() {
         request.header(Headers.CONTENT_TYPE, "application/json")
 
         val values = request.header(Headers.CONTENT_TYPE)
-        assertThat(values.lastOrNull(), isEqualTo("application/json"))
-        assertThat(values.size, isEqualTo(1))
+        assertThat(values.lastOrNull(), equalTo("application/json"))
+        assertThat(values.size, equalTo(1))
     }
 
     @Test
@@ -84,9 +84,9 @@ class RequestHeadersTest : BaseTestCase() {
         request[Headers.ACCEPT] = listOf("text/plain", "*/*; q=0.2")
 
         val values = request.header(Headers.ACCEPT)
-        assertThat(values.firstOrNull(), isEqualTo("text/plain"))
-        assertThat(values.lastOrNull(), isEqualTo("*/*; q=0.2"))
-        assertThat(values.size, isEqualTo(2))
+        assertThat(values.firstOrNull(), equalTo("text/plain"))
+        assertThat(values.lastOrNull(), equalTo("*/*; q=0.2"))
+        assertThat(values.size, equalTo(2))
     }
 
     @Test
@@ -97,9 +97,9 @@ class RequestHeadersTest : BaseTestCase() {
         request.header(Headers.ACCEPT, listOf("text/plain", "*/*; q=0.2"))
 
         val values = request.header(Headers.ACCEPT)
-        assertThat(values.firstOrNull(), isEqualTo("text/plain"))
-        assertThat(values.lastOrNull(), isEqualTo("*/*; q=0.2"))
-        assertThat(values.size, isEqualTo(2))
+        assertThat(values.firstOrNull(), equalTo("text/plain"))
+        assertThat(values.lastOrNull(), equalTo("*/*; q=0.2"))
+        assertThat(values.size, equalTo(2))
     }
 
     @Test
@@ -110,9 +110,9 @@ class RequestHeadersTest : BaseTestCase() {
         request.header(mapOf(Headers.ACCEPT to listOf("text/plain", "*/*; q=0.2")))
 
         val values = request.header(Headers.ACCEPT)
-        assertThat(values.firstOrNull(), isEqualTo("text/plain"))
-        assertThat(values.lastOrNull(), isEqualTo("*/*; q=0.2"))
-        assertThat(values.size, isEqualTo(2))
+        assertThat(values.firstOrNull(), equalTo("text/plain"))
+        assertThat(values.lastOrNull(), equalTo("*/*; q=0.2"))
+        assertThat(values.size, equalTo(2))
     }
 
     @Test
@@ -123,9 +123,9 @@ class RequestHeadersTest : BaseTestCase() {
         request.header(Headers.ACCEPT to listOf("text/plain", "*/*; q=0.2"))
 
         val values = request.header(Headers.ACCEPT)
-        assertThat(values.firstOrNull(), isEqualTo("text/plain"))
-        assertThat(values.lastOrNull(), isEqualTo("*/*; q=0.2"))
-        assertThat(values.size, isEqualTo(2))
+        assertThat(values.firstOrNull(), equalTo("text/plain"))
+        assertThat(values.lastOrNull(), equalTo("*/*; q=0.2"))
+        assertThat(values.size, equalTo(2))
     }
 
     @Test
@@ -136,9 +136,9 @@ class RequestHeadersTest : BaseTestCase() {
         request.header(Headers.ACCEPT, "text/plain", "*/*; q=0.2")
 
         val values = request.header(Headers.ACCEPT)
-        assertThat(values.firstOrNull(), isEqualTo("text/plain"))
-        assertThat(values.lastOrNull(), isEqualTo("*/*; q=0.2"))
-        assertThat(values.size, isEqualTo(2))
+        assertThat(values.firstOrNull(), equalTo("text/plain"))
+        assertThat(values.lastOrNull(), equalTo("*/*; q=0.2"))
+        assertThat(values.size, equalTo(2))
     }
 
     @Test
@@ -148,9 +148,9 @@ class RequestHeadersTest : BaseTestCase() {
 
         request.header(Headers.ACCEPT_ENCODING to "br", Headers.ACCEPT_ENCODING to "gzip")
         val values = request.header(Headers.ACCEPT_ENCODING)
-        assertThat(values.firstOrNull(), isEqualTo("br"))
-        assertThat(values.lastOrNull(), isEqualTo("gzip"))
-        assertThat(values.size, isEqualTo(2))
+        assertThat(values.firstOrNull(), equalTo("br"))
+        assertThat(values.lastOrNull(), equalTo("gzip"))
+        assertThat(values.size, equalTo(2))
     }
 
     @Test
@@ -161,8 +161,8 @@ class RequestHeadersTest : BaseTestCase() {
         request.header(mapOf(Headers.ACCEPT_ENCODING to "br", Headers.ACCEPT_ENCODING to "gzip"))
 
         val values = request.header(Headers.ACCEPT_ENCODING)
-        assertThat(values.firstOrNull(), isEqualTo("gzip"))
-        assertThat(values.size, isEqualTo(1))
+        assertThat(values.firstOrNull(), equalTo("gzip"))
+        assertThat(values.size, equalTo(1))
     }
 
     @Test
@@ -173,9 +173,9 @@ class RequestHeadersTest : BaseTestCase() {
         request.appendHeader(Headers.ACCEPT_LANGUAGE, "fr-FR; q=0.8")
 
         val values = request.header(Headers.ACCEPT_LANGUAGE)
-        assertThat(values.firstOrNull(), isEqualTo("en-US"))
-        assertThat(values.lastOrNull(), isEqualTo("fr-FR; q=0.8"))
-        assertThat(values.size, isEqualTo(3))
+        assertThat(values.firstOrNull(), equalTo("en-US"))
+        assertThat(values.lastOrNull(), equalTo("fr-FR; q=0.8"))
+        assertThat(values.size, equalTo(3))
     }
 
     @Test
@@ -186,9 +186,9 @@ class RequestHeadersTest : BaseTestCase() {
         request.appendHeader(Headers.ACCEPT_LANGUAGE, "nl-NL; q=0.9", "fr-FR; q=0.8")
 
         val values = request.header(Headers.ACCEPT_LANGUAGE)
-        assertThat(values.firstOrNull(), isEqualTo("en-US"))
-        assertThat(values.lastOrNull(), isEqualTo("fr-FR; q=0.8"))
-        assertThat(values.size, isEqualTo(3))
+        assertThat(values.firstOrNull(), equalTo("en-US"))
+        assertThat(values.lastOrNull(), equalTo("fr-FR; q=0.8"))
+        assertThat(values.size, equalTo(3))
     }
 
     @Test
@@ -199,8 +199,8 @@ class RequestHeadersTest : BaseTestCase() {
         request.appendHeader(Headers.ACCEPT_LANGUAGE to "nl-NL; q=0.9", Headers.ACCEPT_LANGUAGE to "fr-FR; q=0.8")
 
         val values = request.header(Headers.ACCEPT_LANGUAGE)
-        assertThat(values.firstOrNull(), isEqualTo("en-US"))
-        assertThat(values.lastOrNull(), isEqualTo("fr-FR; q=0.8"))
-        assertThat(values.size, isEqualTo(3))
+        assertThat(values.firstOrNull(), equalTo("en-US"))
+        assertThat(values.lastOrNull(), equalTo("fr-FR; q=0.8"))
+        assertThat(values.size, equalTo(3))
     }
 }

@@ -13,7 +13,7 @@ import org.junit.Test
 import java.io.File
 import java.nio.charset.Charset
 
-class CustomClientTest : BaseTestCase() {
+class CustomClientTest {
     private val manager: FuelManager by lazy {
         val dir = System.getProperty("user.dir")
         val currentDir = File(dir, "src/test/assets")
@@ -32,8 +32,7 @@ class CustomClientTest : BaseTestCase() {
 
     @Test
     fun httpRequestWithMockedResponse() {
-        val (request, response, data) =
-                manager.request(Method.GET, "http://foo.bar").response()
+        val (request, response, data) = manager.request(Method.GET, "http://foo.bar").response()
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(data.get(), notNullValue())

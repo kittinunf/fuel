@@ -1,6 +1,5 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.BaseTestCase
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -11,7 +10,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.URL
 
-class BodyTest : BaseTestCase() {
+class BodyTest {
 
     @Test
     fun bodyIsEmptyByDefault() {

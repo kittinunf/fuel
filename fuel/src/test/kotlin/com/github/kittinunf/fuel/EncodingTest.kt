@@ -7,7 +7,7 @@ import org.junit.Test
 import java.io.ByteArrayOutputStream
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class EncodingTest : BaseTestCase() {
+class EncodingTest {
 
     @Test
     fun testEncodingNormal() {
@@ -131,7 +131,7 @@ class EncodingTest : BaseTestCase() {
     @Test
     fun testEncodingNonAsciiString() {
         val hebrewString = "טקסט בעברית 1 3.txt"
-        val path = "https://www.example.com/files/" + hebrewString
+        val path = "https://www.example.com/files/$hebrewString"
 
         val request = Encoding(
                 httpMethod = Method.GET,

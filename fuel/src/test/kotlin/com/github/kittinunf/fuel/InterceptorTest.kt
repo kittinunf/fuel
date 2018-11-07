@@ -193,6 +193,8 @@ class InterceptorTest : MockHttpTestCase() {
         val manager = FuelManager()
 
         var interceptorCalled = false
+
+        @Suppress("RedundantLambdaArrow")
         fun <T> customLoggingBreakingInterceptor() = { _: (T) -> T ->
             { t: T ->
                 println("1: $t")

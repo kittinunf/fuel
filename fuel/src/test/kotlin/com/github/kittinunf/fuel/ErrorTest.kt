@@ -6,7 +6,7 @@ import org.hamcrest.CoreMatchers.not
 import org.junit.Assert.assertThat
 import org.junit.Test
 
-class ErrorTest : BaseTestCase() {
+class ErrorTest {
     @Test
     fun testNoMessageException() {
         val error = FuelError(RuntimeException())

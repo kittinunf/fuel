@@ -36,9 +36,9 @@ class RequestUploadTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload")).source { _, _ ->
-                    File(currentDir, "lorem_ipsum_short.tmp")
-                }.responseString()
+        val (request, response, result) = manager.upload(mock.path("upload"))
+            .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -60,11 +60,9 @@ class RequestUploadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .source { _, _ ->
-                    File(currentDir, "lorem_ipsum_short.tmp")
-                }
-                .name { "file-name" }
-                .responseString()
+            .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
+            .name { "file-name" }
+            .responseString()
 
         val (data, error) = result
 
@@ -87,8 +85,8 @@ class RequestUploadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), Method.PUT)
-                .source { _, _ -> File(currentDir, "lorem_ipsum_long.tmp")
-                }.responseString()
+            .source { _, _ -> File(currentDir, "lorem_ipsum_long.tmp") }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -112,13 +110,14 @@ class RequestUploadTest : MockHttpTestCase() {
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = manager.upload(mock.path("upload")).source { _, _ ->
-                    File(currentDir, "lorem_ipsum_long.tmp")
-                }.progress { readBytes, totalBytes ->
-                    read = readBytes
-                    total = totalBytes
-                    println("read: $read, total: $total")
-                }.responseString()
+        val (request, response, result) = manager.upload(mock.path("upload"))
+            .source { _, _ -> File(currentDir, "lorem_ipsum_long.tmp") }
+            .progress { readBytes, totalBytes ->
+                read = readBytes
+                total = totalBytes
+                println("read: $read, total: $total")
+            }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -141,10 +140,10 @@ class RequestUploadTest : MockHttpTestCase() {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        val (request, response, result) = manager.upload(mock.path("nope")).source { _, _ ->
-                    File(currentDir, "lorem_ipsum_short.tmp")
-                }.progress { _, _ ->
-                }.responseString()
+        val (request, response, result) = manager.upload(mock.path("nope"))
+            .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
+            .progress { _, _ -> }
+            .responseString()
 
         val (data, error) = result
 
@@ -166,10 +165,10 @@ class RequestUploadTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload")).source { _, _ ->
-                    File(currentDir, "not_found_file.tmp")
-                }.progress { _, _ ->
-                }.responseString()
+        val (request, response, result) = manager.upload(mock.path("upload"))
+            .source { _, _ -> File(currentDir, "not_found_file.tmp") }
+            .progress { _, _ -> }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -193,12 +192,12 @@ class RequestUploadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .sources { _, _ ->
-                    listOf(File(currentDir, "lorem_ipsum_short.tmp"),
-                            File(currentDir, "lorem_ipsum_long.tmp"))
-                }
-                .name { "file-name" }
-                .responseString()
+            .sources { _, _ ->
+                listOf(File(currentDir, "lorem_ipsum_short.tmp"),
+                        File(currentDir, "lorem_ipsum_long.tmp"))
+            }
+            .name { "file-name" }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -224,13 +223,13 @@ class RequestUploadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .dataParts { _, _ ->
-                    listOf(
-                            DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg"),
-                            DataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "second-file", type = "image/jpeg")
-                    )
-                }
-                .responseString()
+            .dataParts { _, _ ->
+                listOf(
+                    DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg"),
+                    DataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "second-file", type = "image/jpeg")
+                )
+            }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -257,11 +256,9 @@ class RequestUploadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .name { "coolblob" }
-                .blob { _, _ ->
-                    Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name)
-                }
-                .responseString()
+            .name { "coolblob" }
+            .blob { _, _ ->  Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name) }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -281,16 +278,16 @@ class RequestUploadTest : MockHttpTestCase() {
         val manager = FuelManager()
 
         mock.chain(
-                request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
-                response = mock.reflect()
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .source { r, _ ->
-                    r.header(Pair("Content-Type", "multipart/form-data; boundary=160f77ec3eff"))
-                    File(currentDir, "lorem_ipsum_short.tmp")
-                }
-                .responseString()
+            .source { r, _ ->
+                r.header(Pair("Content-Type", "multipart/form-data; boundary=160f77ec3eff"))
+                File(currentDir, "lorem_ipsum_short.tmp")
+            }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -310,15 +307,13 @@ class RequestUploadTest : MockHttpTestCase() {
         val manager = FuelManager()
 
         mock.chain(
-                request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
-                response = mock.reflect()
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .source { _, _ ->
-                    File(currentDir, "lorem_ipsum_short.tmp")
-                }
-                .responseString()
+            .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
+            .responseString()
 
         val (data, error) = result
 
