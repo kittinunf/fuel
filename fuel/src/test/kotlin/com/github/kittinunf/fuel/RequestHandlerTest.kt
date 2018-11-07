@@ -15,6 +15,7 @@ import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 class RequestHandlerTest : MockHttpTestCase() {
@@ -74,7 +75,7 @@ class RequestHandlerTest : MockHttpTestCase() {
             .header("sample" to "a\nb\nc")
             .response { _, _, result ->
                 result.fold(
-                    { fail() },
+                    { fail("Expected IllegalArgumentException, actual $it") },
                     { e ->
                         assertTrue(e.exception is IllegalArgumentException)
                         assertThat(isAsync, equalTo(true))
@@ -85,7 +86,11 @@ class RequestHandlerTest : MockHttpTestCase() {
             }
 
         isAsync = true
-        running.join()
+        try {
+            running.join()
+        } catch(exception: ExecutionException) {
+            println(exception)
+        }
 
         assertThat(running.isDone, equalTo(true))
         assertThat(isHandled, equalTo(true))
