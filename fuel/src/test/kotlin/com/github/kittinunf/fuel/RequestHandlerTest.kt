@@ -88,7 +88,7 @@ class RequestHandlerTest : MockHttpTestCase() {
         isAsync = true
         try {
             running.join()
-        } catch(exception: ExecutionException) {
+        } catch (exception: ExecutionException) {
             println(exception)
         }
 
