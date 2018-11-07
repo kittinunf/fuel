@@ -14,6 +14,7 @@ import com.github.kittinunf.fuel.core.Handler;
 import com.github.kittinunf.fuel.core.Request;
 import com.github.kittinunf.fuel.core.Response;
 
+import com.github.kittinunf.fuel.core.extensions.AuthenticationKt;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -177,7 +178,11 @@ public class MainActivity extends AppCompatActivity {
     private void httpBasicAuthentication() {
         String username = "username";
         String password = "P@s$vv0|2|)";
-        Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password).authenticate(username, password).responseString(new Handler<String>() {
+        AuthenticationKt.authenticate(
+            Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password),
+            username,
+            password
+        ).responseString(new Handler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
