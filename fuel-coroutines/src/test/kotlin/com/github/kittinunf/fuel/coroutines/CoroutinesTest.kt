@@ -2,10 +2,15 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.result.Result
 import com.github.kittinunf.fuel.test.MockHelper
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertThat
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
@@ -315,6 +320,40 @@ class CoroutinesTest {
                 throw FuelError(NoValidFormat())
             }
             return UUIDResponse(content)
+        }
+    }
+
+    @Test
+    fun handleException() = runBlocking {
+
+        mock.chain(
+            request = mock.request().withPath("/fail"),
+            response = mock.reflect()
+        )
+
+        val (_, res, result) = Fuel.get(mock.path("fail"))
+            .awaitObjectResponse(object : ResponseDeserializable<Unit> {
+                override fun deserialize(content: String): Unit? {
+                    throw IllegalStateException("some deserialization exception")
+                }
+            })
+
+        assertThat(res, notNullValue())
+        assertThat(result, notNullValue())
+        assertThat(result.component2(), notNullValue())
+        val success = when (result) {
+            is Result.Success -> true
+            is Result.Failure -> false
+        }
+        assertFalse("should catch exception", success)
+        when (result) {
+            is Result.Success -> fail("should catch exception")
+            is Result.Failure -> {
+                assertThat(
+                    result.error.exception as? IllegalStateException,
+                    isA(IllegalStateException::class.java)
+                )
+            }
         }
     }
 }
