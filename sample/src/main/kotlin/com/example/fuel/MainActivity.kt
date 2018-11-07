@@ -9,6 +9,8 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.extensions.authenticate
+import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpDelete
 import com.github.kittinunf.fuel.httpGet
