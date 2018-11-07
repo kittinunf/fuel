@@ -16,8 +16,7 @@ class SuspendingRequest(private val request: Request) {
         val response = executor.client.awaitRequest(modifiedRequest)
 
         return Result.of<Response, Exception> {
-            request.responseTransformer(modifiedRequest, response)
-
+            request.executionOptions.responseTransformer(modifiedRequest, response)
         }.mapError { e ->
             val error = e as? FuelError ?: FuelError(e)
             if (error.exception as? InterruptedIOException != null) {
