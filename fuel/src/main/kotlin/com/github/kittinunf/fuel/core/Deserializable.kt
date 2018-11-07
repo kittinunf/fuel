@@ -1,10 +1,11 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.core.requests.AsyncTaskRequest
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
-import com.github.kittinunf.fuel.core.requests.SuspendingRequest
+import com.github.kittinunf.fuel.core.requests.RequestTaskCallbacks
+import com.github.kittinunf.fuel.core.requests.suspendable
 import com.github.kittinunf.fuel.core.requests.toTask
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.getOrElse
 import com.github.kittinunf.result.map
 import com.github.kittinunf.result.mapError
 import java.io.InputStream
@@ -47,47 +48,44 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 }
 
 fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: HandlerWithResult<T>): CancellableRequest =
-    response(deserializable, { _, response, value ->
-        handler(this@response, response, Result.Success(value))
-    }, { _, response, error ->
-        handler(this@response, response, Result.Failure(error))
-    })
+    response(deserializable,
+        { _, response, value -> handler(this@response, response, Result.Success(value)) },
+        { _, response, error -> handler(this@response, response, Result.Failure(error)) }
+    )
 
 fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: Handler<T>): CancellableRequest =
-    response(deserializable, { request, response, value ->
-        handler.success(request, response, value)
-    }, { request, response, error ->
-        handler.failure(request, response, error)
-    })
+    response(deserializable,
+        { request, response, value -> handler.success(request, response, value) },
+        { request, response, error -> handler.failure(request, response, error) }
+    )
 
 private fun <T : Any, U : Deserializable<T>> Request.response(
     deserializable: U,
     success: (Request, Response, T) -> Unit,
     failure: (Request, Response, FuelError) -> Unit
 ): CancellableRequest {
-    val asyncRequest = AsyncTaskRequest(this)
-
-    asyncRequest.successCallback = { response ->
-        val deliverable = Result.of<T, Exception> { deserializable.deserialize(response) }
-        executionOptions.callback {
-            deliverable.fold({
-                success(this, response, it)
-            }, {
-                failure(this, response, FuelError(it))
-            })
+    val asyncRequest = RequestTaskCallbacks(
+        request = this,
+        onSuccess = { response ->
+            val deliverable = Result.of<T, Exception> { deserializable.deserialize(response) }
+            executionOptions.callback {
+                deliverable.fold(
+                    { success(this, response, it) },
+                    { failure(this, response, FuelError.wrap(it)) }
+                )
+            }
+        },
+        onFailure = { error, response ->
+            executionOptions.callback {
+                failure(this, response, error)
+            }
         }
-    }
-
-    asyncRequest.failureCallback = { error, response ->
-        executionOptions.callback {
-            failure(this, response, error)
-        }
-    }
+    )
 
     return CancellableRequest(this, future = executionOptions.submit(asyncRequest))
 }
 
-fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): ResponseResultOf<T> {
     var response: Response? = null
     val result = Result.of<Response, Exception> { toTask().call() }
         .map {
@@ -106,14 +104,43 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Triple
     return Triple(this, response ?: Response.error(), result)
 }
 
-suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deserializable: U): Triple<Request, Response, Result<T, FuelError>> {
-    val r = SuspendingRequest(this).awaitResult()
-    val res =
-        r.map {
-            deserializable.deserialize(it)
-        }.mapError <T, Exception, FuelError> {
-            it as? FuelError ?: FuelError(it)
-        }
+/**
+ * Await [T] or throws [FuelError]
+ * @return [T] the [T]
+ */
+@Throws
+suspend fun <T : Any, U : Deserializable<T>> Request.await(deserializable: U) : T {
+    val response = suspendable().await()
+    return deserializable.deserialize(response)
+}
 
-    return Triple(this, r.component1() ?: Response.error(), res)
+/**
+ * Await [T] or [FuelError]
+ * @return [ResponseOf<T>] the [Result] of [T]
+ */
+@Throws
+suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deserializable: U) : ResponseOf<T> {
+    val response = suspendable().await()
+    return Triple(this, response, deserializable.deserialize(response))
+}
+
+/**
+ * Await [T] or [FuelError]
+ * @return [Result<T>] the [Result] of [T]
+ */
+suspend fun <T : Any, U : Deserializable<T>> Request.awaitResult(deserializable: U): Result<T, FuelError> {
+    val initialResult = suspendable().awaitResult()
+    return initialResult.map { deserializable.deserialize(it) }
+        .mapError <T, Exception, FuelError> { FuelError.wrap(it) }
+}
+
+/**
+ * Await [T] or [FuelError]
+ * @return [ResponseResultOf<T>] the [ResponseResultOf] of [T]
+ */
+suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponseResult(deserializable: U) : ResponseResultOf<T> {
+    val initialResult = suspendable().awaitResult()
+    return initialResult.map { deserializable.deserialize(it) }
+        .mapError <T, Exception, FuelError> { FuelError.wrap(it) }
+        .let { finalResult -> Triple(this, initialResult.getOrElse(Response.error()), finalResult) }
 }
