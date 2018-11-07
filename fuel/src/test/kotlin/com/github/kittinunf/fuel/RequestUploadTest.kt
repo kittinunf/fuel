@@ -2,10 +2,10 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.DataPart
+import com.github.kittinunf.fuel.core.DefaultRequest
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.requests.UploadBody
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import org.hamcrest.CoreMatchers.containsString
@@ -257,8 +257,8 @@ class RequestUploadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
-                .blob { r, _ ->
-                    r.name = "coolblob"
+                .name { "coolblob" }
+                .blob { _, _ ->
                     Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name)
                 }
                 .responseString()
@@ -336,9 +336,7 @@ class RequestUploadTest : MockHttpTestCase() {
 
     @Test
     fun getBoundaryWithBoundaryHeaders() {
-        val request = Request(Method.POST, "", URL("http://httpbin.org"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000)
+        val request = DefaultRequest(Method.POST, URL("http://httpbin.org"))
         request.header(Pair(Headers.CONTENT_TYPE, "multipart/form-data; boundary=160f77ec3eff"))
 
         val boundary = UploadBody.retrieveBoundaryInfo(request)
@@ -348,9 +346,7 @@ class RequestUploadTest : MockHttpTestCase() {
 
     @Test
     fun getBoundaryWithEmptyHeaders() {
-        val request = Request(Method.POST, "", URL("http://httpbin.org"),
-                timeoutInMillisecond = 15000,
-                timeoutReadInMillisecond = 15000)
+        val request = DefaultRequest(Method.POST, URL("http://httpbin.org"))
         val boundary = UploadBody.retrieveBoundaryInfo(request)
 
         assertThat(boundary, notNullValue())

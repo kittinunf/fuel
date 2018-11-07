@@ -6,18 +6,27 @@ import com.github.kittinunf.fuel.core.Response
 import java.io.InterruptedIOException
 import java.util.concurrent.Callable
 
-internal open class TaskRequest(internal val request: Request) : Callable<Response> {
-    var interruptCallback: ((Request) -> Unit)? = null
+internal fun Request.toTask() : Callable<Response> = TaskRequest(this)
 
-    override fun call(): Response = try {
-        val modifiedRequest = request.requestTransformer(request)
-        request.responseTransformer(modifiedRequest, request.client.executeRequest(modifiedRequest))
-    } catch (error: FuelError) {
-        if (error.exception as? InterruptedIOException != null) {
-            interruptCallback?.invoke(request)
+internal open class TaskRequest(internal val request: Request) : Callable<Response> {
+    private val interruptCallback: ((Request) -> Unit)? by lazy { executor.interruptCallback }
+    private val executor by lazy { request.executionOptions }
+
+    override fun call(): Response = runCatching {
+        val modifiedRequest = executor.requestTransformer(request)
+        executor.responseTransformer(modifiedRequest, executor.client.executeRequest(modifiedRequest))
+    }.fold(
+        onSuccess = { response: Response -> response },
+        onFailure = { error: Throwable ->
+        when (error) {
+            is FuelError -> {
+                (error.exception as? InterruptedIOException).also {
+                    interruptCallback?.invoke(request)
+                }
+                throw error
+            }
+            is Exception -> throw FuelError(error)
+            else -> throw error
         }
-        throw error
-    } catch (exception: Exception) {
-        throw FuelError(exception)
-    }
+    })
 }

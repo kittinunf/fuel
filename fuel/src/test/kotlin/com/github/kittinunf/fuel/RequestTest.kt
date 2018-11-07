@@ -1,10 +1,14 @@
 package com.github.kittinunf.fuel
 
+import com.github.kittinunf.fuel.core.DefaultRequest
 import com.github.kittinunf.fuel.core.Encoding
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.extensions.cUrlString
+import com.github.kittinunf.fuel.core.extensions.httpString
+import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.decodeBase64
 import com.google.common.net.MediaType
@@ -289,8 +293,8 @@ class RequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.request(Method.POST, mock.path("post"))
-                .jsonBody(body)
-                .responseString()
+            .jsonBody(body)
+            .responseString()
         val (data, error) = result
 
         val string = data as String
@@ -591,7 +595,7 @@ class RequestTest : MockHttpTestCase() {
             */
 
             val (request, response, result) = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString()
-            request.cancel()
+            // request.cancel()
 
             // TODO: investigate. By this time there is already data loaded and cancel doesn't
             //  actually cancel anything. See comments next to assertions below:
@@ -606,14 +610,11 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetCurlString() {
-        val request = Request(
+        val request = DefaultRequest(
             method = Method.GET,
-            path = "",
             url = URL("http://httpbin.org/get"),
             headers = Headers.from("Authentication" to "Bearer xxx"),
-            parameters = listOf("foo" to "xxx"),
-            timeoutInMillisecond = 15000,
-            timeoutReadInMillisecond = 15000
+            parameters = listOf("foo" to "xxx")
         )
 
         assertThat(request.cUrlString(), isEqualTo("curl -i -H \"Authentication:Bearer xxx\" http://httpbin.org/get"))
@@ -621,14 +622,11 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpPostCurlString() {
-        val request = Request(
+        val request = DefaultRequest(
             method = Method.POST,
-            path = "",
             url = URL("http://httpbin.org/post"),
             headers = Headers.from("Authentication" to "Bearer xxx"),
-            parameters = listOf("foo" to "xxx"),
-            timeoutInMillisecond = 15000,
-            timeoutReadInMillisecond = 15000
+            parameters = listOf("foo" to "xxx")
         )
 
         assertThat(request.cUrlString(), isEqualTo("curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
@@ -636,13 +634,10 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpStringWithOutParams() {
-        val request = Request(
+        val request = DefaultRequest(
             Method.GET,
-            "",
             url = URL("http://httpbin.org/post"),
-            headers = Headers.from("Content-Type" to "text/html"),
-            timeoutInMillisecond = 15000,
-            timeoutReadInMillisecond = 15000
+            headers = Headers.from("Content-Type" to "text/html")
         )
 
         assertThat(request.httpString(), startsWith("GET http"))
@@ -651,14 +646,11 @@ class RequestTest : MockHttpTestCase() {
 
     @Test
     fun httpStringWithParams() {
-        val request = Request(
+        val request = DefaultRequest(
             Method.POST,
-            "",
             url = URL("http://httpbin.org/post"),
             headers = Headers.from("Content-Type" to "text/html"),
-            parameters = listOf("foo" to "xxx"),
-            timeoutInMillisecond = 15000,
-            timeoutReadInMillisecond = 15000
+            parameters = listOf("foo" to "xxx")
         ).body("it's a body")
 
         assertThat(request.httpString(), startsWith("POST http"))

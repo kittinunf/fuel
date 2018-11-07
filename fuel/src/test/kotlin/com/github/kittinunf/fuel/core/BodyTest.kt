@@ -19,7 +19,7 @@ class BodyTest : BaseTestCase() {
         assertThat(body.isEmpty(), equalTo(true))
         assertThat(body.isConsumed(), equalTo(false))
 
-        val request = Request(Method.POST, "/", URL("https://test.fuel.com/"))
+        val request = DefaultRequest(Method.POST, URL("https://test.fuel.com/"))
         assertThat(request.toString(), containsString("(empty)"))
     }
 
@@ -37,7 +37,7 @@ class BodyTest : BaseTestCase() {
     fun bodyFromString() {
         val value = "String Body ${Math.random()}"
 
-        Request(Method.POST, "/", URL("https://test.fuel.com/"))
+        DefaultRequest(Method.POST, URL("https://test.fuel.com/"))
             .body(value)
             .apply {
                 val output = ByteArrayOutputStream(value.length)
@@ -57,7 +57,7 @@ class BodyTest : BaseTestCase() {
             }
         }
 
-        Request(Method.POST, "/", URL("https://test.fuel.com/"))
+        DefaultRequest(Method.POST, URL("https://test.fuel.com/"))
             .body(value)
             .apply {
                 val output = ByteArrayOutputStream(value.size)
@@ -75,7 +75,7 @@ class BodyTest : BaseTestCase() {
         val file = File.createTempFile("BodyTest", ".txt")
         file.writeText(value)
 
-        Request(Method.POST, "/", URL("https://test.fuel.com/"))
+        DefaultRequest(Method.POST, URL("https://test.fuel.com/"))
             .body(file)
             .apply {
                 val output = ByteArrayOutputStream(value.length)
@@ -93,7 +93,7 @@ class BodyTest : BaseTestCase() {
         val value = "String Body ${Math.random()}"
         val stream = ByteArrayInputStream(value.toByteArray())
 
-        Request(Method.POST, "/", URL("https://test.fuel.com/"))
+        DefaultRequest(Method.POST, URL("https://test.fuel.com/"))
             .body(stream)
             .apply {
                 val output = ByteArrayOutputStream(value.length)
@@ -126,7 +126,7 @@ class BodyTest : BaseTestCase() {
     fun requestWithBodyIsPrintableAfterConsumption() {
         val value = "String Body ${Math.random()}"
 
-        Request(Method.POST, "/", URL("https://test.fuel.com/"))
+        DefaultRequest(Method.POST, URL("https://test.fuel.com/"))
             .body(value)
             .apply {
                 val output = ByteArrayOutputStream()

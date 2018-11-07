@@ -1,15 +1,17 @@
 package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import java.util.concurrent.Callable
 
-internal class AsyncTaskRequest(private val task: TaskRequest) : TaskRequest(task.request) {
+internal class AsyncTaskRequest(private val request: Request) : Callable<Response> {
     var successCallback: ((Response) -> Unit)? = null
     var failureCallback: ((FuelError, Response) -> Unit)? = null
 
     override fun call(): Response = try {
-        task.call().apply {
-            successCallback?.invoke(this)
+        request.toTask().call().also {
+            successCallback?.invoke(it)
         }
     } catch (error: FuelError) {
         failureCallback?.invoke(error, error.response)

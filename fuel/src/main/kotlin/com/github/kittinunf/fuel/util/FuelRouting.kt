@@ -48,18 +48,15 @@ interface FuelRouting : Fuel.RequestConvertible {
     override val request: Request
         get() {
             // generate the encoder according provided parameters, headers, path, etc.
-            val encoder = Encoding(
+            val request = Encoding(
                     baseUrlString = basePath,
                     httpMethod = method,
                     urlString = path,
                     parameters = params
-            )
-            body?.let {
-                encoder.request.body(it)
-            } ?: bytes?.let {
-                encoder.request.body(it)
-            }
+            ).request
+            body?.let {request.body(it) } ?: bytes?.let { request.body(it) }
+
             // return the generated encoder with custom header injected
-            return encoder.request.header(headers ?: emptyMap())
+            return request.header(headers ?: emptyMap())
         }
 }

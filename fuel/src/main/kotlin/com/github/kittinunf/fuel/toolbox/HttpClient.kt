@@ -61,11 +61,11 @@ internal class HttpClient(
     @Throws
     private fun sendRequest(request: Request, connection: HttpURLConnection) {
         connection.apply {
-            connectTimeout = Fuel.testConfiguration.coerceTimeout(request.timeoutInMillisecond)
-            readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.timeoutReadInMillisecond)
+            connectTimeout = Fuel.testConfiguration.coerceTimeout(request.executionOptions.timeoutInMillisecond)
+            readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.executionOptions.timeoutReadInMillisecond)
             requestMethod = HttpClient.coerceMethod(request.method).value
             doInput = true
-            useCaches = request.useHttpCache ?: useHttpCache
+            useCaches = request.executionOptions.useHttpCache ?: useHttpCache
             instanceFollowRedirects = false
 
             request.headers.transformIterate(
@@ -109,7 +109,7 @@ internal class HttpClient(
         val transferEncoding = headers[Headers.TRANSFER_ENCODING].flatMap { it.split(',') }.map { it.trim() }
         val contentEncoding = headers[Headers.CONTENT_ENCODING].lastOrNull()
         var contentLength = headers[Headers.CONTENT_LENGTH].lastOrNull()?.toLong()
-        val shouldDecode = (request.decodeContent ?: decodeContent) && contentEncoding != null && contentEncoding != "identity"
+        val shouldDecode = (request.executionOptions.decodeContent ?: decodeContent) && contentEncoding != null && contentEncoding != "identity"
 
         if (shouldDecode) {
             // `decodeContent` decodes the response, so the final response has no more `Content-Encoding`
@@ -153,7 +153,7 @@ internal class HttpClient(
         val inputStream = if (shouldDecode && contentEncoding != null) contentStream.decode(contentEncoding) else contentStream
         val progressStream = ProgressInputStream(
             inputStream, onProgress = { readBytes ->
-                request.responseProgress(readBytes, contentLength ?: readBytes)
+                request.executionOptions.responseProgress(readBytes, contentLength ?: readBytes)
             }
         )
 
@@ -186,8 +186,8 @@ internal class HttpClient(
         val urlConnection = if (proxy != null) request.url.openConnection(proxy) else request.url.openConnection()
         return if (request.url.protocol == "https") {
             (urlConnection as HttpsURLConnection).apply {
-                sslSocketFactory = request.socketFactory
-                hostnameVerifier = request.hostnameVerifier
+                sslSocketFactory = request.executionOptions.socketFactory
+                hostnameVerifier = request.executionOptions.hostnameVerifier
             }
         } else {
             urlConnection as HttpURLConnection
@@ -217,7 +217,7 @@ internal class HttpClient(
             ProgressOutputStream(
                 connection.outputStream,
                 onProgress = { writtenBytes ->
-                    request.requestProgress(writtenBytes, totalBytes ?: writtenBytes)
+                    request.executionOptions.requestProgress(writtenBytes, totalBytes ?: writtenBytes)
                 }
             ).buffered(FuelManager.progressBufferSize)
         )

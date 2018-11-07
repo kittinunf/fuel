@@ -9,13 +9,14 @@ import java.io.InterruptedIOException
 
 class SuspendingRequest(private val request: Request) {
     var interruptCallback: ((Request) -> Unit)? = null
+    private val executor by lazy { request.executionOptions }
 
     suspend fun awaitResult(): Result<Response, FuelError> {
-        val modifiedRequest = request.requestTransformer(request)
-        val response = request.client.awaitRequest(modifiedRequest)
+        val modifiedRequest = executor.requestTransformer(request)
+        val response = executor.client.awaitRequest(modifiedRequest)
 
         return Result.of<Response, FuelError> {
-            request.responseTransformer(modifiedRequest, response)
+            executor.responseTransformer(modifiedRequest, response)
         }.mapError { e ->
             val error = e as? FuelError ?: FuelError(e)
             if (error.exception as? InterruptedIOException != null) {
