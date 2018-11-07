@@ -1,13 +1,12 @@
 package com.github.kittinunf.fuel
 
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.core.response
-import com.github.kittinunf.fuel.rx.rx
 import com.github.kittinunf.fuel.rx.rxBytes
 import com.github.kittinunf.fuel.rx.rxObject
 import com.github.kittinunf.fuel.rx.rxResponse
-import com.github.kittinunf.fuel.rx.rxResponseObject
-import com.github.kittinunf.fuel.rx.rxResponseString
+import com.github.kittinunf.fuel.rx.rxResponseObjectPair
+import com.github.kittinunf.fuel.rx.rxResponseStringPair
 import com.github.kittinunf.fuel.rx.rxString
 import com.github.kittinunf.fuel.test.MockHelper
 import com.github.kittinunf.result.Result
@@ -45,7 +44,7 @@ class RxFuelTest {
     }
 
     @Test
-    fun rxTestResponse() {
+    fun rxResponse() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
             response = mock.reflect()
@@ -65,13 +64,14 @@ class RxFuelTest {
     }
 
     @Test
-    fun rxTestResponseString() {
+    fun rxResponseStringPair() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
             response = mock.reflect()
         )
 
-        val (response, data) = Fuel.get(mock.path("user-agent")).rxResponseString()
+        val (response, data) = Fuel.get(mock.path("user-agent"))
+            .rxResponseStringPair()
             .test()
             .apply { awaitTerminalEvent() }
             .assertNoErrors()
@@ -90,7 +90,8 @@ class RxFuelTest {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(ByteArray(555) { 0 })
         )
 
-        val data = Fuel.get(mock.path("bytes")).rxBytes()
+        val data = Fuel.get(mock.path("bytes"))
+            .rxBytes()
             .test()
             .apply { awaitTerminalEvent() }
             .assertNoErrors()
@@ -106,13 +107,14 @@ class RxFuelTest {
     }
 
     @Test
-    fun rxTestString() {
+    fun rxString() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
             response = mock.reflect()
         )
 
-        val data = Fuel.get(mock.path("user-agent")).rxString()
+        val data = Fuel.get(mock.path("user-agent"))
+            .rxString()
             .test()
             .apply { awaitTerminalEvent() }
             .assertNoErrors()
@@ -128,12 +130,13 @@ class RxFuelTest {
     }
 
     @Test
-    fun rxTestStringError() {
+    fun rxStringWithError() {
         mock.chain(
             request = mock.request().withPath("/error"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
-        val data = Fuel.get(mock.path("error")).rxString()
+        val data = Fuel.get(mock.path("error"))
+            .rxString()
             .test()
             .apply { awaitTerminalEvent() }
             .assertNoErrors()
@@ -161,101 +164,77 @@ class RxFuelTest {
     }
 
     @Test
-    fun rxTestResponseObject() {
+    fun rxResponseObjectPair() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
             response = mock.reflect()
         )
 
         val (response, result) = Fuel.get(mock.path("user-agent"))
-            .rxResponseObject(HttpBinUserAgentModelDeserializer())
+            .rxResponseObjectPair(HttpBinUserAgentModelDeserializer())
             .test()
             .apply { awaitTerminalEvent() }
             .assertNoErrors()
             .assertValueCount(1)
             .assertComplete()
-            .values()[0]
+            .values()
+            .first()
 
         assertThat(response, notNullValue())
         assertThat(result, notNullValue())
-        assertThat(result as Result.Success, isA(Result.Success::class.java))
-        val (value, error) = result
-        assertThat(value, notNullValue())
-        assertThat(error, nullValue())
+        assertThat(result, isA(HttpBinUserAgentModel::class.java))
     }
 
     @Test
-    fun rxTestResponseObjectError() {
+    fun rxResponseObjectPairWithError() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        val (response, result) = Fuel.get(mock.path("user-agent"))
-            .rxResponseObject(HttpBinUserAgentModelDeserializer())
+        val single = Fuel.get(mock.path("user-agent"))
+            .rxResponseObjectPair(HttpBinUserAgentModelDeserializer())
             .test()
             .apply { awaitTerminalEvent() }
-            .assertNoErrors()
-            .assertValueCount(1)
-            .assertComplete()
-            .values()[0]
+            .assertError(FuelError::class.java)
+            .assertNoValues()
 
-        assertThat(response, notNullValue())
-        assertThat(result as Result.Failure, isA(Result.Failure::class.java))
-        val (value, error) = result
-        assertThat(value, nullValue())
+        val error = single.errors().firstOrNull()
+        val (response, value) = single.values().firstOrNull() ?: Pair(null, null)
+
+        assertThat("Expected error, actual response $response", response, nullValue())
+        assertThat("Expected error, actual value $value", value, nullValue())
         assertThat(error, notNullValue())
     }
 
     @Test
-    fun rxTestResponseObjectMalformed() {
+    fun rxResponseObjectPairWithMalformed() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
             response = mock.reflect()
         )
 
-        val (response, result) = Fuel.get(mock.path("user-agent"))
-            .rxResponseObject(HttpBinMalformedDeserializer())
+        val single = Fuel.get(mock.path("user-agent"))
+            .rxResponseObjectPair(HttpBinMalformedDeserializer())
             .test()
             .apply { awaitTerminalEvent() }
-            .assertNoErrors()
-            .assertValueCount(1)
-            .assertComplete()
-            .values()[0]
+            .assertError(FuelError::class.java)
+            .assertNoValues()
 
-        assertThat(response, notNullValue())
-        assertThat(result as Result.Failure, isA(Result.Failure::class.java))
-        assertThat(result.error.exception as IllegalStateException, isA(IllegalStateException::class.java))
-        assertThat(result.error.exception.message, isEqualTo("Malformed data"))
+        val error = single.errors().firstOrNull()
+        val (response, value) = single.values().firstOrNull() ?: Pair(null, null)
+
+        assertThat("Expected error, actual response $response", response, nullValue())
+        assertThat("Expected error, actual value $value", value, nullValue())
+
+        val fuelError = error as? FuelError
+        assertThat(fuelError, isA(FuelError::class.java))
+        assertThat(fuelError!!.exception as IllegalStateException, isA(IllegalStateException::class.java))
+        assertThat(fuelError.exception.message, isEqualTo("Malformed data"))
     }
 
     @Test
-    fun rxTestWrapper() {
-        mock.chain(
-            request = mock.request().withPath("/user-agent"),
-            response = mock.reflect()
-        )
-
-        val (request, response, result) =
-            Fuel.get(mock.path("user-agent"))
-                .rx { response(HttpBinUserAgentModelDeserializer()) }
-                .test()
-                .apply { awaitTerminalEvent() }
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertComplete()
-                .values()[0]
-
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(result as Result.Success, isA(Result.Success::class.java))
-        val (value, error) = result
-        assertThat(value, notNullValue())
-        assertThat(error, nullValue())
-    }
-
-    @Test
-    fun rxTestObject() {
+    fun rxObject() {
         mock.chain(
                 request = mock.request().withPath("/user-agent"),
                 response = mock.reflect()

@@ -2,13 +2,16 @@ package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.Body
+import com.github.kittinunf.fuel.core.DataPart
 import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
+import com.github.kittinunf.fuel.core.ProgressCallback
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.requests.UploadBody.Companion.DEFAULT_CHARSET
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.URL
@@ -18,8 +21,7 @@ import java.nio.charset.Charset
 typealias UploadSourceCallback = (Request, URL) -> Iterable<Blob>
 
 internal data class UploadBody(
-    val request: Request,
-    val taskRequest: UploadTaskRequest
+    val request: UploadRequest
 ) : Body {
 
     private var inputAvailable: Boolean = true
@@ -42,10 +44,10 @@ internal data class UploadBody(
             }
             .also { result ->
                 // The entire body is now in memory, and can act as a regular body
-                request._body = DefaultBody.from(
+                request.body(DefaultBody.from(
                     { ByteArrayInputStream(result) },
                     { result.size.toLong() }
-                )
+                ))
             }
     }
 
@@ -57,7 +59,7 @@ internal data class UploadBody(
         }
 
         inputAvailable = false
-        val sourceCallback = taskRequest.sourceCallback
+        val sourceCallback = request.sourceCallback
 
         return outputStream.buffered().let { stream ->
             // Parameters
@@ -91,7 +93,7 @@ internal data class UploadBody(
             } +
 
             // Blobs / Files size
-            taskRequest.sourceCallback(request, request.url).withIndex().sumByDouble { (index, blob) ->
+            request.sourceCallback(request, request.url).withIndex().sumByDouble { (index, blob) ->
                 0.0 + writeBlobHeader(ByteArrayOutputStream(), index, blob) + blob.length + CRLF.size
             } +
 
@@ -163,19 +165,11 @@ internal data class UploadBody(
             GENERIC_BYTE_CONTENT
         }
 
-        fun from(uploadTaskRequest: UploadTaskRequest, request: Request): Body {
-            return UploadBody(taskRequest = uploadTaskRequest, request = request).apply {
+        fun from(request: UploadRequest): Body {
+            return UploadBody(request).apply {
                 inputAvailable = true
             }
         }
-    }
-}
-
-internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
-    lateinit var sourceCallback: UploadSourceCallback
-
-    init {
-        request._body = UploadBody.from(this, request)
     }
 }
 
@@ -189,3 +183,90 @@ private fun OutputStream.writeBytes(bytes: ByteArray): Long {
     write(bytes)
     return bytes.size.toLong()
 }
+
+
+data class UploadRequest(private val wrapped: Request) : Request by wrapped {
+    internal var name: String = "file"
+    internal val names: MutableList<String> = mutableListOf()
+    internal val mediaTypes: MutableList<String> = mutableListOf()
+
+    /**
+     *  Replace each pair, using the key as header name and value as header content
+     */
+    fun blobs(blobsCallback: UploadSourceCallback): UploadRequest {
+        sourceCallback = blobsCallback
+        return request
+    }
+
+    fun blob(blobCallback: (Request, URL) -> Blob) = blobs { request, _ -> listOf(blobCallback(request, request.url)) }
+    fun dataParts(dataPartsCallback: (Request, URL) -> Iterable<DataPart>): UploadRequest {
+        val parts = dataPartsCallback(request, request.url)
+
+        mediaTypes.apply {
+            clear()
+            addAll(parts.map { it.type })
+        }
+
+        names.apply {
+            clear()
+            addAll(parts.map { it.name })
+        }
+
+        sourceCallback = { _, _ ->
+            parts.map { (file) -> Blob(file.name, file.length(), file::inputStream) }
+        }
+
+        return request
+    }
+
+    fun sources(sourcesCallback: (Request, URL) -> Iterable<File>): UploadRequest {
+        mediaTypes.clear()
+        names.clear()
+
+        val files = sourcesCallback(request, request.url)
+
+        sourceCallback = { _, _ ->
+            files.map { Blob(it.name, it.length(), it::inputStream) }
+        }
+
+        return request
+    }
+
+    fun source(sourceCallback: (Request, URL) -> File): UploadRequest {
+        sources { request, _ ->
+            listOf(sourceCallback(request, request.url))
+        }
+
+        return request
+    }
+
+    fun name(nameCallback: () -> String): UploadRequest {
+        return name(nameCallback())
+    }
+
+    fun name(newName: String): UploadRequest {
+        name = newName
+        return request
+    }
+
+    fun progress(progress: ProgressCallback) = requestProgress(progress)
+
+    override val request: UploadRequest = this
+    lateinit var sourceCallback: UploadSourceCallback
+
+    companion object {
+        fun enableFor(request: Request) = request.enabledFeatures
+            .getOrPut(UploadRequest::class.java.canonicalName) {
+                UploadRequest(request)
+                    .apply {
+                        this.body(UploadBody.from(this))
+
+                        val boundary = System.currentTimeMillis().toString(16)
+                        this[Headers.CONTENT_TYPE] = "multipart/form-data; boundary=$boundary"
+                    }
+            } as UploadRequest
+    }
+}
+
+
+fun Request.upload(): UploadRequest = UploadRequest.enableFor(this)
