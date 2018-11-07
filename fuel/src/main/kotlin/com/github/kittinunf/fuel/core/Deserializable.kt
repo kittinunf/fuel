@@ -119,7 +119,7 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Respon
  * @return [T] the [T]
  */
 @Throws
-suspend fun <T : Any, U : Deserializable<T>> Request.await(deserializable: U) : T {
+suspend fun <T : Any, U : Deserializable<T>> Request.await(deserializable: U): T {
     val response = suspendable().await()
     return deserializable.deserialize(response)
 }
@@ -129,7 +129,7 @@ suspend fun <T : Any, U : Deserializable<T>> Request.await(deserializable: U) : 
  * @return [ResponseOf<T>] the [Result] of [T]
  */
 @Throws
-suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deserializable: U) : ResponseOf<T> {
+suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deserializable: U): ResponseOf<T> {
     val response = suspendable().await()
     return Triple(this, response, deserializable.deserialize(response))
 }
@@ -148,7 +148,7 @@ suspend fun <T : Any, U : Deserializable<T>> Request.awaitResult(deserializable:
  * Await [T] or [FuelError]
  * @return [ResponseResultOf<T>] the [ResponseResultOf] of [T]
  */
-suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponseResult(deserializable: U) : ResponseResultOf<T> {
+suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponseResult(deserializable: U): ResponseResultOf<T> {
     val initialResult = suspendable().awaitResult()
     return initialResult.map { deserializable.deserialize(it) }
         .mapError <T, Exception, FuelError> { FuelError.wrap(it) }

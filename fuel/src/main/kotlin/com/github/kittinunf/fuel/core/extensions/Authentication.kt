@@ -4,7 +4,7 @@ import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 
-class AuthenticatedRequest(private val wrapped: Request): Request by wrapped {
+class AuthenticatedRequest(private val wrapped: Request) : Request by wrapped {
     override val request: AuthenticatedRequest = this
 
     /**

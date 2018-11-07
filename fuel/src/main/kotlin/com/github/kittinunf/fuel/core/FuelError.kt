@@ -12,7 +12,7 @@ class FuelError(
     override fun toString(): String = "${exception.javaClass.canonicalName}: ${exception.message ?: "<no message>"}"
 
     companion object {
-        fun wrap(it: Throwable): FuelError = when(it) {
+        fun wrap(it: Throwable): FuelError = when (it) {
             is FuelError -> it
             else -> FuelError(it)
         }

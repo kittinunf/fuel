@@ -27,15 +27,15 @@ inline fun <reified T : Any> Request.responseObject(
 ) = responseObject(T::class.serializer(), json, deserializer)
 
 inline fun <reified T : Any> Request.responseObject(
-        deserializer: ResponseHandler<T>,
-        loader: DeserializationStrategy<T>,
-        json: JSON = JSON.plain
+    deserializer: ResponseHandler<T>,
+    loader: DeserializationStrategy<T>,
+    json: JSON = JSON.plain
 ) = response(kotlinxDeserializerOf(loader, json), deserializer)
 
 @ImplicitReflectionSerializer
 inline fun <reified T : Any> Request.responseObject(
-        deserializer: ResponseHandler<T>,
-        json: JSON = JSON.plain
+    deserializer: ResponseHandler<T>,
+    json: JSON = JSON.plain
 ) = responseObject(deserializer, T::class.serializer(), json)
 
 inline fun <reified T : Any> Request.responseObject(
