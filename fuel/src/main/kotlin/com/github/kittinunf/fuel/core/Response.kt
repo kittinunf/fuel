@@ -1,8 +1,12 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.result.Result
 import java.io.ByteArrayInputStream
 import java.net.URL
 import java.net.URLConnection
+
+typealias ResponseOf<T> = Triple<Request, Response, T>
+typealias ResponseResultOf<T> = Triple<Request, Response, Result<T, FuelError>>
 
 data class Response(
     val url: URL,

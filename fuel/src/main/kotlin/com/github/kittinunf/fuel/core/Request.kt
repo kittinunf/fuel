@@ -4,7 +4,6 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
-import com.github.kittinunf.result.Result
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
@@ -176,10 +175,10 @@ interface Request : Fuel.RequestConvertible {
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: HandlerWithResult<T>): CancellableRequest
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): CancellableRequest
 
-    fun response(): Triple<Request, Response, Result<ByteArray, FuelError>>
-    fun responseString(charset: Charset = Charsets.UTF_8): Triple<Request, Response, Result<String, FuelError>>
-    fun responseString(): Triple<Request, Response, Result<String, FuelError>>
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>): Triple<Request, Response, Result<T, FuelError>>
+    fun response(): ResponseResultOf<ByteArray>
+    fun responseString(charset: Charset = Charsets.UTF_8): ResponseResultOf<String>
+    fun responseString(): ResponseResultOf<String>
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>): ResponseResultOf<T>
 
     /**
      * Sets the body to be read from a generic body source.
