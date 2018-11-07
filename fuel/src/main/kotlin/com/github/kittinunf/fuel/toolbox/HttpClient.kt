@@ -6,13 +6,13 @@ import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HeaderName
-import com.github.kittinunf.fuel.core.HeaderValues
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.util.ProgressInputStream
 import com.github.kittinunf.fuel.util.ProgressOutputStream
+import com.github.kittinunf.fuel.util.decode
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -20,8 +20,6 @@ import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.Proxy
 import java.net.URLConnection
-import java.util.zip.GZIPInputStream
-import java.util.zip.InflaterInputStream
 import javax.net.ssl.HttpsURLConnection
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -56,6 +54,12 @@ internal class HttpClient(
     @Throws
     private fun doRequest(request: Request): Response {
         val connection = establishConnection(request) as HttpURLConnection
+        sendRequest(request, connection)
+        return retrieveResponse(request, connection)
+    }
+
+    @Throws
+    private fun sendRequest(request: Request, connection: HttpURLConnection) {
         connection.apply {
             connectTimeout = Fuel.testConfiguration.coerceTimeout(request.timeoutInMillisecond)
             readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.timeoutReadInMillisecond)
@@ -97,7 +101,10 @@ internal class HttpClient(
             setDoOutput(connection, request.method)
             setBodyIfDoOutput(connection, request)
         }
+    }
 
+    @Throws
+    private fun retrieveResponse(request: Request, connection: HttpURLConnection): Response {
         val headers = Headers.from(connection.headerFields)
         val transferEncoding = headers[Headers.TRANSFER_ENCODING].flatMap { it.split(',') }.map { it.trim() }
         val contentEncoding = headers[Headers.CONTENT_ENCODING].lastOrNull()
@@ -142,6 +149,14 @@ internal class HttpClient(
             contentLength = -1
         }
 
+        val contentStream = dataStream(connection)?.decode(transferEncoding) ?: ByteArrayInputStream(ByteArray(0))
+        val inputStream = if (shouldDecode && contentEncoding != null) contentStream.decode(contentEncoding) else contentStream
+        val progressStream = ProgressInputStream(
+            inputStream, onProgress = { readBytes ->
+                request.responseProgress(readBytes, contentLength ?: readBytes)
+            }
+        )
+
         // The input and output streams returned by connection are not buffered. In order to give consistent progress
         // reporting, by means of flushing, the input stream here is buffered.
         return Response(
@@ -151,64 +166,19 @@ internal class HttpClient(
             statusCode = connection.responseCode,
             responseMessage = connection.responseMessage.orEmpty(),
             body = DefaultBody.from(
-                {
-                    ProgressInputStream(
-                        decodeContent(
-                            stream = decodeTransfer(safeDataStream(connection), transferEncoding),
-                            encoding = contentEncoding,
-                            shouldDecode = shouldDecode
-                        ),
-                        onProgress = { readBytes ->
-                            request.responseProgress(readBytes, contentLength ?: readBytes)
-                        }
-                    ).buffered(FuelManager.progressBufferSize)
-                },
+                { progressStream.buffered(FuelManager.progressBufferSize) },
                 { contentLength ?: -1 }
             )
         )
     }
 
-    private fun safeDataStream(connection: HttpURLConnection): InputStream? {
+    private fun dataStream(connection: HttpURLConnection): InputStream? {
         return try {
             (connection.errorStream ?: connection.inputStream) ?.let { BufferedInputStream(it) }
         } catch (exception: IOException) {
             // Stream error
             try { (connection.errorStream ?: connection.inputStream).close() } catch (_: IOException) {}
             ByteArrayInputStream(exception.message?.toByteArray() ?: ByteArray(0))
-        }
-    }
-
-    private fun decodeTransfer(stream: InputStream?, encodings: HeaderValues): InputStream {
-        // No data stream
-        if (stream == null) {
-            return ByteArrayInputStream(ByteArray(0))
-        }
-
-        if (encodings.isEmpty()) {
-            return stream
-        }
-
-        val encoding = encodings.first()
-        return decodeTransfer(decode(stream, encoding), encodings.toList().drop(1))
-    }
-
-    private fun decodeContent(stream: InputStream, encoding: String?, shouldDecode: Boolean): InputStream {
-        if (!shouldDecode || encoding.isNullOrBlank()) {
-            return stream
-        }
-
-        return decode(stream, encoding)
-    }
-
-    private fun decode(stream: InputStream, encoding: String): InputStream {
-        return when (encoding) {
-            "gzip" -> GZIPInputStream(stream)
-            "deflate" -> InflaterInputStream(stream)
-            "identity" -> stream
-            // The underlying HttpClient handles chunked, but does not remove the Transfer-Encoding Header
-            "chunked" -> stream
-            "" -> stream
-            else -> throw UnsupportedOperationException("Decoding $encoding is not supported. $SUPPORTED_DECODING are.")
         }
     }
 
@@ -261,8 +231,7 @@ internal class HttpClient(
     }
 
     companion object {
-        val SUPPORTED_DECODING = listOf("gzip", "deflate; q=0.5")
-
+        private val SUPPORTED_DECODING = listOf("gzip", "deflate; q=0.5")
         private fun coerceMethod(method: Method) = if (method == Method.PATCH) Method.POST else method
     }
 }
