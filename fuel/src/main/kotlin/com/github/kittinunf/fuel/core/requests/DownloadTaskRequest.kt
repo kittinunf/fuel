@@ -1,29 +1,26 @@
 package com.github.kittinunf.fuel.core.requests
 
+import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.util.copyTo
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.URL
 
 internal class DownloadTaskRequest(request: Request) : TaskRequest(request) {
-    var progressCallback: ((Long, Long) -> Unit)? = null
     lateinit var destinationCallback: ((Response, URL) -> File)
 
     override fun call(): Response {
         val response = super.call()
         val file = destinationCallback(response, request.url)
-
-        FileOutputStream(file).use {
-            response.dataStream.copyTo(out = it, bufferSize = BUFFER_SIZE, progress = { readBytes ->
-                progressCallback?.invoke(readBytes, response.contentLength)
-            }) {
-                response.data = it
+        val totalBytes = FileOutputStream(file).use { outputStream ->
+            response.body.toStream().use { inputStream ->
+                inputStream.copyTo(out = outputStream)
             }
         }
-        return response
+
+        // This allows the stream to be written to disk first and then return the written file.
+        return response.copy(body = DefaultBody.from({ FileInputStream(file) }, { totalBytes }))
     }
 }
-
-private const val BUFFER_SIZE = 1024

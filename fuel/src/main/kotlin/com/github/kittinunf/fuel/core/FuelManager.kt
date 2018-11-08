@@ -4,7 +4,6 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import com.github.kittinunf.fuel.toolbox.HttpClient
-import com.github.kittinunf.fuel.util.SameThreadExecutorService
 import com.github.kittinunf.fuel.util.readWriteLazy
 import java.net.Proxy
 import java.security.KeyStore
@@ -23,9 +22,10 @@ class FuelManager {
     var basePath: String? = null
     var timeoutInMillisecond: Int = 15000
     var timeoutReadInMillisecond: Int = timeoutInMillisecond
+    var progressBufferSize: Int = DEFAULT_BUFFER_SIZE
 
     var baseHeaders: Map<String, String>? = null
-    var baseParams: List<Pair<String, Any?>> = emptyList()
+    var baseParams: Parameters = emptyList()
 
     var keystore: KeyStore? = null
     var socketFactory: SSLSocketFactory by readWriteLazy {
@@ -57,48 +57,46 @@ class FuelManager {
     private val responseInterceptors: MutableList<((Request, Response) -> Response) -> ((Request, Response) -> Response)> =
             mutableListOf(redirectResponseInterceptor(this), validatorResponseInterceptor(200..299))
 
-    private fun createExecutor() = if (Fuel.testConfiguration.blocking) SameThreadExecutorService() else executor
-
     // callback executor
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
-    fun request(method: Method, path: String, param: List<Pair<String, Any?>>? = null): Request {
+    fun request(method: Method, path: String, param: Parameters? = null): Request {
         val request = request(Encoding(
-                httpMethod = method,
-                urlString = path,
-                baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param,
-                timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond
+            httpMethod = method,
+            urlString = path,
+            baseUrlString = basePath,
+            parameters = if (param == null) baseParams else baseParams + param,
+            timeoutInMillisecond = timeoutInMillisecond,
+            timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request)
         return request(request)
     }
 
-    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: List<Pair<String, Any?>>? = null): Request =
+    fun request(method: Method, convertible: Fuel.PathStringConvertible, param: Parameters? = null): Request =
             request(method, convertible.path, param)
 
-    fun download(path: String, param: List<Pair<String, Any?>>? = null): Request {
+    fun download(path: String, param: Parameters? = null): Request {
         val request = Encoding(
-                httpMethod = Method.GET,
-                urlString = path,
-                requestType = Request.Type.DOWNLOAD,
-                baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param,
-                timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond
+            httpMethod = Method.GET,
+            urlString = path,
+            requestType = Request.Type.DOWNLOAD,
+            baseUrlString = basePath,
+            parameters = if (param == null) baseParams else baseParams + param,
+            timeoutInMillisecond = timeoutInMillisecond,
+            timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request
         return request(request)
     }
 
-    fun upload(path: String, method: Method = Method.POST, param: List<Pair<String, Any?>>? = null): Request {
+    fun upload(path: String, method: Method = Method.POST, param: Parameters? = null): Request {
         val request = Encoding(
-                httpMethod = method,
-                urlString = path,
-                requestType = Request.Type.UPLOAD,
-                baseUrlString = basePath,
-                parameters = if (param == null) baseParams else baseParams + param,
-                timeoutInMillisecond = timeoutInMillisecond,
-                timeoutReadInMillisecond = timeoutReadInMillisecond
+            httpMethod = method,
+            urlString = path,
+            requestType = Request.Type.UPLOAD,
+            baseUrlString = basePath,
+            parameters = if (param == null) baseParams else baseParams + param,
+            timeoutInMillisecond = timeoutInMillisecond,
+            timeoutReadInMillisecond = timeoutReadInMillisecond
         ).request
         return request(request)
     }
@@ -131,18 +129,25 @@ class FuelManager {
 
     private fun request(request: Request): Request {
         request.client = client
-        request.headers += baseHeaders.orEmpty()
+
+        // Sets base headers ONLY if they are not set
+        val unsetBaseHeaders = request.headers.keys.fold(Headers.from(baseHeaders.orEmpty())) {
+            result, it -> result.remove(it); result
+        }
+        request.header(unsetBaseHeaders)
+
         request.socketFactory = socketFactory
         request.hostnameVerifier = hostnameVerifier
-        request.executor = createExecutor()
+        request.executor = executor
         request.callbackExecutor = callbackExecutor
-        request.requestInterceptor = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
-        request.responseInterceptor = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
+        request.requestTransformer = requestInterceptors.foldRight({ r: Request -> r }) { f, acc -> f(acc) }
+        request.responseTransformer = responseInterceptors.foldRight({ _: Request, res: Response -> res }) { f, acc -> f(acc) }
         return request
     }
 
     companion object {
         // manager
         var instance by readWriteLazy { FuelManager() }
+        val progressBufferSize: Int get() = instance.progressBufferSize
     }
 }

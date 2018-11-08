@@ -11,6 +11,7 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.test.MockHelper
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf

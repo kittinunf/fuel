@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue

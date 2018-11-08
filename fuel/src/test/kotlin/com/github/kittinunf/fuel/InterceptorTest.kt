@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.not
@@ -109,12 +110,6 @@ class InterceptorTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        // TODO: remove request from response logger
-        //   currently the response logger actually logs both request and response, after the
-        //   response comes back. Preferably the requestLogger logs the request as it goes out and
-        //   the responseLogger logs the response as it comes in.
-
-        assertThat("Expected request to be logged", outContent.toString(), containsString(request.toString()))
         assertThat("Expected response to be logged", outContent.toString(), containsString(response.toString()))
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
@@ -342,7 +337,9 @@ class InterceptorTest : MockHttpTestCase() {
 
         manager.baseHeaders = mapOf("User-Agent" to "Fuel")
 
-        val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).responseString(Charsets.UTF_8)
+        val (request, response, result) = manager.request(Method.GET, mock.path("redirect"))
+                .header("User-Agent" to "Fuel")
+                .responseString(Charsets.UTF_8)
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -382,7 +379,9 @@ class InterceptorTest : MockHttpTestCase() {
         val manager = FuelManager()
         manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
 
-        val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).responseString(Charsets.UTF_8)
+        val (request, response, result) = manager.request(Method.GET, mock.path("redirect"))
+                .header(mapOf("User-Agent" to "Fuel"))
+                .responseString(Charsets.UTF_8)
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -677,8 +676,8 @@ class InterceptorTest : MockHttpTestCase() {
         val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.GET))
     }
@@ -713,8 +712,8 @@ class InterceptorTest : MockHttpTestCase() {
         val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.GET))
     }
@@ -749,8 +748,8 @@ class InterceptorTest : MockHttpTestCase() {
         val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.GET))
     }
@@ -785,8 +784,8 @@ class InterceptorTest : MockHttpTestCase() {
         val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.POST))
     }
@@ -821,8 +820,8 @@ class InterceptorTest : MockHttpTestCase() {
         val (originalRequest, _, result) = manager.request(Method.POST, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
         assertThat(originalRequest.method, isEqualTo(Method.POST))
         assertThat(requests[1].method, isEqualTo(Method.POST))
     }
@@ -889,8 +888,8 @@ class InterceptorTest : MockHttpTestCase() {
                 .responseString()
 
         val (data, error) = result
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
+        assertThat(data, notNullValue())
     }
 
     @Test
@@ -931,10 +930,10 @@ class InterceptorTest : MockHttpTestCase() {
 
         val (data, error) = result
 
-        assertThat(data, notNullValue())
         assertThat(error, nullValue())
-        assertThat(requests[1].headers["Foo"], notNullValue())
-        assertThat(requests[1].headers["Authorization"], nullValue())
+        assertThat(data, notNullValue())
+        assertThat(requests[1]["Foo"], notNullValue())
+        assertThat(requests[1]["Authorization"].firstOrNull(), nullValue())
     }
 
     @Test

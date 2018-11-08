@@ -8,18 +8,29 @@ import com.github.kittinunf.result.mapError
 import java.io.InputStream
 import java.io.Reader
 
+typealias HandlerWithResult<T> = (Request, Response, Result<T, FuelError>) -> Unit
+
 interface Deserializable<out T : Any> {
     fun deserialize(response: Response): T
 }
 
 interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     override fun deserialize(response: Response): T {
-        try {
-            return deserialize(response.dataStream) ?: deserialize(response.dataStream.reader())
-            ?: deserialize(response.data) ?: deserialize(String(response.data))
-            ?: throw IllegalStateException("One of deserialize(ByteArray) or deserialize(InputStream) or deserialize(Reader) or deserialize(String) must be implemented")
-        } finally {
-            response.dataStream.close()
+        response.body.toStream().use { stream ->
+            return deserialize(stream)
+                ?: deserialize(stream.reader())
+                ?: response.let {
+                    // Reassign the body here so it can be read once more.
+                    val length = it.body.length
+                    it.body = DefaultBody.from({ stream }, length?.let { l -> { l } })
+
+                    deserialize(response.data)
+                        ?: deserialize(String(response.data))
+                        ?: throw FuelError(IllegalStateException(
+                            "One of deserialize(ByteArray) or deserialize(InputStream) or deserialize(Reader) or " +
+                                "deserialize(String) must be implemented"
+                        ))
+                }
         }
     }
 
@@ -33,7 +44,7 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
     fun deserialize(content: String): T? = null
 }
 
-fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: (Request, Response, Result<T, FuelError>) -> Unit): Request {
+fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U, handler: HandlerWithResult<T>): Request {
     response(deserializable, { _, response, value ->
         handler(this@response, response, Result.Success(value))
     }, { _, response, error ->
@@ -103,7 +114,7 @@ suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deserializabl
     val res =
         r.map {
             deserializable.deserialize(it)
-        }.mapError {
+        }.mapError <T, Exception, FuelError> {
             it as? FuelError ?: FuelError(it)
         }
 

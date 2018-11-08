@@ -3,12 +3,13 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.fuel.rx.rx
-import com.github.kittinunf.fuel.rx.rx_bytes
-import com.github.kittinunf.fuel.rx.rx_object
-import com.github.kittinunf.fuel.rx.rx_response
-import com.github.kittinunf.fuel.rx.rx_responseObject
-import com.github.kittinunf.fuel.rx.rx_responseString
-import com.github.kittinunf.fuel.rx.rx_string
+import com.github.kittinunf.fuel.rx.rxBytes
+import com.github.kittinunf.fuel.rx.rxObject
+import com.github.kittinunf.fuel.rx.rxResponse
+import com.github.kittinunf.fuel.rx.rxResponseObject
+import com.github.kittinunf.fuel.rx.rxResponseString
+import com.github.kittinunf.fuel.rx.rxString
+import com.github.kittinunf.fuel.test.MockHelper
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue
@@ -51,13 +52,13 @@ class RxFuelTest {
         )
 
         val (response, data) = Fuel.get(mock.path("user-agent"))
-                .rx_response()
-                .test()
-                .apply { awaitTerminalEvent() }
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertComplete()
-                .values()[0]
+            .rxResponse()
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertComplete()
+            .values()[0]
 
         assertThat(response, notNullValue())
         assertThat(data, notNullValue())
@@ -70,13 +71,13 @@ class RxFuelTest {
             response = mock.reflect()
         )
 
-        val (response, data) = Fuel.get(mock.path("user-agent")).rx_responseString()
-                .test()
-                .apply { awaitTerminalEvent() }
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertComplete()
-                .values()[0]
+        val (response, data) = Fuel.get(mock.path("user-agent")).rxResponseString()
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertComplete()
+            .values()[0]
 
         assertThat(response, notNullValue())
         assertThat(data, notNullValue())
@@ -89,13 +90,13 @@ class RxFuelTest {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(ByteArray(555) { 0 })
         )
 
-        val data = Fuel.get(mock.path("bytes")).rx_bytes()
-                .test()
-                .apply { awaitTerminalEvent() }
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertComplete()
-                .values()[0]
+        val data = Fuel.get(mock.path("bytes")).rxBytes()
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertComplete()
+            .values()[0]
 
         assertThat(data, notNullValue())
         assertThat(data as Result.Success, isA(Result.Success::class.java))
@@ -111,13 +112,13 @@ class RxFuelTest {
             response = mock.reflect()
         )
 
-        val data = Fuel.get(mock.path("user-agent")).rx_string()
-                .test()
-                .apply { awaitTerminalEvent() }
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertComplete()
-                .values()[0]
+        val data = Fuel.get(mock.path("user-agent")).rxString()
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertComplete()
+            .values()[0]
 
         assertThat(data, notNullValue())
         assertThat(data as Result.Success, isA(Result.Success::class.java))
@@ -132,13 +133,13 @@ class RxFuelTest {
             request = mock.request().withPath("/error"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
-        val data = Fuel.get(mock.path("error")).rx_string()
-                .test()
-                .apply { awaitTerminalEvent() }
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertComplete()
-                .values()[0]
+        val data = Fuel.get(mock.path("error")).rxString()
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertComplete()
+            .values()[0]
 
         assertThat(data as Result.Failure, isA(Result.Failure::class.java))
         val (value, error) = data
@@ -167,13 +168,13 @@ class RxFuelTest {
         )
 
         val (response, result) = Fuel.get(mock.path("user-agent"))
-                .rx_responseObject(HttpBinUserAgentModelDeserializer())
-                .test()
-                .apply { awaitTerminalEvent() }
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertComplete()
-                .values()[0]
+            .rxResponseObject(HttpBinUserAgentModelDeserializer())
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertComplete()
+            .values()[0]
 
         assertThat(response, notNullValue())
         assertThat(result, notNullValue())
@@ -191,13 +192,13 @@ class RxFuelTest {
         )
 
         val (response, result) = Fuel.get(mock.path("user-agent"))
-                .rx_responseObject(HttpBinUserAgentModelDeserializer())
-                .test()
-                .apply { awaitTerminalEvent() }
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertComplete()
-                .values()[0]
+            .rxResponseObject(HttpBinUserAgentModelDeserializer())
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertComplete()
+            .values()[0]
 
         assertThat(response, notNullValue())
         assertThat(result as Result.Failure, isA(Result.Failure::class.java))
@@ -214,13 +215,13 @@ class RxFuelTest {
         )
 
         val (response, result) = Fuel.get(mock.path("user-agent"))
-                .rx_responseObject(HttpBinMalformedDeserializer())
-                .test()
-                .apply { awaitTerminalEvent() }
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertComplete()
-                .values()[0]
+            .rxResponseObject(HttpBinMalformedDeserializer())
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertComplete()
+            .values()[0]
 
         assertThat(response, notNullValue())
         assertThat(result as Result.Failure, isA(Result.Failure::class.java))
@@ -236,14 +237,14 @@ class RxFuelTest {
         )
 
         val (request, response, result) =
-                Fuel.get(mock.path("user-agent"))
-                        .rx { response(HttpBinUserAgentModelDeserializer()) }
-                        .test()
-                        .apply { awaitTerminalEvent() }
-                        .assertNoErrors()
-                        .assertValueCount(1)
-                        .assertComplete()
-                        .values()[0]
+            Fuel.get(mock.path("user-agent"))
+                .rx { response(HttpBinUserAgentModelDeserializer()) }
+                .test()
+                .apply { awaitTerminalEvent() }
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertComplete()
+                .values()[0]
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
@@ -261,13 +262,13 @@ class RxFuelTest {
         )
 
         val data = Fuel.get(mock.path("user-agent"))
-                .rx_object(HttpBinUserAgentModelDeserializer())
-                .test()
-                .apply { awaitTerminalEvent() }
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertComplete()
-                .values()[0]
+            .rxObject(HttpBinUserAgentModelDeserializer())
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertComplete()
+            .values()[0]
 
         assertThat(data, notNullValue())
         assertThat(data as Result.Success, isA(Result.Success::class.java))

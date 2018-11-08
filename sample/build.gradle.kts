@@ -1,6 +1,5 @@
 import com.android.build.gradle.BaseExtension
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
 plugins {
     id(Android.appPlugin)

@@ -1,7 +1,10 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.HeaderValues
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Parameters
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.FuelRouting
 import com.github.kittinunf.fuel.util.decodeBase64ToString
 import com.github.kittinunf.fuel.util.encodeBase64
@@ -47,7 +50,7 @@ class RoutingTest : MockHttpTestCase() {
                 }
             }
 
-        override val params: List<Pair<String, Any?>>?
+        override val params: Parameters?
             get() {
                 return when (this) {
                     is GetParamsTest -> listOf(this.name to this.value)
@@ -79,12 +82,12 @@ class RoutingTest : MockHttpTestCase() {
                 }
             }
 
-        override val headers: Map<String, String>?
+        override val headers: Map<String, HeaderValues>?
             get() {
                 return when (this) {
-                    is PostBodyTest -> mapOf("Content-Type" to "application/json")
-                    is PostBinaryBodyTest -> mapOf("Content-Type" to "application/octet-stream")
-                    is PostEmptyBodyTest -> mapOf("Content-Type" to "application/json")
+                    is PostBodyTest -> mapOf("Content-Type" to listOf("application/json"))
+                    is PostBinaryBodyTest -> mapOf("Content-Type" to listOf("application/octet-stream"))
+                    is PostEmptyBodyTest -> mapOf("Content-Type" to listOf("application/json"))
                     else -> null
                 }
             }

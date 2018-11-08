@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.google.common.net.MediaType
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
@@ -10,11 +11,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
 import org.mockserver.model.BinaryBody
+import org.mockserver.model.Delay
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.util.Random
-import java.util.concurrent.TimeUnit
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestDownloadTest : MockHttpTestCase() {
@@ -32,10 +33,9 @@ class RequestDownloadTest : MockHttpTestCase() {
             response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
         )
 
-        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
-            println(file.absolutePath)
-            file
-        }.response()
+        val (request, response, result) = manager.download(mock.path("bytes"))
+            .destination { _, _ -> file }
+            .response()
 
         val (data, error) = result
 
@@ -66,14 +66,14 @@ class RequestDownloadTest : MockHttpTestCase() {
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
-            println(file.absolutePath)
-            file
-        }.progress { readBytes, totalBytes ->
-            read = readBytes
-            total = totalBytes
-            println("read: $read, total: $total")
-        }.response()
+        val (request, response, result) = manager.download(mock.path("bytes"))
+            .destination { _, _ -> file }
+            .progress { readBytes, totalBytes ->
+                read = readBytes
+                total = totalBytes
+                println("read: $read, total: $total")
+            }
+            .response()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -93,10 +93,9 @@ class RequestDownloadTest : MockHttpTestCase() {
     fun httpDownloadWithProgressValidCase() {
         val manager = FuelManager()
 
-        val numberOfBytes = 45024
+        val numberOfBytes = DEFAULT_BUFFER_SIZE * 5
         val file = File.createTempFile(numberOfBytes.toString(), null)
-        val bytes = ByteArray(numberOfBytes)
-        Random().nextBytes(bytes)
+        val bytes = ByteArray(numberOfBytes).apply { Random().nextBytes(this) }
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
@@ -106,14 +105,14 @@ class RequestDownloadTest : MockHttpTestCase() {
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
-            println(file.absolutePath)
-            file
-        }.progress { readBytes, totalBytes ->
-            read = readBytes
-            total = totalBytes
-            println("read: $read, total: $total")
-        }.responseString()
+        val (request, response, result) = manager.download(mock.path("bytes"))
+            .destination { _, _ -> file }
+            .progress { readBytes, totalBytes ->
+                read = readBytes
+                total = totalBytes
+                println("read: $read, total: $total")
+            }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -142,8 +141,7 @@ class RequestDownloadTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
-            println(file.absolutePath)
-            file
+                        file
         }.progress { _, _ ->
         }.responseString()
         val (data, error) = result
@@ -190,33 +188,32 @@ class RequestDownloadTest : MockHttpTestCase() {
 
         val numberOfBytes = 1024 * 1024 // 1 MB
         val file = File.createTempFile(numberOfBytes.toString(), null)
-        val bytes = ByteArray(numberOfBytes)
-        Random().nextBytes(bytes)
+        val bytes = ByteArray(numberOfBytes).apply { Random().nextBytes(this) }
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
-            response = mock.response()
-                        .withDelay(TimeUnit.SECONDS, 3)
-                        .withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+            response = mock.response().withDelay(Delay.seconds(1)).withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
         )
 
         var read = -1L
         var total = -1L
         var lastPercent = 0L
 
-        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
-            println(file.absolutePath)
-            file
-        }.progress { readBytes, totalBytes ->
-            read = readBytes
-            total = totalBytes
-            val percent = readBytes * 100 / totalBytes
-            if (percent > lastPercent) {
-                println("read: $read, total: $total, $percent% ")
-                lastPercent = percent
+        val (request, response, result) = manager.download(mock.path("bytes"))
+            .destination { _, _ -> file }
+            .progress { readBytes, totalBytes ->
+                read = readBytes
+                total = totalBytes
+                val percent = readBytes * 100 / totalBytes
+                if (percent > lastPercent) {
+                    println("read: $read, total: $total, $percent% ")
+                    lastPercent = percent
+                }
             }
-        }.responseString()
+            .responseString()
         val (data, error) = result
+
+        println("done downloading")
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())

@@ -2,8 +2,10 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Encoding
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertThat
@@ -255,7 +257,7 @@ class BlockingRequestTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestWithNotOverriddenHeaders() {
-        val headerKey = "Content-Type"
+        val headerKey = Headers.CONTENT_TYPE
         val headerValue = "application/json"
         manager.baseHeaders = mapOf(headerKey to headerValue)
 
@@ -274,7 +276,7 @@ class BlockingRequestTest : MockHttpTestCase() {
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response.statusCode, isEqualTo(statusCode))
 
-        assertThat(request.headers[headerKey], isEqualTo(headerValue))
+        assertThat(request[headerKey].lastOrNull(), isEqualTo(headerValue))
     }
 
     @Test
@@ -296,7 +298,6 @@ class BlockingRequestTest : MockHttpTestCase() {
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
-        println(data)
         assertThat(data.get(), notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK

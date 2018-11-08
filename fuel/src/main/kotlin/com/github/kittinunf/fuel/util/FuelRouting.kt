@@ -2,7 +2,9 @@ package com.github.kittinunf.fuel.util
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.HeaderValues
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Parameters
 import com.github.kittinunf.fuel.core.Request
 
 /**
@@ -25,7 +27,7 @@ interface FuelRouting : Fuel.RequestConvertible {
      * Parameters for the remote call.
      * It uses a pair with String, Any.
      */
-    val params: List<Pair<String, Any?>>?
+    val params: Parameters?
     /**
      * Body to handle binary type of request (e.g. application/octet-stream )
      */
@@ -37,7 +39,7 @@ interface FuelRouting : Fuel.RequestConvertible {
     /**
      * Headers for remote call.
      */
-    val headers: Map<String, String>?
+    val headers: Map<String, HeaderValues>?
 
     /**
      * @return a Request object.
@@ -58,6 +60,6 @@ interface FuelRouting : Fuel.RequestConvertible {
                 encoder.request.body(it)
             }
             // return the generated encoder with custom header injected
-            return encoder.request.header(headers)
+            return encoder.request.header(headers ?: emptyMap())
         }
 }

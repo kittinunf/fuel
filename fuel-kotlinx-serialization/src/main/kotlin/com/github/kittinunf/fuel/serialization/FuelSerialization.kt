@@ -9,39 +9,52 @@ import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 import kotlinx.io.InputStream
 import kotlinx.io.Reader
-import kotlinx.serialization.KSerialLoader
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.serializer
 
 inline fun <reified T : Any> Request.responseObject(
-    loader: KSerialLoader<T> = T::class.serializer(),
+    loader: DeserializationStrategy<T>,
     json: JSON = JSON.plain,
     noinline deserializer: (Request, Response, Result<T, FuelError>) -> Unit
 ) = response(kotlinxDeserializerOf(loader, json), deserializer)
 
+@ImplicitReflectionSerializer
+inline fun <reified T : Any> Request.responseObject(
+    json: JSON = JSON.plain,
+    noinline deserializer: (Request, Response, Result<T, FuelError>) -> Unit
+) = responseObject(T::class.serializer(), json, deserializer)
+
 inline fun <reified T : Any> Request.responseObject(
     deserializer: Handler<T>,
-    loader: KSerialLoader<T> = T::class.serializer(),
+    loader: DeserializationStrategy<T>,
     json: JSON = JSON.plain
 ) = response(kotlinxDeserializerOf(loader, json), deserializer)
 
+@ImplicitReflectionSerializer
 inline fun <reified T : Any> Request.responseObject(
-    loader: KSerialLoader<T> = T::class.serializer(),
+    deserializer: Handler<T>,
     json: JSON = JSON.plain
-) = response(kotlinxDeserializerOf<T>(loader, json))
+) = responseObject(deserializer, T::class.serializer(), json)
 
-inline fun <reified T : Any> kotlinxDeserializerOf(loader: KSerialLoader<T> = T::class.serializer(), json: JSON = JSON.plain) = object : ResponseDeserializable<T> {
-    override fun deserialize(content: String): T? {
-        return json.parse(loader, content)
-    }
+inline fun <reified T : Any> Request.responseObject(
+    loader: DeserializationStrategy<T>,
+    json: JSON = JSON.plain
+) = response(kotlinxDeserializerOf(loader, json))
 
-    override fun deserialize(reader: Reader): T? {
-        return deserialize(reader.readText())
-    }
+@ImplicitReflectionSerializer
+inline fun <reified T : Any> Request.responseObject(
+    json: JSON = JSON.plain
+) = responseObject(T::class.serializer(), json)
 
-    override fun deserialize(bytes: ByteArray): T? {
-        return deserialize(String(bytes))
-    }
+inline fun <reified T : Any> kotlinxDeserializerOf(
+    loader: DeserializationStrategy<T>,
+    json: JSON = JSON.plain
+) = object : ResponseDeserializable<T> {
+    override fun deserialize(content: String): T? = json.parse(loader, content)
+    override fun deserialize(reader: Reader): T? = deserialize(reader.readText())
+    override fun deserialize(bytes: ByteArray): T? = deserialize(String(bytes))
 
     override fun deserialize(inputStream: InputStream): T? {
         inputStream.bufferedReader().use {
@@ -49,3 +62,8 @@ inline fun <reified T : Any> kotlinxDeserializerOf(loader: KSerialLoader<T> = T:
         }
     }
 }
+
+@ImplicitReflectionSerializer
+inline fun <reified T : Any> kotlinxDeserializerOf(
+    json: JSON = JSON.plain
+) = kotlinxDeserializerOf(T::class.serializer(), json)

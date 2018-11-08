@@ -153,12 +153,13 @@ class EncodingTest : BaseTestCase() {
                 parameters = parameters
         ).request
 
-        val body = ByteArrayOutputStream().apply {
-            request.bodyCallback?.invoke(request, this, 0)
-        }.toByteArray()
+        val body = ByteArrayOutputStream()
+            .use { stream ->
+                request.body.writeTo(stream)
+                stream.toByteArray()
+            }
 
         val bodyString = String(body)
-        print(bodyString)
         assertThat(bodyString, isEqualTo("param1=value1&param2=value2"))
     }
 
@@ -173,9 +174,11 @@ class EncodingTest : BaseTestCase() {
                 parameters = parameters
         ).request
 
-        val body = ByteArrayOutputStream().apply {
-            request.bodyCallback?.invoke(request, this, 0)
-        }.toByteArray()
+        val body = ByteArrayOutputStream()
+            .use { stream ->
+                request.body.writeTo(stream)
+                stream.toByteArray()
+            }
 
         val bodyString = String(body)
         assertThat(bodyString, isEqualTo("param1=val%2Bue&param2=val+ue&param3=val%21ue&param4=%3A%2F%3F%23%5B%5D%40%24%26%27%28%29*%2B%2C%3B%3D+"))

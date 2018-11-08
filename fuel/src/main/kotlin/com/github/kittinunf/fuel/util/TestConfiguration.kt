@@ -12,12 +12,7 @@ data class TestConfiguration(
      * If set to null, the timeout value will be used.
      * If set to -1, there will be no timeout.
      */
-    var timeoutRead: Int? = null,
-
-    /**
-     * If set to true, it will block the thread for every request.
-     */
-    var blocking: Boolean = true
+    var timeoutRead: Int? = null
 ) {
 
     fun coerceTimeout(timeout: Int) = this.timeout?.let { if (it == -1) Int.MAX_VALUE else it } ?: timeout

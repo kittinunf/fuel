@@ -1,16 +1,12 @@
 pluginManagement {
     repositories {
         google()
-        maven(url = "http://dl.bintray.com/kotlin/kotlin-eap")
         mavenCentral()
         jcenter()
         maven(url = "https://plugins.gradle.org/m2/")
     }
     resolutionStrategy {
         eachPlugin {
-            if (requested.id.id == Kotlin.jvmId) {
-                useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
-            }
             if (requested.id.id == Android.libPlugin) {
                 useModule("com.android.tools.build:gradle:${requested.version}")
             }
@@ -37,5 +33,6 @@ include(":fuel-android")
 include(":fuel-jackson")
 include(":fuel-kotlinx-serialization")
 include(":fuel-moshi")
+include(":fuel-test")
 include(":sample")
 include(":sample-java")
