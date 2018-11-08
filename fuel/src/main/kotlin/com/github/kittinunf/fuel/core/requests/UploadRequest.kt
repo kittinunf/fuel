@@ -53,7 +53,7 @@ internal data class UploadBody(
 
     override fun writeTo(outputStream: OutputStream): Long {
         if (!inputAvailable) {
-            throw FuelError(IllegalStateException(
+            throw FuelError.wrap(IllegalStateException(
                 "The inputs have already been written to an output stream and can not be consumed again."
             ))
         }
@@ -184,7 +184,7 @@ private fun OutputStream.writeBytes(bytes: ByteArray): Long {
     return bytes.size.toLong()
 }
 
-data class UploadRequest(private val wrapped: Request) : Request by wrapped {
+class UploadRequest private constructor(private val wrapped: Request) : Request by wrapped {
     override val request: UploadRequest = this
     lateinit var sourceCallback: UploadSourceCallback
 
@@ -256,8 +256,9 @@ data class UploadRequest(private val wrapped: Request) : Request by wrapped {
     fun progress(progress: ProgressCallback) = requestProgress(progress)
 
     companion object {
+        val FEATURE: String = UploadRequest::class.java.canonicalName
         fun enableFor(request: Request) = request.enabledFeatures
-            .getOrPut(UploadRequest::class.java.canonicalName) {
+            .getOrPut(FEATURE) {
                 UploadRequest(request)
                     .apply {
                         this.body(UploadBody.from(this))
