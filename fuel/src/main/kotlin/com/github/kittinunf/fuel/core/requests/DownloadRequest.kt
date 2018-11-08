@@ -9,7 +9,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.URL
 
-class DownloadRequest(private val wrapped: Request) : Request by wrapped {
+class DownloadRequest private constructor(private val wrapped: Request) : Request by wrapped {
     override val request: DownloadRequest = this
     override fun toString() = "Download[\n\r\t$wrapped\n\r]"
 
@@ -39,8 +39,9 @@ class DownloadRequest(private val wrapped: Request) : Request by wrapped {
     }
 
     companion object {
+        val FEATURE: String = DownloadRequest::class.java.canonicalName
         fun enableFor(request: Request) = request.enabledFeatures
-            .getOrPut(DownloadRequest::class.java.canonicalName) { DownloadRequest(request) } as DownloadRequest
+            .getOrPut(FEATURE) { DownloadRequest(request) } as DownloadRequest
     }
 }
 
