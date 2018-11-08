@@ -1,4 +1,4 @@
-package com.github.kittinunf.fuel
+package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.DataPart
@@ -6,7 +6,6 @@ import com.github.kittinunf.fuel.core.DefaultRequest
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.requests.UploadBody
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
@@ -21,7 +20,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestUploadTest : MockHttpTestCase() {
+class UploadRequestTest : MockHttpTestCase() {
     private val currentDir: File by lazy {
         val dir = System.getProperty("user.dir")
         File(dir, "src/test/assets")

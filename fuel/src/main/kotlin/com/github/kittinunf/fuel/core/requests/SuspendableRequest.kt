@@ -8,7 +8,7 @@ import com.github.kittinunf.result.mapError
 import java.io.InterruptedIOException
 
 class SuspendableRequest(private val wrapped: Request) : Request by wrapped {
-    var interruptCallback: ((Request) -> Unit)? = null
+    private val interruptCallback by lazy { executor.interruptCallback }
     private val executor by lazy { request.executionOptions }
 
     suspend fun awaitResult(): Result<Response, FuelError> {
@@ -17,11 +17,9 @@ class SuspendableRequest(private val wrapped: Request) : Request by wrapped {
 
         return Result.of<Response, Exception> {
             request.executionOptions.responseTransformer(modifiedRequest, response)
-        }.mapError { e ->
-            FuelError.wrap(e).also {
-                if (it.exception as? InterruptedIOException != null) {
-                    interruptCallback?.invoke(request)
-                }
+        }.mapError { error ->
+            FuelError.wrap(error).also {
+                (it.exception as? InterruptedIOException)?.also { interruptCallback?.invoke(request) }
             }
         }
     }

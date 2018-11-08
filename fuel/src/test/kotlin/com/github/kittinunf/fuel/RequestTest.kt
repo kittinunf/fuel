@@ -553,55 +553,6 @@ class RequestTest : MockHttpTestCase() {
         assertThat(string, containsString(paramValue))
     }
 
-    // @Test
-    // TODO turn on when it works reliably
-    fun httpGetRequestCancel() {
-            /*
-                TODO: turn into mocked request. This one is failing because the mock server probably
-                    doesn't allow for streamed responses. Or maybe something else. Does show the
-                    issue with completed requests that are cancelled. Should probably be killed even
-                    if they are completed.
-
-
-            val bytes = ByteArray(1024 * 1024)
-            Random().nextBytes(bytes)
-
-            mock.chain(
-                request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
-                response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
-            )
-
-            val file = File.createTempFile(bytes.toString(), null)
-            val requestPrimed = manager.download(mock.path("bytes")).destination { _, _ -> file }
-
-            requestPrimed.progress { _, _ ->
-                requestPrimed.cancel()
-            }
-
-            val (request, response, result) = requestPrimed.response()
-            val (data, error) = result
-
-            assertThat(request, notNullValue())
-            assertThat(response, nullValue())
-            assertThat(data, nullValue())
-            assertThat(error, nullValue())
-
-            */
-
-            val (request, response, result) = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString()
-            // request.cancel()
-
-            // TODO: investigate. By this time there is already data loaded and cancel doesn't
-            //  actually cancel anything. See comments next to assertions below:
-
-            val (data, error) = result
-
-            assertThat(request, notNullValue())
-            assertThat(response.contentLength, equalTo(-1L)) // this is true
-            assertThat(data, nullValue()) // but then this is not
-            assertThat(error, nullValue())
-    }
-
     @Test
     fun httpGetParameterArrayWillFormCorrectURL() {
         val lionel = "Lionel Ritchie"

@@ -1,4 +1,4 @@
-package com.github.kittinunf.fuel
+package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
@@ -18,7 +18,7 @@ import java.net.HttpURLConnection
 import java.util.Random
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestDownloadTest : MockHttpTestCase() {
+class DownloadRequestTest : MockHttpTestCase() {
     @Test
     fun httpDownloadCase() {
         val manager = FuelManager()

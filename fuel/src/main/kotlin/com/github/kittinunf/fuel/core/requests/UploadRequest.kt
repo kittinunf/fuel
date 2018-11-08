@@ -192,7 +192,7 @@ data class UploadRequest(private val wrapped: Request) : Request by wrapped {
     internal val names: MutableList<String> = mutableListOf()
     internal val mediaTypes: MutableList<String> = mutableListOf()
 
-    override fun toString() = "Upload[\n\r\t$request\n\r]"
+    override fun toString() = "Upload[\n\r\t$wrapped\n\r]"
 
     /**
      *  Replace each pair, using the key as header name and value as header content

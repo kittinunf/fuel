@@ -12,19 +12,6 @@ internal class RequestTaskCallbacks(
     private val onSuccess: RequestSuccessCallback,
     private val onFailure: RequestFailureCallback
 ) : Callable<Response> {
-    override fun call(): Response = try {
-        request.toTask().call().also {
-            onSuccess(it)
-        }
-    } catch (error: FuelError) {
-        onFailure(error, error.response)
-        errorResponse()
-    } catch (ex: Exception) {
-        val error = FuelError(ex)
-        val response = errorResponse()
-        onFailure(error, response)
-        response
-    }
-
-    private fun errorResponse() = Response(request.url)
+    override fun call(): Response = runCatching { request.toTask().call().also { onSuccess(it) } }
+        .getOrElse { error -> FuelError.wrap(error).also { onFailure(it, it.response) }.response }
 }
