@@ -34,7 +34,7 @@ internal class HttpClient(
         return try {
             doRequest(request)
         } catch (exception: Exception) {
-            throw FuelError(exception, ByteArray(0), Response(request.url))
+            throw FuelError.wrap(exception, Response(request.url))
         } finally {
             // As per Android documentation, a connection that is not explicitly disconnected
             // will be pooled and reused!  So, don't close it as we need inputStream later!
@@ -46,8 +46,7 @@ internal class HttpClient(
         try {
             continuation.resume(doRequest(request))
         } catch (exception: Exception) {
-            continuation.resumeWithException(exception as? FuelError
-                ?: FuelError(exception, ByteArray(0), Response(request.url)))
+            continuation.resumeWithException(FuelError.wrap(exception, Response(request.url)))
         }
     }
 
@@ -61,8 +60,8 @@ internal class HttpClient(
     @Throws
     private fun sendRequest(request: Request, connection: HttpURLConnection) {
         connection.apply {
-            connectTimeout = Fuel.testConfiguration.coerceTimeout(request.executionOptions.timeoutInMillisecond)
-            readTimeout = Fuel.testConfiguration.coerceTimeoutRead(request.executionOptions.timeoutReadInMillisecond)
+            connectTimeout = max(request.executionOptions.timeoutInMillisecond, 0)
+            readTimeout = max(request.executionOptions.timeoutReadInMillisecond, 0)
             requestMethod = HttpClient.coerceMethod(request.method).value
             doInput = true
             useCaches = request.executionOptions.useHttpCache ?: useHttpCache

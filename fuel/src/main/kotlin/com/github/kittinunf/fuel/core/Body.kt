@@ -119,7 +119,7 @@ data class DefaultBody(
         }
 
         private val CONSUMED_STREAM = {
-            throw FuelError(IllegalStateException(
+            throw FuelError.wrap(IllegalStateException(
                 "The input has already been written to an output stream and can not be consumed again."
             ))
         }

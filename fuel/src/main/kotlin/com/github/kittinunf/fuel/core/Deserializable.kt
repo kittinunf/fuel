@@ -27,7 +27,7 @@ interface ResponseDeserializable<out T : Any> : Deserializable<T> {
 
                     deserialize(response.data)
                         ?: deserialize(String(response.data))
-                        ?: throw FuelError(IllegalStateException(
+                        ?: throw FuelError.wrap(IllegalStateException(
                             "One of deserialize(ByteArray) or deserialize(InputStream) or deserialize(Reader) or " +
                                 "deserialize(String) must be implemented"
                         ))
@@ -81,7 +81,7 @@ private fun <T : Any, U : Deserializable<T>> Request.response(
             executionOptions.callback {
                 deliverable.fold(
                     { success(this, response, it) },
-                    { failure(this, response, FuelError.wrap(it)) }
+                    { failure(this, response, FuelError.wrap(it, response).also { error -> println("[Deserializable] unfold failure: \n\r$error") }) }
                 )
             }
         },
