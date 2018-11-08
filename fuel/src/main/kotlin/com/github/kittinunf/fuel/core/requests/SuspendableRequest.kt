@@ -4,26 +4,55 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.mapError
-import java.io.InterruptedIOException
 
-class SuspendableRequest(private val wrapped: Request) : Request by wrapped {
-    private val interruptCallback by lazy { executor.interruptCallback }
+/**
+ * Coroutine version of [RequestTask]. Turns a [Request] into an executable, suspendable, coroutine.
+ */
+class SuspendableRequest private constructor(private val wrapped: Request) : Request by wrapped {
+    private val interruptCallback by lazy { executor.interruptCallback ?: { println("no interrupt callback registered") } }
     private val executor by lazy { request.executionOptions }
+    private val client by lazy { executor.client }
 
-    suspend fun awaitResult(): Result<Response, FuelError> {
-        val modifiedRequest = executor.requestTransformer(request)
-        val response = executor.client.awaitRequest(modifiedRequest)
+    private fun prepareRequest(request: Request): Request = executor.requestTransformer(request)
 
-        return Result.of<Response, Exception> {
-            request.executionOptions.responseTransformer(modifiedRequest, response)
-        }.mapError { error ->
-            FuelError.wrap(error).also {
-                (it.exception as? InterruptedIOException)?.also { interruptCallback?.invoke(request) }
-            }
-        }
+    private suspend fun executeRequest(request: Request): Pair<Request, Response> {
+        return runCatching { Pair(request, client.awaitRequest(request)) }
+            .recover { error -> throw FuelError.wrap(error, Response(url)) }
+            .getOrThrow()
     }
 
+    private fun prepareResponse(result: Pair<Request, Response>): Response {
+        val (request, response) = result
+        return runCatching { executor.responseTransformer(request, response) }
+            .recover { error -> throw FuelError.wrap(error, response) }
+            .getOrThrow()
+    }
+
+    suspend fun awaitResult(): Result<Response, FuelError> {
+        return runCatching { prepareRequest(request) }
+            .mapCatching { executeRequest(it) }
+            .mapCatching { pair ->
+                // Nested runCatching so response can be rebound
+                runCatching { prepareResponse(pair) }
+                    .recover { error ->
+                        error.also { println("[RequestTask] execution error\n\r\t$error") }
+                        throw FuelError.wrap(error, pair.second)
+                    }
+                    .getOrThrow()
+            }
+            .onFailure { error ->
+                println("[RequestTask] on failure ${(error as? FuelError)?.exception ?: error}")
+                if (error is FuelError && error.causedByInterruption) {
+                    println("[RequestTask] execution error\n\r\t$error")
+                    interruptCallback.invoke(request)
+                }
+            }
+            .map { Result.Success<Response, FuelError>(it)  }
+            .recover { Result.Failure<Response, FuelError>(it as FuelError)  }
+            .getOrThrow()
+    }
+
+    @Throws(FuelError::class)
     suspend fun await(): Response {
         return awaitResult().get()
     }

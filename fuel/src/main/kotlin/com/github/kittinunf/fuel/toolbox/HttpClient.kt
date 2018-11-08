@@ -1,6 +1,5 @@
 package com.github.kittinunf.fuel.toolbox
 
-import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Client
 import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.FuelError
@@ -10,6 +9,7 @@ import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.requests.isCancelled
 import com.github.kittinunf.fuel.util.ProgressInputStream
 import com.github.kittinunf.fuel.util.ProgressOutputStream
 import com.github.kittinunf.fuel.util.decode
@@ -17,6 +17,7 @@ import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
+import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
 import java.net.Proxy
 import java.net.URLConnection
@@ -24,6 +25,7 @@ import javax.net.ssl.HttpsURLConnection
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.max
 
 internal class HttpClient(
     private val proxy: Proxy? = null,
@@ -42,6 +44,21 @@ internal class HttpClient(
         }
     }
 
+    @Throws(InterruptedException::class)
+    private fun ensureRequestActive(request: Request, connection: HttpURLConnection? = null) {
+        val cancelled = request.isCancelled
+        if (!cancelled && !Thread.currentThread().isInterrupted) {
+            return
+        }
+
+        // Flush all the pipes. This is necessary because we don't want the other end to wait for a timeout or hang.
+        // This interrupts the connection correctly and makes the connection available later. This does break any
+        // keep-alive on this particular connection
+        connection?.disconnect()
+
+        throw InterruptedException("[HttpClient] could not ensure Request was active: cancelled=$cancelled")
+    }
+
     override suspend fun awaitRequest(request: Request): Response = suspendCoroutine { continuation ->
         try {
             continuation.resume(doRequest(request))
@@ -57,8 +74,9 @@ internal class HttpClient(
         return retrieveResponse(request, connection)
     }
 
-    @Throws
+    @Throws(InterruptedException::class)
     private fun sendRequest(request: Request, connection: HttpURLConnection) {
+        ensureRequestActive(request, connection)
         connection.apply {
             connectTimeout = max(request.executionOptions.timeoutInMillisecond, 0)
             readTimeout = max(request.executionOptions.timeoutReadInMillisecond, 0)
@@ -104,6 +122,8 @@ internal class HttpClient(
 
     @Throws
     private fun retrieveResponse(request: Request, connection: HttpURLConnection): Response {
+        ensureRequestActive(request, connection)
+
         val headers = Headers.from(connection.headerFields)
         val transferEncoding = headers[Headers.TRANSFER_ENCODING].flatMap { it.split(',') }.map { it.trim() }
         val contentEncoding = headers[Headers.CONTENT_ENCODING].lastOrNull()
@@ -150,9 +170,11 @@ internal class HttpClient(
 
         val contentStream = dataStream(connection)?.decode(transferEncoding) ?: ByteArrayInputStream(ByteArray(0))
         val inputStream = if (shouldDecode && contentEncoding != null) contentStream.decode(contentEncoding) else contentStream
+        val cancellationConnection = WeakReference<HttpURLConnection>(connection)
         val progressStream = ProgressInputStream(
             inputStream, onProgress = { readBytes ->
                 request.executionOptions.responseProgress(readBytes, contentLength ?: readBytes)
+                ensureRequestActive(request, cancellationConnection.get())
             }
         )
 
@@ -217,6 +239,7 @@ internal class HttpClient(
                 connection.outputStream,
                 onProgress = { writtenBytes ->
                     request.executionOptions.requestProgress(writtenBytes, totalBytes ?: writtenBytes)
+                    ensureRequestActive(request, connection)
                 }
             ).buffered(FuelManager.progressBufferSize)
         )
