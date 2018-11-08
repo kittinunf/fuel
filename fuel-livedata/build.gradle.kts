@@ -4,5 +4,5 @@ dependencies {
     implementation(Android.Arch.extensions)
     testImplementation(RoboElectric.dependency)
     testImplementation(JUnit.dependency)
-    testCompile(MockServer.dependency)
+    testImplementation(MockServer.dependency)
 }
