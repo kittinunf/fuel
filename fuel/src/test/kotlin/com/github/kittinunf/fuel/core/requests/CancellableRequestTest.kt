@@ -57,7 +57,7 @@ class CancellableRequestTest : MockHttpTestCase() {
             .destination { _, _ -> file }
             .interrupt { interrupted = true }
 
-        val running = requestPrimed.response { _, _, result -> fail(result.toString())}
+        val running = requestPrimed.response { _, _, result -> fail(result.toString()) }
         running.cancel()
         running.join()
 
