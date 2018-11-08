@@ -86,11 +86,7 @@ class RequestHandlerTest : MockHttpTestCase() {
             }
 
         isAsync = true
-        try {
-            running.join()
-        } catch (exception: ExecutionException) {
-            println(exception)
-        }
+        running.join()
 
         assertThat(running.isDone, equalTo(true))
         assertThat(isHandled, equalTo(true))
