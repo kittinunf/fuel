@@ -15,7 +15,6 @@ import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 class RequestHandlerTest : MockHttpTestCase() {

@@ -168,9 +168,8 @@ class DownloadRequestTest : MockHttpTestCase() {
         val (request, response, result) = manager.download(mock.path("bytes"))
             .destination { _, _ ->
                 val dir = System.getProperty("user.dir")
-            File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
+                File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
             }
-            .progress { _, _ -> }
             .responseString()
         val (data, error) = result
 
@@ -179,7 +178,7 @@ class DownloadRequestTest : MockHttpTestCase() {
         assertThat(error, notNullValue())
         assertThat(data, nullValue())
 
-        val statusCode = -1
+        val statusCode = 200
         assertThat(error?.exception as IOException, isA(IOException::class.java))
         assertThat(response.statusCode, isEqualTo(statusCode))
     }
