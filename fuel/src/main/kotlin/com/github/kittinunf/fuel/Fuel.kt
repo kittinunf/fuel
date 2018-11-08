@@ -6,7 +6,6 @@ import com.github.kittinunf.fuel.core.Parameters
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.requests.DownloadRequest
 import com.github.kittinunf.fuel.core.requests.UploadRequest
-import com.github.kittinunf.fuel.util.TestConfiguration
 
 class Fuel {
     interface PathStringConvertible {
@@ -18,19 +17,6 @@ class Fuel {
     }
 
     companion object {
-        internal var testConfiguration = TestConfiguration(timeout = null, timeoutRead = null)
-
-        @JvmStatic
-        @JvmOverloads
-        fun testMode(configuration: TestConfiguration.() -> Unit = {}) {
-            testConfiguration = TestConfiguration().apply(configuration)
-        }
-
-        @JvmStatic
-        fun regularMode() = testMode { timeout = null; timeoutRead = null }
-
-        // convenience methods
-        // get
         @JvmStatic
         @JvmOverloads
         fun get(path: String, parameters: Parameters? = null): Request =
