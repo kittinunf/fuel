@@ -5,7 +5,20 @@ import java.io.ByteArrayInputStream
 import java.net.URL
 import java.net.URLConnection
 
+/**
+ * Response object that holds [Request] and [Response] metadata, as well as the result T
+ *
+ * @see ResponseResultOf
+ * @see ResponseHandler
+ */
 typealias ResponseOf<T> = Triple<Request, Response, T>
+
+/**
+ * Response object that holds [Request] and [Response] metadata, as well as a [Result] wrapping T or [FuelError]
+ *
+ * @see ResponseOf
+ * @see ResponseResultHandler
+ */
 typealias ResponseResultOf<T> = Triple<Request, Response, Result<T, FuelError>>
 
 data class Response(
@@ -74,7 +87,7 @@ data class Response(
     }
 
     companion object {
-        fun error(): Response = Response(URL("http://."))
+        fun error(url: URL = URL("http://.")): Response = Response(url)
     }
 }
 
