@@ -1,12 +1,12 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.serialization.kotlinxDeserializerOf
 import com.github.kittinunf.fuel.serialization.responseObject
-import com.github.kittinunf.fuel.test.MockHelper
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.result.Result
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.Serializable
@@ -17,36 +17,15 @@ import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
-import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import org.mockserver.matchers.Times
 import java.net.HttpURLConnection
 
 @ImplicitReflectionSerializer
-class FuelKotlinxSerializationTest {
-
-    init {
-        Fuel.testMode {
-            timeout = 15000
-        }
-    }
-
-    private lateinit var mock: MockHelper
-
-    @Before
-    fun setup() {
-        this.mock = MockHelper()
-        this.mock.setup()
-    }
-
-    @After
-    fun tearDown() {
-        this.mock.tearDown()
-    }
+class FuelKotlinxSerializationTest : MockHttpTestCase() {
 
     // Model
     @Serializable

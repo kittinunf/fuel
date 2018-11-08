@@ -2,39 +2,18 @@ package com.github.kittinunf.fuel.livedata
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.test.MockHelper
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 
 /**
  * @see [Testing documentation](http://d.android.com/tools/testing)
  */
-class FuelLiveDataTest {
-
-    init {
-        Fuel.testMode {
-            timeout = 15000
-        }
-    }
-
-    private lateinit var mock: MockHelper
-
-    @Before
-    fun setup() {
-        this.mock = MockHelper()
-        this.mock.setup()
-    }
-
-    @After
-    fun tearDown() {
-        this.mock.tearDown()
-    }
+class FuelLiveDataTest : MockHttpTestCase() {
 
     @Test
     fun liveDataTestResponse() {

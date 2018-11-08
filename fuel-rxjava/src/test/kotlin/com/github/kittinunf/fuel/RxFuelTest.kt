@@ -8,40 +8,19 @@ import com.github.kittinunf.fuel.rx.rxResponse
 import com.github.kittinunf.fuel.rx.rxResponseObjectPair
 import com.github.kittinunf.fuel.rx.rxResponseStringPair
 import com.github.kittinunf.fuel.rx.rxString
-import com.github.kittinunf.fuel.test.MockHelper
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.core.Is.isA
-import org.junit.After
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import java.io.InputStream
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RxFuelTest {
-
-    init {
-        Fuel.testMode {
-            timeout = 15000
-        }
-    }
-
-    private lateinit var mock: MockHelper
-
-    @Before
-    fun setup() {
-        this.mock = MockHelper()
-        this.mock.setup()
-    }
-
-    @After
-    fun tearDown() {
-        this.mock.tearDown()
-    }
+class RxFuelTest : MockHttpTestCase() {
 
     @Test
     fun rxResponse() {
