@@ -575,7 +575,7 @@ data class DefaultRequest(
             else -> String(body.toByteArray())
         }
 
-        appendln("--> $url")
+        appendln("--> $method $url")
         appendln("\"Body : $bodyString\"")
         appendln("\"Headers : (${headers.size})\"")
 
