@@ -74,7 +74,7 @@ object Jackson {
 
 object KotlinX {
     object Coroutines {
-        const val version = "1.0.0"
+        const val version = "1.0.1"
         val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         val jvm = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     }
