@@ -1,9 +1,9 @@
 package com.github.kittinunf.fuel.gson
 
-import com.github.kittinunf.fuel.core.ResponseHandler
-import com.github.kittinunf.fuel.core.ResponseResultHandler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.ResponseHandler
+import com.github.kittinunf.fuel.core.ResponseResultHandler
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
 import com.github.kittinunf.fuel.core.response

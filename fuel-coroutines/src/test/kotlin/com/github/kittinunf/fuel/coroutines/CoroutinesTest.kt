@@ -133,7 +133,7 @@ class CoroutinesTest : MockHttpTestCase() {
 
         override fun deserialize(content: String): UUIDResponse {
             if (content.contains("=") || !content.contains("-")) {
-                throw FuelError(NoValidFormat())
+                throw FuelError.wrap(NoValidFormat())
             }
             return UUIDResponse(content)
         }

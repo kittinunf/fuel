@@ -112,7 +112,7 @@ class MockHelper {
      * Creates a new mock response template.
      *
      * @see REFLECT_TEMPLATE
-     * @see mock.reflect
+     * @see reflect
      *
      * This method is introduced to keep the import out of test cases and to make it easy to replace
      *   the library for mocking requests.
