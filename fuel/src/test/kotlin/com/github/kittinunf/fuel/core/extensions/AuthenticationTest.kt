@@ -1,6 +1,6 @@
 package com.github.kittinunf.fuel.core.extensions
 
-import com.github.kittinunf.fuel.core.DefaultRequest
+import com.github.kittinunf.fuel.core.requests.DefaultRequest
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request

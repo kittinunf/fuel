@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.requests.DefaultRequest
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException

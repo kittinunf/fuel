@@ -16,7 +16,7 @@ class DownloadRequest private constructor(private val wrapped: Request) : Reques
     internal lateinit var destinationCallback: ((Response, URL) -> File)
 
     init {
-        executionOptions.transformResponse(this::transformResponse)
+        executionOptions += this::transformResponse
     }
 
     fun destination(destination: (Response, URL) -> File): DownloadRequest {

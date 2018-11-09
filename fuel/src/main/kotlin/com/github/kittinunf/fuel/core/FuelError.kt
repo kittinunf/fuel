@@ -2,18 +2,41 @@ package com.github.kittinunf.fuel.core
 
 import java.io.InterruptedIOException
 
+private typealias StackTrace = Array<out StackTraceElement>
+
+/**
+ * Indicates a call to [FuelError.wrap] passing in a [FuelError]
+ */
 private class BubbleFuelError(inner: FuelError) : FuelError(inner, inner.response)
 
+/**
+ * Error wrapper for all caught [Throwable] in fuel
+ *
+ * @see FuelError.wrap
+ *
+ * @param exception [Throwable] the underlying cause
+ * @param response [Response] the response, if any
+ */
 open class FuelError internal constructor(
     exception: Throwable,
     val response: Response = Response.error()
 ) : Exception(exception.message, exception) {
     init {
-        // Only store new stack since `cause`
-        stackTrace = stackTrace.takeWhile { stack -> exception.stackTrace.find { inner -> inner == stack } == null }
+        stackTrace = buildRelativeStack(wrapped = this.stackTrace, cause = exception.stackTrace)
+    }
+
+    /**
+     * Builds a stack for [wrapped] that is relative to [cause]
+     */
+    private fun buildRelativeStack(wrapped: StackTrace, cause: StackTrace): StackTrace {
+        return wrapped
+            .takeWhile { stack -> cause.find { inner -> inner == stack } == null }
             .toTypedArray()
     }
 
+    /**
+     * Returns a string representation of the error with the complete stack
+     */
     override fun toString(): String = "${this::class.java.canonicalName}: $message\r\n".plus(buildString {
         stackTrace.forEach { stack -> appendln("\t$stack") }
 
@@ -27,6 +50,10 @@ open class FuelError internal constructor(
         }
     })
 
+    /**
+     * Get the original exception that caused this, passing through all [BubbleFuelError] and wrapping [FuelError]
+     * @return [Throwable] the original exception
+     */
     val exception: Throwable get() {
         var pointer: Throwable = this
         while (pointer is FuelError && pointer.cause != null) {
@@ -36,10 +63,17 @@ open class FuelError internal constructor(
         return pointer
     }
 
+    /**
+     * Get the [Response] error data
+     *
+     * @see Response.body
+     * @return [ByteArray] the error data
+     */
     val errorData: ByteArray get() = response.data
 
     /**
-     * This FuelError was caused by an interruption
+     * Returns if this [FuelError] was caused by an interruption
+     * @return [Boolean] true if it was, false otherwise
      */
     val causedByInterruption: Boolean get() =
         exception is InterruptedException ||
