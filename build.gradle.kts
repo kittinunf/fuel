@@ -1,6 +1,6 @@
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
-import com.novoda.gradle.release.PublishExtension
+import com.jfrog.bintray.gradle.BintrayExtension
 import org.jmailen.gradle.kotlinter.KotlinterExtension
 import org.jmailen.gradle.kotlinter.support.ReporterType
 
@@ -9,9 +9,12 @@ plugins {
     kotlin("jvm") version Kotlin.version apply false
     id(Android.libPlugin) version Android.version apply false
     id(Jacoco.Android.plugin) version Jacoco.Android.version apply false
-    id(BintrayRelease.plugin) version BintrayRelease.version apply false
     id(KotlinX.Serialization.plugin) version Kotlin.version apply false
     id(Ktlint.plugin) version Ktlint.version apply false
+
+    maven
+    `maven-publish`
+    id(Release.Bintray.plugin) version Release.Bintray.version apply false
 }
 
 allprojects {
@@ -114,29 +117,52 @@ subprojects {
             html.enabled(true)
             xml.enabled(true)
         }
-
-        tasks.withType<Javadoc>().all { enabled = false }
     }
 
     if (!isSample) {
         apply {
-            plugin(BintrayRelease.plugin)
+            plugin("org.gradle.maven-publish")
+
+            plugin(Release.Bintray.plugin)
             plugin(Ktlint.plugin)
         }
 
-        configure<PublishExtension> {
-            artifactId = project.name
-            autoPublish = true
-            desc = "The easiest HTTP networking library in Kotlin/Android"
-            groupId = "com.github.kittinunf.fuel"
-            setLicences("MIT")
-            publishVersion = Fuel.publishVersion
-            uploadName = "Fuel-Android"
-            website = "https://github.com/kittinunf/Fuel"
+        configure<BintrayExtension> {
+            user = findProperty("BINTRAY_USER") as? String
+            key = findProperty("BINTRAY_KEY") as? String
+            setConfigurations("archives")
+            pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
+                repo = "maven"
+                name = "Fuel-Android"
+                desc = "The easiest HTTP networking library in Kotlin/Android"
+                userOrg = "kittinunf"
+                websiteUrl = "https://github.com/kittinunf/Fuel"
+                vcsUrl = "https://github.com/kittinunf/Fuel"
+                setLicenses("MIT")
+            })
         }
 
         configure<KotlinterExtension> {
             reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
+        }
+
+        if (project.hasProperty("android").not()) {
+            val sourcesJar by tasks.registering(Jar::class) {
+                classifier = "sources"
+                from(sourceSets["main"].allSource)
+            }
+
+            publishing {
+                publications {
+                    register(project.name, MavenPublication::class) {
+                        from(components["java"])
+                        artifact(sourcesJar.get())
+                        groupId = "com.github.kittinunf.fuel"
+                        artifactId = project.name
+                        version = Fuel.publishVersion
+                    }
+                }
+            }
         }
     }
 }
