@@ -14,8 +14,7 @@ open class FuelError internal constructor(
             .toTypedArray()
     }
 
-    override fun toString(): String = this::class.java.canonicalName.plus(buildString {
-        appendln(": $message")
+    override fun toString(): String = "${this::class.java.canonicalName}: $message\r\n".plus(buildString {
         stackTrace.forEach { stack -> appendln("\t$stack") }
 
         cause?.also {
