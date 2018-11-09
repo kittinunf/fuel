@@ -12,7 +12,6 @@ plugins {
     id(KotlinX.Serialization.plugin) version Kotlin.version apply false
     id(Ktlint.plugin) version Ktlint.version apply false
 
-    maven
     `maven-publish`
     id(Release.Bintray.plugin) version Release.Bintray.version apply false
 }
