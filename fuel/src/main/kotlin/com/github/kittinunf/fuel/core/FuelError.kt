@@ -21,7 +21,7 @@ open class FuelError internal constructor(
         cause?.also {
             append("Caused by: ")
             appendln(it.toString())
-            when(it) {
+            when (it) {
                 is FuelError -> {}
                 else -> { it.stackTrace.forEach { stack -> appendln("\t$stack") } }
             }
@@ -30,7 +30,7 @@ open class FuelError internal constructor(
 
     val exception: Throwable get() {
         var pointer: Throwable = this
-        while(pointer is FuelError && pointer.cause != null) {
+        while (pointer is FuelError && pointer.cause != null) {
             pointer = pointer.cause!!
         }
 

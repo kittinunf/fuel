@@ -65,7 +65,7 @@ class CancellableRequestTest : MockHttpTestCase() {
         )
 
         val running = manager.download(mock.path("cancel-response"))
-            .destination { _, _ -> file  }
+            .destination { _, _ -> file }
             .responseProgress { readBytes, _ ->
                 responseWrittenSemaphore.release()
                 Thread.sleep(200)
@@ -107,7 +107,7 @@ class CancellableRequestTest : MockHttpTestCase() {
             .request(Method.GET, mock.path("cancel-inline"), listOf("foo" to "bar"))
             .authentication().basic("username", "password")
             .body(
-                { ByteArrayInputStream("my-body".toByteArray()).also { bodyReadSemaphore.release() }},
+                { ByteArrayInputStream("my-body".toByteArray()).also { bodyReadSemaphore.release() } },
                 { "my-body".length.toLong() }
             )
             .interrupt { interruptSemaphore.release() }

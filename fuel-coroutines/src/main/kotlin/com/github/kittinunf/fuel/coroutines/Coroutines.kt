@@ -69,11 +69,11 @@ suspend inline fun Request.awaitStringResponse(charset: Charset = Charsets.UTF_8
  * @return Result object
  */
 @Throws
-suspend fun <U : Any> Request.awaitObject(deserializable: ResponseDeserializable<U>, scope: CoroutineContext = Dispatchers.Default): U =
+suspend inline fun <U : Any> Request.awaitObject(deserializable: ResponseDeserializable<U>, scope: CoroutineContext = Dispatchers.Default): U =
     await(deserializable, scope)
 
 @Throws
-suspend fun <U : Any> Request.awaitObjectResponse(deserializable: ResponseDeserializable<U>, scope: CoroutineContext = Dispatchers.Default): ResponseOf<U> =
+suspend inline fun <U : Any> Request.awaitObjectResponse(deserializable: ResponseDeserializable<U>, scope: CoroutineContext = Dispatchers.Default): ResponseOf<U> =
     awaitResponse(deserializable, scope)
 
 /***
