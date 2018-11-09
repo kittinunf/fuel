@@ -127,9 +127,15 @@ subprojects {
             plugin(Ktlint.plugin)
         }
 
+        configure<KotlinterExtension> {
+            reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
+        }
+
+        version = Fuel.publishVersion
         configure<BintrayExtension> {
             user = findProperty("BINTRAY_USER") as? String
             key = findProperty("BINTRAY_KEY") as? String
+            dryRun = true
             setConfigurations("archives")
             pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
                 repo = "maven"
@@ -139,11 +145,10 @@ subprojects {
                 websiteUrl = "https://github.com/kittinunf/Fuel"
                 vcsUrl = "https://github.com/kittinunf/Fuel"
                 setLicenses("MIT")
+                version(delegateClosureOf<BintrayExtension.VersionConfig> {
+                    name = Fuel.publishVersion
+                })
             })
-        }
-
-        configure<KotlinterExtension> {
-            reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
         }
 
         if (project.hasProperty("android").not()) {
@@ -152,11 +157,20 @@ subprojects {
                 from(sourceSets["main"].allSource)
             }
 
+            val doc by tasks.registering(Javadoc::class) {
+                source = sourceSets["main"].allJava
+            }
+
+            val javadocJar by tasks.registering(Jar::class) {
+                dependsOn(doc)
+            }
+
             publishing {
                 publications {
                     register(project.name, MavenPublication::class) {
                         from(components["java"])
                         artifact(sourcesJar.get())
+                        artifact(javadocJar.get())
                         groupId = "com.github.kittinunf.fuel"
                         artifactId = project.name
                         version = Fuel.publishVersion
