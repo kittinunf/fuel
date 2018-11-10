@@ -130,6 +130,7 @@ subprojects {
         }
 
         version = Fuel.publishVersion
+        group = Fuel.groupId
         configure<BintrayExtension> {
             user = findProperty("BINTRAY_USER") as? String
             key = findProperty("BINTRAY_KEY") as? String
@@ -151,16 +152,26 @@ subprojects {
 
         if (project.hasProperty("android").not()) {
             val sourcesJar by tasks.registering(Jar::class) {
-                classifier = "sources"
                 from(sourceSets["main"].allSource)
+
+                classifier = "sources"
             }
 
             val doc by tasks.creating(Javadoc::class) {
+                isFailOnError = false
                 source = sourceSets["main"].allJava
             }
 
             val javadocJar by tasks.registering(Jar::class) {
                 dependsOn(doc)
+                from(doc.destinationDir)
+
+                classifier = "javadoc"
+            }
+
+            artifacts {
+                add("archives", javadocJar)
+                add("archives", sourcesJar)
             }
 
             publishing {
@@ -169,11 +180,29 @@ subprojects {
                         from(components["java"])
                         artifact(sourcesJar.get())
                         artifact(javadocJar.get())
-                        groupId = "com.github.kittinunf.fuel"
+                        groupId = Fuel.groupId
                         artifactId = project.name
                         version = Fuel.publishVersion
+
+                        pom.withXml {
+                            asNode().appendNode("dependencies").let { depNode ->
+                                configurations.implementation.allDependencies.forEach {
+                                    depNode.appendNode("dependency").apply {
+                                        appendNode("groupId", it.group)
+                                        appendNode("artifactId", it.name)
+                                        appendNode("version", it.version)
+                                    }
+
+                                    println(depNode)
+                                }
+                            }
+                        }
                     }
                 }
+            }
+
+            tasks.withType<GenerateMavenPom> {
+                destination = file("$buildDir/libs/${project.name}-$version.pom")
             }
         }
     }
