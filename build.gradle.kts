@@ -120,8 +120,7 @@ subprojects {
 
     if (!isSample) {
         apply {
-            plugin("org.gradle.maven-publish")
-
+            plugin("maven-publish")
             plugin(Release.Bintray.plugin)
             plugin(Ktlint.plugin)
         }
@@ -156,7 +155,7 @@ subprojects {
                 from(sourceSets["main"].allSource)
             }
 
-            val doc by tasks.registering(Javadoc::class) {
+            val doc by tasks.creating(Javadoc::class) {
                 source = sourceSets["main"].allJava
             }
 

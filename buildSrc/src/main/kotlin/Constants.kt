@@ -141,11 +141,6 @@ object RoboElectric {
     const val dependency = "org.robolectric:robolectric:$version"
 }
 
-object BintrayRelease {
-    const val version = "0.8.0"
-    const val plugin = "com.novoda.bintray-release"
-}
-
 object Release {
 
     object Bintray {
