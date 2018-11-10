@@ -110,6 +110,16 @@ object RxJava {
     }
 }
 
+object Stetho {
+    const val version = "1.5.0"
+    const val plugin = "com.facebook.stetho:stetho:$version"
+
+    object StethoUrlConnection {
+        const val version = "1.5.0"
+        const val plugin = "com.facebook.stetho:stetho-urlconnection:$version"
+    }
+}
+
 // Lint
 object Ktlint {
     const val version = "1.20.1"

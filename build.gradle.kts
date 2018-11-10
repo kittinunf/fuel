@@ -24,7 +24,7 @@ allprojects {
     }
 }
 
-val androidModules = listOf("fuel-android", "fuel-livedata")
+val androidModules = listOf("fuel-android", "fuel-livedata", "fuel-stetho")
 val androidSampleModules = listOf("sample")
 
 subprojects {

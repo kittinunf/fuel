@@ -30,6 +30,7 @@ include(":fuel-android")
 include(":fuel-jackson")
 include(":fuel-kotlinx-serialization")
 include(":fuel-moshi")
+include(":fuel-stetho")
 include(":fuel-test")
 include(":fuel-json")
 

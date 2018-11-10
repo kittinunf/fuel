@@ -12,12 +12,15 @@ dependencies {
     implementation(Android.Support.appCompat)
     implementation(KotlinX.Coroutines.android)
     implementation(RxJava.Android.dependency)
+    implementation(Stetho.plugin)
+    implementation(Stetho.StethoUrlConnection.plugin)
 
     api(project(":fuel-rxjava"))
     api(project(":fuel-android"))
     api(project(":fuel-livedata"))
     api(project(":fuel-gson"))
     api(project(":fuel-coroutines"))
+    api(project(":fuel-stetho"))
 
     androidTestImplementation(Android.Support.annotation)
     androidTestImplementation(Android.Test.runner)

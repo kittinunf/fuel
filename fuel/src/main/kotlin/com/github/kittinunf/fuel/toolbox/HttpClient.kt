@@ -27,8 +27,9 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.max
 
-internal class HttpClient(
+class HttpClient(
     private val proxy: Proxy? = null,
+    private var stethoHook: StethoHook? = null,
     var useHttpCache: Boolean = true,
     var decodeContent: Boolean = true
 ) : Client {
@@ -117,6 +118,7 @@ internal class HttpClient(
 
             setDoOutput(connection, request.method)
             setBodyIfDoOutput(connection, request)
+            stethoHook?.preConnect(connection, request)
         }
     }
 
@@ -169,7 +171,8 @@ internal class HttpClient(
         }
 
         val contentStream = dataStream(connection)?.decode(transferEncoding) ?: ByteArrayInputStream(ByteArray(0))
-        val inputStream = if (shouldDecode && contentEncoding != null) contentStream.decode(contentEncoding) else contentStream
+        val inputStream = if (shouldDecode && contentEncoding != null) {contentStream.decode(contentEncoding)} else {contentStream}
+
         val cancellationConnection = WeakReference<HttpURLConnection>(connection)
         val progressStream = ProgressInputStream(
             inputStream, onProgress = { readBytes ->
@@ -196,7 +199,9 @@ internal class HttpClient(
     private fun dataStream(connection: HttpURLConnection): InputStream? {
         return try {
             try {
-                BufferedInputStream(connection.inputStream)
+                val inputStream = stethoHook?.interpretResponseStream(connection.inputStream) ?: connection.inputStream
+                stethoHook?.postConnect()
+                BufferedInputStream(inputStream)
             } catch (_: IOException) {
                 // The InputStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures
                 // the InputStream ís actually always closed.
@@ -207,9 +212,12 @@ internal class HttpClient(
                 // We want the stream to live. Closing the stream is handled by Deserialize
             }
         } catch (exception: IOException) {
+
             // The ErrorStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures the
             // ErrorStream ís actually always closed.
             try { connection.errorStream?.close() } catch (_: IOException) {}
+
+            stethoHook?.httpExchangeFailed(exception)
 
             ByteArrayInputStream(exception.message?.toByteArray() ?: ByteArray(0))
         } finally {
@@ -269,5 +277,12 @@ internal class HttpClient(
     companion object {
         private val SUPPORTED_DECODING = listOf("gzip", "deflate; q=0.5")
         private fun coerceMethod(method: Method) = if (method == Method.PATCH) Method.POST else method
+    }
+
+    interface StethoHook {
+        fun preConnect(connection: HttpURLConnection, request: Request)
+        fun interpretResponseStream(inputStream: InputStream): InputStream
+        fun postConnect()
+        fun httpExchangeFailed(exception: IOException)
     }
 }

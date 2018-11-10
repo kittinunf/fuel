@@ -30,7 +30,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
+
 import java.io.Reader
+import com.github.worker8.fuel.stetho.StethoHook
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,11 +43,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         FuelManager.instance.apply {
             basePath = "http://httpbin.org"
             baseHeaders = mapOf("Device" to "Android")
             baseParams = listOf("key" to "value")
+            stethoHook = StethoHook("Fuel Sample App")
 //            addResponseInterceptor { loggingResponseInterceptor() }
         }
 
