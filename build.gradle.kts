@@ -34,7 +34,6 @@ subprojects {
 
     if (isJvmModule) {
         apply {
-            plugin("java")
             plugin(Kotlin.plugin)
             plugin(Jacoco.plugin)
         }
@@ -64,6 +63,16 @@ subprojects {
                 xml.isEnabled = true
                 csv.isEnabled = false
             }
+        }
+
+        val sourcesJar by tasks.registering(Jar::class) {
+            from(sourceSets["main"].allSource)
+            classifier = "sources"
+        }
+
+        val doc by tasks.creating(Javadoc::class) {
+            isFailOnError = false
+            source = sourceSets["main"].allJava
         }
     }
 
@@ -109,6 +118,18 @@ subprojects {
             testOptions {
                 unitTests.isReturnDefaultValues = true
             }
+
+            val sourcesJar by tasks.registering(Jar::class) {
+                from(sourceSets["main"].java.srcDirs)
+                classifier = "sources"
+            }
+
+            val doc by tasks.creating(Javadoc::class) {
+                isFailOnError = false
+                source = sourceSets["main"].java.sourceFiles
+                classpath += files(bootClasspath.joinToString(File.pathSeparator))
+                classpath += configurations.compile
+            }
         }
 
         configure<JacocoAndroidUnitTestReportExtension> {
@@ -120,7 +141,7 @@ subprojects {
 
     if (!isSample) {
         apply {
-            plugin("maven-publish")
+            plugin(Release.MavenPublish.plugin)
             plugin(Release.Bintray.plugin)
             plugin(Ktlint.plugin)
         }
@@ -134,8 +155,7 @@ subprojects {
         configure<BintrayExtension> {
             user = findProperty("BINTRAY_USER") as? String
             key = findProperty("BINTRAY_KEY") as? String
-            dryRun = true
-            setConfigurations("archives")
+            setPublications(project.name)
             pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
                 repo = "maven"
                 name = "Fuel-Android"
@@ -150,59 +170,45 @@ subprojects {
             })
         }
 
-        if (project.hasProperty("android").not()) {
-            val sourcesJar by tasks.registering(Jar::class) {
-                from(sourceSets["main"].allSource)
+        val javadocJar by tasks.creating(Jar::class) {
+            val doc by tasks
+            dependsOn(doc)
+            from(doc)
 
-                classifier = "sources"
-            }
+            classifier = "javadoc"
+        }
 
-            val doc by tasks.creating(Javadoc::class) {
-                isFailOnError = false
-                source = sourceSets["main"].allJava
-            }
-
-            val javadocJar by tasks.registering(Jar::class) {
-                dependsOn(doc)
-                from(doc.destinationDir)
-
-                classifier = "javadoc"
-            }
-
-            artifacts {
-                add("archives", javadocJar)
-                add("archives", sourcesJar)
-            }
-
-            publishing {
-                publications {
-                    register(project.name, MavenPublication::class) {
+        val sourcesJar by tasks
+        publishing {
+            publications {
+                register(project.name, MavenPublication::class) {
+                    if (project.hasProperty("android")) {
+                        artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+                    } else {
                         from(components["java"])
-                        artifact(sourcesJar.get())
-                        artifact(javadocJar.get())
-                        groupId = Fuel.groupId
-                        artifactId = project.name
-                        version = Fuel.publishVersion
+                    }
+                    artifact(sourcesJar)
+                    artifact(javadocJar)
+                    groupId = Fuel.groupId
+                    artifactId = project.name
+                    version = Fuel.publishVersion
 
-                        pom.withXml {
-                            asNode().appendNode("dependencies").let { depNode ->
-                                configurations.implementation.allDependencies.forEach {
-                                    depNode.appendNode("dependency").apply {
-                                        appendNode("groupId", it.group)
-                                        appendNode("artifactId", it.name)
-                                        appendNode("version", it.version)
+                    if (project.hasProperty("android")) {
+                        pom {
+                            withXml {
+                                asNode().appendNode("dependencies").let { depNode ->
+                                    configurations.implementation.allDependencies.forEach {
+                                        depNode.appendNode("dependency").apply {
+                                            appendNode("groupId", it.group)
+                                            appendNode("artifactId", it.name)
+                                            appendNode("version", it.version)
+                                        }
                                     }
-
-                                    println(depNode)
                                 }
                             }
                         }
                     }
                 }
-            }
-
-            tasks.withType<GenerateMavenPom> {
-                destination = file("$buildDir/libs/${project.name}-$version.pom")
             }
         }
     }

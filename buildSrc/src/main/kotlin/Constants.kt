@@ -143,6 +143,9 @@ object RoboElectric {
 }
 
 object Release {
+    object MavenPublish {
+        const val plugin = "maven-publish"
+    }
 
     object Bintray {
         const val version = "1.8.4"
