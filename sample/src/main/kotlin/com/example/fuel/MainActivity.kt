@@ -104,21 +104,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpResponseObject() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1"
+            .httpGet()
             .also { Log.d(TAG, it.cUrlString()) }
             .responseObject(Issue.Deserializer()) { _, _, result -> update(result) }
     }
 
     private fun httpListResponseObject() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues".httpGet()
+        "https://api.github.com/repos/kittinunf/Fuel/issues"
+            .httpGet()
             .also { Log.d(TAG, it.cUrlString()) }
             .responseObject(Issue.ListDeserializer()) { _, _, result -> update(result) }
     }
 
     private fun httpGsonResponseObject() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1"
+            .httpGet()
             .also { Log.d(TAG, it.cUrlString()) }
-            .responseObject<Issue> { request, _, result -> update(result) }
+            .responseObject<Issue> { _, _, result -> update(result) }
     }
 
     private fun httpGet() {
@@ -126,7 +129,8 @@ class MainActivity : AppCompatActivity() {
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
 
-        "/get".httpGet()
+        "/get"
+            .httpGet()
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
     }
@@ -136,7 +140,8 @@ class MainActivity : AppCompatActivity() {
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
 
-        "/put".httpPut(listOf("foo" to "foo", "bar" to "bar"))
+        "/put"
+            .httpPut(listOf("foo" to "foo", "bar" to "bar"))
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
     }
@@ -146,7 +151,8 @@ class MainActivity : AppCompatActivity() {
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
 
-        "/post".httpPost(listOf("foo" to "foo", "bar" to "bar"))
+        "/post"
+            .httpPost(listOf("foo" to "foo", "bar" to "bar"))
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
     }
@@ -156,7 +162,8 @@ class MainActivity : AppCompatActivity() {
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
 
-        "/delete".httpDelete(listOf("foo" to "foo", "bar" to "bar"))
+        "/delete"
+            .httpDelete(listOf("foo" to "foo", "bar" to "bar"))
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
     }
@@ -209,7 +216,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpRxSupport() {
-        val disposable = "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+        val disposable = "https://api.github.com/repos/kittinunf/Fuel/issues/1"
+            .httpGet()
             .rxObject(Issue.Deserializer())
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
@@ -218,7 +226,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpLiveDataSupport() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1"
+            .httpGet()
             .liveDataObject(Issue.Deserializer())
             .observeForever { result -> Log.d(TAG, result.toString()) }
     }
