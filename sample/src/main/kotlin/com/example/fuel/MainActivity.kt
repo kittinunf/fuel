@@ -96,162 +96,140 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpCancel() {
-        val request = Fuel.get("/delay/10").interrupt {
-            Log.d(TAG, it.url.toString() + " is interrupted")
-        }.responseString { _, _, result ->
-            update(result)
-        }
+        val request = Fuel.get("/delay/10")
+            .interrupt { Log.d(TAG, it.url.toString() + " is interrupted") }
+            .responseString { _, _, _ -> /* noop */ }
 
-        Handler().postDelayed({
-            request.cancel()
-        }, 1000)
+        Handler().postDelayed({ request.cancel() }, 1000)
     }
 
     private fun httpResponseObject() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
-                .responseObject(Issue.Deserializer()) { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1"
+            .httpGet()
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseObject(Issue.Deserializer()) { _, _, result -> update(result) }
     }
 
     private fun httpListResponseObject() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues".httpGet()
-                .responseObject(Issue.ListDeserializer()) { _, _, result ->
-                    update(result)
-                }
+        "https://api.github.com/repos/kittinunf/Fuel/issues"
+            .httpGet()
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseObject(Issue.ListDeserializer()) { _, _, result -> update(result) }
     }
 
     private fun httpGsonResponseObject() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
-                .responseObject<Issue> { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1"
+            .httpGet()
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseObject<Issue> { _, _, result -> update(result) }
     }
 
     private fun httpGet() {
         Fuel.get("/get", listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.cUrlString())
-                    update(result)
-                }
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
 
-        "/get".httpGet().responseString { request, _, result ->
-            Log.d(TAG, request.toString())
-            update(result)
-        }
+        "/get"
+            .httpGet()
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
     }
 
     private fun httpPut() {
         Fuel.put("/put", listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.cUrlString())
-                    update(result)
-                }
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
 
-        "/put".httpPut(listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        "/put"
+            .httpPut(listOf("foo" to "foo", "bar" to "bar"))
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
     }
 
     private fun httpPost() {
         Fuel.post("/post", listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.cUrlString())
-                    update(result)
-                }
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
 
-        "/post".httpPost(listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        "/post"
+            .httpPost(listOf("foo" to "foo", "bar" to "bar"))
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
     }
 
     private fun httpDelete() {
         Fuel.delete("/delete", listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.cUrlString())
-                    update(result)
-                }
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
 
-        "/delete".httpDelete(listOf("foo" to "foo", "bar" to "bar"))
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        "/delete"
+            .httpDelete(listOf("foo" to "foo", "bar" to "bar"))
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
     }
 
     private fun httpDownload() {
         val n = 100
-        Fuel.download("/bytes/${1024 * n}").destination { _, _ ->
-            File(filesDir, "test.tmp")
-        }.progress { readBytes, totalBytes ->
-            val progress = "$readBytes / $totalBytes"
-            runOnUiThread {
-                mainAuxText.text = progress
+        Fuel.download("/bytes/${1024 * n}")
+            .destination { _, _ -> File(filesDir, "test.tmp") }
+            .progress { readBytes, totalBytes ->
+                val progress = "$readBytes / $totalBytes"
+                runOnUiThread { mainAuxText.text = progress }
+                Log.v(TAG, progress)
             }
-            Log.v(TAG, progress)
-        }.responseString { request, _, result ->
-            Log.d(TAG, request.toString())
-            update(result)
-        }
+            .also { Log.d(TAG, it.toString()) }
+            .responseString { _, _, result -> update(result) }
     }
 
     private fun httpUpload() {
-        Fuel.upload("/post").source { _, _ ->
-            // create random file with some non-sense string
-            val file = File(filesDir, "out.tmp")
-            file.writer().use { writer ->
-                repeat(100) {
-                    writer.appendln("abcdefghijklmnopqrstuvwxyz")
+        Fuel.upload("/post")
+            .source { _, _ ->
+                // create random file with some non-sense string
+                val file = File(filesDir, "out.tmp")
+                file.writer().use { writer ->
+                    repeat(100) {
+                        writer.appendln("abcdefghijklmnopqrstuvwxyz")
+                    }
                 }
+                file
             }
-            file
-        }.progress { writtenBytes, totalBytes ->
-            Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
-        }.responseString { request, _, result ->
-            Log.d(TAG, request.toString())
-            update(result)
-        }
+            .progress { writtenBytes, totalBytes ->
+                Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
+            }
+            .also { Log.d(TAG, it.toString()) }
+            .responseString { _, _, result -> update(result) }
     }
 
     private fun httpBasicAuthentication() {
         val username = "U$3|2|\\|@me"
         val password = "P@$\$vv0|2|)"
-        Fuel.get("/basic-auth/$username/$password").authenticate(username, password)
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
 
-        "/basic-auth/$username/$password".httpGet().authenticate(username, password)
-                .responseString { request, _, result ->
-                    Log.d(TAG, request.toString())
-                    update(result)
-                }
+        Fuel.get("/basic-auth/$username/$password")
+            .authenticate(username, password)
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
+
+        "/basic-auth/$username/$password".httpGet()
+            .authenticate(username, password)
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
     }
 
     private fun httpRxSupport() {
-        val disposable = "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
-                .rxObject(Issue.Deserializer())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { result ->
-                    Log.d(TAG, result.toString())
-                }
+        val disposable = "https://api.github.com/repos/kittinunf/Fuel/issues/1"
+            .httpGet()
+            .rxObject(Issue.Deserializer())
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { result -> Log.d(TAG, result.toString()) }
         bag.add(disposable)
     }
 
     private fun httpLiveDataSupport() {
-        "https://api.github.com/repos/kittinunf/Fuel/issues/1".httpGet()
-                .liveDataObject(Issue.Deserializer())
-                .observeForever { result ->
-                    Log.d(TAG, result.toString())
-                }
+        "https://api.github.com/repos/kittinunf/Fuel/issues/1"
+            .httpGet()
+            .liveDataObject(Issue.Deserializer())
+            .observeForever { result -> Log.d(TAG, result.toString()) }
     }
 
     private fun <T : Any> update(result: Result<T, FuelError>) {
