@@ -195,11 +195,17 @@ internal class HttpClient(
 
     private fun dataStream(connection: HttpURLConnection): InputStream? {
         return try {
-            (connection.errorStream ?: connection.inputStream) ?.let { BufferedInputStream(it) }
-        } catch (exception: IOException) {
-            // Stream error
-            try { (connection.errorStream ?: connection.inputStream).close() } catch (_: IOException) {}
+            try {
+                BufferedInputStream(connection.inputStream)
+            } catch (_: IOException) {
+                connection.errorStream?.let { BufferedInputStream(it) }
+            } finally {
+                try { connection.inputStream?.close() } catch (_: IOException) {}
+            }
+        } catch(exception: IOException) {
             ByteArrayInputStream(exception.message?.toByteArray() ?: ByteArray(0))
+        } finally {
+            try { connection.errorStream?.close() } catch (_: IOException) {}
         }
     }
 
