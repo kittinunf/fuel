@@ -18,7 +18,7 @@ interface RequestFactory {
      *
      * @return [Request] the request
      */
-    fun request(method: Method, convertible: PathStringConvertible, parameters: Parameters?): Request
+    fun request(method: Method, convertible: PathStringConvertible, parameters: Parameters? = null): Request
 
     /**
      * Make a request using [method] to [path] with [parameters]
@@ -32,12 +32,12 @@ interface RequestFactory {
      *
      * @return [Request] the request
      */
-    fun request(method: Method, path: String, parameters: Parameters?): Request
+    fun request(method: Method, path: String, parameters: Parameters? = null): Request
 
     /**
      * Make a request using from [convertible]
      *
-     * @param convertible [Fuel.RequestConvertible] the instance that can be turned into a [Request]
+     * @param convertible [RequestConvertible] the instance that can be turned into a [Request]
      * @return [Request] the request
      */
     fun request(convertible: RequestConvertible): Request
