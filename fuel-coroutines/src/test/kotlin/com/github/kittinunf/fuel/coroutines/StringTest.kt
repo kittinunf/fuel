@@ -1,9 +1,5 @@
 package com.github.kittinunf.fuel.coroutines
 
-import awaitString
-import awaitStringResponse
-import awaitStringResponseResult
-import awaitStringResult
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method

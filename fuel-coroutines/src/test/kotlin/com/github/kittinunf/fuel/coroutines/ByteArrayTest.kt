@@ -1,9 +1,5 @@
 package com.github.kittinunf.fuel.coroutines
 
-import awaitByteArray
-import awaitByteArrayResponse
-import awaitByteArrayResponseResult
-import awaitByteArrayResult
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method
