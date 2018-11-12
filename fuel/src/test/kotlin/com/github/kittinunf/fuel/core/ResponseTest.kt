@@ -1,12 +1,11 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.BaseTestCase
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.net.URL
 
-class ResponseTest : BaseTestCase() {
+class ResponseTest {
     @Test
     fun responseHasHeaderGetter() {
         val response = Response(
