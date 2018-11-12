@@ -1,6 +1,6 @@
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
-import com.novoda.gradle.release.PublishExtension
+import com.jfrog.bintray.gradle.BintrayExtension
 import org.jmailen.gradle.kotlinter.KotlinterExtension
 import org.jmailen.gradle.kotlinter.support.ReporterType
 
@@ -9,9 +9,11 @@ plugins {
     kotlin("jvm") version Kotlin.version apply false
     id(Android.libPlugin) version Android.version apply false
     id(Jacoco.Android.plugin) version Jacoco.Android.version apply false
-    id(BintrayRelease.plugin) version BintrayRelease.version apply false
     id(KotlinX.Serialization.plugin) version Kotlin.version apply false
     id(Ktlint.plugin) version Ktlint.version apply false
+
+    `maven-publish`
+    id(Release.Bintray.plugin) version Release.Bintray.version apply false
 }
 
 allprojects {
@@ -32,7 +34,6 @@ subprojects {
 
     if (isJvmModule) {
         apply {
-            plugin("java")
             plugin(Kotlin.plugin)
             plugin(Jacoco.plugin)
         }
@@ -62,6 +63,16 @@ subprojects {
                 xml.isEnabled = true
                 csv.isEnabled = false
             }
+        }
+
+        val sourcesJar by tasks.registering(Jar::class) {
+            from(sourceSets["main"].allSource)
+            classifier = "sources"
+        }
+
+        val doc by tasks.creating(Javadoc::class) {
+            isFailOnError = false
+            source = sourceSets["main"].allJava
         }
     }
 
@@ -107,6 +118,18 @@ subprojects {
             testOptions {
                 unitTests.isReturnDefaultValues = true
             }
+
+            val sourcesJar by tasks.registering(Jar::class) {
+                from(sourceSets["main"].java.srcDirs)
+                classifier = "sources"
+            }
+
+            val doc by tasks.creating(Javadoc::class) {
+                isFailOnError = false
+                source = sourceSets["main"].java.sourceFiles
+                classpath += files(bootClasspath.joinToString(File.pathSeparator))
+                classpath += configurations.compile
+            }
         }
 
         configure<JacocoAndroidUnitTestReportExtension> {
@@ -114,29 +137,79 @@ subprojects {
             html.enabled(true)
             xml.enabled(true)
         }
-
-        tasks.withType<Javadoc>().all { enabled = false }
     }
 
     if (!isSample) {
         apply {
-            plugin(BintrayRelease.plugin)
+            plugin(Release.MavenPublish.plugin)
+            plugin(Release.Bintray.plugin)
             plugin(Ktlint.plugin)
-        }
-
-        configure<PublishExtension> {
-            artifactId = project.name
-            autoPublish = true
-            desc = "The easiest HTTP networking library in Kotlin/Android"
-            groupId = "com.github.kittinunf.fuel"
-            setLicences("MIT")
-            publishVersion = Fuel.publishVersion
-            uploadName = "Fuel-Android"
-            website = "https://github.com/kittinunf/Fuel"
         }
 
         configure<KotlinterExtension> {
             reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
+        }
+
+        version = Fuel.publishVersion
+        group = Fuel.groupId
+        configure<BintrayExtension> {
+            user = findProperty("BINTRAY_USER") as? String
+            key = findProperty("BINTRAY_KEY") as? String
+            setPublications(project.name)
+            pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
+                repo = "maven"
+                name = "Fuel-Android"
+                desc = "The easiest HTTP networking library in Kotlin/Android"
+                userOrg = "kittinunf"
+                websiteUrl = "https://github.com/kittinunf/Fuel"
+                vcsUrl = "https://github.com/kittinunf/Fuel"
+                setLicenses("MIT")
+                version(delegateClosureOf<BintrayExtension.VersionConfig> {
+                    name = Fuel.publishVersion
+                })
+            })
+        }
+
+        val javadocJar by tasks.creating(Jar::class) {
+            val doc by tasks
+            dependsOn(doc)
+            from(doc)
+
+            classifier = "javadoc"
+        }
+
+        val sourcesJar by tasks
+        publishing {
+            publications {
+                register(project.name, MavenPublication::class) {
+                    if (project.hasProperty("android")) {
+                        artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+                    } else {
+                        from(components["java"])
+                    }
+                    artifact(sourcesJar)
+                    artifact(javadocJar)
+                    groupId = Fuel.groupId
+                    artifactId = project.name
+                    version = Fuel.publishVersion
+
+                    if (project.hasProperty("android")) {
+                        pom {
+                            withXml {
+                                asNode().appendNode("dependencies").let { depNode ->
+                                    configurations.implementation.allDependencies.forEach {
+                                        depNode.appendNode("dependency").apply {
+                                            appendNode("groupId", it.group)
+                                            appendNode("artifactId", it.name)
+                                            appendNode("version", it.version)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 // Library version
 object Fuel {
     const val publishVersion = "1.16.0"
+    const val groupId = "com.github.kittinunf.fuel"
 
     const val compileSdkVersion = 27
     const val minSdkVersion = 19
@@ -102,6 +103,7 @@ object RxJava {
         const val version = "2.1.13"
         const val dependency = "io.reactivex.rxjava2:rxjava:$version"
     }
+
     object Android {
         const val version = "2.1.0"
         val dependency = "io.reactivex.rxjava2:rxandroid:$version"
@@ -140,7 +142,18 @@ object RoboElectric {
     const val dependency = "org.robolectric:robolectric:$version"
 }
 
-object BintrayRelease {
-    const val version = "0.8.0"
-    const val plugin = "com.novoda.bintray-release"
+object Release {
+    object MavenPublish {
+        const val plugin = "maven-publish"
+    }
+
+    object Bintray {
+        const val version = "1.8.4"
+        const val plugin = "com.jfrog.bintray"
+    }
+
+    object AndroidMaven {
+        const val version = "2.1"
+        const val plugin = "com.github.dcendents.android-maven"
+    }
 }

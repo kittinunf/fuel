@@ -13,9 +13,6 @@ pluginManagement {
             if (requested.id.id == Jacoco.Android.plugin) {
                 useModule("com.dicedmelon.gradle:jacoco-android:${requested.version}")
             }
-            if (requested.id.id == BintrayRelease.plugin) {
-                useModule("com.novoda:bintray-release:${requested.version}")
-            }
             if (requested.id.id == KotlinX.Serialization.plugin) {
                 useModule("org.jetbrains.kotlin:kotlin-serialization:${requested.version}")
             }
