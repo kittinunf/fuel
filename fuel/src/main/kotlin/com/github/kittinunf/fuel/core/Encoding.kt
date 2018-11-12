@@ -1,6 +1,5 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.requests.DefaultRequest
 import java.net.MalformedURLException
 import java.net.URI
@@ -13,7 +12,7 @@ class Encoding(
     val urlString: String,
     val baseUrlString: String? = null,
     val parameters: Parameters? = null
-) : Fuel.RequestConvertible {
+) : RequestFactory.RequestConvertible {
 
     private val encoder: (Method, String, Parameters?) -> Request = { method, path, parameters ->
         var modifiedPath = path

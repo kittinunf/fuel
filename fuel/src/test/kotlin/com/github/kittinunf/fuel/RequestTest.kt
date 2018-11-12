@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.RequestFactory
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.decodeBase64
@@ -25,11 +26,11 @@ import java.util.Random
 class RequestTest : MockHttpTestCase() {
     private val manager: FuelManager by lazy { FuelManager() }
 
-    class PathStringConvertibleImpl(url: String) : Fuel.PathStringConvertible {
+    class PathStringConvertibleImpl(url: String) : RequestFactory.PathStringConvertible {
         override val path = url
     }
 
-    class RequestConvertibleImpl(val method: Method, private val url: String) : Fuel.RequestConvertible {
+    class RequestConvertibleImpl(val method: Method, private val url: String) : RequestFactory.RequestConvertible {
         override val request = createRequest()
 
         private fun createRequest(): Request {

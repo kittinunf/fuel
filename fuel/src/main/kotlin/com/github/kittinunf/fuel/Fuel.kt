@@ -4,136 +4,12 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Parameters
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.RequestFactory
 import com.github.kittinunf.fuel.core.requests.DownloadRequest
 import com.github.kittinunf.fuel.core.requests.UploadRequest
 
-class Fuel private constructor() {
-    interface PathStringConvertible {
-        val path: String
-    }
+object Fuel : RequestFactory.Convenience by FuelManager.instance
 
-    interface RequestConvertible {
-        val request: Request
-    }
-
-    companion object {
-        @JvmStatic
-        @JvmOverloads
-        fun get(path: String, parameters: Parameters? = null): Request =
-            request(Method.GET, path, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun get(convertible: PathStringConvertible, parameters: Parameters? = null): Request =
-            request(Method.GET, convertible, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun post(path: String, parameters: Parameters? = null): Request =
-            request(Method.POST, path, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun post(convertible: PathStringConvertible, parameters: Parameters? = null): Request =
-            request(Method.POST, convertible, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun put(path: String, parameters: Parameters? = null): Request =
-            request(Method.PUT, path, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun put(convertible: PathStringConvertible, parameters: Parameters? = null): Request =
-            request(Method.PUT, convertible, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun patch(path: String, parameters: Parameters? = null): Request =
-            request(Method.PATCH, path, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun patch(convertible: PathStringConvertible, parameters: Parameters? = null): Request =
-            request(Method.PATCH, convertible, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun delete(path: String, parameters: Parameters? = null): Request =
-            request(Method.DELETE, path, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun delete(convertible: PathStringConvertible, parameters: Parameters? = null): Request =
-            request(Method.DELETE, convertible, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun download(path: String, parameters: Parameters? = null): DownloadRequest =
-            FuelManager.instance.download(path, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun download(convertible: PathStringConvertible, parameters: Parameters? = null): DownloadRequest =
-                download(convertible.path, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun upload(path: String, method: Method = Method.POST, parameters: Parameters? = null): UploadRequest =
-            FuelManager.instance.upload(path, method, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun upload(convertible: PathStringConvertible, method: Method = Method.POST, parameters: Parameters? = null): UploadRequest =
-            upload(convertible.path, method, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun head(path: String, parameters: Parameters? = null): Request =
-            request(Method.HEAD, path, parameters)
-
-        @JvmStatic
-        @JvmOverloads
-        fun head(convertible: PathStringConvertible, parameters: Parameters? = null): Request =
-            request(Method.HEAD, convertible, parameters)
-
-        /**
-         * Convenience method to make a request
-         *
-         * @see Method
-         *
-         * @param method [Method] the HTTP method to make the request with
-         * @param path [String] the absolute url or relative path (to FuelManager.instance.basePath)
-         * @param parameters [Parameters?] list of parameters
-         */
-        @JvmStatic
-        @JvmOverloads
-        fun request(method: Method, path: String, parameters: Parameters? = null): Request =
-            FuelManager.instance.request(method, path, parameters)
-
-        /**
-         * Convenience method to make a request from a [com.github.kittinunf.fuel.Fuel.PathStringConvertible}
-         *
-         * @see Method
-         * @see Fuel.request(Method, String, Parameters?)
-         *
-         * @param convertible [PathStringConvertible]
-         */
-        @JvmStatic
-        @JvmOverloads
-        fun request(method: Method, convertible: PathStringConvertible, parameters: Parameters? = null): Request =
-            request(method, convertible.path, parameters)
-
-        /**
-         * Convenience method to make a request from a [com.github.kittinunf.fuel.Fuel.RequestConvertible}
-         */
-        @JvmStatic
-        fun request(convertible: RequestConvertible): Request =
-            FuelManager.instance.request(convertible)
-    }
-}
-
-@JvmOverloads
 fun String.httpGet(parameters: Parameters? = null): Request =
     Fuel.get(this, parameters?.flatMap { pair ->
         // TODO: move to generic url encoding
@@ -144,62 +20,47 @@ fun String.httpGet(parameters: Parameters? = null): Request =
         }?.toList() ?: listOf(pair)
     })
 
-@JvmOverloads
-fun Fuel.PathStringConvertible.httpGet(parameter: Parameters? = null): Request =
-    Fuel.get(this, parameter)
+fun RequestFactory.PathStringConvertible.httpGet(parameter: Parameters? = null): Request =
+    this.path.httpGet(parameter)
 
-@JvmOverloads
 fun String.httpPost(parameters: Parameters? = null): Request =
     Fuel.post(this, parameters)
 
-@JvmOverloads
-fun Fuel.PathStringConvertible.httpPost(parameter: Parameters? = null): Request =
-    Fuel.post(this, parameter)
+fun RequestFactory.PathStringConvertible.httpPost(parameter: Parameters? = null): Request =
+    this.path.httpPost(parameter)
 
-@JvmOverloads
 fun String.httpPut(parameters: Parameters? = null): Request =
     Fuel.put(this, parameters)
 
-@JvmOverloads
-fun Fuel.PathStringConvertible.httpPut(parameter: Parameters? = null): Request =
-    Fuel.put(this, parameter)
+fun RequestFactory.PathStringConvertible.httpPut(parameter: Parameters? = null): Request =
+    this.path.httpPut(parameter)
 
-@JvmOverloads
 fun String.httpPatch(parameters: Parameters? = null): Request =
     Fuel.patch(this, parameters)
 
-@JvmOverloads
-fun Fuel.PathStringConvertible.httpPatch(parameter: Parameters? = null): Request =
-        Fuel.patch(this, parameter)
+fun RequestFactory.PathStringConvertible.httpPatch(parameter: Parameters? = null): Request =
+    this.path.httpPatch(parameter)
 
-@JvmOverloads
 fun String.httpDelete(parameters: Parameters? = null): Request =
     Fuel.delete(this, parameters)
 
-@JvmOverloads
-fun Fuel.PathStringConvertible.httpDelete(parameter: Parameters? = null): Request =
-    Fuel.delete(this, parameter)
+fun RequestFactory.PathStringConvertible.httpDelete(parameter: Parameters? = null): Request =
+    this.path.httpDelete(parameter)
 
-@JvmOverloads
-fun String.httpDownload(parameter: Parameters? = null): DownloadRequest =
-    Fuel.download(this, parameter)
+fun String.httpDownload(parameter: Parameters? = null, method: Method = Method.GET): DownloadRequest =
+    Fuel.download(this, method, parameter)
 
-@JvmOverloads
-fun Fuel.PathStringConvertible.httpDownload(parameter: Parameters? = null): DownloadRequest =
-    Fuel.download(this, parameter)
+fun RequestFactory.PathStringConvertible.httpDownload(parameters: Parameters? = null, method: Method = Method.GET): DownloadRequest =
+    this.path.httpDownload(parameters, method)
 
-@JvmOverloads
-fun String.httpUpload(method: Method = Method.POST, parameters: Parameters? = null): UploadRequest =
+fun String.httpUpload(parameters: Parameters? = null, method: Method = Method.POST): UploadRequest =
     Fuel.upload(this, method, parameters)
 
-@JvmOverloads
-fun Fuel.PathStringConvertible.httpUpload(method: Method = Method.POST, parameters: Parameters? = null): UploadRequest =
-    Fuel.upload(this, method, parameters)
+fun RequestFactory.PathStringConvertible.httpUpload(parameters: Parameters? = null, method: Method = Method.POST): UploadRequest =
+    this.path.httpUpload(parameters, method)
 
-@JvmOverloads
-fun Fuel.PathStringConvertible.httpHead(parameter: Parameters? = null): Request =
-    Fuel.head(this, parameter)
-
-@JvmOverloads
 fun String.httpHead(parameters: Parameters? = null): Request =
     Fuel.head(this, parameters)
+
+fun RequestFactory.PathStringConvertible.httpHead(parameters: Parameters? = null): Request =
+    this.path.httpHead(parameters)

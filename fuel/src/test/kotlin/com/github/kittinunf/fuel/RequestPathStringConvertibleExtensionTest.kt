@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.RequestFactory
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
@@ -12,7 +13,7 @@ import java.io.File
 import java.net.HttpURLConnection
 
 class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
-    class PathStringConvertibleImpl(url: String) : Fuel.PathStringConvertible {
+    class PathStringConvertibleImpl(url: String) : RequestFactory.PathStringConvertible {
         override val path = url
     }
 

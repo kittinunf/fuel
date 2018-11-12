@@ -1,6 +1,5 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
 import java.io.File
 import java.io.InputStream
@@ -10,7 +9,7 @@ import java.nio.charset.Charset
 typealias Parameters = List<Pair<String, Any?>>
 typealias RequestFeatures = MutableMap<String, Request>
 
-interface Request : Fuel.RequestConvertible {
+interface Request : RequestFactory.RequestConvertible {
     val method: Method
     val url: URL
     val headers: Headers

@@ -57,7 +57,7 @@ class UploadRequestTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
             .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
             .name { "file-name" }
             .responseString()
@@ -189,7 +189,7 @@ class UploadRequestTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
             .sources { _, _ ->
                 listOf(File(currentDir, "lorem_ipsum_short.tmp"),
                         File(currentDir, "lorem_ipsum_long.tmp"))
@@ -220,7 +220,7 @@ class UploadRequestTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
             .dataParts { _, _ ->
                 listOf(
                     DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg"),
@@ -253,7 +253,7 @@ class UploadRequestTest : MockHttpTestCase() {
                 response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
             .name { "coolblob" }
             .blob { _, _ -> Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name) }
             .responseString()
@@ -280,7 +280,7 @@ class UploadRequestTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
             .source { r, _ ->
                 r.header(Pair("Content-Type", "multipart/form-data; boundary=160f77ec3eff"))
                 File(currentDir, "lorem_ipsum_short.tmp")
@@ -309,7 +309,7 @@ class UploadRequestTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), param = listOf("foo" to "bar"))
+        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
             .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
             .responseString()
 

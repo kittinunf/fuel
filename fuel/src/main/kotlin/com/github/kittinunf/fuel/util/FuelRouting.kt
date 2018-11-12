@@ -1,16 +1,16 @@
 package com.github.kittinunf.fuel.util
 
-import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Encoding
 import com.github.kittinunf.fuel.core.HeaderValues
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Parameters
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.RequestFactory
 
 /**
  * Created by matteocrippa on 8/16/17.
  */
-interface FuelRouting : Fuel.RequestConvertible {
+interface FuelRouting : RequestFactory.RequestConvertible {
     /**
      * Base path handler for the remote call.
      */

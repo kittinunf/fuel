@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.RequestFactory
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.notNullValue
@@ -17,11 +18,11 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 class BlockingRequestTest : MockHttpTestCase() {
     private val manager: FuelManager by lazy { FuelManager() }
 
-    class PathStringConvertibleImpl(url: String) : Fuel.PathStringConvertible {
+    class PathStringConvertibleImpl(url: String) : RequestFactory.PathStringConvertible {
         override val path = url
     }
 
-    class RequestConvertibleImpl(val method: Method, private val url: String) : Fuel.RequestConvertible {
+    class RequestConvertibleImpl(val method: Method, private val url: String) : RequestFactory.RequestConvertible {
         override val request = createRequest()
 
         private fun createRequest(): Request {
@@ -288,7 +289,7 @@ class BlockingRequestTest : MockHttpTestCase() {
         mock.chain(request = httpRequest, response = mock.reflect())
 
         val (request, response, data) =
-                manager.upload(mock.path("upload"), param = listOf("foo" to "bar", "foo1" to "bar1"))
+                manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar", "foo1" to "bar1"))
                         .source { _, _ ->
                             val dir = System.getProperty("user.dir")
                             val currentDir = File(dir, "src/test/assets")

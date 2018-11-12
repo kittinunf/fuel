@@ -150,7 +150,7 @@ class RequestStringExtensionTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = mock.path("http-upload")
-            .httpUpload(Method.PUT)
+            .httpUpload(method = Method.PUT)
             .source { _, _ ->
                 val dir = System.getProperty("user.dir")
                 val currentDir = File(dir, "src/test/assets")
