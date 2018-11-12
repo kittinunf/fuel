@@ -198,14 +198,22 @@ internal class HttpClient(
             try {
                 BufferedInputStream(connection.inputStream)
             } catch (_: IOException) {
+                // The InputStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures
+                // the InputStream ís actually always closed.
+                try { connection.inputStream?.close() } catch (_: IOException) {}
+
                 connection.errorStream?.let { BufferedInputStream(it) }
             } finally {
-                try { connection.inputStream?.close() } catch (_: IOException) {}
+                // We want the stream to live. Closing the stream is handled by Deserialize
             }
         } catch(exception: IOException) {
+            // The ErrorStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures the
+            // ErrorStream ís actually always closed.
+            try { connection.errorStream?.close() } catch (_: IOException) {}
+
             ByteArrayInputStream(exception.message?.toByteArray() ?: ByteArray(0))
         } finally {
-            try { connection.errorStream?.close() } catch (_: IOException) {}
+            // We want the stream to live. Closing the stream is handled by Deserialize
         }
     }
 
