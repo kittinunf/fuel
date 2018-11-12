@@ -206,7 +206,7 @@ internal class HttpClient(
             } finally {
                 // We want the stream to live. Closing the stream is handled by Deserialize
             }
-        } catch(exception: IOException) {
+        } catch (exception: IOException) {
             // The ErrorStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures the
             // ErrorStream ís actually always closed.
             try { connection.errorStream?.close() } catch (_: IOException) {}
