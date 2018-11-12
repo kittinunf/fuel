@@ -9,6 +9,7 @@ import android.view.View;
 import com.example.fuel.databinding.ActivityMainBinding;
 import com.github.kittinunf.fuel.Fuel;
 import com.github.kittinunf.fuel.core.FuelError;
+import com.github.kittinunf.fuel.core.Method;
 import com.github.kittinunf.fuel.core.Request;
 import com.github.kittinunf.fuel.core.Response;
 import com.github.kittinunf.fuel.core.ResponseHandler;
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void httpGet() {
-        Fuel.get("http://httpbin.org/get", params).responseString(new ResponseHandler<String>() {
+        Fuel.INSTANCE.get("http://httpbin.org/get", params).responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
@@ -80,12 +81,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Fuel.get("http://httpbin.org/get", params).responseString();
+        Fuel.INSTANCE.get("http://httpbin.org/get", params).responseString();
     }
 
     private void httpPut() {
         //put
-        Fuel.put("http://httpbin.org/put").responseString(new ResponseHandler<String>() {
+        Fuel.INSTANCE.put("http://httpbin.org/put", null).responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void httpPost() {
         //post
-        Fuel.post("http://httpbin.org/post", params).responseString(new ResponseHandler<String>() {
+        Fuel.INSTANCE.post("http://httpbin.org/post", params).responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void httpDelete() {
         //delete
-        Fuel.delete("http://httpbin.org/delete").responseString(new ResponseHandler<String>() {
+        Fuel.INSTANCE.delete("http://httpbin.org/delete", null).responseString(new ResponseHandler<String>() {
             @Override
             public void failure(@NotNull Request request, @NotNull Response response, @NotNull FuelError error) {
                 updateUI(error, null);
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void httpDownload() {
-        Fuel.download("http://httpbin.org/bytes/1048").destination(new Function2<Response, URL, File>() {
+        Fuel.INSTANCE.download("http://httpbin.org/bytes/1048", Method.GET, null).destination(new Function2<Response, URL, File>() {
             @Override
             public File invoke(Response response, URL url) {
                 File sd = Environment.getExternalStorageDirectory();
@@ -151,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void httpUpload() {
-        Fuel.upload("http://httpbin.org/post").source(new Function2<Request, URL, File>() {
+        Fuel.INSTANCE.upload("http://httpbin.org/post", Method.POST, null).source(new Function2<Request, URL, File>() {
             @Override
             public File invoke(Request request, URL url) {
                 File sd = Environment.getExternalStorageDirectory();
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
     private void httpBasicAuthentication() {
         String username = "username";
         String password = "P@s$vv0|2|)";
-        AuthenticationKt.authentication(Fuel.get("http://httpbin.org/basic-auth/" + username + "/" + password))
+        AuthenticationKt.authentication(Fuel.INSTANCE.get("http://httpbin.org/basic-auth/" + username + "/" + password, null))
             .basic(username, password)
             .responseString(new ResponseHandler<String>() {
                 @Override
