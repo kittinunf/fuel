@@ -42,7 +42,7 @@ class ObjectTest : MockHttpTestCase() {
         )
         return Fuel.request(method, mock.path(path))
     }
-    
+
     private fun randomUuid(path: String = "uuid"): Request {
         mock.chain(
             request = mock.request().withPath("/$path"),
@@ -50,7 +50,7 @@ class ObjectTest : MockHttpTestCase() {
         )
         return Fuel.request(Method.GET, mock.path(path))
     }
-    
+
     @Test
     fun awaitObject() = runBlocking {
         try {

@@ -155,7 +155,7 @@ class ByteArrayTest : MockHttpTestCase() {
     @Test
     fun responseResponseResultHandler() {
         val bytes = randomBytes()
-        val running = getBytes(bytes).response { request, response, result  ->
+        val running = getBytes(bytes).response { request, response, result ->
             val (data, error) = result
             assertThat("Expected data, actual error $error", data, notNullValue())
             assertThat(data, equalTo(bytes))
@@ -165,7 +165,6 @@ class ByteArrayTest : MockHttpTestCase() {
         }
 
         running.join()
-
     }
 
     @Test

@@ -35,7 +35,6 @@ private object UUIDResponseDeserializer : ResponseDeserializable<UUIDResponse> {
     }
 }
 
-
 class ObjectTest : MockHttpTestCase() {
 
     private fun randomUUID() = UUID.randomUUID()
@@ -172,7 +171,7 @@ class ObjectTest : MockHttpTestCase() {
     @Test
     fun responseResponseResultHandler() {
         val uuid = randomUUID()
-        val running = getUUID(uuid).response(UUIDResponseDeserializer) { request, response, result  ->
+        val running = getUUID(uuid).response(UUIDResponseDeserializer) { request, response, result ->
             val (data, error) = result
             assertThat("Expected data, actual error $error", data, notNullValue())
             assertThat(data!!.uuid, equalTo(uuid.toString()))
@@ -182,7 +181,6 @@ class ObjectTest : MockHttpTestCase() {
         }
 
         running.join()
-
     }
 
     @Test

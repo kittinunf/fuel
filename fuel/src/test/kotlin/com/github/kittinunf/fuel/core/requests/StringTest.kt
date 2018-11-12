@@ -155,7 +155,7 @@ class StringTest : MockHttpTestCase() {
     @Test
     fun responseResponseResultHandler() {
         val string = randomString()
-        val running = getString(string).responseString { request, response, result  ->
+        val running = getString(string).responseString { request, response, result ->
             val (data, error) = result
             assertThat("Expected data, actual error $error", data, notNullValue())
             assertThat(data, equalTo(string))
@@ -165,7 +165,6 @@ class StringTest : MockHttpTestCase() {
         }
 
         running.join()
-
     }
 
     @Test
