@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.result.Result
 import java.io.ByteArrayInputStream
 import java.net.URL

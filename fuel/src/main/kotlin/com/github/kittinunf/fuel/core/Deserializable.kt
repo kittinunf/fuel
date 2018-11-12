@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
+import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.fuel.core.requests.RequestTaskCallbacks
 import com.github.kittinunf.fuel.core.requests.suspendable
 import com.github.kittinunf.fuel.core.requests.toTask

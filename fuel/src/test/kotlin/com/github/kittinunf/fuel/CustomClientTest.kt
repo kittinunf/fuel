@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Client
-import com.github.kittinunf.fuel.core.DefaultBody
+import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request

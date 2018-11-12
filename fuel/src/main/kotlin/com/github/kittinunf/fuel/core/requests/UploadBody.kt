@@ -2,7 +2,6 @@ package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.Body
-import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Request

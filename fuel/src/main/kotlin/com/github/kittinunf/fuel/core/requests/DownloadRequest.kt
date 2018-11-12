@@ -1,6 +1,5 @@
 package com.github.kittinunf.fuel.core.requests
 
-import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.ProgressCallback
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
