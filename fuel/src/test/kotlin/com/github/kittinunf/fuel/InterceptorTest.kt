@@ -65,8 +65,8 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun testWithLoggingRequestInterceptor() {
         val httpRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/get")
+            .withMethod(Method.GET.value)
+            .withPath("/get")
 
         mock.chain(request = httpRequest, response = mock.reflect())
 
@@ -91,8 +91,8 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun testWithLoggingResponseInterceptor() {
         val httpRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/get")
+            .withMethod(Method.GET.value)
+            .withPath("/get")
 
         mock.chain(request = httpRequest, response = mock.reflect())
 
@@ -116,8 +116,8 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun testWithResponseToString() {
         val httpRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/get")
+            .withMethod(Method.GET.value)
+            .withPath("/get")
 
         mock.chain(request = httpRequest, response = mock.reflect())
 
@@ -141,8 +141,8 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun testWithMultipleInterceptors() {
         val httpRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/get")
+            .withMethod(Method.GET.value)
+            .withPath("/get")
 
         mock.chain(request = httpRequest, response = mock.reflect())
 
@@ -180,8 +180,8 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun testWithBreakingChainInterceptor() {
         val httpRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/get")
+            .withMethod(Method.GET.value)
+            .withPath("/get")
 
         mock.chain(request = httpRequest, response = mock.reflect())
 
@@ -230,12 +230,12 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun testWithoutDefaultRedirectionInterceptor() {
         val firstRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/redirect")
+            .withMethod(Method.GET.value)
+            .withPath("/redirect")
 
         val firstResponse = mock.response()
-                .withHeader("Location", mock.path("redirected"))
-                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+            .withHeader("Location", mock.path("redirected"))
+            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         mock.chain(request = firstRequest, response = firstResponse)
 
@@ -257,11 +257,11 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun testHttpExceptionWithRemoveInterceptors() {
         val firstRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/invalid")
+            .withMethod(Method.GET.value)
+            .withPath("/invalid")
 
         val firstResponse = mock.response()
-                .withStatusCode(418) // I'm a teapot
+            .withStatusCode(418) // I'm a teapot
 
         mock.chain(request = firstRequest, response = firstResponse)
 
@@ -282,11 +282,11 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun failsIfRequestedResourceReturns404() {
         val firstRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/not-found")
+            .withMethod(Method.GET.value)
+            .withPath("/not-found")
 
         val firstResponse = mock.response()
-                .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
 
         mock.chain(request = firstRequest, response = firstResponse)
 
@@ -301,11 +301,11 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun testGetNotModified() {
         val firstRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/not-modified")
+            .withMethod(Method.GET.value)
+            .withPath("/not-modified")
 
         val firstResponse = mock.response()
-                .withStatusCode(HttpURLConnection.HTTP_NOT_MODIFIED)
+            .withStatusCode(HttpURLConnection.HTTP_NOT_MODIFIED)
 
         mock.chain(request = firstRequest, response = firstResponse)
         val manager = FuelManager()
@@ -320,19 +320,19 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun testGetWrongUrl() {
         val firstRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/redirect")
+            .withMethod(Method.GET.value)
+            .withPath("/redirect")
 
         val firstResponse = mock.response()
-                .withHeader("Location", mock.path("not-found"))
-                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+            .withHeader("Location", mock.path("not-found"))
+            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val secondRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/not-found")
+            .withMethod(Method.GET.value)
+            .withPath("/not-found")
 
         val secondResponse = mock.response()
-                .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = secondResponse)
@@ -348,11 +348,11 @@ class InterceptorTest : MockHttpTestCase() {
     @Test
     fun testRemoveAllRequestInterceptors() {
         val firstRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withPath("/teapot")
+            .withMethod(Method.GET.value)
+            .withPath("/teapot")
 
         val firstResponse = mock.response()
-                .withStatusCode(418)
+            .withStatusCode(418)
 
         mock.chain(request = firstRequest, response = firstResponse)
 
