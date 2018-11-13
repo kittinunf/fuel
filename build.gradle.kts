@@ -1,8 +1,8 @@
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
-import com.jfrog.bintray.gradle.BintrayExtension
 import org.jmailen.gradle.kotlinter.KotlinterExtension
 import org.jmailen.gradle.kotlinter.support.ReporterType
+import org.gradle.api.publish.maven.MavenPom
 
 plugins {
     java
@@ -13,7 +13,7 @@ plugins {
     id(Ktlint.plugin) version Ktlint.version apply false
 
     `maven-publish`
-    id(Release.Bintray.plugin) version Release.Bintray.version apply false
+    id(Release.Bintray.plugin) version Release.Bintray.version
 }
 
 allprojects {
@@ -152,11 +152,11 @@ subprojects {
 
         version = Fuel.publishVersion
         group = Fuel.groupId
-        configure<BintrayExtension> {
+        bintray {
             user = findProperty("BINTRAY_USER") as? String
             key = findProperty("BINTRAY_KEY") as? String
             setPublications(project.name)
-            pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
+            with(pkg) {
                 repo = "maven"
                 name = "Fuel-Android"
                 desc = "The easiest HTTP networking library in Kotlin/Android"
@@ -164,10 +164,22 @@ subprojects {
                 websiteUrl = "https://github.com/kittinunf/Fuel"
                 vcsUrl = "https://github.com/kittinunf/Fuel"
                 setLicenses("MIT")
-                version(delegateClosureOf<BintrayExtension.VersionConfig> {
+                with(version) {
                     name = Fuel.publishVersion
-                })
-            })
+                }
+            }
+        }
+
+        fun MavenPom.addDependencies() = withXml {
+            asNode().appendNode("dependencies").let { depNode ->
+                configurations.implementation.allDependencies.forEach {
+                    depNode.appendNode("dependency").apply {
+                        appendNode("groupId", it.group)
+                        appendNode("artifactId", it.name)
+                        appendNode("version", it.version)
+                    }
+                }
+            }
         }
 
         val javadocJar by tasks.creating(Jar::class) {
@@ -194,19 +206,7 @@ subprojects {
                     version = Fuel.publishVersion
 
                     if (project.hasProperty("android")) {
-                        pom {
-                            withXml {
-                                asNode().appendNode("dependencies").let { depNode ->
-                                    configurations.implementation.allDependencies.forEach {
-                                        depNode.appendNode("dependency").apply {
-                                            appendNode("groupId", it.group)
-                                            appendNode("artifactId", it.name)
-                                            appendNode("version", it.version)
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        pom.addDependencies()
                     }
                 }
             }
