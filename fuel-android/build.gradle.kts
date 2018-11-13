@@ -3,5 +3,5 @@ dependencies {
     implementation(Kotlin.stdlib)
     testImplementation(RoboElectric.dependency)
     testImplementation(JUnit.dependency)
-    testCompile(project(":fuel-test"))
+    testImplementation(project(":fuel-test"))
 }
