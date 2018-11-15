@@ -543,4 +543,15 @@ class Request(
         response(deserializer, handler)
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) =
             response(deserializer)
+
+    fun Request.responseJson(handler: (Request, Response, Result<Json, FuelError>) -> Unit) =
+        response(jsonDeserializer(), handler)
+
+    fun Request.responseJson(handler: Handler<Json>) = response(jsonDeserializer(), handler)
+    fun Request.responseJson() = response(jsonDeserializer())
+    fun jsonDeserializer(): Deserializable<Json> {
+        return object : Deserializable<Json> {
+            override fun deserialize(response: Response): Json = Json(String(response.data))
+        }
+    }
 }
