@@ -81,7 +81,7 @@ class ReadmeIntegrityTest : MockHttpTestCase() {
 
     @Test
     fun makingRequestsAddingParametersGetArray() {
-        val parameters = listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey"))
+        val parameters = listOf("foo" to "foo", "dwarf" to arrayOf("grumpy", "happy", "sleepy", "dopey"))
         val endpoint = "https://httpbin.org/get"
 
         val request = Fuel.get(endpoint, parameters = parameters)
