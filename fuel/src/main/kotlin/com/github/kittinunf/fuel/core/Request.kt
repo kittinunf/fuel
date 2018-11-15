@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
+import com.github.kittinunf.fuel.core.deserializers.JsonDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
 import com.github.kittinunf.fuel.core.requests.TaskRequest
@@ -544,14 +545,10 @@ class Request(
     fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) =
             response(deserializer)
 
-    fun Request.responseJson(handler: (Request, Response, Result<Json, FuelError>) -> Unit) =
-        response(jsonDeserializer(), handler)
-
-    fun Request.responseJson(handler: Handler<Json>) = response(jsonDeserializer(), handler)
-    fun Request.responseJson() = response(jsonDeserializer())
-    fun jsonDeserializer(): Deserializable<Json> {
-        return object : Deserializable<Json> {
-            override fun deserialize(response: Response): Json = Json(String(response.data))
-        }
-    }
+    fun Request.responseJson(handler: HandlerWithResult<Json>) -> Unit) =
+        response(JsonDeserializer(), handler)
+    fun Request.responseJson(handler: Handler<Json>) =
+        response(JsonDeserializer(), handler)
+    fun Request.responseJson() =
+        response(JsonDeserializer())
 }
