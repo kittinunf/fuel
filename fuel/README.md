@@ -1,6 +1,6 @@
 # Fuel (core)
 
-The core package for [`Fuel`](../).
+The core package for [`Fuel`](../README.md). The documentation outlined here touches most subjects and functions but is not exhaustive. 
 
 ## Installation
 
@@ -41,7 +41,7 @@ Fuel.get("https://httpbin.org/get")
  * Body : ({
  *   "args": {},
  *   "headers": {
- *     "Accept": "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2",
+ *     "Accept": "text/html, image/gif, image/jpeg, *; q=.2, *\/*; q=.2",
  *     "Connection": "close",
  *     "Host": "httpbin.org",
  *     "User-Agent": "Java/1.8.0_172"
@@ -428,27 +428,68 @@ Fuel.upload("/post")
 - If you set `Content-Type` using `.header()`, make sure to include a valid `boundary=`
 
 ### Getting a Response
+As mentioned before, you can use `Fuel` both synchronously and a-synchronously, with support for coroutines.
 
-### Result
+#### Blocking responses
+By default, there are three response functions to get a request synchronously:
 
-* [Result](https://github.com/kittinunf/Result) is a functional style data structure that represents data that contains result of *Success* or *Failure* but not both. It represents the result of an action that can be success (with result) or error.
+| function | arguments | result |
+|---|---|---|
+| `response()` | _none_ | `ResponseResultOf<ByteArray>` |
+| `responseString(charset)` | `charset: Charset` | `ResponseResultOf<String>` |
+| `responseObject(deserializer)` | `deserializer: Deserializer<U>` | `ResponseResultOf<U>` |
 
-* Working with result is easy. You could [*fold*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L324), [*destructure*](https://github.com/kittinunf/Fuel/blob/master/fuel/src/test/kotlin/com/github/kittinunf/fuel/RequestTest.kt#L266) as because it is just a [data class](https://kotlinlang.org/docs/reference/data-classes.html) or do a simple ```when``` checking whether it is *Success* or *Failure*.
+The default charset is `UTF-8`. If you want to implement your own deserializers, scroll down to advanced usage.
 
-### Response
-```kotlin
-fun response(handler: (Request, Response, Result<ByteArray, FuelError>) -> Unit)
-```
+#### Async responses
+Add a handler to a blocking function, to make it asynchronous:
 
-### Response in String
-```kotlin
-fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Unit)
-```
+| function | arguments | result |
+|---|---|---|
+| `response() { handler }` | `handler: Handler` | `CancellableRequest` |
+| `responseString(charset) { handler }` | `charset: Charset, handler: Handler` | `CancellableRequest` |
+| `responseObject(deserializer) { handler }` | `deserializer: Deserializer, handler: Handler` | `CancellableRequest` |
 
-### Response in T (object)
-```kotlin
-fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit)
-```
+The default charset is `UTF-8`. If you want to implement your own deserializers, scroll down to advanced usage.
+
+#### Suspended responses
+The core package has limited support for coroutines:
+
+| function | arguments | result |
+|---|---|---|
+| `await(deserializer)` | `deserializer: Deserializer<U>` | `U` |
+| `awaitResult(deserializer)` | `deserializer: Deserializer<U>` | `Result<U, FuelError>` |
+| `awaitResponse(deserializer)` | `deserializer: Deserializer<U>` | `ResponseOf<U>` |
+| `awaitResponseResult(deserializer)` | `deserializer: Deserializer<U>` | `ResponseResultOf<U>` |
+
+When using other packages such as `fuel-coroutines`, more response/await functions are available.
+
+#### Response types
+- The `ResponseResultOf<U>` type is a `Triple` of the `Request`, `Response` and a `Result<U, FuelError>`
+- The `ResponseOf<U>` type is a `Triple` of the `Request`, `Response` and a `U`; errors are thrown
+- The `Result<U, FuelError>` type is a non-throwing wrapper around `U`
+- The `U` type doesn't wrap anything; errors are thrown
+
+#### Handler types
+When defining a handler, you can use one of the following for all `responseXXX` functions that accept a `Handler`:
+
+| type | handler fns | arguments | description |
+|---|---|---|---|
+|`Handler<T>`| 2 | 1 | calls `success` with an instance of `T` or `failure` on errors |
+|`ResponseHandler<T>` | 2 | 3 | calls `success` with `Request`, `Response` and an instance of `T`, or `failure` or errors |
+|`ResultHandler<T>` | 1 | 1 | invokes the function with `Result<T, FuelError>` |
+|`ResponseResultHandler<T>` | 1 | 3 | invokes the function with `Request` `Response` and `Result<T, FuelError>` |
+
+This means that you can either choose to unwrap the `Result` yourself using a `ResultHandler` or `ResponseResultHandler`, or define dedicated callbacks in case of success or failure.
+
+#### Dealing with `Result<T, FuelError>`
+
+[Result](https://github.com/kittinunf/Result) is a functional style data structure that represents data that contains result of *Success* or *Failure* but not both. It represents the result of an action that can be success (with result) or error.
+
+Working with result is easy: 
+- You can call [`fold`] and define a tranformation function for both cases that results in the same return type,
+- [`destructure`] as `(data, error) = result` because it is just a [data class](https://kotlinlang.org/docs/reference/data-classes.html) or 
+- use `when` checking whether it is `Result.Success` or `Result.Failure`
 
 #### Download response to file
 Fuel supports downloading the request `Body` to a file using the `.download()` feature. You can turn _any_ `Request` into a download request by calling `.download()` or call `.download(method = Method.GET)` directly onto `Fuel` / `FuelManager`.
@@ -540,6 +581,7 @@ data class User(val firstName: String = "",
 ### Configuration
 
 * Use singleton `FuelManager.instance` to manage global configurations.
+* Create separate managers using `FuelManager()`
 
 * `basePath` is used to manage common root path. Great usage is for your static API endpoint.
     ```kotlin

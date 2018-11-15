@@ -82,7 +82,7 @@ FuelManager.instance.basePath = "https://httpbin.org"
 
 ## Detailed usage
 
-Check each of the packages documentations or the Wiki for more features, usages and examples.
+Check each of the packages documentations or the Wiki for more features, usages and examples. Are you looking for basic usage on how to set headers, authentication, request bodies and more? [`fuel`: Basic usage](./fuel/README.md) is all you need.
 
 ### Basic functionality
 - [`fuel`: Basic usage](./fuel/README.md)

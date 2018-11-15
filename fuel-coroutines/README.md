@@ -1,11 +1,27 @@
+# fuel-coroutines
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0-blue.svg)](https://kotlinlang.org)
 
-### Coroutines Support
+The coroutines extension package for [`Fuel`](../README.md).
 
-Coroutines module provides extension functions to wrap a response inside a coroutine and handle its result. The coroutines-based API provides equivalent methods to the standard API (e.g: `responseString()` in coroutines is `awaitStringResponse()`).
+## Installation
+
+You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-coroutines` with `Maven` and `Gradle`. The android package has the following dependencies:
+* `fuel:fuel:<same-version>`
+* Kotlin: 1.3.0
+* KotlinX Coroutines: 1.0.1
+
+```groovy
+compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
+compile 'com.github.kittinunf.fuel:fuel-coroutines:<latest-version>'
+```
+
+## Usage
+
+Coroutines module provides extension functions to wrap a response inside a coroutine and handle its result. The coroutines-based API provides equivalent methods to the standard API (e.g: `responseString()` in coroutines is `awaitStringResponseResult()`).
 
 ```kotlin
 runBlocking {
-    val (request, response, result) = Fuel.get("https://httpbin.org/ip").awaitStringResponse()
+    val (request, response, result) = Fuel.get("https://httpbin.org/ip").awaitStringResponseResult()
 
     result.fold(
         { data -> println(data) /* "{"origin":"127.0.0.1"}" */ },
@@ -19,7 +35,7 @@ There are functions to handle `Result` object directly too.
 ```kotlin
 runBlocking {
     Fuel.get("https://httpbin.org/ip")
-        .awaitStringResult()
+        .awaitStringResponseResult()
         .fold(
             { data -> println(data) /* "{"origin":"127.0.0.1"}" */ },
             { error -> println("An error of type ${error.exception} happened: ${error.message}") }
@@ -39,7 +55,7 @@ runBlocking {
 }
 ```
 
-Handling objects other than `String` (`awaitStringResponse() `) or `ByteArray` (`awaitByteArrayResponse()`) can be done using `awaitObject`, `awaitObjectResult` or `awaitObjectResponse`.
+Handling objects other than `String` (`awaitStringResponseResult() `) or `ByteArray` (`awaitByteArrayResponseResult()`) can be done using `awaitObject`, `awaitObjectResult` or `awaitObjectResponseResult`.
 
 ```kotlin
 data class Ip(val origin: String)

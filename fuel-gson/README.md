@@ -1,4 +1,23 @@
+# fuel-forge
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0-blue.svg)](https://kotlinlang.org)
 
+The gson extension package for [`Fuel`](../README.md).
+
+## Installation
+
+You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-gson` with `Maven` and `Gradle`. The gson package has the following dependencies:
+* `fuel:fuel:<same-version>`
+* Kotlin: 1.3.0
+* Gson: 2.8.2
+
+```groovy
+compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
+compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>'
+```
+
+## Usage
+
+See `FuelGson.kt`
 
 ### Gson Deserialization
 

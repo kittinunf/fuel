@@ -1,20 +1,95 @@
+# fuel-rxjava
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0-blue.svg)](https://kotlinlang.org)
 
-### RxJava Support
+The rxjava extension package for [`Fuel`](../README.md).
+
+## Installation
+
+You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-rxjava` with `Maven` and `Gradle`. The rxjava package has the following dependencies:
+* `fuel:fuel:<same-version>`
+* Kotlin: 1.3.0
+* RxJava: 2.1.x
+
+```groovy
+compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
+compile 'com.github.kittinunf.fuel:fuel-rxjava:<latest-version>'
+```
+
+## Usage
+
+See `RxFuel.kt`
+
+### Responses
 
 * Fuel supports [RxJava](https://github.com/ReactiveX/RxJava) right off the box.
     ```kotlin
     "https://www.example.com/photos/1".httpGet()
-      .toRxObject(Photo.Deserializer())
+      .rxObject(Photo.Deserializer())
       .subscribe { /* do something */ }
     ```
 
-* There are 6 extensions over `Request` that provide RxJava 2.x `Single<Result<T, FuelError>>` as return type.
-    ```kotlin
-    fun Request.toRxResponse(): Single<Pair<Response, Result<ByteArray, FuelError>>>
-    fun Request.toRxResponseString(charset: Charset): Single<Pair<Response, Result<String, FuelError>>>
-    fun <T : Any> Request.toRxResponseObject(deserializable: Deserializable<T>): Single<Pair<Response, Result<T, FuelError>>>
+* There are extensions over `Request` that provide RxJava 2.x `Single<Result<T, FuelError>>` as return type.
 
-    fun Request.toRxData(): Single<Result<ByteArray, FuelError>>
-    fun Request.toRxString(charset: Charset): Single<Result<String, FuelError>>
-    fun <T : Any> Request.toRxObject(deserializable: Deserializable<T>): Single<Result<T, FuelError>>
-    ```
+```kotlin    
+/**
+ * Returns a reactive stream for a [Single] value response [ByteArray]
+ *
+ * @see rxBytes
+ * @return [Single<T>] the [ByteArray] wrapped into a [Pair] and [Result]
+ */
+fun Request.rxResponse() = rxResponseSingle(ByteArrayDeserializer())
+fun Request.rxResponsePair() = rxResponsePair(ByteArrayDeserializer())
+fun Request.rxResponseTriple() = rxResponseTriple(ByteArrayDeserializer())
+
+/**
+ * Returns a reactive stream for a [Single] value response [String]
+ *
+ * @see rxString
+ *
+ * @param charset [Charset] the character set to deserialize with
+ * @return [Single<Pair<Response, Result<String, FuelError>>>] the [String] wrapped into a [Pair] and [Result]
+ */
+fun Request.rxResponseString(charset: Charset = Charsets.UTF_8) = rxResponseSingle(StringDeserializer(charset))
+fun Request.rxResponseStringPair(charset: Charset = Charsets.UTF_8) = rxResponsePair(StringDeserializer(charset))
+fun Request.rxResponseStringTriple(charset: Charset = Charsets.UTF_8) = rxResponseTriple(StringDeserializer(charset))
+
+/**
+ * Returns a reactive stream for a [Single] value response object [T]
+ *
+ * @see rxObject
+ *
+ * @param deserializable [Deserializable<T>] something that can deserialize the [Response] to a [T]
+ * @return [Single<Pair<Response, Result<T, FuelError>>>] the [T] wrapped into a [Pair] and [Result]
+ */
+fun <T : Any> Request.rxResponseObject(deserializable: Deserializable<T>) = rxResponseSingle(deserializable)
+fun <T : Any> Request.rxResponseObjectPair(deserializable: Deserializable<T>) = rxResponsePair(deserializable)
+fun <T : Any> Request.rxResponseObjectTriple(deserializable: Deserializable<T>) = rxResponseTriple(deserializable)
+
+/**
+ * Returns a reactive stream for a [Single] value response [ByteArray]
+ *
+ * @see rxResponse
+ * @return [Single<Result<ByteArray, FuelError>>] the [ByteArray] wrapped into a [Result]
+ */
+fun Request.rxBytes() = rxResult(ByteArrayDeserializer())
+
+/**
+ * Returns a reactive stream for a [Single] value response [ByteArray]
+ *
+ * @see rxResponseString
+ *
+ * @param charset [Charset] the character set to deserialize with
+ * @return [Single<Result<String, FuelError>>] the [String] wrapped into a [Result]
+ */
+fun Request.rxString(charset: Charset = Charsets.UTF_8) = rxResult(StringDeserializer(charset))
+
+/**
+ * Returns a reactive stream for a [Single] value response [T]
+ *
+ * @see rxResponseObject
+ *
+ * @param deserializable [Deserializable<T>] something that can deserialize the [Response] to a [T]
+ * @return [Single<Result<T, FuelError>>] the [T] wrapped into a [Result]
+ */
+fun <T : Any> Request.rxObject(deserializable: Deserializable<T>) = rxResult(deserializable)
+```
