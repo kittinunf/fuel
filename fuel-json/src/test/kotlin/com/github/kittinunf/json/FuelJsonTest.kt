@@ -1,7 +1,5 @@
-package com.github.kittinunf.fuel.android
+package com.github.kittinunf.fuel.json
 
-import com.github.kittinunf.fuel.android.core.Json
-import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.httpGet
 import org.hamcrest.CoreMatchers.isA
@@ -13,13 +11,29 @@ import org.junit.Test
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestAndroidSyncTest : BaseTestCase() {
+class FuelJsonTest {
 
-    init {
+	init {
+        Fuel.testMode {
+            timeout = 15000
+        }
         FuelManager.instance.apply {
             baseHeaders = mapOf("foo" to "bar")
             baseParams = listOf("key" to "value")
         }
+    }
+
+    private lateinit var mock: MockHelper
+
+    @Before
+    fun setup() {
+        this.mock = MockHelper()
+        this.mock.setup()
+    }
+
+    @After
+    fun tearDown() {
+        this.mock.tearDown()
     }
 
     @Test
@@ -55,7 +69,7 @@ class RequestAndroidSyncTest : BaseTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertThat(data as Json, isA(Json::class.java))
+        assertThat(data as Json, isA(FuelJson::class.java))
         assertThat(data.obj(), isA(JSONObject::class.java))
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
