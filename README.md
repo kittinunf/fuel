@@ -7,14 +7,14 @@
 
 The easiest HTTP networking library for Kotlin/Android.
 
-> You are looking at the documentation for **2.x.y.**. If you are looking for the documentation for **1.x.y**, checkout [README.legacy.md](README.legacy.md)
+> You are looking at the documentation for **2.x.y.**. If you are looking for the documentation for **1.x.y**, checkout [the 1.16.0 README.md](https://github.com/kittinunf/Fuel/blob/1.16.0/README.md)
 
 ## Features
 
 - [x] HTTP `GET`/`POST`/`PUT`/`DELETE`/`HEAD`/`PATCH` requests in a fluent style interface
 - [x] Asynchronous and blocking requests
 - [x] Download as a file
-- [x] Upload files, blobs, dataparts as `multipart/form-data`
+- [x] Upload files, `Blob`s, `DataPart`s as `multipart/form-data`
 - [x] Cancel asynchronous request
 - [x] Debug logging / convert to cUrl call
 - [x] Deserialization into POJO / POKO
@@ -34,17 +34,17 @@ compile 'com.github.kittinunf.fuel:<package>:<latest-version>'
 Each of the extensions / integrations has to be installed separately.
 
 | Package | Description |
-|----------|---------|--------|---------|
+|----------|---------|
 | [`fuel`](./fuel) | Core package |
+| [`fuel-coroutines`](./fuel-coroutines) | _KotlinX_: Execution with [coroutines]((https://github.com/Kotlin/kotlinx.coroutines)) |
 | [`fuel-android`](./fuel-android) |  _Android_: Automatically invoke handler on Main Thread when using Android Module |
 | [`fuel-livedata`](./fuel-livedata) | _Android Architectures_: Responses as [`LiveData`](https://developer.android.com/topic/libraries/architecture/livedata.html) |
-| [`fuel-coroutines`](./fuel-coroutines) | _KotlinX_: Requests as [coroutines]((https://github.com/Kotlin/kotlinx.coroutines)) |
 | [`fuel-rxjava`](./fuel-rxjava) | _Reactive Programming_: Responses as [`Single`](http://reactivex.io/RxJava/2.x/javadoc/io/reactivex/Single.html) (**RxJava 2.x**)
 | [`fuel-reactor`](./fuel-reactor) | _Reactive Programming_: Responses as [`Mono`](https://projectreactor.io/docs/core/release/reference/#mono) (**Project Reactor 3.x**)
 | [`fuel-gson`](./fuel-gson) | _(De)serialization_: [`Gson`](https://github.com/google/gson) |
+| [`fuel-kotlinx-serialization`](/fuel-kotlinx-serialization) | _(De)serialization_: [`KotlinX Serialization`](https://github.com/Kotlin/kotlinx.serialization) |
 | [`fuel-forge`](./fuel-forge) | _Deserialization_: [`Forge`](https://github.com/kittinunf/Forge/) |
 | [`fuel-jackson`](./fuel-jackson) | _Deserialization_: [`Jackson`](https://github.com/FasterXML/jackson-module-kotlin)
-| [`fuel-kotlinx-serialization`](/fuel-kotlinx-serialization) | _Deserialization_: [`KotlinX Serialization`](https://github.com/Kotlin/kotlinx.serialization) |
 | [`fuel-moshi`](./fuel-moshi) | _Deserialization_: [`Moshi`](https://github.com/square/moshi)  |
 
 ## Quick start
@@ -81,7 +81,26 @@ FuelManager.instance.basePath = "https://httpbin.org"
 ```
 
 ## Detailed usage
+
 Check each of the packages documentations or the Wiki for more features, usages and examples.
+
+### Basic functionality
+- [`fuel`: Basic usage](./fuel/README.md)
+- [`fuel-coroutines`: Execution with coroutines](./fuel-coroutines/README.md)
+- [`fuel-android`: Android usage](./fuel-android/README.md)
+
+### Responses
+- [`fuel-livedata`: Responses as LiveData](./fuel-livedata/README.md)
+- [`fuel-rxjava`: Responses as Single](./fuel-coroutines/README.md)
+- [`fuel-reactor`: Responses as Mono](./fuel-coroutines/README.md)
+
+### (De)serialization
+- [`fuel-gson`: (De)serialization with Gson](./fuel-gson/README.md)
+- [`fuel-kotlinx-serialization`: (De)serialization with KotlinX Serialization](/fuel-kotlinx-serialization/README.md)
+- [`fuel-forge`: Deserialization with Forge](./fuel-forge/README.md)
+- [`fuel-jackson`: Deserialization with Jackson](./fuel-jackson/README.md)
+- [`fuel-moshi`: Deserialization with Moshi](./fuel-moshi/README.md)
+
 
 ## Other libraries
 
