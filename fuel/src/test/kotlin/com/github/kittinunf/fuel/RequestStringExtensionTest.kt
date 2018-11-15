@@ -7,14 +7,22 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
 
 class RequestStringExtensionTest : MockHttpTestCase() {
-    init {
+    @Before
+    fun setupFuelManager() {
         FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
         FuelManager.instance.baseParams = listOf("key" to "value")
+    }
+
+    @After
+    fun resetFuelManager() {
+        FuelManager.instance.reset()
     }
 
     @Test

@@ -22,6 +22,7 @@ import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 
 class FuelManager : RequestFactory, RequestFactory.Convenience {
+
     var client: Client by readWriteLazy { HttpClient(proxy) }
     var proxy: Proxy? = null
     var basePath: String? = null
@@ -353,4 +354,34 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      */
     override fun head(convertible: PathStringConvertible, parameters: Parameters?): Request =
         request(Method.HEAD, convertible, parameters)
+
+    /**
+     * Resets this FuelManager to a clean instance
+     */
+    fun reset(): FuelManager {
+        val clean = FuelManager()
+
+        client = clean.client
+        proxy = clean.proxy
+        basePath = clean.basePath
+        timeoutInMillisecond = clean.timeoutInMillisecond
+        timeoutReadInMillisecond = clean.timeoutReadInMillisecond
+        baseHeaders = clean.baseHeaders
+        baseParams = clean.baseParams
+        keystore = clean.keystore
+        socketFactory = clean.socketFactory
+        hostnameVerifier = clean.hostnameVerifier
+        executorService = clean.executorService
+        requestInterceptors.apply {
+            clear()
+            addAll(clean.requestInterceptors)
+        }
+        responseInterceptors.apply {
+            clear()
+            addAll(clean.responseInterceptors)
+        }
+        callbackExecutor = clean.callbackExecutor
+
+        return this
+    }
 }

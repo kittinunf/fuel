@@ -8,13 +8,16 @@ import com.github.kittinunf.fuel.test.MockReflected
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.PrintStream
 
 class ReadmeIntegrityTest : MockHttpTestCase() {
 
-    /*
     // This silences the printing so it doesn't pollute the log
     private val outContent = ByteArrayOutputStream()
     private val originalOut = System.out
@@ -22,12 +25,13 @@ class ReadmeIntegrityTest : MockHttpTestCase() {
     @Before
     fun prepareStream() {
         System.setOut(PrintStream(outContent))
+        Fuel.reset()
     }
 
     @After
     fun teardownStream() {
         System.setOut(originalOut)
-    }*/
+    }
 
     @Test
     fun makingRequestsExample() {
