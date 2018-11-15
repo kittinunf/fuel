@@ -12,9 +12,11 @@ You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersi
 compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
 ```
 
-## GET request
+## Usage
 
-You can make `GET` requests using `.get(path: String)` on `Fuel`, a `FuelManager` instance or the `httpGet` extension.
+### Making Requests
+
+You can make requests using functions on `Fuel`, a `FuelManager` instance or the string extensions.
 
 ```kotlin
 Fuel.get("https://httpbin.org/get")
@@ -23,45 +25,192 @@ Fuel.get("https://httpbin.org/get")
       println(response)
       val (bytes, error) = result
       if (bytes != null) {
-        println(bytes)
+        println("[response bytes] ${String(bytes)}")
       }
   }
+
+/*
+ * --> GET https://httpbin.org/get
+ * "Body : (empty)"
+ * "Headers : (0)"
+ *
+
+ * <-- 200 (https://httpbin.org/get)
+ * Response : OK
+ * Length : 268
+ * Body : ({
+ *   "args": {},
+ *   "headers": {
+ *     "Accept": "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2",
+ *     "Connection": "close",
+ *     "Host": "httpbin.org",
+ *     "User-Agent": "Java/1.8.0_172"
+ *   },
+ *   "origin": "123.456.789.123",
+ *   "url": "https://httpbin.org/get"
+ * })
+ * Headers : (8)
+ * Connection : keep-alive
+ * Date : Thu, 15 Nov 2018 00:47:50 GMT
+ * Access-Control-Allow-Origin : *
+ * Server : gunicorn/19.9.0
+ * Content-Type : application/json
+ * Content-Length : 268
+ * Access-Control-Allow-Credentials : true
+ * Via : 1.1 vegur
+
+ * [response bytes] {
+ *   "args": {},
+ *   "headers": {
+ *     "Accept": "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2",
+ *     "Connection": "close",
+ *     "Host": "httpbin.org",
+ *     "User-Agent": "Java/1.8.0_172"
+ *   },
+ *   "origin": "123.456.789.123",
+ *   "url": "https://httpbin.org/get"
+ * }
+ */
 ```
 
-## POST request
+The extensions and functions made available by the core package are listed here:
 
-You can make `POST` requests using `.post(path: String)` on `Fuel`, a `FuelManager` instance or the `httpPost` extension.
+| Fuel Method | String extension | `Fuel`/`FuelManager` method |
+|----|----|----|
+| `Method.GET` | `"https://httpbin.org/get".httpGet()` | `Fuel.get("https://httpbin.org/get")` |
+| `Method.POST` | `"https://httpbin.org/post".httpPost()` | `Fuel.post("https://httpbin.org/post")` |
+| `Method.PUT` | `"https://httpbin.org/put".httpPut()` | `Fuel.put("https://httpbin.org/put")` |
+| `Method.PATCH` | `"https://httpbin.org/patch".httpPatch()` | `Fuel.patch("https://httpbin.org/patch")` |
+| `Method.HEAD` | `"https://httpbin.org/get".httpHead()` | `Fuel.head("https://httpbin.org/get")` |
+| `Method.OPTIONS` | _not supported_ | `Fuel.request(Method.OPTIONS, "https://httpbin.org/anything")` |
+| `Method.TRACE` | _not supported_ | `Fuel.request(Method.TRACE, "https://httpbin.org/anything")` |
+| `Method.CONNECT` | _not supported_ | _not supported_ |
 
-There are several functions to set a `Body` for the request. If you are looking for a `application/form-multipart` upload request, check out the `UploadRequest` feature.
+#### About `PATCH` requests
+The default `client` is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html) does not support a [`PATCH`](https://download.java.net/jdk7/archive/b123/docs/api/java/net/HttpURLConnection.html#setRequestMethod(java.lang.String)) method. [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) converts `PATCH` requests to a `POST` request and adds a `X-HTTP-Method-Override: PATCH` header. While this is a semi-standard industry practice not all APIs are configured to accept this header by default.
 
 ```kotlin
-Fuel.post("https://httpbin.org/post")
-    .response { request, response, result -> }
+Fuel.patch("https://httpbin.org/patch")
+    .also { println(it) }
+    .response { result -> }
+
+/* --> PATCH https://httpbin.org/post
+ * "Body : (empty)"
+ * "Headers : (1)"
+ * Content-Type : application/x-www-form-urlencoded
+ */
+
+// What is actually sent to the server
+
+/* --> POST (https://httpbin.org/post)
+ * "Body" : (empty)
+ * "Headers : (3)"
+ * Accept-Encoding : compress;q=0.5, gzip;q=1.0
+ * Content-Type : application/x-www-form-urlencoded
+ * X-HTTP-Method-Override : PATCH
+ */
 ```
 
-### Use `application/json`
-If you don't want to set the `application/json` header, you can use `.jsonBody(value: String)` extension to automatically do this for you.
-```kotlin
-Fuel.post("https://httpbin.org/post")
-    .jsonBody("{ \"foo\" : \"bar\" }")
-    .response { request, response, result -> }
-```
+#### About `CONNECT` request
+Connect is not supported by the Java JVM via the regular HTTP clients, and is therefore not supported.
 
-### Body
+### Adding `Parameters`
+All the `String` extensions listed above, as well as the `Fuel` and `FuelManager` calls accept a parameter `parameters: Parameters`.
+
+* URL encoded style for `GET` and `DELETE` request
+
+    ```kotlin
+    Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "bar" to "bar"))
+        .url
+    // https://httpbin.org/get?foo=foo&bar=bar
+    ```
+
+    ```kotlin
+    Fuel.delete("https://httpbin.org/delete", listOf("foo" to "foo", "bar" to "bar"))
+        .url
+    // https://httpbin.org/delete?foo=foo&bar=bar
+    ```
+
+* Array support for `GET` requests
+
+    ```kotlin
+    Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey")))
+        .url
+    // https://httpbin.org/get?foo=foo&dwarf[]=grumpy&dwarf[]=happy&dwarf[]=sleepy&dwarf[]=dopey
+    ```
+
+* Support `x-www-form-urlencoded` for `PUT`, `POST` and `PATCH`
+
+    ```kotlin
+    Fuel.post("https://httpbin.org/post", listOf("foo" to "foo", "bar" to "bar"))
+        .also { println(it.url) }
+        .also { println(String(it.body().toByteArray())) }
+
+    // https://httpbin.org/post
+    // "foo=foo&bar=bar"
+    ```
+
+    ```kotlin
+    Fuel.put("https://httpbin.org/put", listOf("foo" to "foo", "bar" to "bar"))
+        .also { println(it.url) }
+        .also { println(String(it.body().toByteArray())) }
+
+    // https://httpbin.org/post
+    // "foo=foo&bar=bar"
+    ```
+
+### Adding `Request` body
 Bodies are formed from generic streams, but there are helpers to set it from values that can be turned into streams. It is important to know that, by default, the streams are **NOT** read into memory until the `Request` is sent.
 
 When you're using the default `Client`, bodies are supported for:
 - `POST`
 - `PUT`
-- `PATCH` (actually a `POST`)
+- `PATCH` (actually a `POST`, as noted above)
 - `DELETE`
+
+There are several functions to set a `Body` for the request. If you are looking for a `multipart/form-data` upload request, checkout the `UploadRequest` feature.
+
+```kotlin
+Fuel.post("https://httpbin.org/post")
+    .body("My Post Body")
+    .also { println(it) }
+    .response { result -> }
+
+/* --> POST https://httpbin.org/post
+ * "Body : My Post Body"
+ * "Headers : (1)"
+ * Content-Type : application/x-www-form-urlencoded
+ */
+```
+
+#### Use `application/json`
+If you don't want to set the `application/json` header, you can use `.jsonBody(value: String)` extension to automatically do this for you.
+```kotlin
+Fuel.post("https://httpbin.org/post")
+    .jsonBody("{ \"foo\" : \"bar\" }")
+    .also { println(it) }
+    .response { result -> }
+
+/* --> POST https://httpbin.org/post
+ * "Body : { "foo" : "bar" }"
+ * "Headers : (1)"
+ * Content-Type : application/json
+ */
+```
 
 #### from `String`
 ```kotlin
 Fuel.post("https://httpbin.org/post")
     .header(Headers.CONTENT_TYPE, "text/plain")
     .body("my body is plain")
-    .response { request, response, result -> }
+    .also { println(it) }
+    .response { result -> }
+
+/* --> POST https://httpbin.org/post
+ * "Body : my body is plain"
+ * "Headers : (1)"
+ * Content-Type : text/plain
+ */
 ```
 
 #### from a `File`
@@ -69,281 +218,217 @@ Fuel.post("https://httpbin.org/post")
 Fuel.post("https://httpbin.org/post")
     .header(Headers.CONTENT_TYPE, "text/plain")
     .body(File("lipsum.txt"))
-    .response { request, response, result -> }
+    .also { println(it) }
+    .response { result -> }
+
+/* --> POST https://httpbin.org/post
+ * "Body : Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+ * "Headers : (1)"
+ * Content-Type : text/plain
+ */
 ```
 
 #### from a `InputStream`
 ```kotlin
 val stream = ByteArrayInputStream("source-string-from-string".toByteArray())
+
 Fuel.post("https://httpbin.org/post")
     .header(Headers.CONTENT_TYPE, "text/plain")
     .body(stream)
-    .response { request, response, result -> }
+    .also { println(it) }
+    .response { result -> }
+
+/* --> POST https://httpbin.org/post
+ * "Body : source-string-from-string"
+ * "Headers : (1)"
+ * Content-Type : text/plain
+ */
 ```
 
-## PUT request
+#### from a `lazy` source (`InputStream`)
+Fuel always reads the body lazily, which means you can also provide a callback that will return a stream. This is also known as a `BodyCallback`:
 
 ```kotlin
-Fuel.put("https://httpbin.org/put")
-    .response { request, response, result -> }
+val produceStream = { ByteArrayInputStream("source-string-from-string".toByteArray()) }
+
+Fuel.post("https://httpbin.org/post")
+    .header(Headers.CONTENT_TYPE, "text/plain")
+    .body(produceStream)
+    .also { println(it) }
+    .response { result -> }
+
+/* --> POST https://httpbin.org/post
+ * "Body : source-string-from-string"
+ * "Headers : (1)"
+ * Content-Type : text/plain
+ */
 ```
 
-## DELETE request
+### Adding `Headers`
+There are many ways to set, overwrite, remove and append headers. For your convenience, internally used and common header names are attached to the `Headers` companion and can be accessed (e.g. `Headers.CONTENT_TYPE`, `Headers.ACCEPT`, ...).
 
+The most common ones are mentioned here:
+
+#### Reading `HeaderValues`
+
+| call | arguments | action |
+|----|----|----|
+| `request[header]` | `header: String` | Get the current values of the header, after normalisation of the header |
+| `request.header(header)` | `header: String` | Get the current values |
+
+#### (Over)writing `HeaderValues`
+
+| call | arguments | action |
+|----|----|----|
+| `request[header] = values` | `header: String`, `values: Collection<*>` | Set the values of the header, overriding what's there, after normalisation of the header |
+| `request[header] = value` | `header: String`, `value: Any` | Set the value of the header, overriding what's there, after normalisation of the header |
+| `request.header(map)` | `map: Map<String, Any>` | Replace the headers with the map provided |
+| `request.header(pair, pair, ...)` | `vararg pairs: Pair<String, Any>` | Replace the headers with the pairs provided |
+| `request.header(header, values)` | `header: String, values: Collection<*>` | Replace the header with the provided values |
+| `request.header(header, value)` | `header: String, value: Any` | Replace the header with the provided value |
+| `request.header(header, value, value, ...)` | `header: String, vararg values: Any` | Replace the header with the provided values |
+
+#### Appending `HeaderValues`
+
+| call | arguments | action |
+|----|----|----|
+| `request.appendHeader(pair, pair, ...)` | `vararg pairs: Pair<String, Any>` | Append each pair, using the key as header name and value as header content |
+| `request.appendHeader(header, value)` | `header: String, value: Any` |  Appends the value to the header or sets it if there was none yet |
+| `request.appendHeader(header, value, value, ...)` | `header: String, vararg values: Any` | Appends the value to the header or sets it if there was none yet |
+
+Note that headers which by the RFC may only have one value are always overwritten, such as `Content-Type`.
+
+#### `FuelManager` base headers vs. `Request` headers
+The `baseHeaders` set through a `FuelManager` are only applied to a `Request` if that request does **not** have that specific header set yet. There is no appending logic. If you set a header it will overwrite the base value.
+
+#### `Client` headers vs. `Request` headers
+Any `Client` can add, remove or transform `HeaderValues` before it sends the `Request` or after it receives the `Response`. The default `Client` for example sets `TE` values.
+
+#### `HeaderValues` values are `List`
+Even though some headers can only be set once (and will overwrite even when you try to append), the internal structure is always a list. Before a `Request` is made, the default `Client` collapses the multiple values, if allowed by the RFCs, into a single header value delimited by a separator for that header. Headers that can only be set once will use the last value by default and ignore earlier set values.
+
+### Adding Authentication
+Authentication can be added to a `Request` using the `.authentication()` feature.
+By default, `authentication` is passed on when using the default `redirectResponseInterceptor` (which is enabled by default), unless it is redirecting to a different host. You can remove this behaviour by implementing your own redirection logic.
+
+> When you call `.authentication()`, a few extra functions are available. If you call a regular function (e.g. `.header()`) the extra functions are no longer available, but you can safely call `.authentication()` again without losing any previous calls.
+
+
+*  *Basic* authentication
+    ```kotlin
+    val username = "username"
+    val password = "abcd1234"
+
+    Fuel.get("https://httpbin.org/basic-auth/$user/$password")
+        .authentication()
+        .basic(username, password)
+        .response { result -> }
+    ```
+
+* *Bearer* authentication
+    ```kotlin
+    val token = "mytoken"
+
+    Fuel.get("https://httpbin.org/bearer")
+        .authentication()
+        .bearer(token)
+        .response { result -> }
+    ```
+
+* Any authentication using a header
+    ```kotlin
+    Fuel.get("https://httpbin.org/anything")
+        .header(Headers.AUTHORIZATION, "Custom secret")
+        .response { result -> }
+    ```
+
+### Adding Progress callbacks
+Any request supports `Progress` callbacks when uploading or downloading a body; the `Connection` header does not support progress (which is the only thing that is sent if there are no bodies).
+You can have as many progress handlers of each type as you like.
+
+#### Request progress
 ```kotlin
-Fuel.delete("https://httpbin.org/delete")
-    .response { request, response, result -> }
-```
-
-## HEAD request
-
-```kotlin
-Fuel.head("https://httpbin.org/get")
-    .response { request, response, result -> /* request body is empty */ }
-```
-
-## PATCH request
-The default `client` is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html) does not support a [`PATCH`](https://download.java.net/jdk7/archive/b123/docs/api/java/net/HttpURLConnection.html#setRequestMethod(java.lang.String)) method. [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) converts `PATCH` requests to a `POST` request and adds a `X-HTTP-Method-Override: PATCH` header. While this is a semi-standard industry practice not all APIs are configured to accept this header by default.
-
-```kotlin
-Fuel.patch("https://httpbin.org/patch")
-    .response { request, response, result -> }
-```
-
-## CONNECT request
-Connect is not supported by the Java JVM via the regular HTTP clients, and is therefore not supported.
-
-## OPTIONS request
-There are no convenience methods for making an OPTIONS request, but you can still make one directly:
-
-```kotlin
-Fuel.request(Method.OPTIONS, "https://httpbin.org/anything")
-    .response { request, response, result -> }
-```
-
-## TRACE request
-There are no convenience methods for making an TRACE request, but you can still make one directly:
-
-```kotlin
-Fuel.request(Method.TRACE, "https://httpbin.org/anything")
-    .response { request, response, result -> }
-```
-
-## Logging
-Fuel supports multiple forms of logging out of the box.
-
-### Debug Logging
-* Use `toString()` method to inspect requests
-
-```kotlin
-val request = Fuel.get("https://httpbin.org/get", parameters = listOf("key" to "value"))
-println(request)
-
-// --> GET (https://httpbin.org/get?key=value)
-//    Body : (empty)
-//    Headers : (2)
-//    Accept-Encoding : compress;q=0.5, gzip;q=1.0
-//    Device : Android
-```
-
-* Use `toString()` method to inspect responses
-
-```kotlin
-val (_, response, _) = Fuel.get("https://httpbin.org/get", parameters = listOf("key" to "value")).response()
-println(response)
-// <-- 200 (https://httpbin.org/get?key=value)
-//    Body : (empty)
-```
-
-* Also support cUrl string to Log request, make it very easy to cUrl on command line
-
-```kotlin
-val request = Fuel.post("https://httpbin.org/post", parameters = listOf("foo" to "foo", "bar" to "bar", "key" to "value"))
-println(request.cUrlString())
-```
-
-```bash
-curl -i -X POST -d "foo=foo&bar=bar&key=value" -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" -H "Device:Android" -H "Content-Type:application/x-www-form-urlencoded" "https://httpbin.org/post"
-```
-
-## Parameter Support
-
-* URL encoded style for GET & DELETE request
-
-```kotlin
-Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "bar" to "bar"))
-    .response { request, response, result -> }
-// resolve to https://httpbin.org/get?foo=foo&bar=bar
-
-Fuel.delete("https://httpbin.org/delete", listOf("foo" to "foo", "bar" to "bar"))
-    .response { request, response, result -> }
-// resolve to https://httpbin.org/delete?foo=foo&bar=bar
-```
-
-* Array support for GET requests
-
-```kotlin
-Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey")))
-    .response { request, response, result -> }
-// resolve to  https://httpbin.org/get?foo=foo&dwarf[]=grumpy&dwarf[]=happy&dwarf[]=sleepy&dwarf[]=dopey
-```
-
-* Support x-www-form-urlencoded for PUT & POST
-
-```kotlin
-Fuel.post("https://httpbin.org/post", listOf("foo" to "foo", "bar" to "bar"))
-    .response { request, response, result -> }
-// Body : "foo=foo&bar=bar"
-
-Fuel.put("https://httpbin.org/put", listOf("foo" to "foo", "bar" to "bar"))
-    .response { request, response, result -> }
-// Body : "foo=foo&bar=bar"
-```
-
-## Set request's timeout and read timeout
-Default timeout for a request is 15000 milliseconds.
-Default read timeout for a request is 15000 milliseconds.
-
-```kotlin
-val timeout = 5000 // 5000 milliseconds = 5 seconds.
-val timeoutRead = 60000 // 60000 milliseconds = 1 minute.
-
-Fuel.get("https://httpbin.org/get")
-    .timeout(timeout)
-    .timeoutRead(timeoutRead)
-    .responseString { request, response, result -> }
-```
-
-
-## Download with or without progress handler
-```kotlin
-Fuel.download("https://httpbin.org/bytes/32768")
-    .destination { response, url -> File.createTempFile("temp", ".tmp") }
-    .response { req, res, result -> }
-
-Fuel.download("https://httpbin.org/bytes/32768")
-    .destination { response, url -> File.createTempFile("temp", ".tmp") }
-    .progress { readBytes, totalBytes ->
-        val progress = readBytes.toFloat() / totalBytes.toFloat() * 100
-        println("Bytes downloaded $readBytes / $totalBytes ($progress %)")
+Fuel.post("/post")
+    .body(...)
+    .requestProgress { readBytes, totalBytes ->
+      val progress = readBytes.toFloat() / totalBytes.toFloat() * 100
+      println("Bytes uploaded $readBytes / $totalBytes ($progress %)")
     }
-    .response { req, res, result -> }
+    .response { result -> }
 ```
 
-## Upload with or without progress handler
+#### Response progress
+```kotlin
+Fuel.get("/get")
+    .responseProgress { readBytes, totalBytes ->
+      val progress = readBytes.toFloat() / totalBytes.toFloat() * 100
+      println("Bytes downloaded $readBytes / $totalBytes ($progress %)")
+    }
+    .response { result -> }
+```
+
+#### Why does totalBytes increase?
+Not all source `Body` or `Response` `Body` report their total size. If the size is not known, the current size will be reported. This means that you will constantly get an increasing amount of totalBytes that equals readBytes.
+
+### Using `multipart/form-data` (`UploadRequest`)
+Fuel supports multipart uploads using the `.upload()` feature. You can turn _any_ `Request` into a upload request by calling `.upload()` or call `.upload(method = Method.POST)` directly onto `Fuel` / `FuelManager`.
+
+> When you call `.upload()`, a few extra functions are available. If you call a regular function (e.g. `.header()`) the extra functions are no longer available, but you can safely call `.upload()` again without losing any previous calls.
+
+| method | arguments | action |
+|----|----|----|
+| `request.source { }` | `(Request, URL) -> File` | Add a source file to the form-data |
+| `request.sources { }` | `(Request, URL) -> Iterable<File>` | Add a list of source files to the form data |
+| `request.name(name)` | `name: String` | the base field name |
+| `request.dataParts { }` | `(Request, URL) -> Iterable<DataPart>` | Add a list of `DataPart` to the form data |
+| `request.progress(handler)` | `hander: ProgressCallback` | Add a `requestProgress` handler |
+
 ```kotlin
 Fuel.upload("/post")
     .source { request, url -> File.createTempFile("temp", ".tmp") }
-    .responseString { request, response, result -> }
-
-// By default upload use Method.POST, unless it is specified as something else
-Fuel.upload("/put", Method.PUT)
-    .source { request, url -> File.createTempFile("temp", ".tmp") }
-    .responseString { request, response, result -> }
-
-// Upload with multiple files
-Fuel.upload("/post")
-    .sources { request, url ->
-        listOf(
-            File.createTempFile("temp1", ".tmp"),
-            File.createTempFile("temp2", ".tmp")
-        )
-    }
     .name { "temp" }
-    .responseString { request, response, result -> }
+    .response { result -> }
 ```
 
-## Specify custom field names for files
+#### `Content-Type` and field names using `DataPart`
+The `DataPart` type can be used to add metadata to the files you're uploading. Currently supported are field name and `Content-Type`:
+
 ```Kotlin
 Fuel.upload("/post")
     .dataParts { request, url ->
         listOf(
-            //DataPart takes a file, and you can specify the name and/or type
-            DataPart(File.createTempFile("temp1", ".tmp"), "image/jpeg"),
-            DataPart(File.createTempFile("temp2", ".tmp"), "file2"),
+            DataPart(File.createTempFile("temp1", ".tmp"), type = "image/jpeg"),
+            DataPart(File.createTempFile("temp2", ".tmp"), name = "file2"),
             DataPart(File.createTempFile("temp3", ".tmp"), "third-file", "image/jpeg")
         )
     }
-    .responseString { request, response, result -> /* ... */ }
+    .response { result -> }
 ```
 
-## Upload a multipart form without a file
+#### Multipart request without a file
+By providing an empty list you can make a request without any files:
 ```kotlin
 val formData = listOf("Email" to "mail@example.com", "Name" to "Joe Smith" )
+
 Fuel.upload("/post", param = formData)
-    // Upload normally requires a file, but we can give it an empty list of `DataPart`
     .dataParts { request, url -> listOf<DataPart>() }
-    .responseString { request, response, result -> /* ... */ }
+    .response { result -> }
 ```
 
-## Upload from an `InputStream`
+#### `InputStream` sources using `Blob`
+If your data comes from arbitrary `InpuStream`s, you can use `Blob` to add these to the form-data.
 
 ```kotlin
 Fuel.upload("/post")
     .blob { request, url -> Blob("filename.png", someObject.length) { someObject.getInputStream() } }
 ```
 
-## Authentication
+#### Limitations
+- The upload API will soon be overhauled to enable metadata for any source and therefore allowing uploads without the need to create temporary files.
+- If you set `Content-Type` using `.header()`, make sure to include a valid `boundary=`
 
-* Support *Basic Authentication* right off the box
-    ```kotlin
-    val username = "username"
-    val password = "abcd1234"
+### Getting a Response
 
-    Fuel.get("https://httpbin.org/basic-auth/$user/$password")
-        .basicAuthentication(username, password)
-        .response { request, response, result -> }
-    ```
-
-* Support *Bearer Authentication*
-    ```kotlin
-    val token = "mytoken"
-
-    Fuel.get("https://httpbin.org/bearer")
-        .bearerAuthentication(token)
-        .response { request, response, result -> }
-    ```
-
-* Support *Any authentication* by header
-    ```kotlin
-    Fuel.get("https://httpbin.org/anything")
-        .header(Headers.AUTHORIZATION, "Custom secret")
-        .response { request, response, result -> }
-    ```
-
-### Validation
-
-* By default, the valid range for HTTP status code will be (200..299).
-
-### Cancel
-
-* If one wants to cancel on-going request, one could call `cancel` on the request object
-    ```kotlin
-    val request = Fuel.get("https://httpbin.org/get")
-      .response { request, response, result ->
-        // if request is cancelled successfully, response callback will not be called.
-        // Interrupt callback (if provided) will be called instead
-      }
-
-    //later
-    request.cancel() //this will cancel on-going request
-    ```
-
-* Also, interrupt request can be further processed with interrupt callback
-    ```kotlin
-    val request = Fuel.get("https://httpbin.org/get")
-      .interrupt { request -> println("${request.url} was interrupted and cancelled") }
-      .response { request, response, result ->
-        // if request is cancelled successfully, response callback will not be called.
-        // Interrupt callback (if provided) will be called instead
-      }
-
-    request.cancel()
-    ```
-
-## Advanced Configuration
-
-### Response Handling
 ### Result
 
 * [Result](https://github.com/kittinunf/Result) is a functional style data structure that represents data that contains result of *Success* or *Failure* but not both. It represents the result of an action that can be success (with result) or error.
@@ -364,6 +449,45 @@ fun responseString(handler: (Request, Response, Result<String, FuelError>) -> Un
 ```kotlin
 fun <T> responseObject(deserializer: ResponseDeserializable<T>, handler: (Request, Response, Result<T, FuelError>) -> Unit)
 ```
+
+#### Download response to file
+Fuel supports downloading the request `Body` to a file using the `.download()` feature. You can turn _any_ `Request` into a download request by calling `.download()` or call `.download(method = Method.GET)` directly onto `Fuel` / `FuelManager`.
+
+> When you call `.download()`, a few extra functions are available. If you call a regular function (e.g. `.header()`) the extra functions are no longer available, but you can safely call `.download()` again without losing any previous calls.
+
+| method | arguments | action |
+|----|----|----|
+| `request.destination { }` | `(Request, URL) -> File` | Set the destination file callback where to store the data |
+| `request.progress(handler)` | `hander: ProgressCallback` | Add a `responseProgress` handler |
+
+```kotlin
+Fuel.download("https://httpbin.org/bytes/32768")
+    .destination { response, url -> File.createTempFile("temp", ".tmp") }
+    .progress { readBytes, totalBytes ->
+        val progress = readBytes.toFloat() / totalBytes.toFloat() * 100
+        println("Bytes downloaded $readBytes / $totalBytes ($progress %)")
+    }
+    .response { result -> }
+```
+
+### Cancel an async `Request`
+The `response` functions called with a `handler` are async and return a `CancellableRequest`. These requests expose a few extra functions that can be used to control the `Future` that should resolve a response:
+
+```kotlin
+val request = Fuel.get("https://httpbin.org/get")
+  .interrupt { request -> println("${request.url} was interrupted and cancelled") }
+  .response { result ->
+    // if request is cancelled successfully, response callback will not be called.
+    // Interrupt callback (if provided) will be called instead
+  }
+
+request.cancel() // this will cancel on-going request
+```
+
+If you can't get hold of the `CancellableRequest` because, for example, you are adding this logic in an `Interceptor`, a generic `Queue`, or a `ProgressCallback`, you can call `tryCancel()` which returns true if it was cancelled and false otherwise.
+At this moment `blocking` requests *can not* be cancelled.
+
+## Advanced Configuration
 
 ### Response Deserialization
 
