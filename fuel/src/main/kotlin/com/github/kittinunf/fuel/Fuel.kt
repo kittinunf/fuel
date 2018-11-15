@@ -11,14 +11,7 @@ import com.github.kittinunf.fuel.core.requests.UploadRequest
 object Fuel : RequestFactory.Convenience by FuelManager.instance
 
 fun String.httpGet(parameters: Parameters? = null): Request =
-    Fuel.get(this, parameters?.flatMap { pair ->
-        // TODO: move to generic url encoding
-        (pair.second as? Iterable<*>)?.map {
-            "${pair.first}[]" to it
-        }?.toList() ?: (pair.second as? Array<*>)?.map {
-            "${pair.first}[]" to it
-        }?.toList() ?: listOf(pair)
-    })
+    Fuel.get(this, parameters)
 
 fun RequestFactory.PathStringConvertible.httpGet(parameter: Parameters? = null): Request =
     this.path.httpGet(parameter)
@@ -26,8 +19,8 @@ fun RequestFactory.PathStringConvertible.httpGet(parameter: Parameters? = null):
 fun String.httpPost(parameters: Parameters? = null): Request =
     Fuel.post(this, parameters)
 
-fun RequestFactory.PathStringConvertible.httpPost(parameter: Parameters? = null): Request =
-    this.path.httpPost(parameter)
+fun RequestFactory.PathStringConvertible.httpPost(parameters: Parameters? = null): Request =
+    this.path.httpPost(parameters)
 
 fun String.httpPut(parameters: Parameters? = null): Request =
     Fuel.put(this, parameters)
