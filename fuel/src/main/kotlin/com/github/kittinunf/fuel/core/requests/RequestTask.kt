@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core.requests
 
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
@@ -10,7 +11,7 @@ private typealias RequestTaskResult = Pair<Request, Response>
  * Synchronous version of [SuspendableRequest]. Turns a [Request] into a [Callable]
  */
 internal class RequestTask(internal val request: Request) : Callable<Response> {
-    private val interruptCallback by lazy { executor.interruptCallback ?: { println("no interrupt callback registered") } }
+    private val interruptCallback by lazy { executor.interruptCallback }
     private val executor by lazy { request.executionOptions }
     private val client by lazy { executor.client }
 
@@ -39,15 +40,15 @@ internal class RequestTask(internal val request: Request) : Callable<Response> {
                 // Nested runCatching so response can be rebound
                 runCatching { prepareResponse(pair) }
                     .recover { error ->
-                        error.also { println("[RequestTask] execution error\n\r\t$error") }
+                        error.also { Fuel.trace { "[RequestTask] execution error\n\r\t$error" } }
                         throw FuelError.wrap(error, pair.second)
                     }
                     .getOrThrow()
             }
             .onFailure { error ->
-                println("[RequestTask] on failure (interrupted=${(error as? FuelError)?.causedByInterruption ?: error})")
+                Fuel.trace { "[RequestTask] on failure (interrupted=${(error as? FuelError)?.causedByInterruption ?: error})" }
                 if (error is FuelError && error.causedByInterruption) {
-                    println("[RequestTask] execution error\n\r\t$error")
+                    Fuel.trace { "[RequestTask] execution error\n\r\t$error" }
                     interruptCallback.invoke(request)
                 }
             }

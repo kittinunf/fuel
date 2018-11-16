@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core.requests
 
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
@@ -31,12 +32,12 @@ class CancellableRequest private constructor(private val wrapped: Request, priva
      * @return [Response]
      */
     fun join(): Response = runCatching { future.get() }.fold(
-        onSuccess = { it -> it.also { println("[CancellableRequest] joined to $it") } },
+        onSuccess = { it -> it.also { Fuel.trace { "[CancellableRequest] joined to $it" } } },
         onFailure = { error ->
             Response.error(url).also {
-                println("[CancellableRequest] joined to $error")
+                Fuel.trace { "[CancellableRequest] joined to $error" }
                 if (FuelError.wrap(error).causedByInterruption) {
-                    interruptCallback?.invoke(wrapped)
+                    interruptCallback.invoke(wrapped)
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core.requests
 
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
@@ -23,7 +24,7 @@ internal class RequestTaskCallbacks(
     private val onFailure: RequestFailureCallback
 ) : Callable<Response> {
     override fun call(): Response {
-        println("[RequestTaskCallbacks] start request task\n\r\t$request")
+        Fuel.trace { "[RequestTaskCallbacks] start request task\n\r\t$request" }
         return runCatching { task.call() }
             .mapCatching { it -> it.also { onSuccess(it) } }
             .getOrElse { error -> FuelError.wrap(error).also { onFailure(it, it.response) }.response }

@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.gson
 
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.ResponseHandler
@@ -57,4 +58,6 @@ inline fun <reified T : Any> gsonDeserializer() = object : ResponseDeserializabl
  * @return [Request] the modified request
  */
 inline fun <reified T : Any> Request.jsonBody(src: T) =
-    this.jsonBody(Gson().toJson(src, object : TypeToken<T>() {}.type).also { println("serialized $it") } as String)
+    this.jsonBody(Gson().toJson(src, object : TypeToken<T>() {}.type)
+        .also { Fuel.trace { "serialized $it" } } as String
+    )

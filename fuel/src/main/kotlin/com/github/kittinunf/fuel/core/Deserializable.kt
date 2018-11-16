@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
 import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.fuel.core.requests.RequestTaskCallbacks
@@ -189,12 +190,19 @@ private fun <T : Any, U : Deserializable<T>> Request.response(
             executionOptions.callback {
                 deliverable.fold(
                     { success(this, response, it) },
-                    { failure(this, response, FuelError.wrap(it, response).also { error -> println("[Deserializable] unfold failure: \n\r$error") }) }
+                    { failure(this, response, FuelError.wrap(it, response).also { error ->
+                        Fuel.trace { "[Deserializable] unfold failure: \n\r$error" } })
+                    }
                 )
             }
         },
-        onFailure = { error, response -> executionOptions.callback { failure(this, response, error.also {
-            error -> println("[Deserializable] callback failure: \n\r$error") }) } }
+        onFailure = { error, response ->
+            executionOptions.callback {
+                failure(this, response, error.also { error ->
+                    Fuel.trace { "[Deserializable] callback failure: \n\r$error" }
+                })
+            }
+        }
     )
 
     return CancellableRequest.enableFor(this, future = executionOptions.submit(asyncRequest))

@@ -9,6 +9,13 @@ import com.github.kittinunf.fuel.core.requests.DownloadRequest
 import com.github.kittinunf.fuel.core.requests.UploadRequest
 
 object Fuel : RequestFactory.Convenience by FuelManager.instance {
+    var trace = false
+
+    fun trace(function: () -> String) {
+        @Suppress("ConstantConditionIf")
+        if (trace) println(function())
+    }
+
     fun reset() = FuelManager.instance.reset()
 }
 
