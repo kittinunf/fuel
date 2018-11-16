@@ -104,7 +104,7 @@ class CancellableRequestTest : MockHttpTestCase() {
         )
 
         val running = FuelManager()
-            .request(Method.GET, mock.path("cancel-inline"), listOf("foo" to "bar"))
+            .request(Method.POST, mock.path("cancel-inline"), listOf("foo" to "bar"))
             .authentication().basic("username", "password")
             .body(
                 { ByteArrayInputStream("my-body".toByteArray()).also { bodyReadSemaphore.release() } },
