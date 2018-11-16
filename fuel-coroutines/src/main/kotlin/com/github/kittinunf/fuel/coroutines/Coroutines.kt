@@ -28,7 +28,6 @@ import kotlin.coroutines.CoroutineContext
  * @return [T]
  */
 @Throws
-@JvmOverloads
 suspend inline fun <T : Any, U : Deserializable<T>> Request.await(deserializable: U, scope: CoroutineContext = Dispatchers.IO): T =
     withContext(scope) { await(deserializable) }
 
@@ -40,7 +39,6 @@ suspend inline fun <T : Any, U : Deserializable<T>> Request.await(deserializable
  *
  * @return [Result] [T] or [FuelError]
  */
-@JvmOverloads
 suspend inline fun <T : Any, U : Deserializable<T>> Request.awaitResult(deserializable: U, scope: CoroutineContext = Dispatchers.IO): Result<T, FuelError> =
     withContext(scope) { awaitResult(deserializable) }
 
@@ -55,7 +53,6 @@ suspend inline fun <T : Any, U : Deserializable<T>> Request.awaitResult(deserial
  * @return [ResponseOf] [T]
  */
 @Throws
-@JvmOverloads
 suspend inline fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deserializable: U, scope: CoroutineContext = Dispatchers.IO): ResponseOf<T> =
     withContext(scope) { awaitResponse(deserializable) }
 
@@ -67,7 +64,6 @@ suspend inline fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deseri
  *
  * @return [ResponseResultOf] [T] or [FuelError]
  */
-@JvmOverloads
 suspend inline fun <T : Any, U : Deserializable<T>> Request.awaitResponseResult(deserializable: U, scope: CoroutineContext = Dispatchers.IO): ResponseResultOf<T> =
     withContext(scope) { awaitResponseResult(deserializable) }
 
@@ -80,7 +76,6 @@ suspend inline fun <T : Any, U : Deserializable<T>> Request.awaitResponseResult(
  * @return [ByteArray] if no exceptions are thrown
  */
 @Throws
-@JvmOverloads
 suspend inline fun Request.awaitByteArray(scope: CoroutineContext = Dispatchers.IO): ByteArray =
     await(ByteArrayDeserializer(), scope)
 
@@ -93,7 +88,6 @@ suspend inline fun Request.awaitByteArray(scope: CoroutineContext = Dispatchers.
  * @return [ResponseOf] [ByteArray] if no exceptions are thrown
  */
 @Throws
-@JvmOverloads
 suspend inline fun Request.awaitByteArrayResponse(scope: CoroutineContext = Dispatchers.IO): ResponseOf<ByteArray> =
     awaitResponse(ByteArrayDeserializer(), scope)
 
@@ -108,7 +102,6 @@ suspend inline fun Request.awaitByteArrayResponse(scope: CoroutineContext = Disp
  * @return [String] if no exceptions are thrown
  */
 @Throws
-@JvmOverloads
 suspend inline fun Request.awaitString(charset: Charset = Charsets.UTF_8, scope: CoroutineContext = Dispatchers.IO): String =
     await(StringDeserializer(charset), scope)
 
@@ -120,7 +113,6 @@ suspend inline fun Request.awaitString(charset: Charset = Charsets.UTF_8, scope:
  * @return [ResponseOf] [String] if no exceptions are thrown
  */
 @Throws
-@JvmOverloads
 suspend inline fun Request.awaitStringResponse(charset: Charset = Charsets.UTF_8, scope: CoroutineContext = Dispatchers.IO): ResponseOf<String> =
     awaitResponse(StringDeserializer(charset), scope)
 
@@ -135,7 +127,6 @@ suspend inline fun Request.awaitStringResponse(charset: Charset = Charsets.UTF_8
  * @return [U] if no exceptions are thrown
  */
 @Throws
-@JvmOverloads
 suspend inline fun <U : Any> Request.awaitObject(deserializable: ResponseDeserializable<U>, scope: CoroutineContext = Dispatchers.IO): U =
     await(deserializable, scope)
 
@@ -150,7 +141,6 @@ suspend inline fun <U : Any> Request.awaitObject(deserializable: ResponseDeseria
  * @return [ResponseOf] [U] if no exceptions are thrown
  */
 @Throws
-@JvmOverloads
 suspend inline fun <U : Any> Request.awaitObjectResponse(deserializable: ResponseDeserializable<U>, scope: CoroutineContext = Dispatchers.IO): ResponseOf<U> =
     awaitResponse(deserializable, scope)
 
@@ -160,7 +150,6 @@ suspend inline fun <U : Any> Request.awaitObjectResponse(deserializable: Respons
  * @param scope [CoroutineContext] the coroutine context you want the call to be made on, defaulting to [Dispatchers.IO]
  * @return [Result] [ByteArray] or [FuelError]
  */
-@JvmOverloads
 suspend inline fun Request.awaitByteArrayResult(scope: CoroutineContext = Dispatchers.IO): Result<ByteArray, FuelError> =
     awaitResult(ByteArrayDeserializer(), scope)
 
@@ -170,7 +159,6 @@ suspend inline fun Request.awaitByteArrayResult(scope: CoroutineContext = Dispat
  * @param scope [CoroutineContext] the coroutine context you want the call to be made on, defaulting to [Dispatchers.IO]
  * @return [ResponseResultOf] [ByteArray]
  */
-@JvmOverloads
 suspend inline fun Request.awaitByteArrayResponseResult(scope: CoroutineContext = Dispatchers.IO): ResponseResultOf<ByteArray> =
     awaitResponseResult(ByteArrayDeserializer(), scope)
 
@@ -182,7 +170,6 @@ suspend inline fun Request.awaitByteArrayResponseResult(scope: CoroutineContext 
  *
  * @return [Result] [String] or [FuelError]
  */
-@JvmOverloads
 suspend inline fun Request.awaitStringResult(charset: Charset = Charsets.UTF_8, scope: CoroutineContext = Dispatchers.IO): Result<String, FuelError> =
     awaitResult(StringDeserializer(charset), scope)
 
@@ -194,7 +181,6 @@ suspend inline fun Request.awaitStringResult(charset: Charset = Charsets.UTF_8, 
  *
  * @return [ResponseResultOf] [String]
  */
-@JvmOverloads
 suspend inline fun Request.awaitStringResponseResult(charset: Charset = Charsets.UTF_8, scope: CoroutineContext = Dispatchers.IO): ResponseResultOf<String> =
     awaitResponseResult(StringDeserializer(charset), scope)
 
@@ -206,7 +192,6 @@ suspend inline fun Request.awaitStringResponseResult(charset: Charset = Charsets
  *
  * @return [Result] [U] or [FuelError]
  */
-@JvmOverloads
 suspend inline fun <U : Any> Request.awaitObjectResult(deserializable: ResponseDeserializable<U>, scope: CoroutineContext = Dispatchers.IO): Result<U, FuelError> =
     awaitResult(deserializable, scope)
 
@@ -218,6 +203,5 @@ suspend inline fun <U : Any> Request.awaitObjectResult(deserializable: ResponseD
  *
  * @return [ResponseResultOf] [U]
  */
-@JvmOverloads
 suspend inline fun <U : Any> Request.awaitObjectResponseResult(deserializable: ResponseDeserializable<U>, scope: CoroutineContext = Dispatchers.IO): ResponseResultOf<U> =
     awaitResponseResult(deserializable, scope)
