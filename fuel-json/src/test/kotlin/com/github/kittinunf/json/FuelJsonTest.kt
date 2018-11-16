@@ -69,7 +69,7 @@ class FuelJsonTest {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
-        assertThat(data as Json, isA(FuelJson::class.java))
+        assertThat(data as FuelJson, isA(FuelJson::class.java))
         assertThat(data.obj(), isA(JSONObject::class.java))
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
