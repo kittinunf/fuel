@@ -48,16 +48,16 @@ data class Response(
         val contentType = guessContentType()
 
         val bodyString = when {
-            body.isEmpty() -> "empty"
-            body.isConsumed() -> "consumed"
+            body.isEmpty() -> "(empty)"
+            body.isConsumed() -> "(consumed)"
             else -> processBody(contentType, body.toByteArray())
         }
 
         return buildString {
-            appendln("<-- $statusCode ($url)")
+            appendln("<-- $statusCode $url")
             appendln("Response : $responseMessage")
             appendln("Length : $contentLength")
-            appendln("Body : ($bodyString)")
+            appendln("Body : $bodyString")
             appendln("Headers : (${headers.size})")
 
             val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
@@ -79,7 +79,7 @@ data class Response(
         return if (contentType.isNotEmpty() &&
                 (contentType.contains("image/") ||
                         contentType.contains("application/octet-stream"))) {
-            "$contentLength bytes of ${guessContentType(headers)}"
+            "($contentLength bytes of ${guessContentType(headers)})"
         } else if (bodyData.isNotEmpty()) {
             String(bodyData)
         } else {

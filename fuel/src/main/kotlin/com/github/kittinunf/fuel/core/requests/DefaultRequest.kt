@@ -373,8 +373,8 @@ data class DefaultRequest(
         }
 
         appendln("--> $method $url")
-        appendln("\"Body : $bodyString\"")
-        appendln("\"Headers : (${headers.size})\"")
+        appendln("Body : $bodyString")
+        appendln("Headers : (${headers.size})")
 
         val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
         headers.transformIterate(appendHeaderWithValue)
