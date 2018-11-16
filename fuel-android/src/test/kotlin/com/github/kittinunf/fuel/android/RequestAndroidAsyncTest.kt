@@ -14,6 +14,7 @@ import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.json.JSONObject
+import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -25,12 +26,18 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestAndroidAsyncTest : BaseTestCase() {
 
-    init {
+    @Before
+    fun setupFuelManager() {
         FuelManager.instance.apply {
             baseHeaders = mapOf("foo" to "bar")
             baseParams = listOf("key" to "value")
             callbackExecutor = Executor(Runnable::run)
         }
+    }
+
+    @After
+    fun resetFuelManager() {
+        FuelManager.instance.reset()
     }
 
     // Model
