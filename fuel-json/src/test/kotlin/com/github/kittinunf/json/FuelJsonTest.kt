@@ -1,12 +1,16 @@
 package com.github.kittinunf.fuel.json
 
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.fuel.test.MockHelper
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.json.JSONObject
+import org.junit.After
 import org.junit.Assert.assertThat
+import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
