@@ -17,7 +17,7 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class FuelJsonTest {
 
-	init {
+    init {
         Fuel.testMode {
             timeout = 15000
         }
