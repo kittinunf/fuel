@@ -1,5 +1,5 @@
 # fuel-forge
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.10-blue.svg)](https://kotlinlang.org)
 
 The forge extension package for [`Fuel`](../README.md).
 
@@ -7,7 +7,7 @@ The forge extension package for [`Fuel`](../README.md).
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-forge` with `Maven` and `Gradle`. The forge package has the following dependencies:
 * `fuel:fuel:<same-version>`
-* Kotlin: 1.3.0
+* Kotlin: 1.3.10
 * Forge: 0.3.0
 
 ```groovy

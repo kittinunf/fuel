@@ -1,5 +1,5 @@
 # fuel-moshi
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.10-blue.svg)](https://kotlinlang.org)
 
 The moshi extension package for [`Fuel`](../README.md).
 
@@ -7,8 +7,8 @@ The moshi extension package for [`Fuel`](../README.md).
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-moshi` with `Maven` and `Gradle`. The moshi package has the following dependencies:
 * `fuel:fuel:<same-version>`
-* Kotlin: 1.3.0
-* Moshi: 1.6.0
+* Kotlin: 1.3.10
+* Moshi: 1.8.0
 
 ```groovy
 compile 'com.github.kittinunf.fuel:fuel:<latest-version>'

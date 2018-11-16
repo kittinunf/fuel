@@ -1,5 +1,5 @@
 # fuel-rxjava
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.10-blue.svg)](https://kotlinlang.org)
 
 The rxjava extension package for [`Fuel`](../README.md).
 
@@ -7,8 +7,8 @@ The rxjava extension package for [`Fuel`](../README.md).
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-rxjava` with `Maven` and `Gradle`. The rxjava package has the following dependencies:
 * `fuel:fuel:<same-version>`
-* Kotlin: 1.3.0
-* RxJava: 2.1.x
+* Kotlin: 1.3.10
+* RxJava: 2.2.x
 
 ```groovy
 compile 'com.github.kittinunf.fuel:fuel:<latest-version>'

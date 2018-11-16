@@ -1,5 +1,5 @@
 # fuel-kotlinx-serialization
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.10-blue.svg)](https://kotlinlang.org)
 
 The kotlinx-serialization extension package for [`Fuel`](../README.md).
 
@@ -7,7 +7,7 @@ The kotlinx-serialization extension package for [`Fuel`](../README.md).
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-kotlinx-serialization` with `Maven` and `Gradle`. The kotlinx-serialization package has the following dependencies:
 * `fuel:fuel:<same-version>`
-* Kotlin: 1.3.0
+* Kotlin: 1.3.10
 * [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serialization#gradlejvm): 0.9.0
 
 ```groovy

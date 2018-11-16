@@ -1,12 +1,13 @@
 # Fuel (core)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.10-blue.svg)](https://kotlinlang.org)
 
 The core package for [`Fuel`](../README.md). The documentation outlined here touches most subjects and functions but is not exhaustive. 
 
 ## Installation
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `Fuel` with `Maven` and `Gradle`. The core package has the following dependencies:
-* Kotlin - 1.3.0
-* Coroutine - 1.0.0
+* Kotlin - 1.3.10
+* KotlinX Coroutines - 1.0.1
 
 ```groovy
 compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
