@@ -5,11 +5,15 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.test.MockHttpTestCase
+import com.github.kittinunf.result.Result
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThat
 import org.junit.Assert.fail
 import org.junit.Test
+import java.net.ConnectException
 import java.net.HttpURLConnection
 
 class StringTest : MockHttpTestCase() {
@@ -81,5 +85,25 @@ class StringTest : MockHttpTestCase() {
     fun awaitStringResponseResultFailure() = runBlocking {
         val (data, error) = mocked404().awaitStringResponseResult()
         assertThat("Expected error, actual data $data", error, notNullValue())
+    }
+
+    @Test
+    fun captureConnectException() = runBlocking {
+        val (_, res, result) = Fuel.get("http://127.0.0.1:80")
+            .awaitStringResponseResult()
+
+        assertThat(res, notNullValue())
+        assertThat(result, notNullValue())
+        val (data, error) = result
+        assertThat(error, notNullValue())
+        when (result) {
+            is Result.Success -> fail("should catch connect exception")
+            is Result.Failure -> {
+                assertThat(
+                    result.error.exception as? ConnectException,
+                    isA(ConnectException::class.java)
+                )
+            }
+        }
     }
 }
