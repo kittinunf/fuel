@@ -1,43 +1,22 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.moshi.moshiDeserializerOf
 import com.github.kittinunf.fuel.moshi.responseObject
-import com.github.kittinunf.fuel.test.MockHelper
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.result.Result
 import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.notNullValue
-import org.junit.After
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
-import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 
-class FuelMoshiTest {
-
-    init {
-        Fuel.testMode {
-            timeout = 15000
-        }
-    }
-
-    private lateinit var mock: MockHelper
-
-    @Before
-    fun setup() {
-        this.mock = MockHelper()
-        this.mock.setup()
-    }
-
-    @After
-    fun tearDown() {
-        this.mock.tearDown()
-    }
+class FuelMoshiTest : MockHttpTestCase() {
 
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
@@ -104,7 +83,7 @@ class FuelMoshiTest {
         )
 
         Fuel.get(mock.path("user-agent"))
-            .responseObject(object : Handler<HttpBinUserAgentModel> {
+            .responseObject(object : ResponseHandler<HttpBinUserAgentModel> {
                 override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                     assertThat(value, notNullValue())
                 }
@@ -123,7 +102,7 @@ class FuelMoshiTest {
         )
 
         Fuel.get(mock.path("user-agent"))
-            .responseObject(object : Handler<HttpBinUserAgentModel> {
+            .responseObject(object : ResponseHandler<HttpBinUserAgentModel> {
                 override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                     assertThat(value, notNullValue())
                 }

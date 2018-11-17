@@ -2,20 +2,20 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
-import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.net.HttpURLConnection
-import org.hamcrest.CoreMatchers.`is` as isEqualTo
+import java.util.concurrent.TimeUnit
 
 class RequestHandlerTest : MockHttpTestCase() {
 
@@ -26,100 +26,150 @@ class RequestHandlerTest : MockHttpTestCase() {
 
     @Test
     fun httpGetRequestValid() {
+        var isAsync = false
+        var isHandled = false
+
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/http-get"),
-            response = mock.reflect()
+            response = mock.reflect().withDelay(TimeUnit.MILLISECONDS, 1_000)
         )
 
-        mock.path("http-get").httpGet().response(object : Handler<ByteArray> {
+        val running = mock.path("http-get").httpGet().response(object : ResponseHandler<ByteArray> {
             override fun success(request: Request, response: Response, value: ByteArray) {
                 assertThat(request, notNullValue())
                 assertThat(response, notNullValue())
                 assertThat(value, notNullValue())
 
                 val statusCode = HttpURLConnection.HTTP_OK
-                assertThat(response.statusCode, isEqualTo(statusCode))
+                assertThat(response.statusCode, equalTo(statusCode))
+                assertThat(isAsync, equalTo(true))
+
+                isHandled = true
             }
 
             override fun failure(request: Request, response: Response, error: FuelError) {
                 fail("Expected to not hit failure path")
             }
         })
+
+        isAsync = true
+        running.join()
+
+        assertThat(running.isDone, equalTo(true))
+        assertThat(isHandled, equalTo(true))
     }
 
     @Test
     fun httpGetRequestWithMalformedHeaders() {
+        var isAsync = false
+        var isHandled = false
+
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/http-get"),
-            response = mock.reflect()
+            response = mock.reflect().withDelay(TimeUnit.MILLISECONDS, 1_000)
         )
 
-        mock.path("http-get").httpGet().header("sample" to "a\nb\nc").response().third.fold({ _ ->
-            fail()
-        }, { e ->
-            e.printStackTrace()
-            assertTrue(e.exception is IllegalArgumentException)
-        })
+        val running = mock.path("http-get")
+            .httpGet()
+            .header("sample" to "a\nb\nc")
+            .response { _, _, result ->
+                result.fold(
+                    { fail("Expected IllegalArgumentException, actual $it") },
+                    { e ->
+                        assertTrue(e.exception is IllegalArgumentException)
+                        assertThat(isAsync, equalTo(true))
+
+                        isHandled = true
+                    }
+                )
+            }
+
+        isAsync = true
+        running.join()
+
+        assertThat(running.isDone, equalTo(true))
+        assertThat(isHandled, equalTo(true))
     }
 
     @Test
     fun httpGetRequestInvalid() {
-        val data: Any? = null
+        var isAsync = false
+        var isHandled = false
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/not-found"),
-            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            response = mock.response()
+                .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+                .withDelay(TimeUnit.MILLISECONDS, 1_000)
         )
 
-        mock.path("not-found").httpGet().response(object : Handler<ByteArray> {
+        val running = mock.path("not-found")
+            .httpGet()
+            .response(object : ResponseHandler<ByteArray> {
+                override fun success(request: Request, response: Response, value: ByteArray) {
+                    fail("Expected not to hit success path")
+                }
 
-            override fun success(request: Request, response: Response, value: ByteArray) {
-                fail("Expected not to hit success path")
-            }
+                override fun failure(request: Request, response: Response, error: FuelError) {
+                    assertThat(request, notNullValue())
+                    assertThat(response, notNullValue())
+                    assertThat(error, notNullValue())
 
-            override fun failure(request: Request, response: Response, error: FuelError) {
-                assertThat(request, notNullValue())
-                assertThat(response, notNullValue())
-                assertThat(error, notNullValue())
+                    val statusCode = HttpURLConnection.HTTP_NOT_FOUND
+                    assertThat(response.statusCode, equalTo(statusCode))
+                    assertThat(isAsync, equalTo(true))
 
-                val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-                assertThat(response.statusCode, isEqualTo(statusCode))
-            }
-        })
+                    isHandled = true
+                }
+            })
 
-        assertThat(data, nullValue())
+        isAsync = true
+        running.join()
+
+        assertThat(running.isDone, equalTo(true))
+        assertThat(isHandled, equalTo(true))
     }
 
     @Test
     fun httpPostRequestWithParameters() {
-        val err: FuelError? = null
+        var isAsync = false
+        var isHandled = false
 
         val paramKey = "foo"
         val paramValue = "bar"
 
         mock.chain(
             request = mock.request().withMethod(Method.POST.value).withPath("/http-post"),
-            response = mock.reflect()
+            response = mock.reflect().withDelay(TimeUnit.MILLISECONDS, 1_000)
         )
 
-        mock.path("http-post").httpPost(listOf(paramKey to paramValue)).responseString(object : Handler<String> {
-            override fun success(request: Request, response: Response, value: String) {
-                assertThat(request, notNullValue())
-                assertThat(response, notNullValue())
-                assertThat(value, notNullValue())
+        val running = mock.path("http-post")
+            .httpPost(listOf(paramKey to paramValue))
+            .responseString(object : ResponseHandler<String> {
+                override fun success(request: Request, response: Response, value: String) {
+                    assertThat(request, notNullValue())
+                    assertThat(response, notNullValue())
+                    assertThat(value, notNullValue())
 
-                val statusCode = HttpURLConnection.HTTP_OK
-                assertThat(response.statusCode, isEqualTo(statusCode))
+                    val statusCode = HttpURLConnection.HTTP_OK
+                    assertThat(response.statusCode, equalTo(statusCode))
 
-                assertThat(value, containsString(paramKey))
-                assertThat(value, containsString(paramValue))
-            }
+                    assertThat(value, containsString(paramKey))
+                    assertThat(value, containsString(paramValue))
+                    assertThat(isAsync, equalTo(true))
 
-            override fun failure(request: Request, response: Response, error: FuelError) {
-                fail("Expected not to hit failure path")
-            }
-        })
+                    isHandled = true
+                }
 
-        assertThat(err, nullValue())
+                override fun failure(request: Request, response: Response, error: FuelError) {
+                    fail("Expected not to hit failure path")
+                }
+            })
+
+        isAsync = true
+        running.join()
+
+        assertThat(running.isDone, equalTo(true))
+        assertThat(isHandled, equalTo(true))
     }
 }

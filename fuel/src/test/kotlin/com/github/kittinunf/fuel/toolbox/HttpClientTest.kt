@@ -20,7 +20,7 @@ class HttpClientTest : MockHttpTestCase() {
     @Test
     fun httpClientIsTheDefaultClient() {
         val request = Fuel.request(Method.GET, mock.path("default-client"))
-        assertThat(request.client, instanceOf(HttpClient::class.java))
+        assertThat(request.executionOptions.client, instanceOf(HttpClient::class.java))
     }
 
     @Test
@@ -145,7 +145,7 @@ class HttpClientTest : MockHttpTestCase() {
         assertThat("Expected data, actual error $error", data, notNullValue())
         assertThat(data, equalTo("cached"))
 
-        val (_, _, result2) = request.apply { useHttpCache = false }.responseString()
+        val (_, _, result2) = request.apply { executionOptions.useHttpCache = false }.responseString()
         val (data2, error2) = result2
 
         assertThat("Expected data, actual error $error2", data2, notNullValue())

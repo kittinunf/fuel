@@ -12,6 +12,7 @@ import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.HttpTemplate
 import org.slf4j.event.Level
+import java.net.URL
 
 class MockHelper {
 
@@ -111,7 +112,7 @@ class MockHelper {
      * Creates a new mock response template.
      *
      * @see REFLECT_TEMPLATE
-     * @see mock.reflect
+     * @see reflect
      *
      * This method is introduced to keep the import out of test cases and to make it easy to replace
      *   the library for mocking requests.
@@ -134,7 +135,7 @@ class MockHelper {
      * @param path [String] the relative path
      * @return [String] the full path
      */
-    fun path(path: String): String = "http://localhost:${server().localPort}/$path"
+    fun path(path: String): String = URL("http://localhost:${server().localPort}/$path").toString()
 
     companion object {
         const val REFLECT_TEMPLATE = """

@@ -1,13 +1,12 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.BaseTestCase
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
-class HeadersTest : BaseTestCase() {
+class HeadersTest {
 
     @Test
     fun headerNameEqualityCaseInsensitive() {

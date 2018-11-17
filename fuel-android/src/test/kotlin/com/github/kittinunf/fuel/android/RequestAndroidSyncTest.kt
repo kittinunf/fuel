@@ -8,18 +8,26 @@ import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.json.JSONObject
+import org.junit.After
 import org.junit.Assert.assertThat
+import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestAndroidSyncTest : BaseTestCase() {
 
-    init {
+    @Before
+    fun setupFuelManager() {
         FuelManager.instance.apply {
             baseHeaders = mapOf("foo" to "bar")
             baseParams = listOf("key" to "value")
         }
+    }
+
+    @After
+    fun resetFuelManager() {
+        FuelManager.instance.reset()
     }
 
     @Test

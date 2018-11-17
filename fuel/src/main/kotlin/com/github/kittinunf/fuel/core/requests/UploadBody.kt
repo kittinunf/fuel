@@ -2,7 +2,6 @@ package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.Body
-import com.github.kittinunf.fuel.core.DefaultBody
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Request
@@ -11,16 +10,10 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-import java.net.URL
 import java.net.URLConnection
 import java.nio.charset.Charset
 
-typealias UploadSourceCallback = (Request, URL) -> Iterable<Blob>
-
-internal data class UploadBody(
-    val request: Request,
-    val taskRequest: UploadTaskRequest
-) : Body {
+internal data class UploadBody(val request: UploadRequest) : Body {
 
     private var inputAvailable: Boolean = true
 
@@ -30,7 +23,7 @@ internal data class UploadBody(
     override fun toStream(): InputStream {
         throw UnsupportedOperationException(
             "Conversion `toStream` is not supported on UploadBody, because the source is not a single single stream." +
-                "Use `toByteArray` to write the contents to memory or `writeTo` to write the contents to a stream."
+                    "Use `toByteArray` to write the contents to memory or `writeTo` to write the contents to a stream."
         )
     }
 
@@ -42,22 +35,22 @@ internal data class UploadBody(
             }
             .also { result ->
                 // The entire body is now in memory, and can act as a regular body
-                request._body = DefaultBody.from(
-                    { ByteArrayInputStream(result) },
-                    { result.size.toLong() }
-                )
+                request.body(DefaultBody.from(
+                        { ByteArrayInputStream(result) },
+                        { result.size.toLong() }
+                ))
             }
     }
 
     override fun writeTo(outputStream: OutputStream): Long {
         if (!inputAvailable) {
-            throw FuelError(IllegalStateException(
-                "The inputs have already been written to an output stream and can not be consumed again."
+            throw FuelError.wrap(IllegalStateException(
+                    "The inputs have already been written to an output stream and can not be consumed again."
             ))
         }
 
         inputAvailable = false
-        val sourceCallback = taskRequest.sourceCallback
+        val sourceCallback = request.sourceCallback
 
         return outputStream.buffered().let { stream ->
             // Parameters
@@ -73,10 +66,10 @@ internal data class UploadBody(
 
             // Sum and Trailer
             val writtenLength = 0L +
-                parameterLength +
-                filesWithHeadersLength +
-                stream.writeString("--$boundary--") +
-                stream.writeBytes(CRLF)
+                    parameterLength +
+                    filesWithHeadersLength +
+                    stream.writeString("--$boundary--") +
+                    stream.writeBytes(CRLF)
 
             // This is a buffered stream, so flush what's remaining
             writtenLength.toLong().also { stream.flush() }
@@ -90,14 +83,14 @@ internal data class UploadBody(
                 writeParameter(ByteArrayOutputStream(), name, data).toDouble()
             } +
 
-            // Blobs / Files size
-            taskRequest.sourceCallback(request, request.url).withIndex().sumByDouble { (index, blob) ->
-                0.0 + writeBlobHeader(ByteArrayOutputStream(), index, blob) + blob.length + CRLF.size
-            } +
+                // Blobs / Files size
+                request.sourceCallback(request, request.url).withIndex().sumByDouble { (index, blob) ->
+                    0.0 + writeBlobHeader(ByteArrayOutputStream(), index, blob) + blob.length + CRLF.size
+                } +
 
-            // Trailer size
-            "--$boundary--".toByteArray(DEFAULT_CHARSET).size + CRLF.size
-        ).toLong()
+                // Trailer size
+                "--$boundary--".toByteArray(DEFAULT_CHARSET).size + CRLF.size
+            ).toLong()
     }
 
     private val boundary: String by lazy { retrieveBoundaryInfo(request) }
@@ -120,11 +113,7 @@ internal data class UploadBody(
     private fun writeBlob(outputStream: OutputStream, index: Int, blob: Blob): Long {
         outputStream.apply {
             val headerLength = writeBlobHeader(outputStream, index, blob)
-
-            blob.inputStream().use {
-                it.copyTo(this)
-            }
-
+            blob.inputStream().use { it.copyTo(this) }
             return headerLength + blob.length + writeBytes(CRLF)
         }
     }
@@ -153,7 +142,7 @@ internal data class UploadBody(
 
         fun retrieveBoundaryInfo(request: Request): String {
             return request[Headers.CONTENT_TYPE].lastOrNull()?.split("boundary=", limit = 2)?.getOrNull(1)
-                    ?: System.currentTimeMillis().toString(16)
+                ?: System.currentTimeMillis().toString(16)
         }
 
         fun guessContentType(name: String): String = try {
@@ -163,19 +152,11 @@ internal data class UploadBody(
             GENERIC_BYTE_CONTENT
         }
 
-        fun from(uploadTaskRequest: UploadTaskRequest, request: Request): Body {
-            return UploadBody(taskRequest = uploadTaskRequest, request = request).apply {
+        fun from(request: UploadRequest): Body {
+            return UploadBody(request).apply {
                 inputAvailable = true
             }
         }
-    }
-}
-
-internal class UploadTaskRequest(request: Request) : TaskRequest(request) {
-    lateinit var sourceCallback: UploadSourceCallback
-
-    init {
-        request._body = UploadBody.from(this, request)
     }
 }
 

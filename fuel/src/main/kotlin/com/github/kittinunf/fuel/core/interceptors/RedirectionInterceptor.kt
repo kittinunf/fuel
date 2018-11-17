@@ -20,7 +20,7 @@ private val redirectStatusWithGets = listOf(
 fun redirectResponseInterceptor(manager: FuelManager) =
     { next: (Request, Response) -> Response ->
         inner@{ request: Request, response: Response ->
-            if (!response.isStatusRedirection || !request.isAllowRedirects) {
+            if (!response.isStatusRedirection || request.executionOptions.allowRedirects == false) {
                 return@inner next(request, response)
             }
 
@@ -32,7 +32,7 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                 return@inner next(request, response)
             }
 
-            val newUrl = if (URI(redirectedUrl).isAbsolute) URL(redirectedUrl) else URL(request.url, redirectedUrl)
+            val newUrl = if (URI(redirectedUrl.split('?').first()).isAbsolute) URL(redirectedUrl) else URL(request.url, redirectedUrl)
 
             val newMethod = when {
                 response.statusCode in redirectStatusWithGets -> Method.GET
@@ -49,8 +49,8 @@ fun redirectResponseInterceptor(manager: FuelManager) =
 
             val newRequest = manager.request(encoding)
                 .header(newHeaders)
-                .requestProgress(request.requestProgress)
-                .responseProgress(request.responseProgress)
+                .requestProgress(request.executionOptions.requestProgress)
+                .responseProgress(request.executionOptions.responseProgress)
 
             // Redirect
             next(request, newRequest.response().second)
