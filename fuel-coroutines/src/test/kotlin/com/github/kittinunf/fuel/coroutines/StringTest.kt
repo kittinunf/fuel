@@ -9,7 +9,6 @@ import com.github.kittinunf.result.Result
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThat
 import org.junit.Assert.fail
 import org.junit.Test
