@@ -1,6 +1,5 @@
 package com.github.kittinunf.fuel.json
 
-import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.test.MockHelper
@@ -17,7 +16,7 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class FuelJsonTest {
 
-     private lateinit var mock: MockHelper
+    private lateinit var mock: MockHelper
 
     @Before
     fun setupFuelManager() {
