@@ -1,4 +1,4 @@
-package com.github.kittinunf.fuel
+package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
@@ -18,7 +18,7 @@ import java.net.HttpURLConnection
 import java.util.Random
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
-class RequestDownloadTest : MockHttpTestCase() {
+class DownloadRequestTest : MockHttpTestCase() {
     @Test
     fun httpDownloadCase() {
         val manager = FuelManager()
@@ -140,10 +140,10 @@ class RequestDownloadTest : MockHttpTestCase() {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
-                        file
-        }.progress { _, _ ->
-        }.responseString()
+        val (request, response, result) = manager.download(mock.path("bytes"))
+            .destination { _, _ -> file }
+            .progress { _, _ -> }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -165,11 +165,12 @@ class RequestDownloadTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.download(mock.path("bytes")).destination { _, _ ->
-            val dir = System.getProperty("user.dir")
-            File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
-        }.progress { _, _ ->
-        }.responseString()
+        val (request, response, result) = manager.download(mock.path("bytes"))
+            .destination { _, _ ->
+                val dir = System.getProperty("user.dir")
+                File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
+            }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -177,7 +178,7 @@ class RequestDownloadTest : MockHttpTestCase() {
         assertThat(error, notNullValue())
         assertThat(data, nullValue())
 
-        val statusCode = -1
+        val statusCode = 200
         assertThat(error?.exception as IOException, isA(IOException::class.java))
         assertThat(response.statusCode, isEqualTo(statusCode))
     }

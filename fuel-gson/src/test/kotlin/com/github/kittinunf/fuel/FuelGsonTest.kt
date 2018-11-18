@@ -1,165 +1,218 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.ResponseHandler
+import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
+import com.github.kittinunf.fuel.gson.jsonBody
 import com.github.kittinunf.fuel.gson.responseObject
-import com.github.kittinunf.fuel.test.MockHelper
-import com.github.kittinunf.result.Result
-import org.hamcrest.CoreMatchers.instanceOf
-import org.hamcrest.CoreMatchers.isA
+import com.github.kittinunf.fuel.test.MockHttpTestCase
+import com.github.kittinunf.fuel.test.MockReflected
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
-import org.junit.After
-import org.junit.Assert
 import org.junit.Assert.assertThat
-import org.junit.Before
+import org.junit.Assert.fail
 import org.junit.Test
 import java.net.HttpURLConnection
 
-class FuelGsonTest {
+private typealias IssuesList = List<IssueInfo>
 
-    init {
-        Fuel.testMode {
-            timeout = 15000
-        }
-    }
+private data class IssueInfo(
+    val id: Int,
+    val title: String,
+    val number: Int?
+) {
+    fun specialMethod() = "$id: $title"
+}
 
-    private lateinit var mock: MockHelper
+class FuelGsonTest : MockHttpTestCase() {
 
-    @Before
-    fun setup() {
-        this.mock = MockHelper()
-        this.mock.setup()
-    }
-
-    @After
-    fun tearDown() {
-        this.mock.tearDown()
-    }
-
-    // Model
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
     @Test
-    fun gsonTestResponseObject() {
-        mock.chain(
-            request = mock.request().withPath("/user-agent"),
-            response = mock.reflect()
-        )
+    fun gsonTestResponseObjectSync() {
+        val (_, _, result) = reflectedRequest(Method.GET, "user-agent")
+            .responseObject(gsonDeserializerOf(HttpBinUserAgentModel::class.java))
 
-        Fuel.get(mock.path("user-agent"))
-                .responseObject(gsonDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), notNullValue())
-                }
+        val (data, error) = result
+        assertThat("Expected data, actual error $error", data, notNullValue())
+        assertThat("Expected data to have a user agent", data!!.userAgent, notNullValue())
     }
 
     @Test
-    fun gsonTestResponseObjectError() {
+    fun gsonTestResponseObjectAsync() {
+        var isAsync = false
+        val running = reflectedRequest(Method.GET, "user-agent")
+            .responseObject(gsonDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
+                val (data, error) = result
+                assertThat("Expected data, actual error $error", data, notNullValue())
+                assertThat("Expected data to have a user agent", data!!.userAgent, notNullValue())
+                assertThat("Expected isAsync to be true, actual false", isAsync, equalTo(true))
+            }
+
+        isAsync = true
+        running.join()
+
+        assertThat(running.isDone, equalTo(true))
+        assertThat(running.isCancelled, equalTo(false))
+    }
+
+    @Test
+    fun gsonTestResponseObjectErrorSync() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        Fuel.get(mock.path("user-agent"))
-                .responseObject(gsonDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
-                }
+        val (_, _, result) = Fuel.get(mock.path("user-agent"))
+            .responseObject(gsonDeserializerOf(FuelGsonTest.HttpBinUserAgentModel::class.java))
+
+        val (data, error) = result
+        assertThat("Expected error, actual data $data", error, notNullValue())
     }
 
     @Test
-    fun gsonTestResponseDeserializerObject() {
-        mock.chain(
-            request = mock.request().withPath("/user-agent"),
-            response = mock.reflect()
-        )
-
-        Fuel.get(mock.path("user-agent"))
-                .responseObject<HttpBinUserAgentModel> { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), notNullValue())
-                }
-    }
-
-    @Test
-    fun gsonTestResponseDeserializerObjectError() {
+    fun gsonTestResponseObjectErrorAsync() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        Fuel.get(mock.path("user-agent"))
-                .responseObject<HttpBinUserAgentModel> { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
-                }
+        var isAsync = false
+        val running = Fuel.get(mock.path("user-agent"))
+            .responseObject(gsonDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
+                val (data, error) = result
+                assertThat("Expected error, actual data $data", error, notNullValue())
+                assertThat("Expected isAsync to be true, actual false", isAsync, equalTo(true))
+            }
+
+        isAsync = true
+        running.join()
+
+        assertThat(running.isDone, equalTo(true))
+        assertThat(running.isCancelled, equalTo(false))
     }
 
     @Test
-    fun gsonTestResponseHandlerObject() {
+    fun gsonTestResponseDeserializerObjectSync() {
+        val (_, _, result) = reflectedRequest(Method.GET, "user-agent")
+            .responseObject<FuelGsonTest.HttpBinUserAgentModel>()
+
+        val (data, error) = result
+        assertThat("Expected data, actual error $error", data, notNullValue())
+        assertThat("Expected data to have a user agent", data!!.userAgent, notNullValue())
+    }
+
+    @Test
+    fun gsonTestResponseDeserializerObjectAsync() {
+        var isAsync = false
+        val running = reflectedRequest(Method.GET, "user-agent")
+            .responseObject<FuelGsonTest.HttpBinUserAgentModel>() { _, _, result ->
+                val (data, error) = result
+                assertThat("Expected data, actual error $error", data, notNullValue())
+                assertThat("Expected data to have a user agent", data!!.userAgent, notNullValue())
+                assertThat("Expected isAsync to be true, actual false", isAsync, equalTo(true))
+            }
+
+        isAsync = true
+        running.join()
+
+        assertThat(running.isDone, equalTo(true))
+        assertThat(running.isCancelled, equalTo(false))
+    }
+
+    @Test
+    fun gsonTestResponseDeserializerObjectErrorSync() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
-            response = mock.reflect()
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        Fuel.get(mock.path("user-agent"))
-                .responseObject(object : Handler<HttpBinUserAgentModel> {
+        val (_, _, result) = Fuel.get(mock.path("user-agent"))
+            .responseObject<FuelGsonTest.HttpBinUserAgentModel>()
+
+        val (data, error) = result
+        assertThat("Expected error, actual data $data", error, notNullValue())
+    }
+
+    @Test
+    fun gsonTestResponseDeserializerObjectErrorAsync() {
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        )
+
+        var isAsync = false
+        val running = Fuel.get(mock.path("user-agent"))
+            .responseObject<FuelGsonTest.HttpBinUserAgentModel>() { _, _, result ->
+                val (data, error) = result
+                assertThat("Expected error, actual data $data", error, notNullValue())
+                assertThat("Expected isAsync to be true, actual false", isAsync, equalTo(true))
+            }
+
+        isAsync = true
+        running.join()
+
+        assertThat(running.isDone, equalTo(true))
+        assertThat(running.isCancelled, equalTo(false))
+    }
+
+    @Test
+    fun gsonTestResponseHandlerObjectAsync() {
+        var isAsync = false
+        val running = reflectedRequest(Method.GET, "user-agent")
+            .responseObject(
+                object : ResponseHandler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                         assertThat(value, notNullValue())
+                        assertThat("Expected value to have a user agent", value.userAgent, notNullValue())
+                        assertThat("Expected isAsync to be true, actual false", isAsync, equalTo(true))
                     }
 
                     override fun failure(request: Request, response: Response, error: FuelError) {
-                        assertThat(error, notNullValue())
+                        fail("Expected request to succeed, actual $error")
                     }
-                })
+                }
+            )
+
+        isAsync = true
+        running.join()
+
+        assertThat(running.isDone, equalTo(true))
+        assertThat(running.isCancelled, equalTo(false))
     }
 
     @Test
-    fun gsonTestResponseHandlerObjectError() {
+    fun gsonTestResponseHandlerObjectErrorAsync() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        Fuel.get(mock.path("user-agent"))
-                .responseObject(object : Handler<HttpBinUserAgentModel> {
-                    override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                        assertThat(value, notNullValue())
-                    }
+        var isAsync = false
+        val running = Fuel.get(mock.path("user-agent"))
+            .responseObject(object : ResponseHandler<HttpBinUserAgentModel> {
+                override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
+                    fail("Expected request to fail, actual $value")
+                }
 
-                    override fun failure(request: Request, response: Response, error: FuelError) {
-                        assertThat(error, instanceOf(Result.Failure::class.java))
-                    }
-                })
+                override fun failure(request: Request, response: Response, error: FuelError) {
+                    assertThat(error, notNullValue())
+                    assertThat("Expected isAsync to be true, actual false", isAsync, equalTo(true))
+                }
+            })
+
+        isAsync = true
+        running.join()
+
+        assertThat(running.isDone, equalTo(true))
+        assertThat(running.isCancelled, equalTo(false))
     }
-
-    @Test
-    fun gsonTestResponseSyncObject() {
-        mock.chain(
-            request = mock.request().withPath("/user-agent"),
-            response = mock.reflect()
-        )
-
-        val triple = Fuel.get(mock.path("user-agent")).responseObject<HttpBinUserAgentModel>()
-        assertThat(triple.third.component1(), notNullValue())
-        assertThat(triple.third.component1(), instanceOf(HttpBinUserAgentModel::class.java))
-    }
-
-    @Test
-    fun gsonTestResponseSyncObjectError() {
-        mock.chain(
-            request = mock.request().withPath("/user-agent"),
-            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
-        )
-
-        val triple = Fuel.get(mock.path("user-agent")).responseObject<HttpBinUserAgentModel>()
-        assertThat(triple.third.component2(), instanceOf(FuelError::class.java))
-    }
-
-    data class IssueInfo(val id: Int, val title: String, val number: Int)
 
     /**
      * Test for https://github.com/kittinunf/Fuel/issues/233
@@ -174,10 +227,29 @@ class FuelGsonTest {
                     " ]").withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        Fuel.get(mock.path("issues")).responseObject<List<IssueInfo>> { _, _, result ->
-            val issues = result.get()
-            Assert.assertNotEquals(issues.size, 0)
-            assertThat(issues[0], isA(IssueInfo::class.java))
-        }
+        val (_, _, result) = Fuel.get(mock.path("issues")).responseObject<IssuesList>()
+
+        val (issues, error) = result
+        assertThat("Expected issues, actual error $error", issues, notNullValue())
+        assertThat(issues!!.size, not(equalTo(0)))
+        assertThat(issues.first().specialMethod(), equalTo("1: issue 1"))
+    }
+
+    @Test
+    fun testSettingJsonBody() {
+        val data = listOf(
+            IssueInfo(id = 1, title = "issue 1", number = null),
+            IssueInfo(id = 2, title = "issue 2", number = 32)
+        )
+
+        val (_, _, result) = reflectedRequest(Method.POST, "json-body")
+            .jsonBody(data)
+            .responseObject<MockReflected>()
+
+        val (reflected, error) = result
+        val issues: IssuesList = Gson().fromJson(reflected!!.body!!.string!!, object : TypeToken<IssuesList>() {}.type)
+        assertThat("Expected issues, actual error $error", issues, notNullValue())
+        assertThat(issues.size, equalTo(data.size))
+        assertThat(issues.first().specialMethod(), equalTo("1: issue 1"))
     }
 }

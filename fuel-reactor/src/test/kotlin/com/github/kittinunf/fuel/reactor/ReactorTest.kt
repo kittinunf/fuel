@@ -8,34 +8,22 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.github.kittinunf.fuel.test.MockHelper
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.result.Result
-import org.junit.After
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 import reactor.core.publisher.Mono
 import reactor.core.publisher.onErrorResume
 import reactor.test.test
+import java.util.UUID
 
-class ReactorTest {
-
-    private lateinit var mock: MockHelper
-
-    @Before
-    fun setup() {
-        this.mock = MockHelper()
-        this.mock.setup()
-    }
-
-    @After
-    fun tearDown() {
-        this.mock.tearDown()
-    }
+class ReactorTest : MockHttpTestCase() {
 
     @Test
-    fun testBytes() {
+    fun monoBytes() {
         mock.chain(
             request = mock.request().withPath("/bytes"),
             response = mock.response().withBody(ByteArray(10))
@@ -48,7 +36,7 @@ class ReactorTest {
     }
 
     @Test
-    fun testString() {
+    fun monoString() {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.response().withBody("127.0.0.1")
@@ -61,7 +49,7 @@ class ReactorTest {
     }
 
     @Test
-    fun testObjectSuccess() {
+    fun monoObject() {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.response()
@@ -76,7 +64,7 @@ class ReactorTest {
     }
 
     @Test
-    fun testObjectFailureWrongType() {
+    fun monoObjectWithInvalidFormat() {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.response()
@@ -91,7 +79,7 @@ class ReactorTest {
     }
 
     @Test
-    fun testObjectFailureMissingProperty() {
+    fun monoObjectWithMissingProperty() {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.response()
@@ -110,7 +98,7 @@ class ReactorTest {
     }
 
     @Test
-    fun testResponse() {
+    fun monoResponse() {
         mock.chain(
             request = mock.request().withPath("/status"),
             response = mock.response().withStatusCode(404)
@@ -124,7 +112,7 @@ class ReactorTest {
     }
 
     @Test
-    fun testResultBytes() {
+    fun monoResultBytes() {
         mock.chain(
             request = mock.request().withPath("/bytes"),
             response = mock.response().withBody(ByteArray(20))
@@ -138,8 +126,8 @@ class ReactorTest {
     }
 
     @Test
-    fun testResultString() {
-        val randomUuid = "8ab97c1e-cc0c-4d5e-8bab-736fdaf91a79"
+    fun monoResultString() {
+        val randomUuid = UUID.randomUUID().toString()
 
         mock.chain(
             request = mock.request().withPath("/uuid"),
@@ -154,7 +142,7 @@ class ReactorTest {
     }
 
     @Test
-    fun testResultObjectSuccess() {
+    fun monoResultObject() {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.response()
@@ -170,7 +158,7 @@ class ReactorTest {
     }
 
     @Test
-    fun testResultObjectFailureWrongType() {
+    fun monoResultObjectWithInvalidFormat() {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.response()
@@ -185,7 +173,7 @@ class ReactorTest {
     }
 
     @Test
-    fun testResultObjectFailureMissingProperty() {
+    fun monoResultObjectWithMissingProperty() {
         mock.chain(
             request = mock.request().withPath("/ip"),
             response = mock.response()
@@ -197,6 +185,21 @@ class ReactorTest {
             .test()
             .assertNext { assertTrue(it?.exception is MissingKotlinParameterException) }
             .verifyComplete()
+    }
+
+    @Test
+    fun monoCancellation() {
+        mock.chain(
+                request = mock.request().withPath("/bytes"),
+                response = mock.response().withBody(ByteArray(10))
+        )
+
+        val running = Fuel.get(mock.path("bytes"))
+            .monoBytes()
+            .toProcessor()
+
+        running.cancel()
+        assertThat(running.isCancelled, equalTo(true))
     }
 
     private data class IpLong(val origin: Long)

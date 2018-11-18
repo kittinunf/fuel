@@ -4,7 +4,7 @@ import com.github.kittinunf.forge.Forge
 import com.github.kittinunf.forge.core.DeserializedResult
 import com.github.kittinunf.forge.core.JSON
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
@@ -17,10 +17,10 @@ inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.
 inline fun <reified T : Any> Request.responseObjects(noinline deserializer: JSON.() -> DeserializedResult<T>, noinline handler: (Request, Response, Result<List<T>, FuelError>) -> Unit) =
         response(forgesDeserializerOf(deserializer), handler)
 
-inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.() -> DeserializedResult<T>, handler: Handler<T>) =
+inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.() -> DeserializedResult<T>, handler: ResponseHandler<T>) =
         response(forgeDeserializerOf(deserializer), handler)
 
-inline fun <reified T : Any> Request.responseObjects(noinline deserializer: JSON.() -> DeserializedResult<T>, handler: Handler<List<T>>) =
+inline fun <reified T : Any> Request.responseObjects(noinline deserializer: JSON.() -> DeserializedResult<T>, handler: ResponseHandler<List<T>>) =
         response(forgesDeserializerOf(deserializer), handler)
 
 inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.() -> DeserializedResult<T>) = response(forgeDeserializerOf(deserializer))

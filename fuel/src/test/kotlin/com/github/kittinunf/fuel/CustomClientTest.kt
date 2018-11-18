@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Client
-import com.github.kittinunf.fuel.core.DefaultBody
+import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
@@ -13,7 +13,7 @@ import org.junit.Test
 import java.io.File
 import java.nio.charset.Charset
 
-class CustomClientTest : BaseTestCase() {
+class CustomClientTest {
     private val manager: FuelManager by lazy {
         val dir = System.getProperty("user.dir")
         val currentDir = File(dir, "src/test/assets")
@@ -32,8 +32,7 @@ class CustomClientTest : BaseTestCase() {
 
     @Test
     fun httpRequestWithMockedResponse() {
-        val (request, response, data) =
-                manager.request(Method.GET, "http://foo.bar").response()
+        val (request, response, data) = manager.request(Method.GET, "http://foo.bar").response()
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())
         assertThat(data.get(), notNullValue())

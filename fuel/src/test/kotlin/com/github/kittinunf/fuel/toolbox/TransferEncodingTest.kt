@@ -4,15 +4,15 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.test.MockHttpTestCase
+import com.github.kittinunf.fuel.util.encode
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertArrayEquals
 import org.junit.Test
 import org.mockserver.model.Header
 import java.io.ByteArrayOutputStream
-import java.util.zip.DeflaterOutputStream
-import java.util.zip.GZIPOutputStream
 
 class TransferEncodingTest : MockHttpTestCase() {
 
@@ -24,15 +24,16 @@ class TransferEncodingTest : MockHttpTestCase() {
             }
         }
 
-        val output = ByteArrayOutputStream(value.size)
-        output.write(value)
-        val identity = output.toByteArray()
+        val identity = ByteArrayOutputStream(value.size).let {
+            it.write(value)
+            it.toByteArray()
+        }
 
         mock.chain(
             request = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/identity")
-                .withHeader(Header.header(Headers.ACCEPT_TRANSFER_ENCODING, HttpClient.SUPPORTED_DECODING.joinToString(", "))),
+                .withHeader(Header.header(Headers.ACCEPT_TRANSFER_ENCODING, "gzip, deflate; q=0.5")),
             response = mock.response()
                 .withHeaders(
                     Header.header(Headers.TRANSFER_ENCODING, "identity"),
@@ -59,9 +60,10 @@ class TransferEncodingTest : MockHttpTestCase() {
         }
 
         val inner = ByteArrayOutputStream(value.size)
-        val output = GZIPOutputStream(inner)
-        output.write(value)
-        output.finish()
+        inner.encode("gzip").apply {
+            write(value)
+            close()
+        }
 
         // It's written to here
         val gzipped = inner.toByteArray()
@@ -70,7 +72,7 @@ class TransferEncodingTest : MockHttpTestCase() {
             request = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/gzip")
-                .withHeader(Header.header(Headers.ACCEPT_TRANSFER_ENCODING, HttpClient.SUPPORTED_DECODING.joinToString(", "))),
+                .withHeader(Header.header(Headers.ACCEPT_TRANSFER_ENCODING, "gzip, deflate; q=0.5")),
             response = mock.response()
                 .withHeaders(
                     Header.header(Headers.TRANSFER_ENCODING, "gzip"),
@@ -83,7 +85,9 @@ class TransferEncodingTest : MockHttpTestCase() {
             .body(value)
             .response()
 
-        assertArrayEquals(value, response.component1())
+        val (data, error) = response
+        assertThat("Expected data, actual error $error", data, notNullValue())
+        assertArrayEquals(value, data)
         assertThat(result[Headers.CONTENT_ENCODING].lastOrNull(), nullValue())
         assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), nullValue())
     }
@@ -97,9 +101,10 @@ class TransferEncodingTest : MockHttpTestCase() {
         }
 
         val inner = ByteArrayOutputStream(value.size)
-        val output = DeflaterOutputStream(inner)
-        output.write(value)
-        output.finish()
+        inner.encode("deflate").apply {
+            write(value)
+            close()
+        }
 
         // It's written to here
         val gzipped = inner.toByteArray()
@@ -108,7 +113,7 @@ class TransferEncodingTest : MockHttpTestCase() {
             request = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/deflate")
-                .withHeader(Header.header(Headers.ACCEPT_TRANSFER_ENCODING, HttpClient.SUPPORTED_DECODING.joinToString(", "))),
+                .withHeader(Header.header(Headers.ACCEPT_TRANSFER_ENCODING, "gzip, deflate; q=0.5")),
             response = mock.response()
                 .withHeaders(
                     Header.header(Headers.TRANSFER_ENCODING, "deflate"),
@@ -121,7 +126,9 @@ class TransferEncodingTest : MockHttpTestCase() {
             .body(value)
             .response()
 
-        assertArrayEquals(value, response.component1())
+        val (data, error) = response
+        assertThat("Expected data, actual error $error", data, notNullValue())
+        assertArrayEquals(value, data)
         assertThat(result[Headers.CONTENT_ENCODING].lastOrNull(), nullValue())
         assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), nullValue())
     }
@@ -135,14 +142,16 @@ class TransferEncodingTest : MockHttpTestCase() {
         }
 
         val innerData = ByteArrayOutputStream(value.size * 2)
-        val inner = GZIPOutputStream(innerData)
-        inner.write(value)
-        inner.finish()
+        innerData.encode("gzip").apply {
+            write(value)
+            close()
+        }
 
         val outputData = ByteArrayOutputStream(value.size * 2)
-        val output = GZIPOutputStream(outputData)
-        output.write(innerData.toByteArray())
-        output.finish()
+        outputData.encode("gzip").apply {
+            write(innerData.toByteArray())
+            close()
+        }
 
         // It's written to here
         val gzipped = outputData.toByteArray()
@@ -151,7 +160,7 @@ class TransferEncodingTest : MockHttpTestCase() {
             request = mock.request()
                 .withMethod(Method.POST.value)
                 .withPath("/stacked")
-                .withHeader(Header.header(Headers.ACCEPT_TRANSFER_ENCODING, HttpClient.SUPPORTED_DECODING.joinToString(", "))),
+                .withHeader(Header.header(Headers.ACCEPT_TRANSFER_ENCODING, "gzip, deflate; q=0.5")),
             response = mock.response()
                 .withHeaders(
                     Header.header(Headers.TRANSFER_ENCODING, "gzip, gzip"),
@@ -164,7 +173,9 @@ class TransferEncodingTest : MockHttpTestCase() {
             .body(value)
             .response()
 
-        assertArrayEquals(value, response.component1())
+        val (data, error) = response
+        assertThat("Expected data, actual error $error", data, notNullValue())
+        assertArrayEquals(value, data)
         assertThat(result[Headers.CONTENT_ENCODING].lastOrNull(), nullValue())
         assertThat(result[Headers.CONTENT_LENGTH].lastOrNull(), nullValue())
     }

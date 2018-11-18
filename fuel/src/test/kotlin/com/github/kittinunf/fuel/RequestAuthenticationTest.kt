@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.encodeBase64ToString
 import org.hamcrest.CoreMatchers.notNullValue
@@ -22,14 +23,14 @@ class RequestAuthenticationTest : MockHttpTestCase() {
         val encodedAuth = auth.encodeBase64ToString()
 
         val correctRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withHeader("Authorization", "Basic $encodedAuth")
-                .withPath("/authenticate")
+            .withMethod(Method.GET.value)
+            .withHeader("Authorization", "Basic $encodedAuth")
+            .withPath("/authenticate")
 
         val incorrectRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withHeader("Authorization")
-                .withPath("/authenticate")
+            .withMethod(Method.GET.value)
+            .withHeader("Authorization")
+            .withPath("/authenticate")
 
         val correctResponse = mock.reflect()
         val incorrectResponse = mock.response().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED)
@@ -37,9 +38,10 @@ class RequestAuthenticationTest : MockHttpTestCase() {
         mock.chain(request = correctRequest, response = correctResponse)
         mock.chain(request = incorrectRequest, response = incorrectResponse)
 
-        val (request, response, result) = manager.request(Method.GET, mock.path("authenticate"))
-                .authenticate("invalid", "authentication")
-                .response()
+        val (request, response, result) = manager.get(mock.path("authenticate"))
+            .authentication()
+            .basic("invalid", "authentication")
+            .response()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -58,14 +60,14 @@ class RequestAuthenticationTest : MockHttpTestCase() {
         val encodedAuth = auth.encodeBase64ToString()
 
         val correctRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withHeader("Authorization", "Basic $encodedAuth")
-                .withPath("/authenticate")
+            .withMethod(Method.GET.value)
+            .withHeader("Authorization", "Basic $encodedAuth")
+            .withPath("/authenticate")
 
         val incorrectRequest = mock.request()
-                .withMethod(Method.GET.value)
-                .withHeader("Authorization")
-                .withPath("/authenticate")
+            .withMethod(Method.GET.value)
+            .withHeader("Authorization")
+            .withPath("/authenticate")
 
         val correctResponse = mock.reflect()
         val incorrectResponse = mock.response().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED)
@@ -73,9 +75,10 @@ class RequestAuthenticationTest : MockHttpTestCase() {
         mock.chain(request = correctRequest, response = correctResponse)
         mock.chain(request = incorrectRequest, response = incorrectResponse)
 
-        val (request, response, result) = manager.request(Method.GET, mock.path("authenticate"))
-                .authenticate(user, password)
-                .response()
+        val (request, response, result) = manager.get(mock.path("authenticate"))
+            .authentication()
+            .basic(user, password)
+            .response()
         val (data, error) = result
 
         assertThat(request, notNullValue())

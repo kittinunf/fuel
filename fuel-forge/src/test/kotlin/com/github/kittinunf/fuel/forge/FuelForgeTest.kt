@@ -8,10 +8,10 @@ import com.github.kittinunf.forge.core.maybeAt
 import com.github.kittinunf.forge.util.create
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Handler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.test.MockHelper
+import com.github.kittinunf.fuel.core.ResponseHandler
+import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
@@ -20,31 +20,10 @@ import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.json.JSONException
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 
-class FuelForgeTest {
-
-    init {
-        Fuel.testMode {
-            timeout = 15000
-        }
-    }
-
-    private lateinit var mock: MockHelper
-
-    @Before
-    fun setup() {
-        mock = MockHelper()
-        mock.setup()
-    }
-
-    @After
-    fun tearDown() {
-        mock.tearDown()
-    }
+class FuelForgeTest : MockHttpTestCase() {
 
     data class HttpBinUserAgentModel(var userAgent: String = "", var status: String = "")
     data class IssueInfo(val id: Int, val title: String, val number: Int?)
@@ -126,7 +105,7 @@ class FuelForgeTest {
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(httpBinUserDeserializer, object : Handler<HttpBinUserAgentModel> {
+                .responseObject(httpBinUserDeserializer, object : ResponseHandler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                         assertThat(value, notNullValue())
                     }
@@ -148,7 +127,7 @@ class FuelForgeTest {
         )
 
         Fuel.get(mock.path("issues"))
-                .responseObjects(issueInfoDeserializer, object : Handler<List<IssueInfo>> {
+                .responseObjects(issueInfoDeserializer, object : ResponseHandler<List<IssueInfo>> {
                     override fun success(request: Request, response: Response, value: List<IssueInfo>) {
                         assertThat(value, notNullValue())
                         assertThat(value.size, not(equalTo(0)))
@@ -168,7 +147,7 @@ class FuelForgeTest {
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(httpBinUserDeserializer, object : Handler<HttpBinUserAgentModel> {
+                .responseObject(httpBinUserDeserializer, object : ResponseHandler<HttpBinUserAgentModel> {
                     override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                         assertThat(value, notNullValue())
                     }

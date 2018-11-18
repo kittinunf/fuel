@@ -8,10 +8,9 @@ import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
-import org.junit.Assert.assertThat
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.io.Reader
-import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestObjectTest : MockHttpTestCase() {
 
@@ -41,7 +40,7 @@ class RequestObjectTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         assertThat(data as ReflectMockModel, isA(ReflectMockModel::class.java))
-        assertThat(data.userAgent, isEqualTo(not("")))
+        assertThat(data.userAgent, not(equalTo("")))
     }
 
     @Test

@@ -5,6 +5,8 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.RequestFactory
+import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.util.decodeBase64
 import com.google.common.net.MediaType
@@ -13,25 +15,22 @@ import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
-import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Test
 import org.mockserver.model.BinaryBody
 import java.net.HttpURLConnection
-import java.net.URL
 import java.util.Random
-import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class RequestTest : MockHttpTestCase() {
     private val manager: FuelManager by lazy { FuelManager() }
 
-    class PathStringConvertibleImpl(url: String) : Fuel.PathStringConvertible {
+    class PathStringConvertibleImpl(url: String) : RequestFactory.PathStringConvertible {
         override val path = url
     }
 
-    class RequestConvertibleImpl(val method: Method, private val url: String) : Fuel.RequestConvertible {
+    class RequestConvertibleImpl(val method: Method, private val url: String) : RequestFactory.RequestConvertible {
         override val request = createRequest()
 
         private fun createRequest(): Request {
@@ -61,7 +60,7 @@ class RequestTest : MockHttpTestCase() {
 
         assertThat(request.url, notNullValue())
         assertThat(response.url, notNullValue())
-        assertThat(request.url, isEqualTo(response.url))
+        assertThat(request.url, equalTo(response.url))
     }
 
     @Test
@@ -80,7 +79,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
     }
 
     @Test
@@ -99,7 +98,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
     }
 
     @Test
@@ -125,7 +124,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(response.toString(), containsString("bytes of image/png"))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
     }
 
     @Test
@@ -149,7 +148,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(response.toString(), containsString("Body : (555 bytes of application/octet-stream)"))
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
     }
 
     @Test
@@ -169,7 +168,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(response, notNullValue())
         assertThat(error, nullValue())
 
-        assertThat(response.processBody("(unknown)", ByteArray(0)), isEqualTo("(empty)"))
+        assertThat(response.processBody("(unknown)", ByteArray(0)), equalTo("(empty)"))
     }
 
     @Test
@@ -191,7 +190,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val headers: Headers = Headers.from(mapOf(Pair(Headers.CONTENT_TYPE, listOf(""))))
-        assertThat(response.guessContentType(headers), isEqualTo("(unknown)"))
+        assertThat(response.guessContentType(headers), equalTo("(unknown)"))
     }
 
     // Needs Better PNG Base64 in same line
@@ -217,7 +216,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val headers: Map<String, List<String>> = mapOf(Pair("Content-Type", listOf("")))
-        assertThat(response.guessContentType(headers), isEqualTo("image/png"))
+        assertThat(response.guessContentType(headers), equalTo("image/png"))
     }*/
 
     @Test
@@ -240,7 +239,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -267,7 +266,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -289,8 +288,8 @@ class RequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.request(Method.POST, mock.path("post"))
-                .jsonBody(body)
-                .responseString()
+            .jsonBody(body)
+            .responseString()
         val (data, error) = result
 
         val string = data as String
@@ -302,7 +301,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString(correctBodyResponse))
     }
@@ -328,7 +327,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -360,7 +359,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -393,7 +392,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
@@ -420,7 +419,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_OK))
 
         assertThat(string, equalTo(""))
     }
@@ -440,7 +439,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -458,7 +457,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -478,7 +477,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_OK))
 
         assertThat(string, containsString("user-agent"))
     }
@@ -498,7 +497,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -525,7 +524,7 @@ class RequestTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_OK))
     }
 
     @Test
@@ -549,121 +548,10 @@ class RequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
 
         assertThat(string, containsString(paramKey))
         assertThat(string, containsString(paramValue))
-    }
-
-    // @Test
-    // TODO turn on when it works reliably
-    fun httpGetRequestCancel() {
-            /*
-                TODO: turn into mocked request. This one is failing because the mock server probably
-                    doesn't allow for streamed responses. Or maybe something else. Does show the
-                    issue with completed requests that are cancelled. Should probably be killed even
-                    if they are completed.
-
-
-            val bytes = ByteArray(1024 * 1024)
-            Random().nextBytes(bytes)
-
-            mock.chain(
-                request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
-                response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
-            )
-
-            val file = File.createTempFile(bytes.toString(), null)
-            val requestPrimed = manager.download(mock.path("bytes")).destination { _, _ -> file }
-
-            requestPrimed.progress { _, _ ->
-                requestPrimed.cancel()
-            }
-
-            val (request, response, result) = requestPrimed.response()
-            val (data, error) = result
-
-            assertThat(request, notNullValue())
-            assertThat(response, nullValue())
-            assertThat(data, nullValue())
-            assertThat(error, nullValue())
-
-            */
-
-            val (request, response, result) = manager.request(Method.GET, "http://httpbin.org/stream-bytes/4194304").responseString()
-            request.cancel()
-
-            // TODO: investigate. By this time there is already data loaded and cancel doesn't
-            //  actually cancel anything. See comments next to assertions below:
-
-            val (data, error) = result
-
-            assertThat(request, notNullValue())
-            assertThat(response.contentLength, isEqualTo(-1L)) // this is true
-            assertThat(data, nullValue()) // but then this is not
-            assertThat(error, nullValue())
-    }
-
-    @Test
-    fun httpGetCurlString() {
-        val request = Request(
-            method = Method.GET,
-            path = "",
-            url = URL("http://httpbin.org/get"),
-            headers = Headers.from("Authentication" to "Bearer xxx"),
-            parameters = listOf("foo" to "xxx"),
-            timeoutInMillisecond = 15000,
-            timeoutReadInMillisecond = 15000
-        )
-
-        assertThat(request.cUrlString(), isEqualTo("curl -i -H \"Authentication:Bearer xxx\" http://httpbin.org/get"))
-    }
-
-    @Test
-    fun httpPostCurlString() {
-        val request = Request(
-            method = Method.POST,
-            path = "",
-            url = URL("http://httpbin.org/post"),
-            headers = Headers.from("Authentication" to "Bearer xxx"),
-            parameters = listOf("foo" to "xxx"),
-            timeoutInMillisecond = 15000,
-            timeoutReadInMillisecond = 15000
-        )
-
-        assertThat(request.cUrlString(), isEqualTo("curl -i -X POST -H \"Authentication:Bearer xxx\" http://httpbin.org/post"))
-    }
-
-    @Test
-    fun httpStringWithOutParams() {
-        val request = Request(
-            Method.GET,
-            "",
-            url = URL("http://httpbin.org/post"),
-            headers = Headers.from("Content-Type" to "text/html"),
-            timeoutInMillisecond = 15000,
-            timeoutReadInMillisecond = 15000
-        )
-
-        assertThat(request.httpString(), startsWith("GET http"))
-        assertThat(request.httpString(), containsString("Content-Type"))
-    }
-
-    @Test
-    fun httpStringWithParams() {
-        val request = Request(
-            Method.POST,
-            "",
-            url = URL("http://httpbin.org/post"),
-            headers = Headers.from("Content-Type" to "text/html"),
-            parameters = listOf("foo" to "xxx"),
-            timeoutInMillisecond = 15000,
-            timeoutReadInMillisecond = 15000
-        ).body("it's a body")
-
-        assertThat(request.httpString(), startsWith("POST http"))
-        assertThat(request.httpString(), containsString("Content-Type"))
-        assertThat(request.httpString(), containsString("body"))
     }
 
     @Test

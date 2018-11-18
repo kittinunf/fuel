@@ -17,26 +17,20 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class FuelJsonTest {
 
-    init {
-        Fuel.testMode {
-            timeout = 15000
-        }
+     private lateinit var mock: MockHelper
+
+    @Before
+    fun setupFuelManager() {
         FuelManager.instance.apply {
             baseHeaders = mapOf("foo" to "bar")
             baseParams = listOf("key" to "value")
         }
-    }
-
-    private lateinit var mock: MockHelper
-
-    @Before
-    fun setup() {
-        this.mock = MockHelper()
-        this.mock.setup()
+        this.mock = MockHelper().apply { setup() }
     }
 
     @After
-    fun tearDown() {
+    fun resetFuelManager() {
+        FuelManager.instance.reset()
         this.mock.tearDown()
     }
 

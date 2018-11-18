@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core.interceptors
 
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.extensions.cUrlString
 
 fun <T> loggingRequestInterceptor() =
         { next: (T) -> T ->

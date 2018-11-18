@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.issues
 
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.test.MockReflected
 import org.hamcrest.CoreMatchers

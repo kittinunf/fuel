@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import awaitStringResponse
+import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.extensions.authentication
+import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpDelete
 import com.github.kittinunf.fuel.httpGet
@@ -89,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun httpGetCoroutine() {
-        val (request, response, result) = Fuel.get("/get", listOf("userId" to "123")).awaitStringResponse()
+        val (request, response, result) = Fuel.get("/get", listOf("userId" to "123")).awaitStringResponseResult()
         Log.d(TAG, response.toString())
         Log.d(TAG, request.toString())
         update(result)
@@ -205,14 +207,16 @@ class MainActivity : AppCompatActivity() {
         val password = "P@$\$vv0|2|)"
 
         Fuel.get("/basic-auth/$username/$password")
-            .authenticate(username, password)
+            .authentication()
+            .basic(username, password)
             .also { Log.d(TAG, it.cUrlString()) }
-            .responseString { _, _, result -> update(result) }
+            .responseString { request, _, result -> update(result) }
 
         "/basic-auth/$username/$password".httpGet()
-            .authenticate(username, password)
+            .authentication()
+            .basic(username, password)
             .also { Log.d(TAG, it.cUrlString()) }
-            .responseString { _, _, result -> update(result) }
+            .responseString { request, _, result -> update(result) }
     }
 
     private fun httpRxSupport() {

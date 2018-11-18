@@ -1,103 +1,100 @@
 package com.github.kittinunf.fuel.core
 
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
-import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
-import com.github.kittinunf.fuel.core.requests.DownloadTaskRequest
-import com.github.kittinunf.fuel.core.requests.TaskRequest
-import com.github.kittinunf.fuel.core.requests.UploadSourceCallback
-import com.github.kittinunf.fuel.core.requests.UploadTaskRequest
-import com.github.kittinunf.fuel.util.encodeBase64ToString
-import java.io.ByteArrayInputStream
+import com.github.kittinunf.fuel.core.requests.CancellableRequest
 import java.io.File
-import java.io.FileInputStream
 import java.io.InputStream
 import java.net.URL
 import java.nio.charset.Charset
-import java.util.concurrent.Callable
-import java.util.concurrent.Executor
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
-import javax.net.ssl.HostnameVerifier
-import javax.net.ssl.SSLSocketFactory
 
-private typealias RequestTransformer = (Request) -> Request
-private typealias ResponseTransformer = (Request, Response) -> Response
 typealias Parameters = List<Pair<String, Any?>>
+typealias RequestFeatures = MutableMap<String, Request>
 
-class Request(
-    val method: Method,
-    val path: String,
-    val url: URL,
-    var type: Type = Type.REQUEST,
-    val headers: Headers = Headers(),
-    val parameters: Parameters = listOf(),
-    var name: String = "file",
-    val names: MutableList<String> = mutableListOf(),
-    val mediaTypes: MutableList<String> = mutableListOf(),
-    var isAllowRedirects: Boolean = true,
-    var useHttpCache: Boolean? = null,
-    var decodeContent: Boolean? = null,
-    var timeoutInMillisecond: Int = 15_000,
-    var timeoutReadInMillisecond: Int = 15_000,
-    private val _responseProgress: Progress = Progress(),
-    private val _requestProgress: Progress = Progress(),
-    internal var _body: Body = DefaultBody()
-) : Fuel.RequestConvertible {
-    enum class Type {
-        REQUEST,
-        DOWNLOAD,
-        UPLOAD
-    }
+interface Request : RequestFactory.RequestConvertible {
+    val method: Method
+    val url: URL
+    val headers: Headers
+    val parameters: Parameters
+    var executionOptions: RequestExecutionOptions
+    val body: Body
+    val enabledFeatures: RequestFeatures
 
-    internal lateinit var client: Client
+    /**
+     * Add a [ProgressCallback] tracking the [Body] of the [Request]
+     *
+     * @see body
+     * @see com.github.kittinunf.fuel.core.requests.UploadRequest.progress
+     *
+     * @return self
+     */
+    fun requestProgress(handler: ProgressCallback): Request
 
-    val body: Body get() = _body
-    val requestProgress: Progress get() = _requestProgress
-    val responseProgress: Progress get() = _responseProgress
+    /**
+     * Add a [ProgressCallback] tracking the [Body] of the [Response]
+     *
+     * @see com.github.kittinunf.fuel.core.requests.DownloadRequest.progress
+     *
+     * @return self
+     */
+    fun responseProgress(handler: ProgressCallback): Request
 
-    // underlying task request
-    internal val taskRequest: TaskRequest by lazy {
-        when (type) {
-            Type.DOWNLOAD -> DownloadTaskRequest(this)
-            Type.UPLOAD -> UploadTaskRequest(this)
-            else -> TaskRequest(this)
-        }
-    }
+    /**
+     * Overwrite the [Request] [timeout] in milliseconds
+     *
+     * @note [Client] must implement this behaviour
+     * @note the default client sets [java.net.HttpURLConnection.setConnectTimeout]
+     *
+     * @param timeout [Int] timeout in milliseconds
+     * @return self
+     */
+    fun timeout(timeout: Int): Request
 
-    private var taskFuture: Future<*>? = null
+    /**
+     * Overwrite the [Request] [timeout] in milliseconds
+     *
+     * @note [Client] must implement this behaviour
+     * @note the default client sets [java.net.HttpURLConnection.setReadTimeout]
+     *
+     * @param timeout [Int] timeout in milliseconds
+     * @return self
+     */
+    fun timeoutRead(timeout: Int): Request
 
-    // configuration
-    internal var socketFactory: SSLSocketFactory? = null
-    internal var hostnameVerifier: HostnameVerifier? = null
+    /**
+     * Overwrite [RequestExecutionOptions] http cache usage flag
+     *
+     * @note [Client] must implement this behaviour
+     * @note The default client sends `Cache-Control: none` if this flag is false, defaults to true
+     *
+     * @see java.net.HttpURLConnection.setUseCaches
+     * @param useHttpCache [Boolean] true if suggest client to allow cached responses, false otherwise
+     */
+    fun useHttpCache(useHttpCache: Boolean): Request
 
-    // callers
-    internal lateinit var executor: ExecutorService
-    internal lateinit var callbackExecutor: Executor
+    /**
+     * Follow redirects as handled by instances of RedirectInterceptors
+     *  i.e. [com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor]
+     *
+     * @param allowRedirects [Boolean] true if allowing, false if not
+     * @return self
+     */
+    fun allowRedirects(allowRedirects: Boolean): Request
 
-    // interceptor
-    internal lateinit var requestTransformer: RequestTransformer
-    internal lateinit var responseTransformer: ResponseTransformer
-
-    // interfaces
-    fun timeout(timeout: Int): Request {
-        timeoutInMillisecond = timeout
-        return this
-    }
-
-    fun timeoutRead(timeout: Int): Request {
-        timeoutReadInMillisecond = timeout
-        return this
-    }
+    /**
+     * Returns a string representation of the request.
+     *
+     * @see com.github.kittinunf.fuel.core.extensions.httpString
+     * @see com.github.kittinunf.fuel.core.extensions.cUrlString
+     *
+     * @return [String] the string representation
+     */
+    override fun toString(): String
 
     /**
      * Get the current values of the header, after normalisation of the header
      * @param header [String] the header name
      * @return the current values (or empty if none)
      */
-    operator fun get(header: String): HeaderValues {
-        return headers[header]
-    }
+    operator fun get(header: String): HeaderValues
 
     /**
      * Set the values of the header, overriding what's there, after normalisation of the header
@@ -106,10 +103,7 @@ class Request(
      * @param values [Collection<*>] the values to be transformed through #toString
      * @return self
      */
-    operator fun set(header: String, values: Collection<*>): Request {
-        headers[header] = values.map { it.toString() }
-        return this
-    }
+    operator fun set(header: String, values: Collection<*>): Request
 
     /**
      * Set the value of the header, overriding what's there, after normalisation of the header
@@ -117,13 +111,7 @@ class Request(
      * @param header [String] the header name
      * @param value [Any] the value to be transformed through #toString
      */
-    operator fun set(header: String, value: Any): Request {
-        when (value) {
-            is Collection<*> -> this[header] = value
-            else -> headers[header] = value.toString()
-        }
-        return this
-    }
+    operator fun set(header: String, value: Any): Request
 
     /**
      * Get the current values
@@ -131,7 +119,7 @@ class Request(
      * @see get(header: String)
      * @return [HeaderValues] the current values
      */
-    fun header(header: String) = get(header)
+    fun header(header: String): HeaderValues
 
     /**
      * Replace the headers with the map provided
@@ -146,10 +134,7 @@ class Request(
      * @param map [Map<String, Any>] map of headers to replace. Value can be a list or single value
      * @return [Request] the modified request
      */
-    fun header(map: Map<String, Any>): Request {
-        headers.putAll(Headers.from(map))
-        return this
-    }
+    fun header(map: Map<String, Any>): Request
 
     /**
      * Replace the headers with the pairs provided
@@ -164,10 +149,7 @@ class Request(
      * @param pairs [Pair<String, Any>] map of headers to replace. Value can be a list or single value
      * @return [Request] the modified request
      */
-    fun header(vararg pairs: Pair<String, Any>): Request {
-        headers.putAll(Headers.from(*pairs))
-        return this
-    }
+    fun header(vararg pairs: Pair<String, Any>): Request
 
     /**
      * Replace the header with the provided values
@@ -178,7 +160,7 @@ class Request(
      * @param values [List<Any>] the values to set the header to
      * @return [Request] the modified request
      */
-    fun header(header: String, values: Collection<*>) = set(header, values)
+    fun header(header: String, values: Collection<*>): Request
 
     /**
      * Replace the header with the provided value
@@ -189,7 +171,7 @@ class Request(
      * @param value [Any] the value to set the header to
      * @return [Request] the modified request
      */
-    fun header(header: String, value: Any): Request = set(header, value)
+    fun header(header: String, value: Any): Request
 
     /**
      * Replace the header with the provided values
@@ -200,7 +182,7 @@ class Request(
      * @param values [Any] the values to set the header to
      * @return [Request] the modified request
      */
-    fun header(header: String, vararg values: Any) = set(header, values.toList())
+    fun header(header: String, vararg values: Any): Request
 
     /**
      * Appends the value to the header or sets it if there was none yet
@@ -208,10 +190,7 @@ class Request(
      * @param header [String] the header name to append to
      * @param value [Any] the value to be transformed through #toString
      */
-    fun appendHeader(header: String, value: Any): Request {
-        headers.append(header, value)
-        return this
-    }
+    fun appendHeader(header: String, value: Any): Request
 
     /**
      * Appends the value to the header or sets it if there was none yet
@@ -219,20 +198,188 @@ class Request(
      * @param header [String] the header name to append to
      * @param values [Any] the value to be transformed through #toString
      */
-    fun appendHeader(header: String, vararg values: Any): Request {
-        headers.append(header, values.toList())
-        return this
-    }
+    fun appendHeader(header: String, vararg values: Any): Request
 
     /**
      * Append each pair, using the key as header name and value as header content
      *
      * @param pairs [Pair<String, Any>]
      */
-    fun appendHeader(vararg pairs: Pair<String, Any>): Request {
-        pairs.forEach { pair -> appendHeader(pair.first, pair.second) }
-        return this
-    }
+    fun appendHeader(vararg pairs: Pair<String, Any>): Request
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [ByteArray]
+     *
+     * @param handler [ResponseResultHandler] the handler to report the [Request], [Response] and Result of [ByteArray]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun response(handler: ResponseResultHandler<ByteArray>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [ByteArray]
+     *
+     * @param handler [ResultHandler] the handler to report the Result of [ByteArray]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun response(handler: ResultHandler<ByteArray>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [ByteArray]
+     *
+     * @param handler [ResponseHandler] the handler to report the [Request], [Response], and [ByteArray] or [FuelError]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun response(handler: ResponseHandler<ByteArray>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [ByteArray]
+     *
+     * @param handler [Handler] the handler to report the [ByteArray] or [FuelError]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun response(handler: Handler<ByteArray>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [Charsets.UTF_8] [String]
+     *
+     * @param handler [ResponseResultHandler] the handler to report the [Request], [Response] and Result of [String]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun responseString(handler: ResponseResultHandler<String>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [String]
+     *
+     * @param charset [Charset] the charset to use for the [String]
+     * @param handler [ResponseResultHandler] the handler to report the [Request], [Response] and Result of [String]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: ResponseResultHandler<String>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [Charsets.UTF_8] [String]
+     *
+     * @param handler [ResultHandler] the handler to report the Result of [String]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun responseString(handler: ResultHandler<String>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [String]
+     *
+     * @param charset [Charset] the charset to use for the [String]
+     * @param handler [ResultHandler] the handler to report the Result of [String]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: ResultHandler<String>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [Charsets.UTF_8] [String]
+     *
+     * @param handler [ResponseHandler] the handler to report the [Request], [Response], and [String] or [FuelError]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun responseString(handler: ResponseHandler<String>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [String]
+     *
+     * @param charset [Charset] the charset to use for the [String]
+     * @param handler [ResponseHandler] the handler to report the [Request], [Response], and [String] or [FuelError]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: ResponseHandler<String>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [Charsets.UTF_8] [String]
+     *
+     * @param handler [Handler] the handler to report the [String] or [FuelError]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun responseString(handler: Handler<String>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [String]
+
+     * @param charset [Charset] the charset to use for the [String]
+     * @param handler [Handler] the handler to report the [String] or [FuelError]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun responseString(charset: Charset = Charsets.UTF_8, handler: Handler<String>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [T]
+     *
+     * @param deserializer [ResponseDeserializable] instance that can turn [Response] into [T]
+     * @param handler [ResponseResultHandler] the handler to report the [Request], [Response] and Result of [T]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResponseResultHandler<T>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [T]
+     *
+     * @param deserializer [ResponseDeserializable] instance that can turn [Response] into [T]
+     * @param handler [ResponseHandler] the handler to report the [Request], [Response], and [T] or [FuelError]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResponseHandler<T>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [T]
+     *
+     * @param deserializer [ResponseDeserializable] instance that can turn [Response] into [T]
+     * @param handler [ResultHandler] the handler to report the Result of [T]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResultHandler<T>): CancellableRequest
+
+    /**
+     * Execute the [Request] asynchronously, using the [handler], into a [T]
+     *
+     * @param deserializer [ResponseDeserializable] instance that can turn [Response] into [T]
+     * @param handler [Handler] the handler to report the [T] or [FuelError]
+     * @return [CancellableRequest] the request in flight
+     */
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>): CancellableRequest
+
+    /**
+     * Execute the [Request] synchronously, into a [ByteArray]
+     *
+     * @note this is a synchronous execution and can not be cancelled
+     *
+     * @return [ResponseResultOf] the response result of [ByteArray]
+     */
+    fun response(): ResponseResultOf<ByteArray>
+
+    /**
+     * Execute the [Request] synchronously, into a [String]
+     *
+     * @note this is a synchronous execution and can not be cancelled
+     *
+     * @param charset [Charset] the character set to use for the string
+     * @return [ResponseResultOf] the response result of [String]
+     */
+    fun responseString(charset: Charset = Charsets.UTF_8): ResponseResultOf<String>
+
+    /**
+     * Execute the [Request] synchronously, into a [Charsets.UTF_8] [String]
+     *
+     * @note this is a synchronous execution and can not be cancelled
+     *
+     * @return [ResponseResultOf] the response result of [String]
+     */
+    fun responseString(): ResponseResultOf<String>
+
+    /**
+     * Execute the [Request] synchronously, into a [T]
+     *
+     * @note this is a synchronous execution and can not be cancelled
+     *
+     * @param deserializer [ResponseDeserializable] instance that can turn the [Response] into a [T]
+     * @return [ResponseResultOf] the response result of [T]
+     */
+    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>): ResponseResultOf<T>
 
     /**
      * Sets the body to be read from a generic body source.
@@ -246,10 +393,7 @@ class Request(
      *
      * @return [Request] the request
      */
-    fun body(openStream: BodySource, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request {
-        _body = DefaultBody.from(openStream = openStream, calculateLength = calculateLength, charset = charset)
-        return this
-    }
+    fun body(openStream: BodySource, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request
 
     /**
      * Sets the body from a generic stream
@@ -263,8 +407,7 @@ class Request(
      *
      * @return [Request] the request
      */
-    fun body(stream: InputStream, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8) =
-        body({ stream }, calculateLength, charset)
+    fun body(stream: InputStream, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request
 
     /**
      * Sets the body from a byte array
@@ -273,8 +416,7 @@ class Request(
      * @param charset [Charset] the charset to write with
      * @return [Request] the request
      */
-    fun body(bytes: ByteArray, charset: Charset = Charsets.UTF_8) =
-        body(ByteArrayInputStream(bytes), { bytes.size.toLong() }, charset)
+    fun body(bytes: ByteArray, charset: Charset = Charsets.UTF_8): Request
 
     /**
      * Sets the body from a string
@@ -283,8 +425,7 @@ class Request(
      * @param charset [Charset] the charset to write with
      * @return [Request] the request
      */
-    fun body(body: String, charset: Charset = Charsets.UTF_8): Request =
-        body(body.toByteArray(charset), charset)
+    fun body(body: String, charset: Charset = Charsets.UTF_8): Request
 
     /**
      * Sets the body to the contents of a file.
@@ -300,247 +441,22 @@ class Request(
      * @param charset [Charset] the charset to write with
      * @return [Request] the request
      */
-    fun body(file: File, charset: Charset = Charsets.UTF_8): Request = when (charset) {
-        Charsets.UTF_8 -> body({ FileInputStream(file) }, { file.length() }, charset)
-        else -> body({ FileInputStream(file) }, null, charset)
-    }
+    fun body(file: File, charset: Charset = Charsets.UTF_8): Request
 
     /**
-     * Set the body to a JSON string and automatically set the json content type
+     * Sets the body to a defined [Body]
+     *
+     * @param body [Body] the body to assign
+     * @return [Request] the request
      */
-    fun jsonBody(body: String, charset: Charset = Charsets.UTF_8): Request {
-        this[Headers.CONTENT_TYPE] = "application/json"
-        return body(body, charset)
-    }
-
-    fun progress(handler: ProgressCallback): Request {
-        val taskRequest = taskRequest
-        return when (taskRequest) {
-            is DownloadTaskRequest -> responseProgress(handler)
-            is UploadTaskRequest -> requestProgress(handler)
-            else -> throw UnsupportedOperationException("Use requestProgress(handler) or responseProgress(handler)")
-        }
-    }
-
-    fun requestProgress(handler: ProgressCallback): Request {
-        _requestProgress += handler
-        return this
-    }
-
-    fun responseProgress(handler: ProgressCallback): Request {
-        _responseProgress += handler
-        return this
-    }
-    /**
-     *  Replace each pair, using the key as header name and value as header content
-     */
-    fun blobs(blobs: UploadSourceCallback): Request {
-        val uploadTaskRequest = taskRequest as? UploadTaskRequest
-                ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
-        uploadTaskRequest.sourceCallback = blobs
-        return this
-    }
-
-    fun blob(blob: (Request, URL) -> Blob) = blobs { request, _ -> listOf(blob(request, request.url)) }
-
-    fun authenticate(username: String, password: String) = basicAuthentication(username, password)
-
-    fun basicAuthentication(username: String, password: String): Request {
-        val auth = "$username:$password"
-        val encodedAuth = auth.encodeBase64ToString()
-        this[Headers.AUTHORIZATION] = "Basic $encodedAuth"
-        return this
-    }
-
-    fun bearerAuthentication(bearerToken: String): Request {
-        this[Headers.AUTHORIZATION] = "Bearer $bearerToken"
-        return this
-    }
-
-    fun dataParts(dataParts: (Request, URL) -> Iterable<DataPart>): Request {
-        val uploadTaskRequest = taskRequest as? UploadTaskRequest
-                ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
-        val parts = dataParts(request, request.url)
-
-        mediaTypes.apply {
-            clear()
-            addAll(parts.map { it.type })
-        }
-
-        names.apply {
-            clear()
-            addAll(parts.map { it.name })
-        }
-
-        uploadTaskRequest.sourceCallback = { _, _ ->
-            parts.map { (file) -> Blob(file.name, file.length(), file::inputStream) }
-        }
-
-        return this
-    }
-
-    fun sources(sources: (Request, URL) -> Iterable<File>): Request {
-        mediaTypes.clear()
-        names.clear()
-
-        val uploadTaskRequest = taskRequest as? UploadTaskRequest
-                ?: throw IllegalStateException("source is only used with RequestType.UPLOAD")
-        val files = sources(request, request.url)
-
-        uploadTaskRequest.sourceCallback = { _, _ ->
-            files.map { Blob(it.name, it.length(), it::inputStream) }
-        }
-
-        return this
-    }
-
-    fun source(source: (Request, URL) -> File): Request {
-        sources { request, _ ->
-            listOf(source(request, request.url))
-        }
-
-        return this
-    }
-
-    fun name(name: () -> String): Request {
-        this.name = name()
-        return this
-    }
-
-    fun destination(destination: (Response, URL) -> File): Request {
-        val downloadTaskRequest = taskRequest as? DownloadTaskRequest
-                ?: throw IllegalStateException("destination is only used with RequestType.DOWNLOAD")
-
-        downloadTaskRequest.destinationCallback = destination
-        return this
-    }
-
-    fun interrupt(interrupt: (Request) -> Unit): Request {
-        taskRequest.apply {
-            interruptCallback = interrupt
-        }
-        return this
-    }
-
-    fun allowRedirects(allowRedirects: Boolean): Request {
-        isAllowRedirects = allowRedirects
-        return this
-    }
-
-    fun submit(callable: Callable<*>) {
-        taskFuture = executor.submit(callable)
-    }
-
-    fun callback(f: () -> Unit) {
-        callbackExecutor.execute { f() }
-    }
-
-    fun cancel(): Request {
-        taskFuture?.cancel(true)
-        return this
-    }
-
-    override val request: Request get() = this
+    fun body(body: Body): Request
 
     /**
-     * Returns a string representation of the request.
+     * Add a [InterruptCallback] to the [RequestExecutionOptions]
      *
-     * @see httpString
-     * @see cUrlString
+     * @see RequestExecutionOptions.interruptCallbacks
      *
-     * @return [String] the string representation
+     * @return self
      */
-    override fun toString(): String = buildString {
-
-        val bodyString = when {
-            body.isEmpty() -> "(empty)"
-            body.isConsumed() -> "(consumed)"
-            else -> String(body.toByteArray())
-        }
-
-        appendln("--> $url")
-        appendln("\"Body : $bodyString\"")
-        appendln("\"Headers : (${headers.size})\"")
-
-        val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
-        headers.transformIterate(appendHeaderWithValue)
-    }
-
-    /**
-     * Returns a representation that can be used over the HTTP protocol
-     *
-     * @see toString
-     * @see cUrlString
-     *
-     * @return [String] the string representation
-     */
-    fun httpString(): String = buildString {
-        // url
-        val params = parameters.joinToString(separator = "&", prefix = "?") { "${it.first}=${it.second}" }
-        appendln("${method.value} $url$params")
-        appendln()
-        // headers
-
-        val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
-        headers.transformIterate(appendHeaderWithValue)
-
-        // body
-        appendln()
-        appendln(String(body.toByteArray()))
-    }
-
-    /**
-     * Returns a representation that can be used with cURL
-     *
-     * @see toString
-     * @see httpString
-     *
-     * @return [String] the string representation
-     */
-    fun cUrlString(): String = buildString {
-        append("curl -i")
-
-        // method
-        if (method != Method.GET) {
-            append(" -X $method")
-        }
-
-        // body
-        val escapedBody = String(body.toByteArray()).replace("\"", "\\\"")
-        if (escapedBody.isNotEmpty()) {
-            append(" -d \"$escapedBody\"")
-        }
-
-        // headers
-        val appendHeaderWithValue = { key: String, value: String -> append(" -H \"$key:$value\"") }
-        headers.transformIterate(appendHeaderWithValue)
-
-        // url
-        append(" $url")
-    }
-
-    fun response(handler: HandlerWithResult<ByteArray>) =
-        response(ByteArrayDeserializer(), handler)
-    fun response(handler: Handler<ByteArray>) =
-        response(ByteArrayDeserializer(), handler)
-    fun response() =
-        response(ByteArrayDeserializer())
-
-    fun responseString(charset: Charset = Charsets.UTF_8, handler: HandlerWithResult<String>) =
-        response(StringDeserializer(charset), handler)
-    fun responseString(charset: Charset, handler: Handler<String>) =
-        response(StringDeserializer(charset), handler)
-    fun responseString(handler: Handler<String>) =
-        response(StringDeserializer(), handler)
-
-    @JvmOverloads
-    fun responseString(charset: Charset = Charsets.UTF_8) =
-        response(StringDeserializer(charset))
-
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: HandlerWithResult<T>) =
-        response(deserializer, handler)
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) =
-        response(deserializer, handler)
-    fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) =
-            response(deserializer)
+    fun interrupt(interrupt: InterruptCallback): Request
 }

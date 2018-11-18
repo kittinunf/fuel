@@ -1,8 +1,26 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.core.requests.DefaultBody
+import com.github.kittinunf.result.Result
 import java.io.ByteArrayInputStream
 import java.net.URL
 import java.net.URLConnection
+
+/**
+ * Response object that holds [Request] and [Response] metadata, as well as the result T
+ *
+ * @see ResponseResultOf
+ * @see ResponseHandler
+ */
+typealias ResponseOf<T> = Triple<Request, Response, T>
+
+/**
+ * Response object that holds [Request] and [Response] metadata, as well as a [Result] wrapping T or [FuelError]
+ *
+ * @see ResponseOf
+ * @see ResponseResultHandler
+ */
+typealias ResponseResultOf<T> = Triple<Request, Response, Result<T, FuelError>>
 
 data class Response(
     val url: URL,
@@ -30,16 +48,16 @@ data class Response(
         val contentType = guessContentType()
 
         val bodyString = when {
-            body.isEmpty() -> "empty"
-            body.isConsumed() -> "consumed"
+            body.isEmpty() -> "(empty)"
+            body.isConsumed() -> "(consumed)"
             else -> processBody(contentType, body.toByteArray())
         }
 
         return buildString {
-            appendln("<-- $statusCode ($url)")
+            appendln("<-- $statusCode $url")
             appendln("Response : $responseMessage")
             appendln("Length : $contentLength")
-            appendln("Body : ($bodyString)")
+            appendln("Body : $bodyString")
             appendln("Headers : (${headers.size})")
 
             val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
@@ -61,7 +79,7 @@ data class Response(
         return if (contentType.isNotEmpty() &&
                 (contentType.contains("image/") ||
                         contentType.contains("application/octet-stream"))) {
-            "$contentLength bytes of ${guessContentType(headers)}"
+            "($contentLength bytes of ${guessContentType(headers)})"
         } else if (bodyData.isNotEmpty()) {
             String(bodyData)
         } else {
@@ -70,7 +88,7 @@ data class Response(
     }
 
     companion object {
-        fun error(): Response = Response(URL("http://."))
+        fun error(url: URL = URL("http://.")): Response = Response(url)
     }
 }
 
