@@ -16,7 +16,7 @@ class FuelJson(val content: String) {
 }
 
 fun Request.responseJson(handler: (Request, Response, Result<FuelJson, FuelError>) -> Unit) =
-        response(jsonDeserializer(), handler)
+    response(jsonDeserializer(), handler)
 
 fun Request.responseJson(handler: ResponseHandler<FuelJson>) = response(jsonDeserializer(), handler)
 
