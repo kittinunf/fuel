@@ -29,7 +29,7 @@ import kotlin.math.max
 
 class HttpClient(
     private val proxy: Proxy? = null,
-    private var stethoHook: StethoHook? = null,
+    var stethoHook: StethoHook? = null,
     var useHttpCache: Boolean = true,
     var decodeContent: Boolean = true
 ) : Client {
@@ -171,8 +171,7 @@ class HttpClient(
         }
 
         val contentStream = dataStream(connection)?.decode(transferEncoding) ?: ByteArrayInputStream(ByteArray(0))
-        val inputStream = if (shouldDecode && contentEncoding != null) {contentStream.decode(contentEncoding)} else {contentStream}
-
+        val inputStream = if (shouldDecode && contentEncoding != null) contentStream.decode(contentEncoding) else contentStream
         val cancellationConnection = WeakReference<HttpURLConnection>(connection)
         val progressStream = ProgressInputStream(
             inputStream, onProgress = { readBytes ->
@@ -212,7 +211,6 @@ class HttpClient(
                 // We want the stream to live. Closing the stream is handled by Deserialize
             }
         } catch (exception: IOException) {
-
             // The ErrorStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures the
             // ErrorStream ís actually always closed.
             try { connection.errorStream?.close() } catch (_: IOException) {}
