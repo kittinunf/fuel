@@ -1,4 +1,4 @@
-package com.github.worker8.fuel.stetho
+package com.github.kittinunf.fuel.stetho
 
 import com.facebook.stetho.urlconnection.ByteArrayRequestEntity
 import com.facebook.stetho.urlconnection.StethoURLConnectionManager

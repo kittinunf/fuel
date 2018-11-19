@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 import java.io.Reader
-import com.github.worker8.fuel.stetho.StethoHook
+import com.github.kittinunf.fuel.stetho.StethoHook
 
 class MainActivity : AppCompatActivity() {
 
