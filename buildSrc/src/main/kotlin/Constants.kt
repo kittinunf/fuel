@@ -81,7 +81,7 @@ object KotlinX {
     }
 
     object Serialization {
-        const val version = "0.9.0"
+        const val version = "0.9.1"
         const val dependency = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$version"
         const val plugin = "kotlinx-serialization"
     }
