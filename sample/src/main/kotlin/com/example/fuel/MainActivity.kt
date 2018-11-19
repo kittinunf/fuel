@@ -30,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
-
 import java.io.Reader
 import com.github.kittinunf.fuel.stetho.StethoHook
 

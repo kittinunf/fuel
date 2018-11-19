@@ -183,8 +183,8 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
 
     private fun applyOptions(request: Request): Request {
         // Sets base headers ONLY if they are not set
-        val unsetBaseHeaders = request.headers.keys.fold(Headers.from(baseHeaders.orEmpty())) { result, it ->
-            result.remove(it); result
+        val unsetBaseHeaders = request.headers.keys.fold(Headers.from(baseHeaders.orEmpty())) {
+            result, it -> result.remove(it); result
         }
 
         return request.header(unsetBaseHeaders).apply {
