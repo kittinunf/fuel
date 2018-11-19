@@ -17,7 +17,7 @@ object Kotlin {
 }
 
 object Result {
-    const val version = "1.6.0"
+    const val version = "2.0.0"
     const val dependency = "com.github.kittinunf.result:result:$version"
 }
 
