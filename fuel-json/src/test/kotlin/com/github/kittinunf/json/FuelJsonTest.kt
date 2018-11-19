@@ -1,7 +1,10 @@
 package com.github.kittinunf.fuel.json
 
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseHandler
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.test.MockHelper
 import org.hamcrest.CoreMatchers.isA
@@ -10,6 +13,7 @@ import org.hamcrest.CoreMatchers.nullValue
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertThat
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
