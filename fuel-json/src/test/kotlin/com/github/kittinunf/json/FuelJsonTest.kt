@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel.json
 
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.test.MockHelper
 import org.hamcrest.CoreMatchers.isA
@@ -70,5 +71,24 @@ class FuelJsonTest {
         assertThat(data.obj(), isA(JSONObject::class.java))
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+    }
+
+    @Test
+    fun httpSyncRequestJsonWithHandlerTest() {
+        mock.chain(
+            request = mock.request().withPath("/get"),
+            response = mock.reflect()
+        )
+
+        mock.path("get").httpGet(listOf("hello" to "world")).responseJson(object : ResponseHandler<FuelJson> {
+            override fun success(request: Request, response: Response, value: FuelJson) {
+                assertThat(value.obj(), isA(JSONObject::class.java))
+                assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+            }
+
+            override fun failure(request: Request, response: Response, error: FuelError) {
+                fail("Expected request to succeed, actual $error")
+            }
+        })
     }
 }
