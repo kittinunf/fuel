@@ -29,6 +29,7 @@ import kotlin.math.max
 
 class HttpClient(
     private val proxy: Proxy? = null,
+    var stethoHookFactory: (() -> StethoHook)? = null,
     var stethoHook: StethoHook? = null,
     var useHttpCache: Boolean = true,
     var decodeContent: Boolean = true
@@ -78,6 +79,9 @@ class HttpClient(
     @Throws(InterruptedException::class)
     private fun sendRequest(request: Request, connection: HttpURLConnection) {
         ensureRequestActive(request, connection)
+        // make a new copy everytime, according to StethoURLConnectionManager doc,
+        // it is stateful and we should make a new one for every connection
+        stethoHook = stethoHookFactory?.invoke()
         connection.apply {
             connectTimeout = max(request.executionOptions.timeoutInMillisecond, 0)
             readTimeout = max(request.executionOptions.timeoutReadInMillisecond, 0)
@@ -115,10 +119,9 @@ class HttpClient(
             if (request.method == Method.PATCH) {
                 setRequestProperty("X-HTTP-Method-Override", Method.PATCH.value)
             }
-
+            stethoHook?.preConnect(connection, request)
             setDoOutput(connection, request.method)
             setBodyIfDoOutput(connection, request)
-            stethoHook?.preConnect(connection, request)
         }
     }
 

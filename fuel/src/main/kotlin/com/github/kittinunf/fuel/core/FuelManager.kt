@@ -26,8 +26,8 @@ typealias FoldableRequestInterceptor = (RequestTransformer) -> RequestTransforme
 typealias FoldableResponseInterceptor = (ResponseTransformer) -> ResponseTransformer
 
 class FuelManager : RequestFactory, RequestFactory.Convenience {
-    var client: Client by readWriteLazy { HttpClient(proxy, stethoHook) }
-    var stethoHook: HttpClient.StethoHook? = null
+    var client: Client by readWriteLazy { HttpClient(proxy, stethoHookFactory) }
+    var stethoHookFactory: (() -> HttpClient.StethoHook)? = null
     var proxy: Proxy? = null
     var basePath: String? = null
     var timeoutInMillisecond: Int = 15_000
