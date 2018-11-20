@@ -218,8 +218,6 @@ class HttpClient(
             // ErrorStream ís actually always closed.
             try { connection.errorStream?.close() } catch (_: IOException) {}
 
-            stethoHook?.httpExchangeFailed(exception)
-
             ByteArrayInputStream(exception.message?.toByteArray() ?: ByteArray(0))
         } finally {
             // We want the stream to live. Closing the stream is handled by Deserialize
