@@ -2,14 +2,14 @@ package com.github.kittinunf.fuel.android
 
 import android.util.JsonReader
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.android.core.Json
-import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.json.FuelJson
+import com.github.kittinunf.fuel.json.responseJson
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
@@ -148,8 +148,8 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(error, nullValue())
         assertThat(data, notNullValue())
 
-        assertThat(data as Json, isA(Json::class.java))
-        assertThat((data as Json).obj(), isA(JSONObject::class.java))
+        assertThat(data as FuelJson, isA(FuelJson::class.java))
+        assertThat((data as FuelJson).obj(), isA(JSONObject::class.java))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response?.statusCode, isEqualTo(statusCode))
@@ -167,8 +167,8 @@ class RequestAndroidAsyncTest : BaseTestCase() {
             response = mock.reflect()
         )
 
-        Fuel.get(mock.path("user-agent")).responseJson(object : ResponseHandler<Json> {
-            override fun success(request: Request, response: Response, value: Json) {
+        Fuel.get(mock.path("user-agent")).responseJson(object : ResponseHandler<FuelJson> {
+            override fun success(request: Request, response: Response, value: FuelJson) {
                 req = request
                 res = response
                 data = value
@@ -189,8 +189,8 @@ class RequestAndroidAsyncTest : BaseTestCase() {
         assertThat(res, notNullValue())
         assertThat(err, nullValue())
         assertThat(data, notNullValue())
-        assertThat(data as Json, isA(Json::class.java))
-        assertThat((data as Json).obj(), isA(JSONObject::class.java))
+        assertThat(data as FuelJson, isA(FuelJson::class.java))
+        assertThat((data as FuelJson).obj(), isA(JSONObject::class.java))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(res?.statusCode, isEqualTo(statusCode))
@@ -242,8 +242,8 @@ class RequestAndroidAsyncTest : BaseTestCase() {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        Fuel.get(mock.path("404")).responseJson(object : ResponseHandler<Json> {
-            override fun success(request: Request, response: Response, value: Json) {
+        Fuel.get(mock.path("404")).responseJson(object : ResponseHandler<FuelJson> {
+            override fun success(request: Request, response: Response, value: FuelJson) {
                 data = value
 
                 lock.countDown()
