@@ -30,7 +30,6 @@ import kotlin.math.max
 class HttpClient(
     private val proxy: Proxy? = null,
     var stethoHookFactory: (() -> StethoHook)? = null,
-    var stethoHook: StethoHook? = null,
     var useHttpCache: Boolean = true,
     var decodeContent: Boolean = true
 ) : Client {
@@ -72,16 +71,16 @@ class HttpClient(
     @Throws
     private fun doRequest(request: Request): Response {
         val connection = establishConnection(request) as HttpURLConnection
-        sendRequest(request, connection)
-        return retrieveResponse(request, connection)
+        val stethoHook = stethoHookFactory?.invoke()
+        sendRequest(request, connection, stethoHook)
+        return retrieveResponse(request, connection, stethoHook)
     }
 
     @Throws(InterruptedException::class)
-    private fun sendRequest(request: Request, connection: HttpURLConnection) {
+    private fun sendRequest(request: Request, connection: HttpURLConnection, stethoHook: StethoHook?) {
         ensureRequestActive(request, connection)
         // make a new copy everytime, according to StethoURLConnectionManager doc,
         // it is stateful and we should make a new one for every connection
-        stethoHook = stethoHookFactory?.invoke()
         connection.apply {
             connectTimeout = max(request.executionOptions.timeoutInMillisecond, 0)
             readTimeout = max(request.executionOptions.timeoutReadInMillisecond, 0)
@@ -126,7 +125,7 @@ class HttpClient(
     }
 
     @Throws
-    private fun retrieveResponse(request: Request, connection: HttpURLConnection): Response {
+    private fun retrieveResponse(request: Request, connection: HttpURLConnection, stethoHook: StethoHook?): Response {
         ensureRequestActive(request, connection)
 
         val headers = Headers.from(connection.headerFields)
@@ -173,7 +172,7 @@ class HttpClient(
             contentLength = -1
         }
 
-        val contentStream = dataStream(connection)?.decode(transferEncoding) ?: ByteArrayInputStream(ByteArray(0))
+        val contentStream = dataStream(connection, stethoHook)?.decode(transferEncoding) ?: ByteArrayInputStream(ByteArray(0))
         val inputStream = if (shouldDecode && contentEncoding != null) contentStream.decode(contentEncoding) else contentStream
         val cancellationConnection = WeakReference<HttpURLConnection>(connection)
         val progressStream = ProgressInputStream(
@@ -198,7 +197,7 @@ class HttpClient(
         )
     }
 
-    private fun dataStream(connection: HttpURLConnection): InputStream? {
+    private fun dataStream(connection: HttpURLConnection, stethoHook: StethoHook?): InputStream? {
         return try {
             try {
                 val inputStream = stethoHook?.interpretResponseStream(connection.inputStream) ?: connection.inputStream
