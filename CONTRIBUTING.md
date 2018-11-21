@@ -54,6 +54,15 @@ curl -sSLO https://github.com/shyiko/ktlint/releases/download/0.29.0/ktlint &&
 ktlint --install-git-pre-commit-hook
 ```
 
+### .editorconfig
+Alternatively, if you prefer to format the code in your editor, you can use the `.editorconfig` file provided by [`ktlint`](https://github.com/shyiko/ktlint/blob/master/.editorconfig). `.editorconfig` works well with many editors ([read more](https://editorconfig.org/)).
+
+You can grab a copy of the `.editorconfig` by running the following command in the project root.
+```
+$ curl -O https://raw.githubusercontent.com/shyiko/ktlint/master/.editorconfig
+```
+
+### Read more about ktlint
 For more detailed instruction, please visit [ktlint](https://github.com/shyiko/ktlint) repository.
 
 
