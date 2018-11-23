@@ -155,6 +155,7 @@ subprojects {
         bintray {
             user = findProperty("BINTRAY_USER") as? String
             key = findProperty("BINTRAY_KEY") as? String
+            override = Fuel.isMasterSnapshot()
             setPublications(project.name)
             with(pkg) {
                 repo = "maven"
