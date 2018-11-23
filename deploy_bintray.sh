@@ -14,3 +14,18 @@ if [[ "$TRAVIS_BRANCH" == */release-v* ]]; then
   done
 
 fi
+
+if [[ "$TRAVIS_BRANCH" == master ]]; then
+
+  echo "We're on master branch, deploying SNAPSHOT"
+
+  for i in $(ls -d */);
+  do
+    m=${i%%/}
+    if [[ $m == fuel* ]]; then
+      echo ">> Deploying $m ..."
+      ./gradlew :$m:clean :$m:build :$m:bintrayUpload -PBINTRAY_USER=$BINTRAY_USER -PBINTRAY_KEY=$BINTRAY_KEY -PdryRun=false -Ppublish=true
+    fi
+  done
+
+fi

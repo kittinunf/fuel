@@ -26,10 +26,12 @@ allprojects {
 
 val androidModules = listOf("fuel-android", "fuel-livedata")
 val androidSampleModules = listOf("sample")
+val testModules = listOf("fuel-test")
 
 subprojects {
     val isAndroidModule = project.name in androidModules
     val isSample = project.name in androidSampleModules
+    val isTest = project.name in testModules
     val isJvmModule = !isAndroidModule && !isSample
 
     if (isJvmModule) {
@@ -139,7 +141,7 @@ subprojects {
         }
     }
 
-    if (!isSample) {
+    if (!isSample && !isTest) {
         apply {
             plugin(Release.MavenPublish.plugin)
             plugin(Release.Bintray.plugin)
@@ -155,7 +157,7 @@ subprojects {
         bintray {
             user = findProperty("BINTRAY_USER") as? String
             key = findProperty("BINTRAY_KEY") as? String
-            override = Fuel.isMasterSnapshot()
+            override = Fuel.isMasterSnapshot
             setPublications(project.name)
             with(pkg) {
                 repo = "maven"

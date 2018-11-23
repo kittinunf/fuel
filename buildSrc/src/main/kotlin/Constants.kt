@@ -1,15 +1,16 @@
 // Library version
 object Fuel {
-    const val version = "1.16.0"
+    const val version = "2.0.0"
 
-    var publishVersion = if (isMasterSnapshot()) "master-SNAPSHOT" else version
+    var publishVersion = if (isMasterSnapshot) "$version-SNAPSHOT" else version
 
     const val groupId = "com.github.kittinunf.fuel"
 
     const val compileSdkVersion = 27
     const val minSdkVersion = 19
 
-    fun isMasterSnapshot() = System.getenv("TRAVIS_BRANCH") == "master"
+    val isMasterSnapshot
+        get() = System.getenv("TRAVIS_BRANCH") == "master"
 }
 
 // Core dependencies
