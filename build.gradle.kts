@@ -25,7 +25,7 @@ allprojects {
 }
 
 val androidModules = listOf("fuel-android", "fuel-livedata")
-val androidSampleModules = listOf("sample", "sample-java")
+val androidSampleModules = listOf("sample")
 
 subprojects {
     val isAndroidModule = project.name in androidModules
