@@ -36,7 +36,7 @@ Each of the extensions / integrations has to be installed separately.
 | Package | Description |
 |----------|---------|
 | [`fuel`](./fuel) | Core package |
-| [`fuel-coroutines`](./fuel-coroutines) | _KotlinX_: Execution with [coroutines]((https://github.com/Kotlin/kotlinx.coroutines)) |
+| [`fuel-coroutines`](./fuel-coroutines) | _KotlinX_: Execution with [coroutines](https://github.com/Kotlin/kotlinx.coroutines) |
 | [`fuel-android`](./fuel-android) |  _Android_: Automatically invoke handler on Main Thread when using Android Module |
 | [`fuel-livedata`](./fuel-livedata) | _Android Architectures_: Responses as [`LiveData`](https://developer.android.com/topic/libraries/architecture/livedata.html) |
 | [`fuel-rxjava`](./fuel-rxjava) | _Reactive Programming_: Responses as [`Single`](http://reactivex.io/RxJava/2.x/javadoc/io/reactivex/Single.html) (**RxJava 2.x**)
