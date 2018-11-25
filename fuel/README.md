@@ -512,6 +512,8 @@ Fuel.download("https://httpbin.org/bytes/32768")
     .response { result -> }
 ```
 
+For more information, check Result's [documentation](https://github.com/kittinunf/Result/README.md)
+
 ### Cancel an async `Request`
 The `response` functions called with a `handler` are async and return a `CancellableRequest`. These requests expose a few extra functions that can be used to control the `Future` that should resolve a response:
 
@@ -607,18 +609,19 @@ FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
 * `Headers` can be added to a request via various methods including
 
 ```kotlin 
-fun header(name: String, value: Any): Request`: `request.header("foo", "a")`
-fun header(pairs: Map<String, Any>): Request`: `request.header(mapOf("foo" to "a"))`
-fun header(vararg pairs: Pair<String, Any>): Request`: `request.header("foo" to "a")`
+fun header(name: String, value: Any): Request: request.header("foo", "a")
+fun header(pairs: Map<String, Any>): Request: request.header(mapOf("foo" to "a"))
+fun header(vararg pairs: Pair<String, Any>): Request`: `request.header("foo" to "a")
 
-operator fun set(header: String, value: Collection<Any>): Request`: `request["foo"] = listOf("a", "b")`
-operator fun set(header: String, value: Any): Request`: `request["foo"] = "a"`
+operator fun set(header: String, value: Collection<Any>): Request: request["foo"] = listOf("a", "b")
+operator fun set(header: String, value: Any): Request: request["foo"] = "a"
 ```
     
 * By default, all subsequent calls overwrite earlier calls, but you may use the `appendHeader` variant to append values to existing values.
     - In earlier versions a `mapOf` overwrote, and `varargs pair` did not, but this was confusing.
     
 * Some of the HTTP headers are defined under `Headers.Companion` and can be used instead of literal strings.
+
 ```kotlin
 Fuel.post("/my-post-path")
    .header(Headers.ACCEPT, "text/html, */*; q=0.1")
@@ -656,7 +659,7 @@ Fuel.get("/get").response { request, response, result ->
 * `hostnameVerifier` is configurable by user. By default, it uses `HttpsURLConnection.getDefaultHostnameVerifier()`.
 
 * `requestInterceptors` `responseInterceptors` is a side-effect to add to `Request` and/or `Response` objects.
-    - For example, one might wanna print cUrlString style for every request that hits server in DEBUG mode.
+  - For example, one might wanna print cUrlString style for every request that hits server in DEBUG mode.
     
 ```kotlin
 val manager = FuelManager()
@@ -668,7 +671,7 @@ if (BUILD_DEBUG) {
 val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response() //it will print curl -i -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" "https://httpbin.org/get"
 ```
 
-    - Another example is that you might wanna add data into your Database, you can achieve that with providing `responseInterceptors` such as
+  - Another example is that you might wanna add data into your Database, you can achieve that with providing `responseInterceptors` such as
 
 ```kotlin
 inline fun <reified T> DbResponseInterceptor() =
@@ -692,6 +695,7 @@ manager.request(Method.GET, "https://www.example.com/api/dog/1").response() // D
 In order to organize better your network stack FuelRouting interface allows you to easily setup a Router design pattern.
 
 ```kotlin
+// Router Definition
 sealed class WeatherApi: FuelRouting {
 
     override val basePath = "https://www.metaweather.com"
@@ -730,9 +734,9 @@ sealed class WeatherApi: FuelRouting {
 Fuel.request(WeatherApi.weatherFor("london"))
     .responseJson { request, response, result ->
         result.fold(success = { json ->
-            Log.d("qdp success", json.array().toString())
+            Log.d("Success", json.array().toString())
         }, failure = { error ->
-            Log.e("qdp error", error.toString())
+            Log.e("Failure", error.toString())
         })
     }
 ```
