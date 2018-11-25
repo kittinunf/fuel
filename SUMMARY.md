@@ -16,6 +16,7 @@
 * [Forge](fuel-forge/README.md)
 * [Gson](fuel-gson/README.md)
 * [Jackson](fuel-jackson/README.md)
+* [Json](fuel-json/README.md)
 * [Kotlinx-Serialization](fuel-kotlinx-serialization/README.md)
 * [Moshi](fuel-moshi/README.md)
 

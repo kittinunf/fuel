@@ -1,4 +1,4 @@
-# fuel-forge
+# fuel-gson
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.3.10-blue.svg)](https://kotlinlang.org)
 
 The gson extension package for [`Fuel`](../README.md).
@@ -25,6 +25,7 @@ See `FuelGson.kt`
 
 ```kotlin
 data class HttpBinUserAgentModel(var userAgent: String = "")
+
 Fuel.get("/user-agent")
     .responseObject<HttpBinUserAgentModel> { _, _, result -> }
 ```
