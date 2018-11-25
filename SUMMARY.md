@@ -22,5 +22,5 @@
 
 ## Legacy
 
-* [v1.x.y] (README.legacy.md)
+* [v1.x.y](README-legacy.md)
 
