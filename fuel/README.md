@@ -534,6 +534,7 @@ At this moment `blocking` requests *can not* be cancelled.
 ### Response Deserialization
 
 * Fuel provides built-in support for response deserialization. Here is how one might want to use Fuel together with [Gson](https://github.com/google/gson)
+
 ```kotlin
 //User Model
 data class User(val firstName: String = "",
@@ -559,7 +560,7 @@ data class User(val firstName: String = "",
 
 * There are 4 methods to support response deserialization depending on your needs (also depending on JSON parsing library of your choice), and you are required to implement only one of them.
 
-    ```kotlin
+```kotlin
     fun deserialize(bytes: ByteArray): T?
 
     fun deserialize(inputStream: InputStream): T?
@@ -567,74 +568,84 @@ data class User(val firstName: String = "",
     fun deserialize(reader: Reader): T?
 
     fun deserialize(content: String): T?
-    ```
+```
 
 * Another example may be parsing a website that is not UTF-8. By default, Fuel serializes text as UTF-8, we need to define our deserializer as such
 
-    ```kotlin
+```kotlin
     object Windows1255StringDeserializer : ResponseDeserializable<String> {
         override fun deserialize(bytes: ByteArray): String {
             return String(bytes, "windows-1255")
         }
     }
-    ```
+```
 
-### Configuration
+### Detail Configuration
 
 * Use singleton `FuelManager.instance` to manage global configurations.
+
 * Create separate managers using `FuelManager()`
 
 * `basePath` is used to manage common root path. Great usage is for your static API endpoint.
-    ```kotlin
+
+```kotlin
     FuelManager.instance.basePath = "https://httpbin.org"
 
     // Later
     Fuel.get("/get").response { request, response, result ->
         //make request to https://httpbin.org/get because Fuel.{get|post|put|delete} use FuelManager.instance to make HTTP request
     }
-    ```
+```
 
 * `baseHeaders` is to manage common HTTP header pairs in format of `Map<String, String>`.
     - The base headers are only applied if the request does not have those headers set.
-    ```kotlin
+    
+```kotlin
     FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
-    ```
+```
 
 * `Headers` can be added to a request via various methods including
-    - `fun header(name: String, value: Any): Request`: `request.header("foo", "a")`
-    - `fun header(pairs: Map<String, Any>): Request`: `request.header(mapOf("foo" to "a"))`
-    - `fun header(vararg pairs: Pair<String, Any>): Request`: `request.header("foo" to "a")`
-    - `operator fun set(header: String, value: Collection<Any>): Request`: `request["foo"] = listOf("a", "b")`
-    - `operator fun set(header: String, value: Any): Request`: `request["foo"] = "a"`
+
+```kotlin 
+    fun header(name: String, value: Any): Request`: `request.header("foo", "a")`
+    fun header(pairs: Map<String, Any>): Request`: `request.header(mapOf("foo" to "a"))`
+    fun header(vararg pairs: Pair<String, Any>): Request`: `request.header("foo" to "a")`
+
+    operator fun set(header: String, value: Collection<Any>): Request`: `request["foo"] = listOf("a", "b")`
+    operator fun set(header: String, value: Any): Request`: `request["foo"] = "a"`
+```
+    
 * By default, all subsequent calls overwrite earlier calls, but you may use the `appendHeader` variant to append values to existing values.
     - In earlier versions a `mapOf` overwrote, and `varargs pair` did not, but this was confusing.
+    
 * Some of the HTTP headers are defined under `Headers.Companion` and can be used instead of literal strings.
-    ```kotlin
+```kotlin
     Fuel.post("/my-post-path")
-        .header(Headers.ACCEPT, "text/html, */*; q=0.1")
-        .header(Headers.CONTENT_TYPE, "image/png")
-        .header(Headers.COOKIE to "basic=very")
-        .appendHeader(Headers.COOKIE to "value_1=foo", Headers.COOKIE to "value_2=bar", Headers.ACCEPT to "application/json")
-        .appendHeader("MyFoo" to "bar", "MyFoo" to "baz")
-        .response { /*...*/ }
-
-     // => request with:
-     //    Headers:
-     //      Accept: "text/html, */*; q=0.1, application/json"
-     //      Content-Type: "image/png"
-     //      Cookie: "basic=very; value_1=foo; value_2=bar"
-     //      MyFoo: "bar, baz"
-    ```
+       .header(Headers.ACCEPT, "text/html, */*; q=0.1")
+       .header(Headers.CONTENT_TYPE, "image/png")
+       .header(Headers.COOKIE to "basic=very")
+       .appendHeader(Headers.COOKIE to "value_1=foo", Headers.COOKIE to "value_2=bar", Headers.ACCEPT to "application/json")
+       .appendHeader("MyFoo" to "bar", "MyFoo" to "baz")
+       .response { /*...*/ }
+    
+    // => request with:
+    //    Headers:
+    //      Accept: "text/html, */*; q=0.1, application/json"
+    //      Content-Type: "image/png"
+    //      Cookie: "basic=very; value_1=foo; value_2=bar"
+    //      MyFoo: "bar, baz"
+```
 
 * `baseParams` is used to manage common `key=value` query param, which will be automatically included in all of your subsequent requests in format of ` Parameters` (`Any` is converted to `String` by `toString()` method)
-    ```kotlin
+
+```kotlin
     FuelManager.instance.baseParams = listOf("api_key" to "1234567890")
 
     // Later
     Fuel.get("/get").response { request, response, result ->
         //make request to https://httpbin.org/get?api_key=1234567890
     }
-    ```
+```
 
 * `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/core/Client.kt) protocol, and set back to `FuelManager.instance` to kick off the effect.
 
@@ -646,38 +657,39 @@ data class User(val firstName: String = "",
 
 * `requestInterceptors` `responseInterceptors` is a side-effect to add to `Request` and/or `Response` objects.
     - For example, one might wanna print cUrlString style for every request that hits server in DEBUG mode.
-        ```kotlin
-        val manager = FuelManager()
-        if (BUILD_DEBUG) {
-            manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
-        }
-        val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response() //it will print curl -i -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" "https://httpbin.org/get"
-        ```
+    
+```kotlin
+    val manager = FuelManager()
+    if (BUILD_DEBUG) {
+        manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
+    }
+    val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response() //it will print curl -i -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" "https://httpbin.org/get"
+```
 
     - Another example is that you might wanna add data into your Database, you can achieve that with providing `responseInterceptors` such as
 
-        ```kotlin
-        inline fun <reified T> DbResponseInterceptor() =
-            { next: (Request, Response) -> Response ->
-                { req: Request, res: Response ->
-                    val db = DB.getInstance()
-                    val instance = Parser.getInstance().parse(res.data, T::class)
-                    db.transaction {
-                        it.copyToDB(instance)
-                    }
-                    next(req, res)
+```kotlin
+    inline fun <reified T> DbResponseInterceptor() =
+        { next: (Request, Response) -> Response ->
+            { req: Request, res: Response ->
+                val db = DB.getInstance()
+                val instance = Parser.getInstance().parse(res.data, T::class)
+                db.transaction {
+                    it.copyToDB(instance)
                 }
+                next(req, res)
             }
+        }
 
-        manager.addResponseInterceptor(DBResponseInterceptor<Dog>)
-        manager.request(Method.GET, "https://www.example.com/api/dog/1").response() // Db interceptor will be called to intercept data and save into Database of your choice
-        ```
+    manager.addResponseInterceptor(DBResponseInterceptor<Dog>)
+    manager.request(Method.GET, "https://www.example.com/api/dog/1").response() // Db interceptor will be called to intercept data and save into Database of your choice
+```
 
 ### Routing Support
 
 In order to organize better your network stack FuelRouting interface allows you to easily setup a Router design pattern.
 
-```Kotlin
+```kotlin
 sealed class WeatherApi: FuelRouting {
 
     override val basePath = "https://www.metaweather.com"
@@ -711,7 +723,6 @@ sealed class WeatherApi: FuelRouting {
         }
 
 }
-
 
 // Usage
 Fuel.request(WeatherApi.weatherFor("london"))
