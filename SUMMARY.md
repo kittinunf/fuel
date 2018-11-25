@@ -1,7 +1,7 @@
 # Summary
 
 ## Core
-* [Fuel (core)](fuel/README.md)
+* [Fuel](fuel/README.md)
 
 ## Support
 ​
@@ -19,4 +19,8 @@
 * [Json](fuel-json/README.md)
 * [Kotlinx-Serialization](fuel-kotlinx-serialization/README.md)
 * [Moshi](fuel-moshi/README.md)
+
+## Legacy
+
+* [v1.x.y] (README.legacy.md)
 
