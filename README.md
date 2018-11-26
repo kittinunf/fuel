@@ -36,13 +36,14 @@ Each of the extensions / integrations has to be installed separately.
 | Package | Description |
 |----------|---------|
 | [`fuel`](./fuel) | Core package |
-| [`fuel-coroutines`](./fuel-coroutines) | _KotlinX_: Execution with [coroutines]((https://github.com/Kotlin/kotlinx.coroutines)) |
+| [`fuel-coroutines`](./fuel-coroutines) | _KotlinX_: Execution with [coroutines](https://github.com/Kotlin/kotlinx.coroutines) |
 | [`fuel-android`](./fuel-android) |  _Android_: Automatically invoke handler on Main Thread when using Android Module |
 | [`fuel-livedata`](./fuel-livedata) | _Android Architectures_: Responses as [`LiveData`](https://developer.android.com/topic/libraries/architecture/livedata.html) |
 | [`fuel-rxjava`](./fuel-rxjava) | _Reactive Programming_: Responses as [`Single`](http://reactivex.io/RxJava/2.x/javadoc/io/reactivex/Single.html) (**RxJava 2.x**)
 | [`fuel-reactor`](./fuel-reactor) | _Reactive Programming_: Responses as [`Mono`](https://projectreactor.io/docs/core/release/reference/#mono) (**Project Reactor 3.x**)
 | [`fuel-gson`](./fuel-gson) | _(De)serialization_: [`Gson`](https://github.com/google/gson) |
 | [`fuel-kotlinx-serialization`](/fuel-kotlinx-serialization) | _(De)serialization_: [`KotlinX Serialization`](https://github.com/Kotlin/kotlinx.serialization) |
+| [`fuel-json`](/fuel-json) | _Deserialization_: [`Json`](http://www.json.org/) |
 | [`fuel-forge`](./fuel-forge) | _Deserialization_: [`Forge`](https://github.com/kittinunf/Forge/) |
 | [`fuel-jackson`](./fuel-jackson) | _Deserialization_: [`Jackson`](https://github.com/FasterXML/jackson-module-kotlin)
 | [`fuel-moshi`](./fuel-moshi) | _Deserialization_: [`Moshi`](https://github.com/square/moshi)  |
@@ -100,6 +101,7 @@ Check each of the packages documentations or the Wiki for more features, usages 
 - [`fuel-forge`: Deserialization with Forge](./fuel-forge/README.md)
 - [`fuel-jackson`: Deserialization with Jackson](./fuel-jackson/README.md)
 - [`fuel-moshi`: Deserialization with Moshi](./fuel-moshi/README.md)
+- [`fuel-json`: Deserialization with Json](./fuel-json/README.md)
 
 
 ## Other libraries

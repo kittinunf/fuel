@@ -314,40 +314,44 @@ By default, `authentication` is passed on when using the default `redirectRespon
 
 > When you call `.authentication()`, a few extra functions are available. If you call a regular function (e.g. `.header()`) the extra functions are no longer available, but you can safely call `.authentication()` again without losing any previous calls.
 
-
 *  *Basic* authentication
-    ```kotlin
-    val username = "username"
-    val password = "abcd1234"
 
-    Fuel.get("https://httpbin.org/basic-auth/$user/$password")
-        .authentication()
-        .basic(username, password)
-        .response { result -> }
-    ```
+```kotlin
+val username = "username"
+val password = "abcd1234"
+
+Fuel.get("https://httpbin.org/basic-auth/$user/$password")
+    .authentication()
+    .basic(username, password)
+    .response { result -> }
+```
 
 * *Bearer* authentication
-    ```kotlin
-    val token = "mytoken"
 
-    Fuel.get("https://httpbin.org/bearer")
-        .authentication()
-        .bearer(token)
-        .response { result -> }
-    ```
+```kotlin
+val token = "mytoken"
+
+Fuel.get("https://httpbin.org/bearer")
+    .authentication()
+    .bearer(token)
+    .response { result -> }
+```
 
 * Any authentication using a header
-    ```kotlin
-    Fuel.get("https://httpbin.org/anything")
-        .header(Headers.AUTHORIZATION, "Custom secret")
-        .response { result -> }
-    ```
+
+```kotlin
+Fuel.get("https://httpbin.org/anything")
+    .header(Headers.AUTHORIZATION, "Custom secret")
+    .response { result -> }
+```
 
 ### Adding Progress callbacks
+
 Any request supports `Progress` callbacks when uploading or downloading a body; the `Connection` header does not support progress (which is the only thing that is sent if there are no bodies).
 You can have as many progress handlers of each type as you like.
 
 #### Request progress
+
 ```kotlin
 Fuel.post("/post")
     .body(...)
@@ -359,6 +363,7 @@ Fuel.post("/post")
 ```
 
 #### Response progress
+
 ```kotlin
 Fuel.get("/get")
     .responseProgress { readBytes, totalBytes ->
@@ -369,9 +374,11 @@ Fuel.get("/get")
 ```
 
 #### Why does totalBytes increase?
+
 Not all source `Body` or `Response` `Body` report their total size. If the size is not known, the current size will be reported. This means that you will constantly get an increasing amount of totalBytes that equals readBytes.
 
 ### Using `multipart/form-data` (`UploadRequest`)
+
 Fuel supports multipart uploads using the `.upload()` feature. You can turn _any_ `Request` into a upload request by calling `.upload()` or call `.upload(method = Method.POST)` directly onto `Fuel` / `FuelManager`.
 
 > When you call `.upload()`, a few extra functions are available. If you call a regular function (e.g. `.header()`) the extra functions are no longer available, but you can safely call `.upload()` again without losing any previous calls.
@@ -392,6 +399,7 @@ Fuel.upload("/post")
 ```
 
 #### `Content-Type` and field names using `DataPart`
+
 The `DataPart` type can be used to add metadata to the files you're uploading. Currently supported are field name and `Content-Type`:
 
 ```Kotlin
@@ -407,7 +415,9 @@ Fuel.upload("/post")
 ```
 
 #### Multipart request without a file
+
 By providing an empty list you can make a request without any files:
+
 ```kotlin
 val formData = listOf("Email" to "mail@example.com", "Name" to "Joe Smith" )
 
@@ -417,6 +427,7 @@ Fuel.upload("/post", param = formData)
 ```
 
 #### `InputStream` sources using `Blob`
+
 If your data comes from arbitrary `InpuStream`s, you can use `Blob` to add these to the form-data.
 
 ```kotlin
@@ -425,13 +436,16 @@ Fuel.upload("/post")
 ```
 
 #### Limitations
+
 - The upload API will soon be overhauled to enable metadata for any source and therefore allowing uploads without the need to create temporary files.
 - If you set `Content-Type` using `.header()`, make sure to include a valid `boundary=`
 
 ### Getting a Response
+
 As mentioned before, you can use `Fuel` both synchronously and a-synchronously, with support for coroutines.
 
 #### Blocking responses
+
 By default, there are three response functions to get a request synchronously:
 
 | function | arguments | result |
@@ -443,6 +457,7 @@ By default, there are three response functions to get a request synchronously:
 The default charset is `UTF-8`. If you want to implement your own deserializers, scroll down to advanced usage.
 
 #### Async responses
+
 Add a handler to a blocking function, to make it asynchronous:
 
 | function | arguments | result |
@@ -454,6 +469,7 @@ Add a handler to a blocking function, to make it asynchronous:
 The default charset is `UTF-8`. If you want to implement your own deserializers, scroll down to advanced usage.
 
 #### Suspended responses
+
 The core package has limited support for coroutines:
 
 | function | arguments | result |
@@ -466,12 +482,14 @@ The core package has limited support for coroutines:
 When using other packages such as `fuel-coroutines`, more response/await functions are available.
 
 #### Response types
+
 - The `ResponseResultOf<U>` type is a `Triple` of the `Request`, `Response` and a `Result<U, FuelError>`
 - The `ResponseOf<U>` type is a `Triple` of the `Request`, `Response` and a `U`; errors are thrown
 - The `Result<U, FuelError>` type is a non-throwing wrapper around `U`
 - The `U` type doesn't wrap anything; errors are thrown
 
 #### Handler types
+
 When defining a handler, you can use one of the following for all `responseXXX` functions that accept a `Handler`:
 
 | type | handler fns | arguments | description |
@@ -493,6 +511,7 @@ Working with result is easy:
 - use `when` checking whether it is `Result.Success` or `Result.Failure`
 
 #### Download response to file
+
 Fuel supports downloading the request `Body` to a file using the `.download()` feature. You can turn _any_ `Request` into a download request by calling `.download()` or call `.download(method = Method.GET)` directly onto `Fuel` / `FuelManager`.
 
 > When you call `.download()`, a few extra functions are available. If you call a regular function (e.g. `.header()`) the extra functions are no longer available, but you can safely call `.download()` again without losing any previous calls.
@@ -512,7 +531,10 @@ Fuel.download("https://httpbin.org/bytes/32768")
     .response { result -> }
 ```
 
+For more information, check Result's [documentation](https://github.com/kittinunf/Result/README.md)
+
 ### Cancel an async `Request`
+
 The `response` functions called with a `handler` are async and return a `CancellableRequest`. These requests expose a few extra functions that can be used to control the `Future` that should resolve a response:
 
 ```kotlin
@@ -531,9 +553,58 @@ At this moment `blocking` requests *can not* be cancelled.
 
 ## Advanced Configuration
 
+### Request Configuration
+
+* `baseHeaders` is to manage common HTTP header pairs in format of `Map<String, String>`.
+  - The base headers are only applied if the request does not have those headers set.
+    
+```kotlin
+FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
+```
+
+* `Headers` can be added to a request via various methods including
+
+```kotlin
+fun header(name: String, value: Any): Request: request.header("foo", "a")
+fun header(pairs: Map<String, Any>): Request: request.header(mapOf("foo" to "a"))
+fun header(vararg pairs: Pair<String, Any>): Request: request.header("foo" to "a")
+
+operator fun set(header: String, value: Collection<Any>): Request: request["foo"] = listOf("a", "b")
+operator fun set(header: String, value: Any): Request: request["foo"] = "a"
+```
+    
+* By default, all subsequent calls overwrite earlier calls, but you may use the `appendHeader` variant to append values to existing values.
+  - In earlier versions (1.x.y), a `mapOf` overwrote, and `varargs pair` did not, but this was confusing. In 2.0, this issue has been fixed and improved so it works as expected.
+  
+```kotlin
+fun appendHeader(header: String, value: Any): Request
+fun appendHeader(header: String, vararg values: Any): Request
+fun appendHeader(vararg pairs: Pair<String, Any>): Request
+```
+
+* Some of the HTTP headers are defined under `Headers.Companion` and can be used instead of literal strings. This is an encouraged way to configure your header in 2.x.y.
+
+```kotlin
+Fuel.post("/my-post-path")
+   .header(Headers.ACCEPT, "text/html, */*; q=0.1")
+   .header(Headers.CONTENT_TYPE, "image/png")
+   .header(Headers.COOKIE to "basic=very")
+   .appendHeader(Headers.COOKIE to "value_1=foo", Headers.COOKIE to "value_2=bar", Headers.ACCEPT to "application/json")
+   .appendHeader("MyFoo" to "bar", "MyFoo" to "baz")
+   .response { /*...*/ }
+
+// => request with:
+//    Headers:
+//      Accept: "text/html, */*; q=0.1, application/json"
+//      Content-Type: "image/png"
+//      Cookie: "basic=very; value_1=foo; value_2=bar"
+//      MyFoo: "bar, baz"
+```
+
 ### Response Deserialization
 
 * Fuel provides built-in support for response deserialization. Here is how one might want to use Fuel together with [Gson](https://github.com/google/gson)
+
 ```kotlin
 //User Model
 data class User(val firstName: String = "",
@@ -559,82 +630,50 @@ data class User(val firstName: String = "",
 
 * There are 4 methods to support response deserialization depending on your needs (also depending on JSON parsing library of your choice), and you are required to implement only one of them.
 
-    ```kotlin
-    fun deserialize(bytes: ByteArray): T?
-
-    fun deserialize(inputStream: InputStream): T?
-
-    fun deserialize(reader: Reader): T?
-
-    fun deserialize(content: String): T?
-    ```
+```kotlin
+fun deserialize(bytes: ByteArray): T?
+fun deserialize(inputStream: InputStream): T?
+fun deserialize(reader: Reader): T?
+fun deserialize(content: String): T?
+```
 
 * Another example may be parsing a website that is not UTF-8. By default, Fuel serializes text as UTF-8, we need to define our deserializer as such
 
-    ```kotlin
-    object Windows1255StringDeserializer : ResponseDeserializable<String> {
-        override fun deserialize(bytes: ByteArray): String {
-            return String(bytes, "windows-1255")
-        }
+```kotlin
+object Windows1255StringDeserializer : ResponseDeserializable<String> {
+    override fun deserialize(bytes: ByteArray): String {
+        return String(bytes, "windows-1255")
     }
-    ```
+}
+```
 
-### Configuration
+### Detail Configuration
 
 * Use singleton `FuelManager.instance` to manage global configurations.
+
 * Create separate managers using `FuelManager()`
 
 * `basePath` is used to manage common root path. Great usage is for your static API endpoint.
-    ```kotlin
-    FuelManager.instance.basePath = "https://httpbin.org"
 
-    // Later
-    Fuel.get("/get").response { request, response, result ->
-        //make request to https://httpbin.org/get because Fuel.{get|post|put|delete} use FuelManager.instance to make HTTP request
-    }
-    ```
+```kotlin
+FuelManager.instance.basePath = "https://httpbin.org"
 
-* `baseHeaders` is to manage common HTTP header pairs in format of `Map<String, String>`.
-    - The base headers are only applied if the request does not have those headers set.
-    ```kotlin
-    FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
-    ```
-
-* `Headers` can be added to a request via various methods including
-    - `fun header(name: String, value: Any): Request`: `request.header("foo", "a")`
-    - `fun header(pairs: Map<String, Any>): Request`: `request.header(mapOf("foo" to "a"))`
-    - `fun header(vararg pairs: Pair<String, Any>): Request`: `request.header("foo" to "a")`
-    - `operator fun set(header: String, value: Collection<Any>): Request`: `request["foo"] = listOf("a", "b")`
-    - `operator fun set(header: String, value: Any): Request`: `request["foo"] = "a"`
-* By default, all subsequent calls overwrite earlier calls, but you may use the `appendHeader` variant to append values to existing values.
-    - In earlier versions a `mapOf` overwrote, and `varargs pair` did not, but this was confusing.
-* Some of the HTTP headers are defined under `Headers.Companion` and can be used instead of literal strings.
-    ```kotlin
-    Fuel.post("/my-post-path")
-        .header(Headers.ACCEPT, "text/html, */*; q=0.1")
-        .header(Headers.CONTENT_TYPE, "image/png")
-        .header(Headers.COOKIE to "basic=very")
-        .appendHeader(Headers.COOKIE to "value_1=foo", Headers.COOKIE to "value_2=bar", Headers.ACCEPT to "application/json")
-        .appendHeader("MyFoo" to "bar", "MyFoo" to "baz")
-        .response { /*...*/ }
-
-     // => request with:
-     //    Headers:
-     //      Accept: "text/html, */*; q=0.1, application/json"
-     //      Content-Type: "image/png"
-     //      Cookie: "basic=very; value_1=foo; value_2=bar"
-     //      MyFoo: "bar, baz"
-    ```
+// Later
+Fuel.get("/get").response { request, response, result ->
+    //make request to https://httpbin.org/get because Fuel.{get|post|put|delete} use FuelManager.instance to make HTTP request
+}
+```
 
 * `baseParams` is used to manage common `key=value` query param, which will be automatically included in all of your subsequent requests in format of ` Parameters` (`Any` is converted to `String` by `toString()` method)
-    ```kotlin
-    FuelManager.instance.baseParams = listOf("api_key" to "1234567890")
 
-    // Later
-    Fuel.get("/get").response { request, response, result ->
-        //make request to https://httpbin.org/get?api_key=1234567890
-    }
-    ```
+```kotlin
+FuelManager.instance.baseParams = listOf("api_key" to "1234567890")
+
+// Later
+Fuel.get("/get").response { request, response, result ->
+    //make request to https://httpbin.org/get?api_key=1234567890
+}
+```
 
 * `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/core/Client.kt) protocol, and set back to `FuelManager.instance` to kick off the effect.
 
@@ -645,39 +684,43 @@ data class User(val firstName: String = "",
 * `hostnameVerifier` is configurable by user. By default, it uses `HttpsURLConnection.getDefaultHostnameVerifier()`.
 
 * `requestInterceptors` `responseInterceptors` is a side-effect to add to `Request` and/or `Response` objects.
-    - For example, one might wanna print cUrlString style for every request that hits server in DEBUG mode.
-        ```kotlin
-        val manager = FuelManager()
-        if (BUILD_DEBUG) {
-            manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
-        }
-        val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response() //it will print curl -i -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" "https://httpbin.org/get"
-        ```
+  - For example, one might wanna print cUrlString style for every request that hits server in DEBUG mode.
+    
+```kotlin
+val manager = FuelManager()
+if (BUILD_DEBUG) {
+    manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
+}
 
-    - Another example is that you might wanna add data into your Database, you can achieve that with providing `responseInterceptors` such as
+// Usage
+val (request, response, result) = manager.request(Method.GET, "https://httpbin.org/get").response() //it will print curl -i -H "Accept-Encoding:compress;q=0.5, gzip;q=1.0" "https://httpbin.org/get"
+```
 
-        ```kotlin
-        inline fun <reified T> DbResponseInterceptor() =
-            { next: (Request, Response) -> Response ->
-                { req: Request, res: Response ->
-                    val db = DB.getInstance()
-                    val instance = Parser.getInstance().parse(res.data, T::class)
-                    db.transaction {
-                        it.copyToDB(instance)
-                    }
-                    next(req, res)
-                }
+  - Another example is that you might wanna add data into your Database, you can achieve that with providing `responseInterceptors` such as
+
+```kotlin
+inline fun <reified T> DbResponseInterceptor() =
+    { next: (Request, Response) -> Response ->
+        { req: Request, res: Response ->
+            val db = DB.getInstance()
+            val instance = Parser.getInstance().parse(res.data, T::class)
+            db.transaction {
+                it.copyToDB(instance)
             }
+            next(req, res)
+        }
+    }
 
-        manager.addResponseInterceptor(DBResponseInterceptor<Dog>)
-        manager.request(Method.GET, "https://www.example.com/api/dog/1").response() // Db interceptor will be called to intercept data and save into Database of your choice
-        ```
+manager.addResponseInterceptor(DBResponseInterceptor<Dog>)
+manager.request(Method.GET, "https://www.example.com/api/dog/1").response() // Db interceptor will be called to intercept data and save into Database of your choice
+```
 
 ### Routing Support
 
 In order to organize better your network stack FuelRouting interface allows you to easily setup a Router design pattern.
 
-```Kotlin
+```kotlin
+// Router Definition
 sealed class WeatherApi: FuelRouting {
 
     override val basePath = "https://www.metaweather.com"
@@ -712,14 +755,13 @@ sealed class WeatherApi: FuelRouting {
 
 }
 
-
 // Usage
 Fuel.request(WeatherApi.weatherFor("london"))
     .responseJson { request, response, result ->
         result.fold(success = { json ->
-            Log.d("qdp success", json.array().toString())
+            Log.d("Success", json.array().toString())
         }, failure = { error ->
-            Log.e("qdp error", error.toString())
+            Log.e("Failure", error.toString())
         })
     }
 ```

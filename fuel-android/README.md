@@ -22,10 +22,4 @@ The `fuel` core package automatically uses the `AndroidEnvironment` from the `fu
 
 ### Making Requests
 
-#### Response in Json
-```kotlin
-fun responseJson(handler: (Request, Response, Result<Json, FuelError>) -> Unit)
-
-val jsonObject = json.obj() //JSONObject
-val jsonArray = json.array() //JSONArray
-```
+It is the same with core package, so refer on core documentation at [here](../fuel/README.md)
