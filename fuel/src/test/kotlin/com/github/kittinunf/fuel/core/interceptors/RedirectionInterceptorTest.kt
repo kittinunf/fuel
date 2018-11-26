@@ -535,6 +535,7 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         )
 
         println(data)
+        println(data)
     }
 
     @Test
@@ -554,5 +555,31 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
                 .allowRedirects(false),
             HttpURLConnection.HTTP_MOVED_TEMP
         )
+    }
+
+    @Test
+    fun repeatableBodiesAreForwardedIfNotGet() {
+        val testValidator = "${Random().nextDouble()}"
+        val firstRequest = mock.request()
+            .withMethod(Method.POST.value)
+            .withPath("/redirect")
+
+        val firstResponse = mock.response()
+            .withHeader(Headers.LOCATION, mock.path("post?validate=$testValidator"))
+            .withStatusCode(308)
+
+        val secondRequest = mock.request()
+            .withMethod(Method.POST.value)
+            .withPath("/post")
+
+        mock.chain(request = firstRequest, response = firstResponse)
+        mock.chain(request = secondRequest, response = mock.reflect())
+
+        val data = expectRedirectedUserAgent(FuelManager().request(Method.POST, mock.path("redirect")).body("body"))
+        assertThat("Expected query to contains validate=\"$testValidator\", actual ${data.query}",
+            data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
+            equalTo(true)
+        )
+        assertThat("Expected body to be forwarded", data.body!!.string, equalTo("body"))
     }
 }

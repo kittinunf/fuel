@@ -390,10 +390,11 @@ interface Request : RequestFactory.RequestConvertible {
      * @param openStream [BodySource] a function that yields a stream
      * @param calculateLength [Number?] size in +bytes+ if it is known
      * @param charset [Charset] the charset to write with
+     * @param repeatable [Boolean] loads the body into memory upon reading
      *
      * @return [Request] the request
      */
-    fun body(openStream: BodySource, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request
+    fun body(openStream: BodySource, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8, repeatable: Boolean = false): Request
 
     /**
      * Sets the body from a generic stream
@@ -404,10 +405,11 @@ interface Request : RequestFactory.RequestConvertible {
      * @param stream [InputStream] a stream to read from
      * @param calculateLength [Number?] size in bytes if it is known
      * @param charset [Charset] the charset to write with
+     * @param repeatable [Boolean] loads the body into memory upon reading
      *
      * @return [Request] the request
      */
-    fun body(stream: InputStream, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8): Request
+    fun body(stream: InputStream, calculateLength: BodyLength? = null, charset: Charset = Charsets.UTF_8, repeatable: Boolean = false): Request
 
     /**
      * Sets the body from a byte array

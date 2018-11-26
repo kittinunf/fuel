@@ -51,6 +51,12 @@ fun redirectResponseInterceptor(manager: FuelManager) =
                 .header(newHeaders)
                 .requestProgress(request.executionOptions.requestProgress)
                 .responseProgress(request.executionOptions.responseProgress)
+                .let {
+                    if (newMethod === request.method && !request.body.isEmpty() && !request.body.isConsumed())
+                        it.body(request.body)
+                    else
+                        it
+                }
 
             // Redirect
             next(request, newRequest.response().second)

@@ -61,6 +61,12 @@ data class DefaultBody(
         }
     }
 
+    /**
+     * Makes the body repeatable by e.g. loading its contents into memory
+     * @return [RepeatableBody] the body to be repeated
+     */
+    fun asRepeatable(): RepeatableBody = RepeatableBody(this)
+
     companion object {
         private val EMPTY_STREAM = {
             ByteArrayInputStream(ByteArray(0))
@@ -72,7 +78,7 @@ data class DefaultBody(
             ))
         }
 
-        fun from(openStream: BodySource, calculateLength: BodyLength?, charset: Charset = Charsets.UTF_8): Body {
+        fun from(openStream: BodySource, calculateLength: BodyLength?, charset: Charset = Charsets.UTF_8): DefaultBody {
             return DefaultBody(
                 openStream = openStream,
                 calculateLength = calculateLength,

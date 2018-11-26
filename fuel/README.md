@@ -161,7 +161,7 @@ All the `String` extensions listed above, as well as the `Fuel` and `FuelManager
     ```
 
 ### Adding `Request` body
-Bodies are formed from generic streams, but there are helpers to set it from values that can be turned into streams. It is important to know that, by default, the streams are **NOT** read into memory until the `Request` is sent.
+Bodies are formed from generic streams, but there are helpers to set it from values that can be turned into streams. It is important to know that, by default, the streams are **NOT** read into memory until the `Request` is sent. However, if you pass in an in-memory value such as a `ByteArray` or `String`, `Fuel` uses `RepeatableBody`, which are kept into memory until the `Request` is dereferenced.
 
 When you're using the default `Client`, bodies are supported for:
 - `POST`
@@ -264,6 +264,11 @@ Fuel.post("https://httpbin.org/post")
  * Content-Type : text/plain
  */
 ```
+
+#### Using automatic body redirection
+The default redirection interceptor only forwards `RepeatableBody`, and only if the status code is 307 or 308, as per the RFCs. In order to use a `RepeatableBody`, pass in a `String` or `ByteArray` as body, or explicitely set `repeatable = true` for the `fun body(...)` call.
+
+**NOTE** this loads the _entire_ body into memory, and therefore is not suited for large bodies.
 
 ### Adding `Headers`
 There are many ways to set, overwrite, remove and append headers. For your convenience, internally used and common header names are attached to the `Headers` companion and can be accessed (e.g. `Headers.CONTENT_TYPE`, `Headers.ACCEPT`, ...).
