@@ -197,8 +197,9 @@ data class DefaultRequest(
      * @return [Request] the request
      */
     override fun body(openStream: BodySource, calculateLength: BodyLength?, charset: Charset, repeatable: Boolean): Request {
-        _body = DefaultBody.from(openStream = openStream, calculateLength = calculateLength, charset = charset)
-                           .let { body -> if (repeatable) body.asRepeatable() else body }
+        _body = DefaultBody
+            .from(openStream = openStream, calculateLength = calculateLength, charset = charset)
+            .let { body -> if (repeatable) body.asRepeatable() else body }
         return request
     }
 
