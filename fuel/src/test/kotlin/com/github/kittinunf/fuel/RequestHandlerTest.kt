@@ -13,15 +13,23 @@ import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
 
 class RequestHandlerTest : MockHttpTestCase() {
 
-    init {
+    @Before
+    fun setupFuelManager() {
         FuelManager.instance.baseHeaders = mapOf("foo" to "bar")
         FuelManager.instance.baseParams = listOf("key" to "value")
+    }
+
+    @After
+    fun resetFuelManager() {
+        FuelManager.instance.reset()
     }
 
     @Test
