@@ -132,14 +132,6 @@ All the `String` extensions listed above, as well as the `Fuel` and `FuelManager
     // https://httpbin.org/delete?foo=foo&bar=bar
     ```
 
-* Array support for `GET` requests
-
-    ```kotlin
-    Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey")))
-        .url
-    // https://httpbin.org/get?foo=foo&dwarf[]=grumpy&dwarf[]=happy&dwarf[]=sleepy&dwarf[]=dopey
-    ```
-
 * Support `x-www-form-urlencoded` for `PUT`, `POST` and `PATCH`
 
     ```kotlin
@@ -159,6 +151,19 @@ All the `String` extensions listed above, as well as the `Fuel` and `FuelManager
     // https://httpbin.org/post
     // "foo=foo&bar=bar"
     ```
+    
+#### `Parameters` with `Body`
+If a request already has a body, the parameters are url-encoded instead. You can remove the handling of parameter encoding by removing the default `ParameterEncoder` request interceptor from your `FuelManager`.
+
+#### `Parameters` with `multipart/form-data`
+The `UploadRequest` handles encoding parameters in the body. Therefore by default, parameter encoding is ignored by `ParameterEncoder` if the content type is `multipart/form-data`.
+
+#### `Parameters` with empty, array, list or null values
+All requests can have parameters, regardless of the method.
+- a list is encoded as `key[]=value1&key[]=value2&...`
+- an array is encoded as `key[]=value1&key[]=value2&...`
+- an empty string value is encoded as `key`
+- a null value is removed
 
 ### Adding `Request` body
 Bodies are formed from generic streams, but there are helpers to set it from values that can be turned into streams. It is important to know that, by default, the streams are **NOT** read into memory until the `Request` is sent. However, if you pass in an in-memory value such as a `ByteArray` or `String`, `Fuel` uses `RepeatableBody`, which are kept into memory until the `Request` is dereferenced.
