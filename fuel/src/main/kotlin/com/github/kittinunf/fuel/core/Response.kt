@@ -2,9 +2,7 @@ package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.result.Result
-import java.io.ByteArrayInputStream
 import java.net.URL
-import java.net.URLConnection
 
 /**
  * Response object that holds [Request] and [Response] metadata, as well as the result T
@@ -45,45 +43,15 @@ data class Response(
     fun header(header: String) = get(header)
 
     override fun toString(): String {
-        val contentType = guessContentType()
-
-        val bodyString = when {
-            body.isEmpty() -> "(empty)"
-            body.isConsumed() -> "(consumed)"
-            else -> processBody(contentType, body.toByteArray())
-        }
-
         return buildString {
             appendln("<-- $statusCode $url")
             appendln("Response : $responseMessage")
             appendln("Length : $contentLength")
-            appendln("Body : $bodyString")
+            appendln("Body : ${body.asString(headers[Headers.CONTENT_TYPE].lastOrNull())}")
             appendln("Headers : (${headers.size})")
 
             val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
             headers.transformIterate(appendHeaderWithValue)
-        }
-    }
-
-    internal fun guessContentType(headers: Headers = this.headers): String {
-        val contentTypeFromHeaders = headers[Headers.CONTENT_TYPE].lastOrNull()
-        if (!contentTypeFromHeaders.isNullOrEmpty()) {
-            return contentTypeFromHeaders
-        }
-
-        val contentTypeFromStream = URLConnection.guessContentTypeFromStream(ByteArrayInputStream(data))
-        return if (contentTypeFromStream.isNullOrEmpty()) "(unknown)" else contentTypeFromStream
-    }
-
-    internal fun processBody(contentType: String, bodyData: ByteArray): String {
-        return if (contentType.isNotEmpty() &&
-                (contentType.contains("image/") ||
-                        contentType.contains("application/octet-stream"))) {
-            "($contentLength bytes of ${guessContentType(headers)})"
-        } else if (bodyData.isNotEmpty()) {
-            String(bodyData)
-        } else {
-            "(empty)"
         }
     }
 
