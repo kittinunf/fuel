@@ -40,17 +40,21 @@ fun redirectResponseInterceptor(manager: FuelManager) =
             }
 
             val encoding = Encoding(httpMethod = newMethod, urlString = newUrl.toString())
-
-            // Check whether it is the same host or not
-            val newHeaders = Headers.from(request.headers)
-            if (newUrl.host != request.url.host) {
-                newHeaders.remove(Headers.AUTHORIZATION)
-            }
-
             val newRequest = manager.request(encoding)
-                .header(newHeaders)
+                .header(Headers.from(request.headers))
+                .also {
+                    // Check whether it is the same host or not
+                    if (newUrl.host != request.url.host)
+                        it.headers.remove(Headers.AUTHORIZATION)
+                }
                 .requestProgress(request.executionOptions.requestProgress)
                 .responseProgress(request.executionOptions.responseProgress)
+                .let {
+                    if (newMethod === request.method && !request.body.isEmpty() && !request.body.isConsumed())
+                        it.body(request.body)
+                    else
+                        it
+                }
 
             // Redirect
             next(request, newRequest.response().second)

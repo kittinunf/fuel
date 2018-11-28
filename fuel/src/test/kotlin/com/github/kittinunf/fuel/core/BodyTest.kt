@@ -106,7 +106,7 @@ class BodyTest {
     }
 
     @Test(expected = FuelError::class)
-    fun bodyCanOnlyBeReadOnce() {
+    fun bodyFromCallbackCanOnlyBeReadOnce() {
         val body = DefaultBody.from({ ByteArrayInputStream("body".toByteArray()) }, { 4 })
         body.writeTo(ByteArrayOutputStream())
         body.writeTo(ByteArrayOutputStream())
@@ -125,7 +125,7 @@ class BodyTest {
 
     @Test
     fun requestWithBodyIsPrintableAfterConsumption() {
-        val value = "String Body ${Math.random()}"
+        val value = { ByteArrayInputStream("String Body ${Math.random()}".toByteArray()) }
 
         DefaultRequest(Method.POST, URL("https://test.fuel.com/"))
             .body(value)
