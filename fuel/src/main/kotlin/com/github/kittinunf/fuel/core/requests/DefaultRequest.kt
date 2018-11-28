@@ -192,11 +192,14 @@ data class DefaultRequest(
      * @param openStream [BodySource] a function that yields a stream
      * @param calculateLength [Number?] size in +bytes+ if it is known
      * @param charset [Charset] the charset to write with
+     * @param repeatable [Boolean] loads the body into memory upon reading
      *
      * @return [Request] the request
      */
-    override fun body(openStream: BodySource, calculateLength: BodyLength?, charset: Charset): Request {
-        _body = DefaultBody.from(openStream = openStream, calculateLength = calculateLength, charset = charset)
+    override fun body(openStream: BodySource, calculateLength: BodyLength?, charset: Charset, repeatable: Boolean): Request {
+        _body = DefaultBody
+            .from(openStream = openStream, calculateLength = calculateLength, charset = charset)
+            .let { body -> if (repeatable) body.asRepeatable() else body }
         return request
     }
 
@@ -209,11 +212,12 @@ data class DefaultRequest(
      * @param stream [InputStream] a stream to read from
      * @param calculateLength [Number?] size in bytes if it is known
      * @param charset [Charset] the charset to write with
+     * @param repeatable [Boolean] loads the body into memory upon reading
      *
      * @return [Request] the request
      */
-    override fun body(stream: InputStream, calculateLength: BodyLength?, charset: Charset) =
-        body({ stream }, calculateLength, charset)
+    override fun body(stream: InputStream, calculateLength: BodyLength?, charset: Charset, repeatable: Boolean) =
+        body(openStream = { stream }, calculateLength = calculateLength, charset = charset, repeatable = repeatable)
 
     /**
      * Sets the body from a byte array
@@ -223,7 +227,7 @@ data class DefaultRequest(
      * @return [Request] the request
      */
     override fun body(bytes: ByteArray, charset: Charset) =
-        body(ByteArrayInputStream(bytes), { bytes.size.toLong() }, charset)
+        body(stream = ByteArrayInputStream(bytes), calculateLength = { bytes.size.toLong() }, charset = charset, repeatable = true)
 
     /**
      * Sets the body from a string
@@ -233,7 +237,7 @@ data class DefaultRequest(
      * @return [Request] the request
      */
     override fun body(body: String, charset: Charset): Request =
-        body(body.toByteArray(charset), charset)
+        body(bytes = body.toByteArray(charset), charset = charset)
 
     /**
      * Sets the body to the contents of a file.
