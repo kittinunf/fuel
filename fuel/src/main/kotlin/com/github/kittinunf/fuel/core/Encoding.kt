@@ -14,16 +14,11 @@ class Encoding(
 ) : RequestFactory.RequestConvertible {
 
     private val encoder: (Method, String, Parameters?) -> Request = { method, path, parameters ->
-        val headerPairs = Headers.from(defaultHeaders)
-        if (headerPairs[Headers.CONTENT_TYPE].lastOrNull().isNullOrBlank()) {
-            headerPairs[Headers.CONTENT_TYPE] = "application/x-www-form-urlencoded"
-        }
-
         DefaultRequest(
             method = method,
             url = createUrl(path),
             parameters = parameters ?: emptyList(),
-            headers = headerPairs
+            headers = Headers.from(defaultHeaders)
         )
     }
 

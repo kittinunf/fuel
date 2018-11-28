@@ -6,7 +6,6 @@ import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.core.interceptors.LogRequestAsCurlInterceptor
 import com.github.kittinunf.fuel.core.interceptors.LogRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.LogResponseInterceptor
-import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.not
@@ -160,7 +159,7 @@ class InterceptorTest : MockHttpTestCase() {
         }
 
         manager.apply {
-            addRequestInterceptor(cUrlLoggingRequestInterceptor())
+            addRequestInterceptor(LogRequestAsCurlInterceptor)
             addRequestInterceptor(customLoggingInterceptor())
         }
 
