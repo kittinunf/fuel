@@ -217,14 +217,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun get(path: String, parameters: Parameters?): Request =
-        request(Method.GET, path, parameters?.flatMap { pair ->
-            // TODO: move to generic url encoding
-            (pair.second as? Iterable<*>)?.map {
-                "${pair.first}[]" to it
-            }?.toList() ?: (pair.second as? Array<*>)?.map {
-                "${pair.first}[]" to it
-            }?.toList() ?: listOf(pair)
-        })
+        request(Method.GET, path, parameters)
 
     /**
      * Create a [Method.GET] [Request] to [PathStringConvertible.path] with [parameters]

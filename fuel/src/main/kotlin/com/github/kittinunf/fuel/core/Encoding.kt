@@ -5,7 +5,6 @@ import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
-import java.net.URLEncoder
 
 class Encoding(
     val httpMethod: Method,
@@ -15,33 +14,17 @@ class Encoding(
 ) : RequestFactory.RequestConvertible {
 
     private val encoder: (Method, String, Parameters?) -> Request = { method, path, parameters ->
-        var modifiedPath = path
-        var data: String? = null
         val headerPairs = Headers.from(defaultHeaders)
-        when {
-            encodeParameterInUrl(method) -> {
-                var querySign = ""
-                val queryParamString = queryFromParameters(parameters)
-                if (queryParamString.isNotEmpty()) {
-                    if (path.count() > 0) {
-                        querySign = if (path.last() == '?') "" else "?"
-                    }
-                }
-                modifiedPath += (querySign + queryParamString)
-            }
-            else -> {
-                headerPairs[Headers.CONTENT_TYPE] = "application/x-www-form-urlencoded"
-                data = queryFromParameters(parameters)
-            }
+        if (headerPairs[Headers.CONTENT_TYPE].lastOrNull().isNullOrBlank()) {
+            headerPairs[Headers.CONTENT_TYPE] = "application/x-www-form-urlencoded"
         }
+
         DefaultRequest(
-                method = method,
-                url = createUrl(modifiedPath),
-                parameters = parameters ?: emptyList(),
-                headers = headerPairs
-        ).apply {
-            if (data != null) body(data)
-        }
+            method = method,
+            url = createUrl(path),
+            parameters = parameters ?: emptyList(),
+            headers = headerPairs
+        )
     }
 
     override val request by lazy { encoder(httpMethod, urlString, parameters) }
@@ -65,16 +48,6 @@ class Encoding(
         }
         return URL(uri.toASCIIString())
     }
-
-    private fun encodeParameterInUrl(method: Method): Boolean = when (method) {
-        Method.GET, Method.DELETE, Method.HEAD -> true
-        else -> false
-    }
-
-    private fun queryFromParameters(params: Parameters?): String = params.orEmpty()
-            .filterNot { it.second == null }
-            .map { (key, value) -> URLEncoder.encode(key, "UTF-8") to URLEncoder.encode("$value", "UTF-8") }
-            .joinToString("&") { (key, value) -> "$key=$value" }
 
     private val defaultHeaders = Headers.from()
 }
