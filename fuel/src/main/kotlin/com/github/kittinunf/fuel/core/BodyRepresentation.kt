@@ -18,7 +18,7 @@ fun Body.representationOfBytes(contentType: String?): String {
     }
 
     val lengthLabel = (length ?: -1L).let {
-        when(true) {
+        when (true) {
             it == 0L -> return "(empty)"
             it < 0L -> "unknown number of bytes"
             else -> "$it bytes"
