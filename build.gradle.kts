@@ -25,12 +25,10 @@ allprojects {
 }
 
 val androidModules = listOf("fuel-android", "fuel-livedata")
-val androidSampleModules = listOf("sample")
 
 subprojects {
     val isAndroidModule = project.name in androidModules
-    val isSample = project.name in androidSampleModules
-    val isJvmModule = !isAndroidModule && !isSample
+    val isJvmModule = !isAndroidModule
 
     if (isJvmModule) {
         apply {
@@ -138,76 +136,74 @@ subprojects {
             xml.enabled(true)
         }
     }
+    
+    apply {
+        plugin(Release.MavenPublish.plugin)
+        plugin(Release.Bintray.plugin)
+        plugin(Ktlint.plugin)
+    }
 
-    if (!isSample) {
-        apply {
-            plugin(Release.MavenPublish.plugin)
-            plugin(Release.Bintray.plugin)
-            plugin(Ktlint.plugin)
+    configure<KotlinterExtension> {
+        reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
+    }
+
+    version = Fuel.publishVersion
+    group = Fuel.groupId
+    bintray {
+        user = findProperty("BINTRAY_USER") as? String
+        key = findProperty("BINTRAY_KEY") as? String
+        setPublications(project.name)
+        with(pkg) {
+            repo = "maven"
+            name = "Fuel-Android"
+            desc = "The easiest HTTP networking library in Kotlin/Android"
+            userOrg = "kittinunf"
+            websiteUrl = "https://github.com/kittinunf/Fuel"
+            vcsUrl = "https://github.com/kittinunf/Fuel"
+            setLicenses("MIT")
+            with(version) {
+                name = Fuel.publishVersion
+            }
         }
+    }
 
-        configure<KotlinterExtension> {
-            reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
-        }
-
-        version = Fuel.publishVersion
-        group = Fuel.groupId
-        bintray {
-            user = findProperty("BINTRAY_USER") as? String
-            key = findProperty("BINTRAY_KEY") as? String
-            setPublications(project.name)
-            with(pkg) {
-                repo = "maven"
-                name = "Fuel-Android"
-                desc = "The easiest HTTP networking library in Kotlin/Android"
-                userOrg = "kittinunf"
-                websiteUrl = "https://github.com/kittinunf/Fuel"
-                vcsUrl = "https://github.com/kittinunf/Fuel"
-                setLicenses("MIT")
-                with(version) {
-                    name = Fuel.publishVersion
+    fun MavenPom.addDependencies() = withXml {
+        asNode().appendNode("dependencies").let { depNode ->
+            configurations.implementation.allDependencies.forEach {
+                depNode.appendNode("dependency").apply {
+                    appendNode("groupId", it.group)
+                    appendNode("artifactId", it.name)
+                    appendNode("version", it.version)
                 }
             }
         }
+    }
 
-        fun MavenPom.addDependencies() = withXml {
-            asNode().appendNode("dependencies").let { depNode ->
-                configurations.implementation.allDependencies.forEach {
-                    depNode.appendNode("dependency").apply {
-                        appendNode("groupId", it.group)
-                        appendNode("artifactId", it.name)
-                        appendNode("version", it.version)
-                    }
+    val javadocJar by tasks.creating(Jar::class) {
+        val doc by tasks
+        dependsOn(doc)
+        from(doc)
+
+        classifier = "javadoc"
+    }
+
+    val sourcesJar by tasks
+    publishing {
+        publications {
+            register(project.name, MavenPublication::class) {
+                if (project.hasProperty("android")) {
+                    artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+                } else {
+                    from(components["java"])
                 }
-            }
-        }
+                artifact(sourcesJar)
+                artifact(javadocJar)
+                groupId = Fuel.groupId
+                artifactId = project.name
+                version = Fuel.publishVersion
 
-        val javadocJar by tasks.creating(Jar::class) {
-            val doc by tasks
-            dependsOn(doc)
-            from(doc)
-
-            classifier = "javadoc"
-        }
-
-        val sourcesJar by tasks
-        publishing {
-            publications {
-                register(project.name, MavenPublication::class) {
-                    if (project.hasProperty("android")) {
-                        artifact("$buildDir/outputs/aar/${project.name}-release.aar")
-                    } else {
-                        from(components["java"])
-                    }
-                    artifact(sourcesJar)
-                    artifact(javadocJar)
-                    groupId = Fuel.groupId
-                    artifactId = project.name
-                    version = Fuel.publishVersion
-
-                    if (project.hasProperty("android")) {
-                        pom.addDependencies()
-                    }
+                if (project.hasProperty("android")) {
+                    pom.addDependencies()
                 }
             }
         }
