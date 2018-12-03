@@ -14,7 +14,6 @@ import java.io.OutputStream
 data class RepeatableBody(
     var body: Body
 ) : Body {
-
     /**
      * Writes the body to the [OutputStream].
      *
@@ -63,6 +62,13 @@ data class RepeatableBody(
      * @return [Boolean] if true, `writeTo`, `toStream` and `toByteArray` may throw
      */
     override fun isConsumed() = body.isConsumed()
+
+    /**
+     * Represents this body as a string
+     * @param contentType [String] the type of the content in the body, or null if a guess is necessary
+     * @return [String] the body as a string or a string that represents the body such as (empty) or (consumed)
+     */
+    override fun asString(contentType: String?) = body.asString(contentType)
 
     /**
      * Returns the length of the body in bytes

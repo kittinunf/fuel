@@ -57,4 +57,11 @@ interface Body {
      * @return [Long?] the length in bytes, null if it is unknown
      */
     val length: Long?
+
+    /**
+     * Represents this body as a string
+     * @param contentType [String] the type of the content in the body, or null if a guess is necessary
+     * @return [String] the body as a string or a string that represents the body such as (empty) or (consumed)
+     */
+    fun asString(contentType: String?): String
 }

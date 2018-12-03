@@ -25,6 +25,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
 import java.net.URL
+import java.net.URLConnection
 import java.nio.charset.Charset
 
 data class DefaultRequest(
@@ -238,6 +239,12 @@ data class DefaultRequest(
      */
     override fun body(body: String, charset: Charset): Request =
         body(bytes = body.toByteArray(charset), charset = charset)
+            .let {
+                if (header(Headers.CONTENT_TYPE).lastOrNull().isNullOrBlank())
+                    header(Headers.CONTENT_TYPE, "text/plain; charset=${charset.name()}")
+                else
+                    it
+            }
 
     /**
      * Sets the body to the contents of a file.
@@ -256,6 +263,13 @@ data class DefaultRequest(
     override fun body(file: File, charset: Charset): Request = when (charset) {
         Charsets.UTF_8 -> body({ FileInputStream(file) }, { file.length() }, charset)
         else -> body({ FileInputStream(file) }, null, charset)
+    }.let {
+        if (header(Headers.CONTENT_TYPE).lastOrNull().isNullOrBlank()) {
+            val contentType = URLConnection.guessContentTypeFromName(file.name)
+            header(Headers.CONTENT_TYPE, "$contentType; charset=${charset.name()}")
+        } else {
+            it
+        }
     }
 
     /**
@@ -370,14 +384,8 @@ data class DefaultRequest(
      */
     override fun toString(): String = buildString {
 
-        val bodyString = when {
-            body.isEmpty() -> "(empty)"
-            body.isConsumed() -> "(consumed)"
-            else -> String(body.toByteArray())
-        }
-
         appendln("--> $method $url")
-        appendln("Body : $bodyString")
+        appendln("Body : ${body.asString(header(Headers.CONTENT_TYPE).lastOrNull())}")
         appendln("Headers : (${headers.size})")
 
         val appendHeaderWithValue = { key: String, value: String -> appendln("$key : $value") }
