@@ -26,7 +26,7 @@ before_script:
 
 script:
   - ./gradlew lintKotlin
-  - ./gradlew test
+  - ./gradlew -x sample test
 
 after_failure:
   - curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o ./reviewdog
