@@ -65,7 +65,7 @@ class CancellableRequestTest : MockHttpTestCase() {
         )
 
         val running = manager.download(mock.path("cancel-response"))
-            .destination { _, _ -> file }
+            .fileDestination { _, _ -> file }
             .responseProgress { readBytes, _ ->
                 responseWrittenSemaphore.release()
                 Thread.sleep(200)
@@ -145,7 +145,7 @@ class CancellableRequestTest : MockHttpTestCase() {
 
         val running = FuelManager()
             .download(mock.path("bytes"))
-            .destination { _, _ -> file }
+            .fileDestination { _, _ -> file }
             .header(Headers.CONTENT_TYPE, "application/octet-stream")
             .responseProgress { _, _ ->
                 responseWrittenCallback.release()

@@ -2,16 +2,18 @@ package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.ResponseResultOf
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.google.common.net.MediaType
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
-import org.hamcrest.CoreMatchers.nullValue
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThat
 import org.junit.Test
 import org.mockserver.model.BinaryBody
 import org.mockserver.model.Delay
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -19,44 +21,74 @@ import java.util.Random
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class DownloadRequestTest : MockHttpTestCase() {
+
+    private fun <T: Any> assertDownloadedBytesToFile(result: ResponseResultOf<T>, file: File, numberOfBytes: Int): ResponseResultOf<T> {
+        val (request, response, wrapped) = result
+        val (data, error) = wrapped
+
+        assertThat("Expected request to not be null", request, notNullValue())
+        assertThat("Expected response to not be null", response, notNullValue())
+        assertThat("Expected data, actual $error", data, notNullValue())
+        assertThat("Expected file length ${file.length()} to match $numberOfBytes", file.length(), equalTo(numberOfBytes.toLong()))
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_OK))
+
+        return result
+    }
+
     @Test
-    fun httpDownloadCase() {
+    fun downloadToFile() {
         val manager = FuelManager()
 
         val numberOfBytes = 32768
         val file = File.createTempFile(numberOfBytes.toString(), null)
-        val bytes = ByteArray(numberOfBytes)
-        Random().nextBytes(bytes)
+        val bytes = ByteArray(numberOfBytes).also { Random().nextBytes(it) }
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
             response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
         )
 
-        val (request, response, result) = manager.download(mock.path("bytes"))
-            .destination { _, _ -> file }
+        val result = manager.download(mock.path("bytes"))
+            .fileDestination { _, _ -> file }
             .response()
 
-        val (data, error) = result
-
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
-        assertThat(file.length(), isEqualTo(numberOfBytes.toLong()))
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertDownloadedBytesToFile(result, file, numberOfBytes)
     }
 
     @Test
-    fun httpDownloadWithProgressValidCaseResponse() {
+    fun downloadToStream() {
+        val manager = FuelManager()
+
+        val numberOfBytes = 32768
+        val stream = ByteArrayOutputStream(numberOfBytes)
+        val bytes = ByteArray(numberOfBytes).also { Random().nextBytes(it) }
+
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.response().withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+        )
+
+        val result = manager.download(mock.path("bytes"))
+            .streamDestination { _, _ -> Pair(stream, { ByteArrayInputStream(stream.toByteArray()) }) }
+            .response()
+
+        val (request, response, wrapped) = result
+        val (data, error) = wrapped
+
+        assertThat("Expected request to not be null", request, notNullValue())
+        assertThat("Expected response to not be null", response, notNullValue())
+        assertThat("Expected data, actual $error", data, notNullValue())
+        assertThat("Expected stream output length ${stream.size()} to match $numberOfBytes", stream.size(), equalTo(numberOfBytes))
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_OK))
+    }
+
+    @Test
+    fun downloadBytesWithProgress() {
         val manager = FuelManager()
 
         val numberOfBytes = 1186
         val file = File.createTempFile(numberOfBytes.toString(), null)
-        val bytes = ByteArray(numberOfBytes)
-        Random().nextBytes(bytes)
+        val bytes = ByteArray(numberOfBytes).also { Random().nextBytes(it) }
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
@@ -66,36 +98,29 @@ class DownloadRequestTest : MockHttpTestCase() {
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = manager.download(mock.path("bytes"))
-            .destination { _, _ -> file }
-            .progress { readBytes, totalBytes ->
-                read = readBytes
-                total = totalBytes
-                println("read: $read, total: $total")
-            }
+        val triple = manager.download(mock.path("bytes"))
+            .fileDestination { _, _ -> file }
+            .progress { readBytes, totalBytes -> read = readBytes; total = totalBytes }
             .response()
-        val (data, error) = result
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
-        assertEquals(data is ByteArray, true)
-        assertEquals((data as ByteArray).size.toLong(), read)
-        assertThat(file.length(), isEqualTo(numberOfBytes.toLong()))
+        val (_, _, result) = assertDownloadedBytesToFile(triple, file, numberOfBytes)
+        val (data, _) = result
 
-        assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(data, isA(ByteArray::class.java))
+        assertThat(data!!.size.toLong(), equalTo(read))
+        assertThat("Progress read bytes and total bytes should be equal",
+            read == total && read != -1L && total != -1L,
+            equalTo(true)
+        )
     }
 
     @Test
-    fun httpDownloadWithProgressValidCase() {
+    fun downloadStringWithProgress() {
         val manager = FuelManager()
 
         val numberOfBytes = DEFAULT_BUFFER_SIZE * 5
         val file = File.createTempFile(numberOfBytes.toString(), null)
-        val bytes = ByteArray(numberOfBytes).apply { Random().nextBytes(this) }
+        val bytes = ByteArray(numberOfBytes).also { Random().nextBytes(it) }
 
         mock.chain(
             request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
@@ -105,31 +130,25 @@ class DownloadRequestTest : MockHttpTestCase() {
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = manager.download(mock.path("bytes"))
-            .destination { _, _ -> file }
-            .progress { readBytes, totalBytes ->
-                read = readBytes
-                total = totalBytes
-                println("read: $read, total: $total")
-            }
+        val triple = manager.download(mock.path("bytes"))
+            .fileDestination { _, _ -> file }
+            .progress { readBytes, totalBytes -> read = readBytes; total = totalBytes }
             .responseString()
-        val (data, error) = result
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
+        val (_, _, result) = assertDownloadedBytesToFile(triple, file, numberOfBytes)
+        val (data, _) = result
 
-        assertThat(file.length(), isEqualTo(response.data.size.toLong()))
-        assertThat(file.length(), isEqualTo(numberOfBytes.toLong()))
-
-        assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(data, isA(String::class.java))
+        assertThat(data, equalTo(file.readText()))
+        assertThat(
+            "Progress read bytes and total bytes should be equal",
+            read == total && read != -1L && total != -1L,
+            equalTo(true)
+        )
     }
 
     @Test
-    fun httpDownloadWithProgressInvalidEndPointCase() {
+    fun downloadFromHttpNotFound() {
         val manager = FuelManager()
 
         val numberOfBytes = 131072
@@ -141,23 +160,22 @@ class DownloadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.download(mock.path("bytes"))
-            .destination { _, _ -> file }
+            .fileDestination { _, _ -> file }
             .progress { _, _ -> }
             .responseString()
         val (data, error) = result
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, notNullValue())
-        assertThat(data, nullValue())
-        assertThat(file.length(), isEqualTo(0L))
+        assertThat("Expected request to not be null", request, notNullValue())
+        assertThat("Expected response to not be null", response, notNullValue())
+        assertThat("Expected error, actual $data", error, notNullValue())
+        assertThat("Expected nothing to be written to file", file.length(), equalTo(0L))
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
         assertThat(response.statusCode, isEqualTo(statusCode))
     }
 
     @Test
-    fun httpDownloadWithProgressInvalidFileCase() {
+    fun downloadToInvalidFileDestination() {
         val manager = FuelManager()
 
         mock.chain(
@@ -166,17 +184,16 @@ class DownloadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.download(mock.path("bytes"))
-            .destination { _, _ ->
+            .fileDestination { _, _ ->
                 val dir = System.getProperty("user.dir")
                 File.createTempFile("not_found_file", null, File(dir, "not-a-folder"))
             }
             .responseString()
         val (data, error) = result
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, notNullValue())
-        assertThat(data, nullValue())
+        assertThat("Expected request to not be null", request, notNullValue())
+        assertThat("Expected response to not be null", response, notNullValue())
+        assertThat("Expected error, actual $data", error, notNullValue())
 
         val statusCode = 200
         assertThat(error?.exception as IOException, isA(IOException::class.java))
@@ -184,10 +201,10 @@ class DownloadRequestTest : MockHttpTestCase() {
     }
 
     @Test
-    fun httpDownloadBigFileWithProgressValidCase() {
+    fun downloadBigFile() {
         val manager = FuelManager()
 
-        val numberOfBytes = 1024 * 1024 // 1 MB
+        val numberOfBytes = 1024 * 1024 * 10 // 10 MB
         val file = File.createTempFile(numberOfBytes.toString(), null)
         val bytes = ByteArray(numberOfBytes).apply { Random().nextBytes(this) }
 
@@ -198,32 +215,16 @@ class DownloadRequestTest : MockHttpTestCase() {
 
         var read = -1L
         var total = -1L
-        var lastPercent = 0L
 
-        val (request, response, result) = manager.download(mock.path("bytes"))
-            .destination { _, _ -> file }
-            .progress { readBytes, totalBytes ->
-                read = readBytes
-                total = totalBytes
-                val percent = readBytes * 100 / totalBytes
-                if (percent > lastPercent) {
-                    println("read: $read, total: $total, $percent% ")
-                    lastPercent = percent
-                }
-            }
-            .responseString()
-        val (data, error) = result
+        val triple = manager.download(mock.path("bytes"))
+            .fileDestination { _, _ -> file }
+            .progress { readBytes, totalBytes -> read = readBytes; total = totalBytes }
+            .response()
 
-        println("done downloading")
-
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
-        assertThat(file.length(), isEqualTo(numberOfBytes.toLong()))
-
-        assertThat("read bytes and total bytes should be equal", read == total && read != -1L && total != -1L, isEqualTo(true))
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertDownloadedBytesToFile(triple, file, numberOfBytes)
+        assertThat("Progress read bytes and total bytes should be equal",
+                read == total && read != -1L && total != -1L,
+                equalTo(true)
+        )
     }
 }
