@@ -4,18 +4,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.github.kittinunf.fuel.*
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
-import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.gson.responseObject
-import com.github.kittinunf.fuel.httpDelete
-import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.fuel.httpPost
-import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rxObject
 import com.github.kittinunf.result.Result
@@ -74,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         httpGet()
         httpPut()
         httpPost()
+        httpPatch()
         httpDelete()
         httpDownload()
         httpUpload()
@@ -155,6 +152,17 @@ class MainActivity : AppCompatActivity() {
 
         "/post"
             .httpPost(listOf("foo" to "foo", "bar" to "bar"))
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
+    }
+
+    private fun httpPatch() {
+        Fuel.patch("/patch", listOf("foo" to "foo", "bar" to "bar"))
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
+
+        "/patch"
+            .httpPatch(listOf("foo" to "foo", "bar" to "bar"))
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
     }

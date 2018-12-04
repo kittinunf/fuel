@@ -19,6 +19,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
+import java.net.ProtocolException
 import java.net.Proxy
 import java.net.URLConnection
 import javax.net.ssl.HttpsURLConnection
@@ -74,13 +75,32 @@ internal class HttpClient(
         return retrieveResponse(request, connection)
     }
 
+    private fun HttpURLConnection.forceMethod(method: String) {
+        try {
+            this.requestMethod = method
+        } catch (ex: ProtocolException) {
+            try {
+                (this.javaClass.getDeclaredField("delegate").apply { this.isAccessible = true }.get(this) as HttpURLConnection?)?.forceMethod(method)
+            } catch (ex: NoSuchFieldException) {
+                // ignore
+            }
+            (listOf(this.javaClass.superclass, this.javaClass)).forEach {
+                try {
+                    it.getDeclaredField("method").apply { this.isAccessible = true }.set(this, method)
+                } catch (ex: NoSuchFieldException) {
+                    // ignore
+                }
+            }
+        }
+    }
+
     @Throws(InterruptedException::class)
     private fun sendRequest(request: Request, connection: HttpURLConnection) {
         ensureRequestActive(request, connection)
         connection.apply {
             connectTimeout = max(request.executionOptions.timeoutInMillisecond, 0)
             readTimeout = max(request.executionOptions.timeoutReadInMillisecond, 0)
-            requestMethod = HttpClient.coerceMethod(request.method).value
+            forceMethod(request.method.value)
             doInput = true
             useCaches = request.executionOptions.useHttpCache ?: useHttpCache
             instanceFollowRedirects = false
@@ -109,11 +129,6 @@ internal class HttpClient(
                 Headers.ACCEPT_TRANSFER_ENCODING,
                 Headers.collapse(HeaderName(Headers.ACCEPT_TRANSFER_ENCODING), SUPPORTED_DECODING)
             )
-
-            // The underlying HttpURLConnection does not support PATCH.
-            if (request.method == Method.PATCH) {
-                setRequestProperty("X-HTTP-Method-Override", Method.PATCH.value)
-            }
 
             setDoOutput(connection, request.method)
             setBodyIfDoOutput(connection, request)
@@ -268,6 +283,5 @@ internal class HttpClient(
 
     companion object {
         private val SUPPORTED_DECODING = listOf("gzip", "deflate; q=0.5")
-        private fun coerceMethod(method: Method) = if (method == Method.PATCH) Method.POST else method
     }
 }
