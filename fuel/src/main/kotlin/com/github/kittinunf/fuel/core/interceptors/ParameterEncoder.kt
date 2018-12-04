@@ -58,7 +58,6 @@ object ParameterEncoder : FoldableRequestInterceptor {
         else -> false
     }
 
-
     private fun URL.withParameters(parameters: Parameters): URL {
         val encoded = ParameterEncoder.encode(parameters)
         if (encoded.isEmpty()) {
