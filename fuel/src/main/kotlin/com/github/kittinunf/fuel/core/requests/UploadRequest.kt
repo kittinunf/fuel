@@ -10,7 +10,6 @@ import java.io.File
 import java.net.URL
 import java.util.UUID
 
-
 class UploadRequest private constructor(private val wrapped: Request) : Request by wrapped {
     override val request: UploadRequest = this
     val dataParts: MutableCollection<LazyDataPart> = mutableListOf()

@@ -24,7 +24,6 @@ internal class BoundaryMissing(request: UploadRequest) : FuelError(
     Response.error(request.url)
 )
 
-
 internal data class UploadBody(val request: UploadRequest) : Body {
 
     private var inputAvailable: Boolean = true
