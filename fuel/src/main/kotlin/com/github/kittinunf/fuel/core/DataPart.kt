@@ -44,7 +44,7 @@ data class InlineDataPart(
     val name: String,
     override val contentType: String = GENERIC_CONTENT,
     override val contentDisposition: String = "form-data; name=\"$name\""
-): DataPart() {
+) : DataPart() {
     override fun inputStream() = content.byteInputStream()
     override val contentLength get() = content.length.toLong()
 }
@@ -76,8 +76,8 @@ data class FileDataPart(
 
     companion object {
         fun guessContentType(file: File) = try {
-            URLConnection.guessContentTypeFromName(file.name) ?:
-                BlobDataPart.guessContentType(file.inputStream())
+            URLConnection.guessContentTypeFromName(file.name)
+                ?: BlobDataPart.guessContentType(file.inputStream())
         } catch (ex: NoClassDefFoundError) {
             // The MimetypesFileTypeMap class doesn't exists on old Android devices.
             GENERIC_BYTE_CONTENT
@@ -96,8 +96,8 @@ data class BlobDataPart(
     override fun inputStream() = inputStream
     companion object {
         fun guessContentType(stream: InputStream) = try {
-            URLConnection.guessContentTypeFromStream(stream) ?:
-            GENERIC_BYTE_CONTENT
+            URLConnection.guessContentTypeFromStream(stream)
+            ?: GENERIC_BYTE_CONTENT
         } catch (ex: NoClassDefFoundError) {
             // The MimetypesFileTypeMap class doesn't exists on old Android devices.
             GENERIC_BYTE_CONTENT
