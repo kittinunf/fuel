@@ -22,7 +22,7 @@ import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class DownloadRequestTest : MockHttpTestCase() {
 
-    private fun <T: Any> assertDownloadedBytesToFile(result: ResponseResultOf<T>, file: File, numberOfBytes: Int): ResponseResultOf<T> {
+    private fun <T : Any> assertDownloadedBytesToFile(result: ResponseResultOf<T>, file: File, numberOfBytes: Int): ResponseResultOf<T> {
         val (request, response, wrapped) = result
         val (data, error) = wrapped
 
