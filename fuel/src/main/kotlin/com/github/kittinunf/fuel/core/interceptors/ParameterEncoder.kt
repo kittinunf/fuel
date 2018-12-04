@@ -39,41 +39,39 @@ object ParameterEncoder : FoldableRequestInterceptor {
         }
     }
 
-    internal fun encode(parameters: Parameters) =
+    private fun encode(parameters: Parameters) =
         parameters
-        .flatMap { (key, values) ->
-            // Deal with arrays
-            ((values as? Iterable<*>)?.toList() ?: (values as? Array<*>)?.toList())?.let {
-                val encodedKey = "${URLEncoder.encode(key, "UTF-8")}[]"
-                it.map { value -> encodedKey to URLEncoder.encode(value.toString(), "UTF-8") }
+            .filterNot { (_, values) -> values == null }
+            .flatMap { (key, values) ->
+                // Deal with arrays
+                ((values as? Iterable<*>)?.toList() ?: (values as? Array<*>)?.toList())?.let {
+                    val encodedKey = "${URLEncoder.encode(key, "UTF-8")}[]"
+                    it.map { value -> encodedKey to URLEncoder.encode(value.toString(), "UTF-8") }
 
-            // Deal with regular
-            } ?: values?.let {
-                listOf(URLEncoder.encode(key, "UTF-8") to URLEncoder.encode(values.toString(), "UTF-8"))
-
-            // Parameters that are null are stripped
-            } ?: emptyList()
-        }
-        .joinToString("&") { (key, value) -> if (value.isNullOrBlank()) key else "$key=$value" }
+                    // Deal with regular
+                } ?: listOf(URLEncoder.encode(key, "UTF-8") to URLEncoder.encode(values.toString(), "UTF-8"))
+            }
+            .joinToString("&") { (key, value) -> if (value.isBlank()) key else "$key=$value" }
 
     private fun allowParametersInBody(method: Method) = when (method) {
         Method.POST, Method.PATCH, Method.PUT -> true
         else -> false
     }
-}
 
-private fun URL.withParameters(parameters: Parameters): URL {
-    val encoded = ParameterEncoder.encode(parameters)
-    if (encoded.isEmpty()) {
-        return this
+
+    private fun URL.withParameters(parameters: Parameters): URL {
+        val encoded = ParameterEncoder.encode(parameters)
+        if (encoded.isEmpty()) {
+            return this
+        }
+
+        val joiner = if (toExternalForm().contains('?')) {
+            // There is already some query
+            if (query.isNotEmpty()) "&"
+            // There is already a trailing ?
+            else ""
+        } else "?"
+
+        return URL(toExternalForm() + joiner + encoded)
     }
-
-    val joiner = if (toExternalForm().contains('?')) {
-        // There is already some query
-        if (query.isNotEmpty()) "&"
-        // There is already a trailing ?
-        else ""
-    } else "?"
-
-    return URL(toExternalForm() + joiner + encoded)
 }
