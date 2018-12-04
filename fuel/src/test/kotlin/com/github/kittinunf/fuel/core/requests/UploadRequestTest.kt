@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel.core.requests
 
-import com.github.kittinunf.fuel.core.Blob
-import com.github.kittinunf.fuel.core.DataPart
+import com.github.kittinunf.fuel.core.BlobDataPart
+import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
@@ -35,7 +35,7 @@ class UploadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"))
-            .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
+            .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp")))
             .responseString()
         val (data, error) = result
 
@@ -58,8 +58,7 @@ class UploadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
-            .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
-            .name { "file-name" }
+            .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp"), name = "file-name"))
             .responseString()
 
         val (data, error) = result
@@ -83,7 +82,7 @@ class UploadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), Method.PUT)
-            .source { _, _ -> File(currentDir, "lorem_ipsum_long.tmp") }
+            .add(FileDataPart(File(currentDir, "lorem_ipsum_long.tmp")))
             .responseString()
         val (data, error) = result
 
@@ -109,7 +108,7 @@ class UploadRequestTest : MockHttpTestCase() {
         var total = -1L
 
         val (request, response, result) = manager.upload(mock.path("upload"))
-            .source { _, _ -> File(currentDir, "lorem_ipsum_long.tmp") }
+            .add(FileDataPart(File(currentDir, "lorem_ipsum_long.tmp")))
             .progress { readBytes, totalBytes ->
                 read = readBytes
                 total = totalBytes
@@ -139,7 +138,7 @@ class UploadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("nope"))
-            .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
+            .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp")))
             .progress { _, _ -> }
             .responseString()
 
@@ -164,7 +163,7 @@ class UploadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"))
-            .source { _, _ -> File(currentDir, "not_found_file.tmp") }
+            .add { FileDataPart(File(currentDir, "not_found_file.tmp")) }
             .progress { _, _ -> }
             .responseString()
         val (data, error) = result
@@ -190,11 +189,10 @@ class UploadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
-            .sources { _, _ ->
-                listOf(File(currentDir, "lorem_ipsum_short.tmp"),
-                        File(currentDir, "lorem_ipsum_long.tmp"))
-            }
-            .name { "file-name" }
+            .add(
+                FileDataPart(File(currentDir, "lorem_ipsum_short.tmp"), name = "file-name"),
+                FileDataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "file-name")
+            )
             .responseString()
         val (data, error) = result
 
@@ -204,8 +202,9 @@ class UploadRequestTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         val string = data as String
-        assertThat(string, containsString("file-name_1"))
-        assertThat(string, containsString("file-name_2"))
+        assertThat(string, containsString("file-name"))
+        assertThat(string, containsString("lorem_ipsum_short.tmp"))
+        assertThat(string, containsString("lorem_ipsum_long.tmp"))
 
         val statusCode = HttpURLConnection.HTTP_OK
         assertThat(response.statusCode, isEqualTo(statusCode))
@@ -221,12 +220,8 @@ class UploadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
-            .dataParts { _, _ ->
-                listOf(
-                    DataPart(File(currentDir, "lorem_ipsum_short.tmp"), type = "image/jpeg"),
-                    DataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "second-file", type = "image/jpeg")
-                )
-            }
+            .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp"), contentType = "image/jpeg"))
+            .add(FileDataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "second-file", contentType = "image/jpeg"))
             .responseString()
         val (data, error) = result
 
@@ -254,8 +249,7 @@ class UploadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
-            .name { "coolblob" }
-            .blob { _, _ -> Blob(inputStream = { file.inputStream() }, length = file.length(), name = file.name) }
+            .add(BlobDataPart(file.inputStream(), contentLength = file.length(), fileName = file.name, name = "coolblob"))
             .responseString()
         val (data, error) = result
 
@@ -281,10 +275,8 @@ class UploadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
-            .source { r, _ ->
-                r.header(Pair("Content-Type", "multipart/form-data; boundary=160f77ec3eff"))
-                File(currentDir, "lorem_ipsum_short.tmp")
-            }
+            .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp")))
+            .header(Headers.CONTENT_TYPE, "multipart/form-data; boundary=160f77ec3eff")
             .responseString()
         val (data, error) = result
 
@@ -310,7 +302,7 @@ class UploadRequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
-            .source { _, _ -> File(currentDir, "lorem_ipsum_short.tmp") }
+            .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp")))
             .responseString()
 
         val (data, error) = result

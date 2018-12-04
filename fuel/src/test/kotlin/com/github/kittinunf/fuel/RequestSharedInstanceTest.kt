@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
@@ -324,14 +325,17 @@ class RequestSharedInstanceTest : MockHttpTestCase() {
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = Fuel.upload(mock.path("Fuel/upload")).source { _, _ ->
-            val dir = System.getProperty("user.dir")
-            File(dir, "src/test/assets/lorem_ipsum_long.tmp")
-        }.progress { readBytes, totalBytes ->
-            read = readBytes
-            total = totalBytes
-            println("read: $read, total: $total")
-        }.responseString()
+        val (request, response, result) = Fuel.upload(mock.path("Fuel/upload"))
+            .add {
+                val dir = System.getProperty("user.dir")
+                FileDataPart(File(dir, "src/test/assets/lorem_ipsum_long.tmp"))
+            }
+            .progress { readBytes, totalBytes ->
+                read = readBytes
+                total = totalBytes
+                println("read: $read, total: $total")
+            }
+            .responseString()
         val (data, error) = result
 
         assertThat(request, notNullValue())

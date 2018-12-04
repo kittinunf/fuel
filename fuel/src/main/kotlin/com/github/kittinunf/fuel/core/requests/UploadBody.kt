@@ -1,18 +1,29 @@
 package com.github.kittinunf.fuel.core.requests
 
-import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.Body
+import com.github.kittinunf.fuel.core.DataPart
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.representationOfBytes
-import com.github.kittinunf.fuel.core.requests.UploadBody.Companion.DEFAULT_CHARSET
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-import java.net.URLConnection
 import java.nio.charset.Charset
+
+internal class BoundaryMissing(request: UploadRequest) : FuelError(
+    IllegalArgumentException(
+        "The Request is missing the boundary parameter in its Content-Type. This can happen if you manually overwrite" +
+            "the Content-Type but forget to set a boundary. The boundary is normally set automatically when you call " +
+            "\"request.upload()\". Remove manually setting the Content-Type or add the boundary parameter to the " +
+            "Content-Type for this request: " +
+            "\n\trequest.header(Headers.ContentType, \"multipart/form-data; boundary=custom-boundary\")"
+    ),
+    Response.error(request.url)
+)
+
 
 internal data class UploadBody(val request: UploadRequest) : Body {
 
@@ -94,7 +105,7 @@ internal data class UploadBody(val request: UploadRequest) : Body {
         }
 
         inputAvailable = false
-        val sourceCallback = request.sourceCallback
+        val lazyDataparts = request.dataParts
 
         return outputStream.buffered().let { stream ->
             // Parameters
@@ -103,17 +114,16 @@ internal data class UploadBody(val request: UploadRequest) : Body {
             }
 
             // Blobs / Files
-            val files = sourceCallback(request, request.url)
-            val filesWithHeadersLength = files.withIndex().sumByDouble { (i, blob) ->
-                writeBlob(stream, i, blob).toDouble()
+            val filesWithHeadersLength = lazyDataparts.sumByDouble { lazyDataPart ->
+                writeDataPart(stream, lazyDataPart(request)).toDouble()
             }
 
             // Sum and Trailer
             val writtenLength = 0L +
-                    parameterLength +
-                    filesWithHeadersLength +
-                    stream.writeString("--$boundary--") +
-                    stream.writeBytes(CRLF)
+                parameterLength +
+                filesWithHeadersLength +
+                stream.writeBoundary() + stream.writeString("--") +
+                stream.writeNewline()
 
             // This is a buffered stream, so flush what's remaining
             writtenLength.toLong().also { stream.flush() }
@@ -132,8 +142,14 @@ internal data class UploadBody(val request: UploadRequest) : Body {
             } +
 
                 // Blobs / Files size
-                request.sourceCallback(request, request.url).withIndex().sumByDouble { (index, blob) ->
-                    0.0 + writeBlobHeader(ByteArrayOutputStream(), index, blob) + blob.length + CRLF.size
+                request.dataParts.sumByDouble { lazyDataPart ->
+                    val dataPart = lazyDataPart(request)
+
+                    // Allow for unknown sizes
+                    val length = dataPart.contentLength ?: return@lazy null
+                    if (length == -1L) return@lazy -1L
+
+                    0.0 + writeDataPartHeader(ByteArrayOutputStream(), dataPart) + length + CRLF.size
                 } +
 
                 // Trailer size
@@ -141,63 +157,61 @@ internal data class UploadBody(val request: UploadRequest) : Body {
             ).toLong()
     }
 
-    private val boundary: String by lazy { retrieveBoundaryInfo(request) }
+    private val boundary: String by lazy {
+        request[Headers.CONTENT_TYPE].lastOrNull()
+            ?.let { Regex("boundary=([^\\s]+)").find(it) }
+            ?.let { it.groupValues.first() }
+            ?: throw BoundaryMissing(request)
+    }
 
     private fun writeParameter(outputStream: OutputStream, name: String, data: Any?): Long {
         outputStream.apply {
             return 0L +
-                writeString("--$boundary") +
-                writeBytes(CRLF) +
+                writeBoundary() +
+                writeNewline() +
                 writeString("${Headers.CONTENT_DISPOSITION}: form-data; name=\"$name\"") +
-                writeBytes(CRLF) +
+                writeNewline() +
                 writeString("${Headers.CONTENT_TYPE}: text/plain; charset=${DEFAULT_CHARSET.name()}") +
-                writeBytes(CRLF) +
-                writeBytes(CRLF) +
+                writeNewline() +
+                writeNewline() +
                 writeString(data.toString()) +
-                writeBytes(CRLF)
+                writeNewline()
         }
     }
 
-    private fun writeBlob(outputStream: OutputStream, index: Int, blob: Blob): Long {
+    private fun writeDataPart(outputStream: OutputStream, dataPart: DataPart): Long {
         outputStream.apply {
-            val headerLength = writeBlobHeader(outputStream, index, blob)
-            blob.inputStream().use { it.copyTo(this) }
-            return headerLength + blob.length + writeBytes(CRLF)
+            val headerLength = writeDataPartHeader(outputStream, dataPart)
+            val dataLength = dataPart.inputStream().use { it.copyTo(this) }
+            return headerLength + dataLength + writeNewline()
         }
     }
 
-    private fun writeBlobHeader(outputStream: OutputStream, index: Int, blob: Blob): Long {
-        val (name, _, _) = blob
-        val fieldName = request.names.getOrElse(index) { "${request.name}_${index + 1}" }
-        val mediaType = request.mediaTypes.getOrElse(index) { guessContentType(name) }
-
+    private fun writeDataPartHeader(outputStream: OutputStream, dataPart: DataPart): Long {
         outputStream.apply {
             return 0L +
-                writeString("--$boundary") +
-                writeBytes(CRLF) +
-                writeString("${Headers.CONTENT_DISPOSITION}: form-data; name=\"$fieldName\"; filename=\"$name\"") +
-                writeBytes(CRLF) +
-                writeString("${Headers.CONTENT_TYPE}: $mediaType") +
-                writeBytes(CRLF) +
-                writeBytes(CRLF)
+                writeBoundary() +
+                writeNewline() +
+                writeString("${Headers.CONTENT_DISPOSITION}: ${dataPart.contentDisposition}") +
+                writeNewline() +
+                writeString("${Headers.CONTENT_TYPE}: ${dataPart.contentType}") +
+                writeNewline() +
+                writeNewline()
         }
     }
+
+    private fun OutputStream.writeNewline() = writeBytes(CRLF)
+    private fun OutputStream.writeBytes(bytes: ByteArray) = write(bytes).let { bytes.size.toLong() }
+    private fun OutputStream.writeString(string: String, charset: Charset = DEFAULT_CHARSET) = writeBytes(string.toByteArray(charset))
+    private fun OutputStream.writeBoundary() = writeString("--$boundary")
 
     companion object {
         val DEFAULT_CHARSET = Charsets.UTF_8
-        private const val GENERIC_BYTE_CONTENT = "application/octet-stream"
         private val CRLF = "\r\n".toByteArray(DEFAULT_CHARSET)
 
         fun retrieveBoundaryInfo(request: Request): String {
             return request[Headers.CONTENT_TYPE].lastOrNull()?.split("boundary=", limit = 2)?.getOrNull(1)
                 ?: System.currentTimeMillis().toString(16)
-        }
-
-        fun guessContentType(name: String): String = try {
-            URLConnection.guessContentTypeFromName(name) ?: GENERIC_BYTE_CONTENT
-        } catch (ex: NoClassDefFoundError) {
-            // The MimetypesFileTypeMap class doesn't exists on old Android devices.
-            GENERIC_BYTE_CONTENT
         }
 
         fun from(request: UploadRequest): Body {
@@ -206,15 +220,4 @@ internal data class UploadBody(val request: UploadRequest) : Body {
             }
         }
     }
-}
-
-private fun OutputStream.writeString(string: String, charset: Charset = DEFAULT_CHARSET): Long {
-    val bytes = string.toByteArray(charset)
-    write(bytes)
-    return bytes.size.toLong()
-}
-
-private fun OutputStream.writeBytes(bytes: ByteArray): Long {
-    write(bytes)
-    return bytes.size.toLong()
 }

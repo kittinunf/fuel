@@ -3,81 +3,38 @@ package com.github.kittinunf.fuel.core.requests
 import com.github.kittinunf.fuel.core.Blob
 import com.github.kittinunf.fuel.core.DataPart
 import com.github.kittinunf.fuel.core.Headers
+import com.github.kittinunf.fuel.core.LazyDataPart
 import com.github.kittinunf.fuel.core.ProgressCallback
 import com.github.kittinunf.fuel.core.Request
 import java.io.File
 import java.net.URL
+import java.util.UUID
 
-typealias UploadSourceCallback = (Request, URL) -> Iterable<Blob>
 
 class UploadRequest private constructor(private val wrapped: Request) : Request by wrapped {
     override val request: UploadRequest = this
-    lateinit var sourceCallback: UploadSourceCallback
+    val dataParts: MutableCollection<LazyDataPart> = mutableListOf()
 
-    internal var name: String = "file"
-    internal val names: MutableList<String> = mutableListOf()
-    internal val mediaTypes: MutableList<String> = mutableListOf()
+    private fun ensureBoundary() {
+        val contentType = this[Headers.CONTENT_TYPE].lastOrNull()
+
+        // Overwrite the current content type
+        if (contentType.isNullOrBlank() || !contentType.startsWith("multipart/form-data") || !Regex("boundary=[^\\s]+").containsMatchIn(contentType)) {
+            this[Headers.CONTENT_TYPE] = "multipart/form-data; boundary=${UUID.randomUUID()}"
+            return
+        }
+    }
 
     override fun toString() = "Upload[\n\r\t$wrapped\n\r]"
 
-    /**
-     *  Replace each pair, using the key as header name and value as header content
-     */
-    fun blobs(blobsCallback: UploadSourceCallback): UploadRequest {
-        sourceCallback = blobsCallback
-        return request
-    }
+    fun add(dataPart: LazyDataPart) = plus(dataPart)
+    fun add(vararg dataParts: LazyDataPart) = dataParts.fold(this, UploadRequest::plus)
+    fun add(dataPart: DataPart) = plus(dataPart)
+    fun add(vararg dataParts: DataPart) = plus(dataParts.toList())
 
-    fun blob(blobCallback: (Request, URL) -> Blob) = blobs { request, _ -> listOf(blobCallback(request, request.url)) }
-    fun dataParts(dataPartsCallback: (Request, URL) -> Iterable<DataPart>): UploadRequest {
-        val parts = dataPartsCallback(request, request.url)
-
-        mediaTypes.apply {
-            clear()
-            addAll(parts.map { it.type })
-        }
-
-        names.apply {
-            clear()
-            addAll(parts.map { it.name })
-        }
-
-        sourceCallback = { _, _ ->
-            parts.map { (file) -> Blob(file.name, file.length(), file::inputStream) }
-        }
-
-        return request
-    }
-
-    fun sources(sourcesCallback: (Request, URL) -> Iterable<File>): UploadRequest {
-        mediaTypes.clear()
-        names.clear()
-
-        val files = sourcesCallback(request, request.url)
-
-        sourceCallback = { _, _ ->
-            files.map { Blob(it.name, it.length(), it::inputStream) }
-        }
-
-        return request
-    }
-
-    fun source(sourceCallback: (Request, URL) -> File): UploadRequest {
-        sources { request, _ ->
-            listOf(sourceCallback(request, request.url))
-        }
-
-        return request
-    }
-
-    fun name(nameCallback: () -> String): UploadRequest {
-        return name(nameCallback())
-    }
-
-    fun name(newName: String): UploadRequest {
-        name = newName
-        return request
-    }
+    operator fun plus(dataPart: LazyDataPart) = this.also { dataParts.add(dataPart) }
+    operator fun plus(dataPart: DataPart) = plus { dataPart }
+    operator fun plus(dataParts: Iterable<DataPart>) = dataParts.fold(this, UploadRequest::plus)
 
     fun progress(progress: ProgressCallback) = requestProgress(progress)
 
@@ -86,14 +43,37 @@ class UploadRequest private constructor(private val wrapped: Request) : Request 
         fun enableFor(request: Request) = request.enabledFeatures
             .getOrPut(FEATURE) {
                 UploadRequest(request)
-                    .apply {
-                        this.body(UploadBody.from(this))
-
-                        val boundary = System.currentTimeMillis().toString(16)
-                        this[Headers.CONTENT_TYPE] = "multipart/form-data; boundary=$boundary"
-                    }
+                    .apply { this.body(UploadBody.from(this)) }
+                    .apply { this.ensureBoundary() }
             } as UploadRequest
     }
-}
 
+    @Deprecated("Use request.add({ BlobDataPart(...) }, { ... }, ...) instead", ReplaceWith(""), DeprecationLevel.ERROR)
+    fun blobs(@Suppress("DEPRECATION") blobsCallback: (Request, URL) -> Iterable<Blob>): UploadRequest =
+        throw NotImplementedError("request.blobs has been removed. Use request.add({ BlobDataPart(...) }, { ... }, ...) instead.")
+
+    @Deprecated("Use request.add { BlobDataPart(...) } instead", ReplaceWith("add(blobsCallback)"))
+    fun blob(@Suppress("DEPRECATION") blobCallback: (Request, URL) -> Blob): UploadRequest =
+        throw NotImplementedError("request.blob has been removed. Use request.add { BlobDataPart(...) } instead.")
+
+    @Deprecated("Use request.add({ ... }, { ... }, ...) instead", ReplaceWith(""), DeprecationLevel.ERROR)
+    fun dataParts(dataPartsCallback: (Request, URL) -> Iterable<DataPart>): UploadRequest =
+        throw NotImplementedError("request.dataParts has been removed. Use request.add { XXXDataPart(...) } instead.")
+
+    @Deprecated("Use request.add({ FileDataPart(...) }, { ... }, ...) instead", ReplaceWith(""), DeprecationLevel.ERROR)
+    fun sources(sourcesCallback: (Request, URL) -> Iterable<File>): UploadRequest =
+        throw NotImplementedError("request.sources has been removed. Use request.add({ BlobDataPart(...) }, { ... }, ...) instead.")
+
+    @Deprecated("Use request.add { FileDataPart(...)} instead", ReplaceWith("add(sourceCallback)"), DeprecationLevel.ERROR)
+    fun source(sourceCallback: (Request, URL) -> File): UploadRequest =
+        throw NotImplementedError("request.source has been removed. Use request.add { FileDataPart(...) } instead.")
+
+    @Deprecated("Set the name via DataPart (FileDataPart, InlineDataPart, BlobDataPart) instead", ReplaceWith(""), DeprecationLevel.ERROR)
+    fun name(nameCallback: () -> String): UploadRequest =
+        throw NotImplementedError("request.name has been removed. Set the name via DataPart (FileDataPart, InlineDataPart, BlobDataPart) instead")
+
+    @Deprecated("Set the name via DataPart (FileDataPart, InlineDataPart, BlobDataPart) instead", ReplaceWith(""), DeprecationLevel.ERROR)
+    fun name(newName: String): UploadRequest =
+        throw NotImplementedError("request.name has been removed. Set the name via DataPart (FileDataPart, InlineDataPart, BlobDataPart) instead")
+}
 fun Request.upload(): UploadRequest = UploadRequest.enableFor(this)
