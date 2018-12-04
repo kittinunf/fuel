@@ -4,29 +4,119 @@ import com.github.kittinunf.fuel.core.BlobDataPart
 import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
+import com.github.kittinunf.fuel.core.InlineDataPart
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.ResponseResultOf
 import com.github.kittinunf.fuel.test.MockHttpTestCase
+import com.github.kittinunf.fuel.test.MockReflected
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.notNullValue
-import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Assert.assertThat
+import org.junit.Assert.fail
 import org.junit.Test
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.HttpURLConnection
-import java.net.URL
-import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class UploadRequestTest : MockHttpTestCase() {
-    private val currentDir: File by lazy {
-        val dir = System.getProperty("user.dir")
-        File(dir, "src/test/assets")
+    private val currentDir = File(System.getProperty("user.dir"), "src/test/assets")
+
+    private fun assertFileUploaded(file: File, result: ResponseResultOf<MockReflected>, name: String? = file.nameWithoutExtension, fileName: String? = file.name): ResponseResultOf<MockReflected> {
+        val (request, response, wrapped) = result
+        val (data, error) = wrapped
+
+        assertThat("Expected request not to be null", request, notNullValue())
+        assertThat("Expected response not to be null", response, notNullValue())
+        assertThat("Expected data, actual error $error", data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response.statusCode, equalTo(statusCode))
+
+        // Assert the content-type
+        assertThat(request[Headers.CONTENT_TYPE].lastOrNull(), startsWith("multipart/form-data"))
+        assertThat(request[Headers.CONTENT_TYPE].lastOrNull(), containsString("boundary="))
+
+        val body = data!!.body!!.string!!
+        assertBodyFormat(body, request[Headers.CONTENT_TYPE].last().split("boundary=", limit = 2).last().trim('"'))
+
+        val expectedContents = file.readText()
+        assertThat(body, containsString(expectedContents))
+
+        val contentDispositions = body.lines().filter { it.startsWith(Headers.CONTENT_DISPOSITION, true) }
+        val contentDispositionParameters = contentDispositions.flatMap { it.split(";").map { it.trim() } }
+        if (name != null) {
+            val foundNames = contentDispositionParameters.filter { it.startsWith("name=") }
+                .map { it.substringAfter("name=") }
+                .map { it.trim('"') }
+
+            assertThat("Expected $name to be the name, actual $foundNames", foundNames.contains(name), equalTo(true))
+        }
+
+        if (fileName != null) {
+            val foundFileNames = contentDispositionParameters.filter { it.startsWith("filename=") }
+                .map { it.substringAfter("filename=") }
+                .map { it.trim('"') }
+
+            assertThat("Expected $fileName to be the filename, actual $foundFileNames", foundFileNames.contains(fileName), equalTo(true))
+        }
+
+        return result
+    }
+
+    private fun assertBodyFormat(body: String, boundary: String) {
+        val parts = body.split("--$boundary\r\n").toMutableList()
+        if (parts.isEmpty()) {
+            return
+        }
+
+        assertThat("Expected there to be at least one part, given there is at least one boundary", parts.size > 1, equalTo(true))
+        assertThat("Expected body to start with boundary", parts.removeAt(0).isBlank(), equalTo(true))
+        assertThat("Expected body to end with boundary EOF", parts.last(), endsWith("\r\n--$boundary--\r\n"))
+
+        parts.forEach { part ->
+            println("PART IS $part")
+
+            val lines = part.split("\r\n").toMutableList()
+            val expected = mutableMapOf(Headers.CONTENT_DISPOSITION to false, Headers.CONTENT_TYPE to false, "\r\n" to false)
+            val found = mutableMapOf(Headers.CONTENT_DISPOSITION to "", Headers.CONTENT_TYPE to "", "\r\n" to "")
+
+            while (expected["\r\n"] == false && lines.isNotEmpty()) {
+                val line = lines.removeAt(0)
+
+                println("LINE is $line")
+
+                val match = expected.keys.find { line.startsWith(it, false) || (it == "\r\n" && line.isEmpty()) }
+
+                if (match == null) {
+                    println("Nothing found for $line")
+                } else {
+
+                    if (expected[match] == true) {
+                        fail("Expected $match to be present at most once")
+                    }
+
+                    expected[match] = true
+                    found[match] = line
+                }
+            }
+
+            if (expected[Headers.CONTENT_DISPOSITION] == false) {
+                fail("Expected ${Headers.CONTENT_DISPOSITION} to be present")
+            }
+
+            val contentDisposition = found[Headers.CONTENT_DISPOSITION]!!
+            assertThat("Only form-data is allowed as content-disposition", contentDisposition, containsString(": form-data"))
+            assertThat("Name parameter is required", contentDisposition, containsString("name="))
+        }
     }
 
     @Test
-    fun httpUploadWithPostCase() {
+    fun uploadFileAsDataPart() {
         val manager = FuelManager()
 
         mock.chain(
@@ -34,22 +124,16 @@ class UploadRequestTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"))
-            .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp")))
-            .responseString()
-        val (data, error) = result
+        val file = File(currentDir, "lorem_ipsum_short.tmp")
+        val triple = manager.upload(mock.path("upload"))
+            .add(FileDataPart(file))
+            .responseObject(MockReflected.Deserializer())
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertFileUploaded(file, triple)
     }
 
     @Test
-    fun httpUploadWithPostAndParamsCase() {
+    fun uploadFileAndParameters() {
         val manager = FuelManager()
 
         mock.chain(
@@ -57,23 +141,21 @@ class UploadRequestTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
-            .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp"), name = "file-name"))
-            .responseString()
+        val file = File(currentDir, "lorem_ipsum_short.tmp")
+        val triple = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
+            .add(FileDataPart(file, name = "file"))
+            .responseObject(MockReflected.Deserializer())
 
-        val (data, error) = result
+        val (request, _, result) = assertFileUploaded(file, triple, name = "file")
+        assertThat(request.url.toExternalForm(), not(containsString("foo")))
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        val (data, _) = result
+        assertThat(data!!.body!!.string, containsString("name=\"foo\""))
+        assertThat(data.body!!.string, containsString("bar"))
     }
 
     @Test
-    fun httpUploadWithPutCase() {
+    fun uploadFileUsingPut() {
         val manager = FuelManager()
 
         mock.chain(
@@ -81,22 +163,16 @@ class UploadRequestTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), Method.PUT)
-            .add(FileDataPart(File(currentDir, "lorem_ipsum_long.tmp")))
-            .responseString()
-        val (data, error) = result
+        val file = File(currentDir, "lorem_ipsum_long.tmp")
+        val triple = manager.upload(mock.path("upload"), Method.PUT)
+            .add(FileDataPart(file))
+            .responseObject(MockReflected.Deserializer())
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertFileUploaded(file, triple)
     }
 
     @Test
-    fun httpUploadWithProgressValidCase() {
+    fun uploadFileUsingProgress() {
         val manager = FuelManager()
 
         mock.chain(
@@ -107,29 +183,19 @@ class UploadRequestTest : MockHttpTestCase() {
         var read = -1L
         var total = -1L
 
-        val (request, response, result) = manager.upload(mock.path("upload"))
-            .add(FileDataPart(File(currentDir, "lorem_ipsum_long.tmp")))
-            .progress { readBytes, totalBytes ->
-                read = readBytes
-                total = totalBytes
-                println("read: $read, total: $total")
-            }
-            .responseString()
-        val (data, error) = result
+        val file = File(currentDir, "lorem_ipsum_long.tmp")
+        val triple = manager.upload(mock.path("upload"))
+            .add(FileDataPart(file))
+            .progress { readBytes, totalBytes -> read = readBytes; total = totalBytes }
+            .responseObject(MockReflected.Deserializer())
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
+        assertFileUploaded(file, triple)
 
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
-
-        assertThat(read == total && read != -1L && total != -1L, isEqualTo(true))
+        assertThat("Expected upload progress", read == total && read != -1L && total != -1L, equalTo(true))
     }
 
     @Test
-    fun httpUploadWithProgressInvalidEndPointCase() {
+    fun uploadToInvalidEndpoint() {
         val manager = FuelManager()
 
         mock.chain(
@@ -139,22 +205,20 @@ class UploadRequestTest : MockHttpTestCase() {
 
         val (request, response, result) = manager.upload(mock.path("nope"))
             .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp")))
-            .progress { _, _ -> }
             .responseString()
 
         val (data, error) = result
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, notNullValue())
-        assertThat(data, nullValue())
+        assertThat("Expected request not to be null", request, notNullValue())
+        assertThat("Expected response not to be null", response, notNullValue())
+        assertThat("Expected error, actual data $data", error, notNullValue())
 
         val statusCode = HttpURLConnection.HTTP_NOT_FOUND
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
     }
 
     @Test
-    fun httpUploadWithProgressInvalidFileCase() {
+    fun uploadNonExistingFile() {
         val manager = FuelManager()
 
         mock.chain(
@@ -164,23 +228,21 @@ class UploadRequestTest : MockHttpTestCase() {
 
         val (request, response, result) = manager.upload(mock.path("upload"))
             .add { FileDataPart(File(currentDir, "not_found_file.tmp")) }
-            .progress { _, _ -> }
             .responseString()
         val (data, error) = result
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, notNullValue())
-        assertThat(data, nullValue())
+        assertThat("Expected request not to be null", request, notNullValue())
+        assertThat("Expected response not to be null", response, notNullValue())
+        assertThat("Expected error, actual data $data", error, notNullValue())
 
         assertThat(error?.exception as FileNotFoundException, isA(FileNotFoundException::class.java))
 
         val statusCode = -1
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(response.statusCode, equalTo(statusCode))
     }
 
     @Test
-    fun httpUploadWithMultipleFiles() {
+    fun uploadMultipleFilesUnderSameField() {
         val manager = FuelManager()
 
         mock.chain(
@@ -188,59 +250,23 @@ class UploadRequestTest : MockHttpTestCase() {
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
+        val shortFile = File(currentDir, "lorem_ipsum_short.tmp")
+        val longFile = File(currentDir, "lorem_ipsum_long.tmp")
+        val triple = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
             .add(
-                FileDataPart(File(currentDir, "lorem_ipsum_short.tmp"), name = "file-name"),
-                FileDataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "file-name")
+                FileDataPart(shortFile, name = "file"),
+                FileDataPart(longFile, name = "file")
             )
-            .responseString()
-        val (data, error) = result
+            .responseObject(MockReflected.Deserializer())
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
+        assertFileUploaded(shortFile, triple, name = "file")
+        assertFileUploaded(longFile, triple, name = "file")
 
-        val string = data as String
-        assertThat(string, containsString("file-name"))
-        assertThat(string, containsString("lorem_ipsum_short.tmp"))
-        assertThat(string, containsString("lorem_ipsum_long.tmp"))
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(triple.third.component1()!!.body!!.string, not(containsString("multipart/mixed")))
     }
 
     @Test
-    fun httpUploadWithMultipleDataParts() {
-        val manager = FuelManager()
-
-        mock.chain(
-            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
-            response = mock.reflect()
-        )
-
-        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
-            .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp"), contentType = "image/jpeg"))
-            .add(FileDataPart(File(currentDir, "lorem_ipsum_long.tmp"), name = "second-file", contentType = "image/jpeg"))
-            .responseString()
-        val (data, error) = result
-
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
-
-        val string = data as String
-        assertThat(string, containsString("lorem_ipsum_short"))
-        assertThat(string, containsString("second-file"))
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
-    }
-
-    @Test
-    fun httpUploadWithNamedBlob() {
-        val file = File(currentDir, "lorem_ipsum_short.tmp")
+    fun uploadMultipleFilesUnderSameFieldArray() {
         val manager = FuelManager()
 
         mock.chain(
@@ -248,25 +274,85 @@ class UploadRequestTest : MockHttpTestCase() {
                 response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
-            .add(BlobDataPart(file.inputStream(), contentLength = file.length(), fileName = file.name, name = "coolblob"))
-            .responseString()
-        val (data, error) = result
+        val shortFile = File(currentDir, "lorem_ipsum_short.tmp")
+        val longFile = File(currentDir, "lorem_ipsum_long.tmp")
+        val triple = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
+            .add(
+                FileDataPart(shortFile, name = "file[]"),
+                FileDataPart(longFile, name = "file[]")
+            )
+            .responseObject(MockReflected.Deserializer())
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
+        assertFileUploaded(shortFile, triple, name = "file[]")
+        assertFileUploaded(longFile, triple, name = "file[]")
 
-        val string = data as String
-        assertThat(string, containsString("coolblob"))
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(triple.third.component1()!!.body!!.string, not(containsString("multipart/mixed")))
     }
 
     @Test
-    fun httpUploadWithSpecifiedBoundary() {
+    fun uploadMultipleFilesAsMultipleFields() {
+        val manager = FuelManager()
+
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
+        )
+
+        val shortFile = File(currentDir, "lorem_ipsum_short.tmp")
+        val longFile = File(currentDir, "lorem_ipsum_long.tmp")
+
+        val triple = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
+            .add(FileDataPart(shortFile, contentType = "image/jpeg"))
+            .add(FileDataPart(longFile, name = "second-file", contentType = "image/jpeg"))
+            .responseObject(MockReflected.Deserializer())
+
+        assertFileUploaded(shortFile, triple)
+        assertFileUploaded(longFile, triple, name = "second-file")
+    }
+
+    @Test
+    fun uploadBlob() {
+        val file = File(currentDir, "lorem_ipsum_short.tmp")
+        val blob = BlobDataPart(file.inputStream(), contentLength = file.length(), fileName = file.name, name = "coolblob")
+        val manager = FuelManager()
+
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
+        )
+
+        val triple = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
+            .add { blob }
+            .responseObject(MockReflected.Deserializer())
+
+        assertFileUploaded(file, triple, name = "coolblob", fileName = file.name)
+    }
+
+    @Test
+    fun uploadWithCustomBoundary() {
+        val manager = FuelManager()
+
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.reflect()
+        )
+
+        val boundary = "160f77ec3eff"
+        val file = File(currentDir, "lorem_ipsum_short.tmp")
+        val triple = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
+            .add(FileDataPart(file))
+            .header(Headers.CONTENT_TYPE, "multipart/form-data; boundary=\"$boundary\"")
+            .responseObject(MockReflected.Deserializer())
+
+        val (_, _, result) = assertFileUploaded(file, triple)
+        val (data, _) = result
+
+        val body = data!!.body!!.string
+        assertThat(body, containsString("--$boundary--"))
+    }
+
+    @Test
+    fun uploadWithInvalidBoundary() {
         val manager = FuelManager()
 
         mock.chain(
@@ -276,64 +362,39 @@ class UploadRequestTest : MockHttpTestCase() {
 
         val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
             .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp")))
-            .header(Headers.CONTENT_TYPE, "multipart/form-data; boundary=160f77ec3eff")
-            .responseString()
+            .header(Headers.CONTENT_TYPE, "multipart/form-data")
+            .responseObject(MockReflected.Deserializer())
+
         val (data, error) = result
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
+        assertThat("Expected request not to be null", request, notNullValue())
+        assertThat("Expected response not to be null", response, notNullValue())
+        assertThat("Expected error, actual data $data", error, notNullValue())
 
-        val string = data as String
-        assertThat(string, containsString("boundary=160f77ec3eff"))
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
+        assertThat(error?.exception as? IllegalArgumentException, isA(IllegalArgumentException::class.java))
     }
 
     @Test
-    fun httpUploadWithEmptyBoundary() {
+    fun uploadInlineDataPart() {
         val manager = FuelManager()
-
         mock.chain(
             request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
             response = mock.reflect()
         )
 
-        val (request, response, result) = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
-            .add(FileDataPart(File(currentDir, "lorem_ipsum_short.tmp")))
-            .responseString()
+        val shortFile = File(currentDir, "lorem_ipsum_short.tmp")
+        val longFile = File(currentDir, "lorem_ipsum_long.tmp")
+        val metadata = longFile.readText()
+        val triple = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
+            .add(
+                FileDataPart(shortFile, name = "file"),
+                InlineDataPart(metadata, name = "metadata", contentType = "application/json", fileName = "metadata.json")
+            )
+            .responseObject(MockReflected.Deserializer())
 
-        val (data, error) = result
+        assertFileUploaded(shortFile, triple, name = "file")
+        assertFileUploaded(longFile, triple, name = "metadata", fileName = "metadata.json")
 
-        assertThat(request, notNullValue())
-        assertThat(response, notNullValue())
-        assertThat(error, nullValue())
-        assertThat(data, notNullValue())
-
-        val string = data as String
-        assertThat(string, containsString("boundary="))
-
-        val statusCode = HttpURLConnection.HTTP_OK
-        assertThat(response.statusCode, isEqualTo(statusCode))
-    }
-
-    @Test
-    fun getBoundaryWithBoundaryHeaders() {
-        val request = DefaultRequest(Method.POST, URL("http://httpbin.org"))
-        request.header(Pair(Headers.CONTENT_TYPE, "multipart/form-data; boundary=160f77ec3eff"))
-
-        val boundary = UploadBody.retrieveBoundaryInfo(request)
-
-        assertThat(boundary, equalTo("160f77ec3eff"))
-    }
-
-    @Test
-    fun getBoundaryWithEmptyHeaders() {
-        val request = DefaultRequest(Method.POST, URL("http://httpbin.org"))
-        val boundary = UploadBody.retrieveBoundaryInfo(request)
-
-        assertThat(boundary, notNullValue())
+        assertThat(triple.third.component1()!!.body!!.string, not(containsString("multipart/mixed")))
     }
 }

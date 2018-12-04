@@ -4,7 +4,6 @@ import com.github.kittinunf.fuel.core.Body
 import com.github.kittinunf.fuel.core.DataPart
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
-import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.representationOfBytes
 import java.io.ByteArrayInputStream
@@ -15,11 +14,11 @@ import java.nio.charset.Charset
 
 internal class BoundaryMissing(request: UploadRequest) : FuelError(
     IllegalArgumentException(
-        "The Request is missing the boundary parameter in its Content-Type. This can happen if you manually overwrite" +
-            "the Content-Type but forget to set a boundary. The boundary is normally set automatically when you call " +
-            "\"request.upload()\". Remove manually setting the Content-Type or add the boundary parameter to the " +
-            "Content-Type for this request: " +
-            "\n\trequest.header(Headers.ContentType, \"multipart/form-data; boundary=custom-boundary\")"
+        "The Request is missing the boundary parameter in its Content-Type.\n\n" +
+        "This can happen if you manually overwrite the Content-Type but forget to set a boundary. The boundary is \n" +
+        "normally set automatically when you call \"request.upload()\". Remove manually setting the Content-Type or \n" +
+        "add the boundary parameter to the Content-Type for this request: \n\n" +
+            "\trequest.header(Headers.ContentType, \"multipart/form-data; boundary=custom-boundary\")"
     ),
     Response.error(request.url)
 )
@@ -140,26 +139,25 @@ internal data class UploadBody(val request: UploadRequest) : Body {
                 writeParameter(ByteArrayOutputStream(), name, data).toDouble()
             } +
 
-                // Blobs / Files size
-                request.dataParts.sumByDouble { lazyDataPart ->
-                    val dataPart = lazyDataPart(request)
+            // Blobs / Files size
+            request.dataParts.sumByDouble { lazyDataPart ->
+                val dataPart = lazyDataPart(request)
 
-                    // Allow for unknown sizes
-                    val length = dataPart.contentLength ?: return@lazy null
-                    if (length == -1L) return@lazy -1L
+                // Allow for unknown sizes
+                val length = dataPart.contentLength ?: return@lazy null
+                if (length == -1L) return@lazy -1L
 
-                    0.0 + writeDataPartHeader(ByteArrayOutputStream(), dataPart) + length + CRLF.size
-                } +
+                0.0 + writeDataPartHeader(ByteArrayOutputStream(), dataPart) + length + CRLF.size
+            } +
 
-                // Trailer size
-                "--$boundary--".toByteArray(DEFAULT_CHARSET).size + CRLF.size
-            ).toLong()
+            // Trailer size
+            "--$boundary--".toByteArray(DEFAULT_CHARSET).size + CRLF.size
+        ).toLong()
     }
 
     private val boundary: String by lazy {
         request[Headers.CONTENT_TYPE].lastOrNull()
-            ?.let { Regex("boundary=([^\\s]+)").find(it) }
-            ?.let { it.groupValues.first() }
+            ?.let { Regex("boundary=([^\\s]+)").find(it)?.groupValues?.getOrNull(1)?.trim('"') }
             ?: throw BoundaryMissing(request)
     }
 
@@ -170,7 +168,7 @@ internal data class UploadBody(val request: UploadRequest) : Body {
                 writeNewline() +
                 writeString("${Headers.CONTENT_DISPOSITION}: form-data; name=\"$name\"") +
                 writeNewline() +
-                writeString("${Headers.CONTENT_TYPE}: text/plain; charset=${DEFAULT_CHARSET.name()}") +
+                writeString("${Headers.CONTENT_TYPE}: text/plain; charset=\"${DEFAULT_CHARSET.name()}\"") +
                 writeNewline() +
                 writeNewline() +
                 writeString(data.toString()) +
@@ -207,11 +205,6 @@ internal data class UploadBody(val request: UploadRequest) : Body {
     companion object {
         val DEFAULT_CHARSET = Charsets.UTF_8
         private val CRLF = "\r\n".toByteArray(DEFAULT_CHARSET)
-
-        fun retrieveBoundaryInfo(request: Request): String {
-            return request[Headers.CONTENT_TYPE].lastOrNull()?.split("boundary=", limit = 2)?.getOrNull(1)
-                ?: System.currentTimeMillis().toString(16)
-        }
 
         fun from(request: UploadRequest): Body {
             return UploadBody(request).apply {
