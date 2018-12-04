@@ -79,17 +79,12 @@ class UploadRequestTest : MockHttpTestCase() {
         assertThat("Expected body to end with boundary EOF", parts.last(), endsWith("\r\n--$boundary--\r\n"))
 
         parts.forEach { part ->
-            println("PART IS $part")
-
             val lines = part.split("\r\n").toMutableList()
             val expected = mutableMapOf(Headers.CONTENT_DISPOSITION to false, Headers.CONTENT_TYPE to false, "\r\n" to false)
             val found = mutableMapOf(Headers.CONTENT_DISPOSITION to "", Headers.CONTENT_TYPE to "", "\r\n" to "")
 
             while (expected["\r\n"] == false && lines.isNotEmpty()) {
                 val line = lines.removeAt(0)
-
-                println("LINE is $line")
-
                 val match = expected.keys.find { line.startsWith(it, false) || (it == "\r\n" && line.isEmpty()) }
 
                 if (match == null) {
