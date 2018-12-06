@@ -11,9 +11,9 @@ typealias RequestFeatures = MutableMap<String, Request>
 
 interface Request : RequestFactory.RequestConvertible {
     val method: Method
-    val url: URL
+    var url: URL
     val headers: Headers
-    val parameters: Parameters
+    var parameters: Parameters
     var executionOptions: RequestExecutionOptions
     val body: Body
     val enabledFeatures: RequestFeatures

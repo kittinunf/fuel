@@ -7,8 +7,9 @@ import java.util.concurrent.Future
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLSocketFactory
 
-private typealias RequestTransformer = (Request) -> Request
-private typealias ResponseTransformer = (Request, Response) -> Response
+typealias RequestTransformer = (Request) -> Request
+typealias ResponseTransformer = (Request, Response) -> Response
+
 typealias InterruptCallback = (Request) -> Unit
 
 data class RequestExecutionOptions(

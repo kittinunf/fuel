@@ -30,13 +30,12 @@ import java.nio.charset.Charset
 
 data class DefaultRequest(
     override val method: Method,
-    override val url: URL,
+    override var url: URL,
     override val headers: Headers = Headers(),
-    override val parameters: Parameters = listOf(),
+    override var parameters: Parameters = listOf(),
     internal var _body: Body = DefaultBody(),
     override val enabledFeatures: RequestFeatures = mutableMapOf()
 ) : Request {
-
     override lateinit var executionOptions: RequestExecutionOptions
     override val body: Body get() = _body
 
