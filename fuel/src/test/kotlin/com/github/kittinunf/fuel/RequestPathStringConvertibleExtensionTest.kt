@@ -174,7 +174,7 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
 
         val (request, response, result) = PathStringConvertibleImpl(mock.path("http-download"))
             .httpDownload()
-            .destination { _, _ -> File.createTempFile("123456", null) }
+            .fileDestination { _, _ -> File.createTempFile("123456", null) }
             .responseString()
         val (data, error) = result
 

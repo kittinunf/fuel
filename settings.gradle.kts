@@ -32,4 +32,8 @@ include(":fuel-kotlinx-serialization")
 include(":fuel-moshi")
 include(":fuel-test")
 include(":fuel-json")
-include(":sample")
+
+val includeSample: String by settings
+if (includeSample == "true") {
+    include(":sample")
+}

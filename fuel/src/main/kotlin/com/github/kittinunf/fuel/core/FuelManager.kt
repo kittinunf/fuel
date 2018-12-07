@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.core.RequestFactory.PathStringConvertible
 import com.github.kittinunf.fuel.core.RequestFactory.RequestConvertible
+import com.github.kittinunf.fuel.core.interceptors.ParameterEncoder
 import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import com.github.kittinunf.fuel.core.requests.DownloadRequest
@@ -20,6 +21,9 @@ import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
+
+typealias FoldableRequestInterceptor = (RequestTransformer) -> RequestTransformer
+typealias FoldableResponseInterceptor = (ResponseTransformer) -> ResponseTransformer
 
 class FuelManager : RequestFactory, RequestFactory.Convenience {
 
@@ -58,9 +62,9 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
         }
     }
 
-    private val requestInterceptors: MutableList<((Request) -> Request) -> ((Request) -> Request)> =
-            mutableListOf()
-    private val responseInterceptors: MutableList<((Request, Response) -> Response) -> ((Request, Response) -> Response)> =
+    private val requestInterceptors: MutableList<FoldableRequestInterceptor> =
+            mutableListOf(ParameterEncoder)
+    private val responseInterceptors: MutableList<FoldableResponseInterceptor> =
             mutableListOf(redirectResponseInterceptor(this), validatorResponseInterceptor(200..299))
 
     // callback executionOptions
@@ -147,22 +151,22 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
         return applyOptions(request).upload()
     }
 
-    fun addRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)): FuelManager {
+    fun addRequestInterceptor(interceptor: FoldableRequestInterceptor): FuelManager {
         requestInterceptors += interceptor
         return this
     }
 
-    fun addResponseInterceptor(interceptor: ((Request, Response) -> Response) -> ((Request, Response) -> Response)): FuelManager {
+    fun addResponseInterceptor(interceptor: FoldableResponseInterceptor): FuelManager {
         responseInterceptors += interceptor
         return this
     }
 
-    fun removeRequestInterceptor(interceptor: ((Request) -> Request) -> ((Request) -> Request)): FuelManager {
+    fun removeRequestInterceptor(interceptor: FoldableRequestInterceptor): FuelManager {
         requestInterceptors -= interceptor
         return this
     }
 
-    fun removeResponseInterceptor(interceptor: ((Request, Response) -> Response) -> ((Request, Response) -> Response)): FuelManager {
+    fun removeResponseInterceptor(interceptor: FoldableResponseInterceptor): FuelManager {
         responseInterceptors -= interceptor
         return this
     }
@@ -213,14 +217,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [Request] the request
      */
     override fun get(path: String, parameters: Parameters?): Request =
-        request(Method.GET, path, parameters?.flatMap { pair ->
-            // TODO: move to generic url encoding
-            (pair.second as? Iterable<*>)?.map {
-                "${pair.first}[]" to it
-            }?.toList() ?: (pair.second as? Array<*>)?.map {
-                "${pair.first}[]" to it
-            }?.toList() ?: listOf(pair)
-        })
+        request(Method.GET, path, parameters)
 
     /**
      * Create a [Method.GET] [Request] to [PathStringConvertible.path] with [parameters]

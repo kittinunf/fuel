@@ -143,7 +143,7 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         mock.chain(request = redirectedRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
+        manager.addRequestInterceptor(LogRequestAsCurlInterceptor)
 
         val data = expectRedirectedUserAgent(
             FuelManager()

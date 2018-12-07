@@ -138,7 +138,7 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
         val (request, response, result) = mock.path("http-download")
             .httpDownload()
-            .destination { _, _ -> File.createTempFile("http-download.dl", null) }
+            .fileDestination { _, _ -> File.createTempFile("http-download.dl", null) }
             .responseString()
         val (data, error) = result
 

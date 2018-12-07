@@ -132,14 +132,6 @@ All the `String` extensions listed above, as well as the `Fuel` and `FuelManager
     // https://httpbin.org/delete?foo=foo&bar=bar
     ```
 
-* Array support for `GET` requests
-
-    ```kotlin
-    Fuel.get("https://httpbin.org/get", listOf("foo" to "foo", "dwarf" to  arrayOf("grumpy","happy","sleepy","dopey")))
-        .url
-    // https://httpbin.org/get?foo=foo&dwarf[]=grumpy&dwarf[]=happy&dwarf[]=sleepy&dwarf[]=dopey
-    ```
-
 * Support `x-www-form-urlencoded` for `PUT`, `POST` and `PATCH`
 
     ```kotlin
@@ -159,6 +151,19 @@ All the `String` extensions listed above, as well as the `Fuel` and `FuelManager
     // https://httpbin.org/post
     // "foo=foo&bar=bar"
     ```
+    
+#### `Parameters` with `Body`
+If a request already has a body, the parameters are url-encoded instead. You can remove the handling of parameter encoding by removing the default `ParameterEncoder` request interceptor from your `FuelManager`.
+
+#### `Parameters` with `multipart/form-data`
+The `UploadRequest` handles encoding parameters in the body. Therefore by default, parameter encoding is ignored by `ParameterEncoder` if the content type is `multipart/form-data`.
+
+#### `Parameters` with empty, array, list or null values
+All requests can have parameters, regardless of the method.
+- a list is encoded as `key[]=value1&key[]=value2&...`
+- an array is encoded as `key[]=value1&key[]=value2&...`
+- an empty string value is encoded as `key`
+- a null value is removed
 
 ### Adding `Request` body
 Bodies are formed from generic streams, but there are helpers to set it from values that can be turned into streams. It is important to know that, by default, the streams are **NOT** read into memory until the `Request` is sent. However, if you pass in an in-memory value such as a `ByteArray` or `String`, `Fuel` uses `RepeatableBody`, which are kept into memory until the `Request` is dereferenced.
@@ -524,7 +529,7 @@ Working with result is easy:
 - [`destructure`] as `(data, error) = result` because it is just a [data class](https://kotlinlang.org/docs/reference/data-classes.html) or 
 - use `when` checking whether it is `Result.Success` or `Result.Failure`
 
-#### Download response to file
+#### Download response to output (`File` or `OutputStream`)
 
 Fuel supports downloading the request `Body` to a file using the `.download()` feature. You can turn _any_ `Request` into a download request by calling `.download()` or call `.download(method = Method.GET)` directly onto `Fuel` / `FuelManager`.
 
@@ -532,12 +537,13 @@ Fuel supports downloading the request `Body` to a file using the `.download()` f
 
 | method | arguments | action |
 |----|----|----|
-| `request.destination { }` | `(Request, URL) -> File` | Set the destination file callback where to store the data |
+| `request.fileDestination { }` | `(Response, Request) -> File` | Set the destination file callback where to store the data |
+| `request.streamDestination { }` | `(Response, Request) -> Pair<OutputStream, () -> InputStream>` | Set the destination file callback where to store the data |
 | `request.progress(handler)` | `hander: ProgressCallback` | Add a `responseProgress` handler |
 
 ```kotlin
 Fuel.download("https://httpbin.org/bytes/32768")
-    .destination { response, url -> File.createTempFile("temp", ".tmp") }
+    .fileDestination { response, url -> File.createTempFile("temp", ".tmp") }
     .progress { readBytes, totalBytes ->
         val progress = readBytes.toFloat() / totalBytes.toFloat() * 100
         println("Bytes downloaded $readBytes / $totalBytes ($progress %)")
@@ -545,7 +551,11 @@ Fuel.download("https://httpbin.org/bytes/32768")
     .response { result -> }
 ```
 
-For more information, check Result's [documentation](https://github.com/kittinunf/Result/README.md)
+The `stream` variant expects your callback to provide a `Pair` with both the `OutputStream` to write too, as well as a callback that gives an `InputStream`, or raises an error.
+- The `OutputStream` is _always_ closed after the body has been written. Make sure you wrap whatever functionality you need on top of the stream and don't rely on the stream to remain open.
+- The `() -> InputStream` replaces the body after the current body has been written to the `OutputStream`. It is used to make sure you can _also_ retrieve the body via the `response` / `await` method results. If you don't want the body to be readable after downloading it, you have to do two things:
+  - use an `EmptyDeserializer` with `await(deserializer)` or one of the `response(deserializer)` variants
+  - provide an `InputStream` callback that `throws` or returns an empty `InputStream`.
 
 ### Cancel an async `Request`
 
