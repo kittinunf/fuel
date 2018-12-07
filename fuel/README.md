@@ -423,7 +423,7 @@ Sometimes you have some content inline that you want to turn into a `DataPart`. 
 Fuel.upload("/post")
     .add(
         FileDataPart(File("myfile.json"), name = "file", fileName="contents.json"),
-        InlineDataPart(myinlinecontent, name = "metadata", fileName="metadata.json", contentType = "application/json")
+        InlineDataPart(myInlineContent, name = "metadata", fileName="metadata.json", contentType = "application/json")
     )
     .response { result -> }
 ```
