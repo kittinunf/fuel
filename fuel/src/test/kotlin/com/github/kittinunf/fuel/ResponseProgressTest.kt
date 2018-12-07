@@ -31,7 +31,7 @@ class ResponseProgressTest : MockHttpTestCase() {
         var progressCalls = 0
 
         val (request, response, result) = threadSafeFuel.download(mock.path("download"))
-            .destination { _, _ -> file.also { println("Downloading $length bytes to file") } }
+            .fileDestination { _, _ -> file.also { println("Downloading $length bytes to file") } }
             .progress { _, _ -> progressCalls += 1 }
             .responseString()
 

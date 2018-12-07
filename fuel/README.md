@@ -520,7 +520,7 @@ Working with result is easy:
 - [`destructure`] as `(data, error) = result` because it is just a [data class](https://kotlinlang.org/docs/reference/data-classes.html) or 
 - use `when` checking whether it is `Result.Success` or `Result.Failure`
 
-#### Download response to file
+#### Download response to output (`File` or `OutputStream`)
 
 Fuel supports downloading the request `Body` to a file using the `.download()` feature. You can turn _any_ `Request` into a download request by calling `.download()` or call `.download(method = Method.GET)` directly onto `Fuel` / `FuelManager`.
 
@@ -528,12 +528,13 @@ Fuel supports downloading the request `Body` to a file using the `.download()` f
 
 | method | arguments | action |
 |----|----|----|
-| `request.destination { }` | `(Request, URL) -> File` | Set the destination file callback where to store the data |
+| `request.fileDestination { }` | `(Response, Request) -> File` | Set the destination file callback where to store the data |
+| `request.streamDestination { }` | `(Response, Request) -> Pair<OutputStream, () -> InputStream>` | Set the destination file callback where to store the data |
 | `request.progress(handler)` | `hander: ProgressCallback` | Add a `responseProgress` handler |
 
 ```kotlin
 Fuel.download("https://httpbin.org/bytes/32768")
-    .destination { response, url -> File.createTempFile("temp", ".tmp") }
+    .fileDestination { response, url -> File.createTempFile("temp", ".tmp") }
     .progress { readBytes, totalBytes ->
         val progress = readBytes.toFloat() / totalBytes.toFloat() * 100
         println("Bytes downloaded $readBytes / $totalBytes ($progress %)")
@@ -541,7 +542,11 @@ Fuel.download("https://httpbin.org/bytes/32768")
     .response { result -> }
 ```
 
-For more information, check Result's [documentation](https://github.com/kittinunf/Result/README.md)
+The `stream` variant expects your callback to provide a `Pair` with both the `OutputStream` to write too, as well as a callback that gives an `InputStream`, or raises an error.
+- The `OutputStream` is _always_ closed after the body has been written. Make sure you wrap whatever functionality you need on top of the stream and don't rely on the stream to remain open.
+- The `() -> InputStream` replaces the body after the current body has been written to the `OutputStream`. It is used to make sure you can _also_ retrieve the body via the `response` / `await` method results. If you don't want the body to be readable after downloading it, you have to do two things:
+  - use an `EmptyDeserializer` with `await(deserializer)` or one of the `response(deserializer)` variants
+  - provide an `InputStream` callback that `throws` or returns an empty `InputStream`.
 
 ### Cancel an async `Request`
 
