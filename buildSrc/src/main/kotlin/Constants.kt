@@ -9,7 +9,7 @@ object Fuel {
 
 // Core dependencies
 object Kotlin {
-    const val version = "1.3.10"
+    const val version = "1.3.11"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Kotlin.version}"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
@@ -150,10 +150,5 @@ object Release {
     object Bintray {
         const val version = "1.8.4"
         const val plugin = "com.jfrog.bintray"
-    }
-
-    object AndroidMaven {
-        const val version = "2.1"
-        const val plugin = "com.github.dcendents.android-maven"
     }
 }
