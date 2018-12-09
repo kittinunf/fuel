@@ -30,6 +30,11 @@ object Android {
     const val version = "3.2.1"
     const val appPlugin = "com.android.application"
     const val libPlugin = "com.android.library"
+
+    object Arch {
+        const val version = "1.1.1"
+        const val testingCore = "android.arch.core:core-testing:$version"
+    }
 }
 
 object AndroidX {
@@ -50,9 +55,9 @@ object AndroidX {
     // Testing dependencies
     object Test {
         const val rulesVersion = "1.1.0"
-        const val runnerVersion = "1.1.0"
-        val rules = "androidx.test:rules:$rulesVersion"
-        val runner = "androidx.test:runner:$runnerVersion"
+        const val junitVersion = "1.0.0"
+        const val rules = "androidx.test:rules:$rulesVersion"
+        const val junit = "androidx.test.ext:junit:$junitVersion"
     }
 }
 
@@ -105,7 +110,7 @@ object RxJava {
 
     object Android {
         const val version = "2.1.0"
-        val dependency = "io.reactivex.rxjava2:rxandroid:$version"
+        const val dependency = "io.reactivex.rxjava2:rxandroid:$version"
     }
 }
 

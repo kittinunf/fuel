@@ -20,7 +20,7 @@ dependencies {
     api(project(":fuel-coroutines"))
 
     androidTestImplementation(AndroidX.annotation)
-    androidTestImplementation(AndroidX.Test.runner)
+    androidTestImplementation(AndroidX.Test.junit)
     androidTestImplementation(AndroidX.Test.rules)
     androidTestImplementation(AndroidX.Espresso.core)
     androidTestImplementation(AndroidX.Espresso.intents)

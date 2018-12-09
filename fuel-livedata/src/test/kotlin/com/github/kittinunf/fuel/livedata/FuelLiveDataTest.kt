@@ -1,5 +1,7 @@
 package com.github.kittinunf.fuel.livedata
 
+import android.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.test.MockHttpTestCase
@@ -7,13 +9,20 @@ import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Rule
+import org.junit.runner.RunWith
 import org.junit.Test
 import java.net.HttpURLConnection
 
 /**
  * @see [Testing documentation](http://d.android.com/tools/testing)
  */
+@RunWith(AndroidJUnit4::class)
 class FuelLiveDataTest : MockHttpTestCase() {
+
+    @Rule
+    @JvmField
+    val rule = InstantTaskExecutorRule()
 
     @Test
     fun liveDataTestResponse() {
