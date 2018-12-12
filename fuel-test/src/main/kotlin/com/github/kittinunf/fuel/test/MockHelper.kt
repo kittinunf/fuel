@@ -206,7 +206,9 @@ data class MockReflected(
                                 }
                             )
                         }
-                        "body" -> current.copy(body = MockReflectedBody.from(json.getJSONObject(key)))
+                        "body" -> current.copy(body = MockReflectedBody.from(
+                            json.optJSONObject(key) ?: JSONObject().put("type", "STRING").put("string", json.getString(key))
+                        ))
                         "headers" -> current.copy(headers = Headers.from(json.getJSONObject(key).toMap()))
                         "reflect" -> current.copy(reflect = json.getBoolean(key))
                         "userAgent" -> current.copy(userAgent = json.getString("userAgent"))

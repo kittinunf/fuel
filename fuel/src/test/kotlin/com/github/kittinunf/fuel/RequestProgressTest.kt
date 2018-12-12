@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel
 
+import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.test.MockHttpTestCase
@@ -31,7 +32,7 @@ class RequestProgressTest : MockHttpTestCase() {
         var expectedLength: Long
 
         val (request, response, result) = threadSafeFuel.upload(mock.path("upload"))
-            .source { _, _ -> file }
+            .add(FileDataPart(file))
             .progress { _, _ -> progressCalls += 1 }
             .also { expectedLength = it.body.length!! }
             .also { println("Request body is $expectedLength bytes ($length bytes of file data)") }
