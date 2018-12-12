@@ -188,18 +188,25 @@ data class FileDataPart(
         }
 
         /**
-         * Create a FileDataPart from a [directory] and [filename]
+         * Create a FileDataPart from a [path]
          *
-         * @param directory [File] the directory
-         * @param filename [String] the filename relative to the [directory]
+         * @param path [File] the absolute path to the file
+         * @param remoteFileName [String] the filename parameter for the DataPart, set to null to exclude, empty to use actual filename
          * @param name [String] the name for the field, uses [filename] without the extension by default
-         * @param remoteFileName [String] the filename parameter for the DataPart, set to null to exclude
          * @param contentType [String] the Content-Type for the DataPart, set to null to [guessContentType]
          *
          * @return [FileDataPart] the DataPart
          */
-        fun from(directory: String, filename: String, name: String? = null, remoteFileName: String? = filename, contentType: String? = null): DataPart =
-            from(directory = File(directory), filename = filename, name = name, remoteFileName = remoteFileName, contentType = contentType)
+        fun from(path: String, remoteFileName: String? = "", name: String? = null, contentType: String? = null): DataPart {
+            val file = File(path)
+
+            return FileDataPart(
+                file = file,
+                name = name ?: file.nameWithoutExtension,
+                filename = remoteFileName?.let { if (it.isBlank()) file.name else it },
+                contentType = contentType ?: guessContentType(file)
+            )
+        }
 
         /**
          * Create a FileDataPart from a [directory] and [filename]
@@ -207,17 +214,36 @@ data class FileDataPart(
          * @param directory [File] the directory
          * @param filename [String] the filename relative to the [directory]
          * @param name [String] the name for the field, uses [filename] without the extension by default
-         * @param remoteFileName [String] the filename parameter for the DataPart, set to null to exclude
+         * @param remoteFileName [String] the filename parameter for the DataPart, set to null to exclude, empty to use [filename]
          * @param contentType [String] the Content-Type for the DataPart, set to null to [guessContentType]
          *
          * @return [FileDataPart] the DataPart
          */
-        fun from(directory: File, filename: String, name: String? = null, remoteFileName: String? = filename, contentType: String? = null): DataPart {
+        fun from(directory: String, filename: String, name: String? = null, remoteFileName: String? = "", contentType: String? = null): DataPart =
+            // This happens if `from` is called with the path and the "remoteFileName" but without using named arguments
+            if (File(directory).isFile && remoteFileName.isNullOrBlank())
+                from(path = directory, remoteFileName = filename, name = name, contentType = contentType)
+            else
+                from(directory = File(directory), filename = filename, name = name, remoteFileName = remoteFileName, contentType = contentType)
+
+        /**
+         * Create a FileDataPart from a [directory] and [filename]
+         *
+         * @param directory [File] the directory
+         * @param filename [String] the filename relative to the [directory]
+         * @param name [String] the name for the field, uses [filename] without the extension by default
+         * @param remoteFileName [String] the filename parameter for the DataPart, set to null to exclude, empty to use [filename]
+         * @param contentType [String] the Content-Type for the DataPart, set to null to [guessContentType]
+         *
+         * @return [FileDataPart] the DataPart
+         */
+        fun from(directory: File?, filename: String, name: String? = null, remoteFileName: String? = "", contentType: String? = null): DataPart {
             val file = File(directory, filename)
+
             return FileDataPart(
                 file = file,
                 name = name ?: file.nameWithoutExtension,
-                filename = remoteFileName,
+                filename = remoteFileName?.let { if (it.isBlank()) filename else it },
                 contentType = contentType ?: guessContentType(file)
             )
         }

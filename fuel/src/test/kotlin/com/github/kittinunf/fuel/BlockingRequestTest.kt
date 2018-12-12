@@ -289,9 +289,10 @@ class BlockingRequestTest : MockHttpTestCase() {
 
         mock.chain(request = httpRequest, response = mock.reflect())
 
+        val path = File(System.getProperty("user.dir"), "/src/test/assets").resolve("lorem_ipsum_long.tmp").path
         val (request, response, data) =
                 manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar", "foo1" to "bar1"))
-                    .add { FileDataPart.from(File(System.getProperty("user.dir")).resolve("/src/test/assets"), "lorem_ipsum_long.tmp") }
+                    .add { FileDataPart.from(path,  "lorem_ipsum_long.tmp") }
                     .responseString()
 
         assertThat(request, notNullValue())
