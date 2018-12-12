@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.kittinunf.fuel.*
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
@@ -193,7 +195,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun httpUpload() {
         Fuel.upload("/post")
-            .source { _, _ ->
+            .add {
                 // create random file with some non-sense string
                 val file = File(filesDir, "out.tmp")
                 file.writer().use { writer ->
@@ -201,7 +203,7 @@ class MainActivity : AppCompatActivity() {
                         writer.appendln("abcdefghijklmnopqrstuvwxyz")
                     }
                 }
-                file
+                FileDataPart(file)
             }
             .progress { writtenBytes, totalBytes ->
                 Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")

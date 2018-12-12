@@ -3,9 +3,9 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.extensions.cUrlString
-import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
-import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
-import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
+import com.github.kittinunf.fuel.core.interceptors.LogRequestAsCurlInterceptor
+import com.github.kittinunf.fuel.core.interceptors.LogRequestInterceptor
+import com.github.kittinunf.fuel.core.interceptors.LogResponseInterceptor
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.not
@@ -71,7 +71,7 @@ class InterceptorTest : MockHttpTestCase() {
         mock.chain(request = httpRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        manager.addRequestInterceptor(loggingRequestInterceptor())
+        manager.addRequestInterceptor(LogRequestInterceptor)
 
         val (request, response, result) = manager.request(Method.GET, mock.path("get")).response()
         val (data, error) = result
@@ -85,7 +85,7 @@ class InterceptorTest : MockHttpTestCase() {
         assertThat("Expected response not to be logged", outContent.toString(), not(containsString(response.toString())))
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
-        manager.removeRequestInterceptor(loggingRequestInterceptor())
+        manager.removeRequestInterceptor(LogRequestInterceptor)
     }
 
     @Test
@@ -97,7 +97,7 @@ class InterceptorTest : MockHttpTestCase() {
         mock.chain(request = httpRequest, response = mock.reflect())
 
         val manager = FuelManager()
-        manager.addResponseInterceptor { loggingResponseInterceptor() }
+        manager.addResponseInterceptor(LogResponseInterceptor)
 
         val (request, response, result) = manager.request(Method.GET, mock.path("get")).response()
         val (data, error) = result
@@ -110,7 +110,7 @@ class InterceptorTest : MockHttpTestCase() {
         assertThat("Expected response to be logged", outContent.toString(), containsString(response.toString()))
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
-        manager.removeResponseInterceptor { loggingResponseInterceptor() }
+        manager.removeResponseInterceptor(LogResponseInterceptor)
     }
 
     @Test
@@ -159,7 +159,7 @@ class InterceptorTest : MockHttpTestCase() {
         }
 
         manager.apply {
-            addRequestInterceptor(cUrlLoggingRequestInterceptor())
+            addRequestInterceptor(LogRequestAsCurlInterceptor)
             addRequestInterceptor(customLoggingInterceptor())
         }
 
@@ -209,7 +209,7 @@ class InterceptorTest : MockHttpTestCase() {
         }
 
         manager.apply {
-            addRequestInterceptor(cUrlLoggingRequestInterceptor())
+            addRequestInterceptor(LogRequestAsCurlInterceptor)
             addRequestInterceptor(customLoggingBreakingInterceptor())
             addRequestInterceptor(customLoggingInterceptor())
         }
@@ -240,7 +240,7 @@ class InterceptorTest : MockHttpTestCase() {
         mock.chain(request = firstRequest, response = firstResponse)
 
         val manager = FuelManager()
-        manager.addRequestInterceptor(cUrlLoggingRequestInterceptor())
+        manager.addRequestInterceptor(LogRequestAsCurlInterceptor)
         manager.removeAllResponseInterceptors()
 
         val (request, response, result) = manager.request(Method.GET, mock.path("redirect")).header(mapOf("User-Agent" to "Fuel")).response()

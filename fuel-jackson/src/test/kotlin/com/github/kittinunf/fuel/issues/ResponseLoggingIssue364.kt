@@ -2,7 +2,7 @@ package com.github.kittinunf.fuel.issues
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
+import com.github.kittinunf.fuel.core.interceptors.LogResponseInterceptor
 import com.github.kittinunf.fuel.jackson.jacksonDeserializerOf
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.test.MockReflected
@@ -40,16 +40,16 @@ class ResponseLoggingIssue364 : MockHttpTestCase() {
     }
 
     private val threadSafeManager = FuelManager()
-    private val responseLoggingInterceptor = loggingResponseInterceptor()
+    private val responseLoggingInterceptor = LogResponseInterceptor
 
     @Before
     fun addBodyInterceptor() {
-        threadSafeManager.addResponseInterceptor { responseLoggingInterceptor }
+        threadSafeManager.addResponseInterceptor(responseLoggingInterceptor)
     }
 
     @After
     fun removeBodyInterceptor() {
-        threadSafeManager.removeResponseInterceptor { responseLoggingInterceptor }
+        threadSafeManager.removeResponseInterceptor(responseLoggingInterceptor)
     }
 
     @Test

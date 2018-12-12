@@ -38,7 +38,7 @@ class RedirectProgressIssue416 : MockHttpTestCase() {
 
         var progressCalled = 0L
         val request = threadSafeFuel.download(mock.path("download-redirect"))
-            .destination { _, _ -> file }
+            .fileDestination { _, _ -> file }
             .progress { _, _ -> progressCalled += 1 }
 
         val (_, _, result) = request.response()

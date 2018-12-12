@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.Encoding
+import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
@@ -288,14 +289,11 @@ class BlockingRequestTest : MockHttpTestCase() {
 
         mock.chain(request = httpRequest, response = mock.reflect())
 
+        val path = File(System.getProperty("user.dir"), "/src/test/assets").resolve("lorem_ipsum_long.tmp").path
         val (request, response, data) =
                 manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar", "foo1" to "bar1"))
-                        .source { _, _ ->
-                            val dir = System.getProperty("user.dir")
-                            val currentDir = File(dir, "src/test/assets")
-                            File(currentDir, "lorem_ipsum_long.tmp")
-                        }
-                        .responseString()
+                    .add { FileDataPart.from(path, "lorem_ipsum_long.tmp") }
+                    .responseString()
 
         assertThat(request, notNullValue())
         assertThat(response, notNullValue())

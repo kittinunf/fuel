@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel
 
+import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.test.MockHttpTestCase
@@ -137,7 +138,7 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
         val (request, response, result) = mock.path("http-download")
             .httpDownload()
-            .destination { _, _ -> File.createTempFile("http-download.dl", null) }
+            .fileDestination { _, _ -> File.createTempFile("http-download.dl", null) }
             .responseString()
         val (data, error) = result
 
@@ -159,10 +160,10 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
         val (request, response, result) = mock.path("http-upload")
             .httpUpload(method = Method.PUT)
-            .source { _, _ ->
+            .add {
                 val dir = System.getProperty("user.dir")
                 val currentDir = File(dir, "src/test/assets")
-                File(currentDir, "lorem_ipsum_long.tmp")
+                FileDataPart(File(currentDir, "lorem_ipsum_long.tmp"))
             }
             .responseString()
         val (data, error) = result
@@ -185,10 +186,10 @@ class RequestStringExtensionTest : MockHttpTestCase() {
 
         val (request, response, result) = mock.path("http-upload")
             .httpUpload()
-            .source { _, _ ->
+            .add {
                 val dir = System.getProperty("user.dir")
                 val currentDir = File(dir, "src/test/assets")
-                File(currentDir, "lorem_ipsum_long.tmp")
+                FileDataPart(File(currentDir, "lorem_ipsum_long.tmp"))
             }
             .responseString()
         val (data, error) = result
