@@ -152,7 +152,7 @@ class RequestPathStringConvertibleExtensionTest : MockHttpTestCase() {
 
         val (request, response, result) = PathStringConvertibleImpl(mock.path("http-upload"))
             .httpUpload()
-            .add { FileDataPart(File(File(System.getProperty("user.dir"), "src/test/assets"), "lorem_ipsum_long.tmp")) }
+            .add { FileDataPart.from(File(System.getProperty("user.dir"), "src/test/assets").absolutePath, "lorem_ipsum_long.tmp") }
             .responseString()
         val (data, error) = result
 

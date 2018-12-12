@@ -88,16 +88,16 @@ sealed class DataPart {
  *
  * @param content [String] the inline content
  * @param name [String] the field name
- * @param fileName [String] the remote file name, or null
+ * @param filename [String] the remote file name, or null
  * @param contentType [String] the content-type of the inline content; defaults to text/plain; charset=utf-8
  * @param contentDisposition [String] defaults to form-data with name and filename set, unless filename is null
  */
 data class InlineDataPart(
     val content: String,
     val name: String,
-    val fileName: String? = null,
+    val filename: String? = null,
     override val contentType: String = "$GENERIC_CONTENT; charset=utf-8",
-    override val contentDisposition: String = "form-data; name=\"$name\"${if (fileName != null) "; filename=\"$fileName\"" else "" }"
+    override val contentDisposition: String = "form-data; name=\"$name\"${if (filename != null) "; filename=\"$filename\"" else "" }"
 ) : DataPart() {
     override fun inputStream() = content.byteInputStream()
     override val contentLength get() = content.length.toLong()
@@ -109,7 +109,7 @@ data class InlineDataPart(
  *  @example Add a file as a DataPart
  *
  *    val file = File("foo.json")
- *    request.add { FileDataPart(file, name = "field-name", fileName = "remote-file-name.json") }
+ *    request.add { FileDataPart(file, name = "field-name", filename = "remote-file-name.json") }
  *
  *    // ...boundary
  *    // Content-Disposition: "form-data; name=metadata; filename=remote-file-name.json"
@@ -157,14 +157,14 @@ data class InlineDataPart(
  *
  *  @param file [File] the source file
  *  @param name [String] the field name, defaults to the file name without extension
- *  @param fileName [String] the remote file name, or null
+ *  @param filename [String] the remote file name, or null
  *  @param contentType [String] the content type of the file contents; defaults to a guess using [guessContentType]
  *  @param contentDisposition [String] defaults to form-data with name and filename set, unless filename is null
  */
 data class FileDataPart(
     val file: File,
     val name: String = file.nameWithoutExtension,
-    val fileName: String? = file.name,
+    val filename: String? = file.name,
     override val contentType: String = FileDataPart.guessContentType(file),
     // For form data that represents the content of a file, a name for the
     //   file SHOULD be supplied as well, by using a "filename" parameter of
@@ -173,7 +173,7 @@ data class FileDataPart(
     //   private; this might result, for example, when selection or drag-and-
     //   drop is used or when the form data content is streamed directly from
     //   a device.
-    override val contentDisposition: String = "form-data; name=\"$name\"${if (fileName != null) "; filename=\"$fileName\"" else "" }"
+    override val contentDisposition: String = "form-data; name=\"$name\"${if (filename != null) "; filename=\"$filename\"" else "" }"
 ) : DataPart() {
     override fun inputStream() = file.inputStream()
     override val contentLength get() = file.length()
@@ -186,6 +186,42 @@ data class FileDataPart(
             // The MimetypesFileTypeMap class doesn't exists on old Android devices.
             GENERIC_BYTE_CONTENT
         }
+
+        /**
+         * Create a FileDataPart from a [directory] and [filename]
+         *
+         * @param directory [File] the directory
+         * @param filename [String] the filename relative to the [directory]
+         * @param name [String] the name for the field, uses [filename] without the extension by default
+         * @param remoteFileName [String] the filename parameter for the DataPart, set to null to exclude
+         * @param contentType [String] the Content-Type for the DataPart, set to null to [guessContentType]
+         *
+         * @return [FileDataPart] the DataPart
+         */
+        fun from(directory: String, filename: String, name: String? = null, remoteFileName: String? = filename, contentType: String? = null): DataPart =
+            from(directory = File(directory), filename = filename, name = name, remoteFileName = remoteFileName, contentType = contentType)
+
+        /**
+         * Create a FileDataPart from a [directory] and [filename]
+         *
+         * @param directory [File] the directory
+         * @param filename [String] the filename relative to the [directory]
+         * @param name [String] the name for the field, uses [filename] without the extension by default
+         * @param remoteFileName [String] the filename parameter for the DataPart, set to null to exclude
+         * @param contentType [String] the Content-Type for the DataPart, set to null to [guessContentType]
+         *
+         * @return [FileDataPart] the DataPart
+         */
+        fun from(directory: File, filename: String, name: String? = null, remoteFileName: String? = filename, contentType: String? = null): DataPart {
+            val file = File(directory, filename)
+            return FileDataPart(
+                file = file,
+                name = name ?: file.nameWithoutExtension,
+                filename = remoteFileName,
+                contentType = contentType ?: guessContentType(file)
+            )
+
+        }
     }
 }
 
@@ -197,7 +233,7 @@ data class FileDataPart(
  *
  * @param inputStream [File] the source stream
  * @param name [String] the field name, required
- * @param fileName [String] the remote file name, or null
+ * @param filename [String] the remote file name, or null
  * @param contentLength [Long] the length in bytes, or -1 or null if it's not knows at creation time.
  * @param contentType [String] the content type of the file contents; defaults to a guess using [guessContentType]
  * @param contentDisposition [String] defaults to form-data with name and filename set, unless filename is null
@@ -205,10 +241,10 @@ data class FileDataPart(
 data class BlobDataPart(
     val inputStream: InputStream,
     val name: String,
-    val fileName: String? = null,
+    val filename: String? = null,
     override val contentLength: Long? = null,
     override val contentType: String = BlobDataPart.guessContentType(inputStream),
-    override val contentDisposition: String = "form-data; name=\"$name\"${if (fileName != null) "; filename=\"$fileName\"" else "" }"
+    override val contentDisposition: String = "form-data; name=\"$name\"${if (filename != null) "; filename=\"$filename\"" else "" }"
 ) : DataPart() {
     override fun inputStream() = inputStream
     companion object {
