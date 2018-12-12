@@ -1,14 +1,7 @@
 package com.github.kittinunf.fuel.toolbox
 
-import com.github.kittinunf.fuel.core.Client
+import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.core.requests.DefaultBody
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.HeaderName
-import com.github.kittinunf.fuel.core.Headers
-import com.github.kittinunf.fuel.core.Method
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.requests.isCancelled
 import com.github.kittinunf.fuel.util.ProgressInputStream
 import com.github.kittinunf.fuel.util.ProgressOutputStream
@@ -19,7 +12,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
-import java.net.ProtocolException
 import java.net.Proxy
 import java.net.URLConnection
 import javax.net.ssl.HttpsURLConnection
@@ -75,22 +67,27 @@ internal class HttpClient(
         return retrieveResponse(request, connection)
     }
 
-    private fun HttpURLConnection.forceMethod(method: String) {
-        try {
-            this.requestMethod = method
-        } catch (ex: ProtocolException) {
-            try {
-                (this.javaClass.getDeclaredField("delegate").apply { this.isAccessible = true }.get(this) as HttpURLConnection?)?.forceMethod(method)
-            } catch (ex: NoSuchFieldException) {
-                // ignore
-            }
-            (listOf(this.javaClass.superclass, this.javaClass)).forEach {
+    /**
+     * When method is Method.PATCH, use reflection to set private field "method" on the HttpURLConnection instance
+     * For other methods, fall back to the public setter "setRequestMethod"
+     */
+    private fun HttpURLConnection.forceMethod(method: Method) {
+        when (method) {
+            Method.PATCH -> {
                 try {
-                    it.getDeclaredField("method").apply { this.isAccessible = true }.set(this, method)
+                    (this.javaClass.getDeclaredField("delegate").apply { this.isAccessible = true }.get(this) as HttpURLConnection?)?.forceMethod(method)
                 } catch (ex: NoSuchFieldException) {
                     // ignore
                 }
+                (listOf(this.javaClass.superclass, this.javaClass)).forEach {
+                    try {
+                        it.getDeclaredField("method").apply { this.isAccessible = true }.set(this, method.value)
+                    } catch (ex: NoSuchFieldException) {
+                        // ignore
+                    }
+                }
             }
+            else -> this.requestMethod = method.value
         }
     }
 
@@ -100,7 +97,7 @@ internal class HttpClient(
         connection.apply {
             connectTimeout = max(request.executionOptions.timeoutInMillisecond, 0)
             readTimeout = max(request.executionOptions.timeoutReadInMillisecond, 0)
-            forceMethod(request.method.value)
+            forceMethod(request.method)
             doInput = true
             useCaches = request.executionOptions.useHttpCache ?: useHttpCache
             instanceFollowRedirects = false

@@ -41,6 +41,13 @@ class HttpClientTest : MockHttpTestCase() {
     }
 
     @Test
+    fun usesReflectionForPatchMethod() {
+        val request = Fuel.patch(mock.path("patch-with-reflection"))
+
+        assertThat(request.method, equalTo(Method.PATCH))
+    }
+
+    @Test
     fun injectsAcceptTransferEncoding() {
         val request = reflectedRequest(Method.GET, "accept-transfer-encoding")
         val (_, _, result) = request.responseObject(MockReflected.Deserializer())
