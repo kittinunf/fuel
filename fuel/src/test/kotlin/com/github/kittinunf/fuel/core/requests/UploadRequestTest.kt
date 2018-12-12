@@ -308,7 +308,7 @@ class UploadRequestTest : MockHttpTestCase() {
     @Test
     fun uploadBlob() {
         val file = File(currentDir, "lorem_ipsum_short.tmp")
-        val blob = BlobDataPart(file.inputStream(), contentLength = file.length(), fileName = file.name, name = "coolblob")
+        val blob = BlobDataPart(file.inputStream(), contentLength = file.length(), filename = file.name, name = "coolblob")
         val manager = FuelManager()
 
         mock.chain(
@@ -383,7 +383,7 @@ class UploadRequestTest : MockHttpTestCase() {
         val triple = manager.upload(mock.path("upload"), parameters = listOf("foo" to "bar"))
             .add(
                 FileDataPart(shortFile, name = "file"),
-                InlineDataPart(metadata, name = "metadata", contentType = "application/json", fileName = "metadata.json")
+                InlineDataPart(metadata, name = "metadata", contentType = "application/json", filename = "metadata.json")
             )
             .responseObject(MockReflected.Deserializer())
 
