@@ -4,8 +4,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.example.fuel.R.id.mainAuxText
+import com.example.fuel.R.id.mainClearButton
+import com.example.fuel.R.id.mainGoButton
+import com.example.fuel.R.id.mainGoCoroutineButton
+import com.example.fuel.R.id.mainResultText
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
@@ -185,7 +191,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun httpUpload() {
         Fuel.upload("/post")
-            .source { _, _ ->
+            .add {
                 // create random file with some non-sense string
                 val file = File(filesDir, "out.tmp")
                 file.writer().use { writer ->
@@ -193,7 +199,7 @@ class MainActivity : AppCompatActivity() {
                         writer.appendln("abcdefghijklmnopqrstuvwxyz")
                     }
                 }
-                file
+                FileDataPart(file)
             }
             .progress { writtenBytes, totalBytes ->
                 Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")

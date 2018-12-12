@@ -1,6 +1,6 @@
 package com.github.kittinunf.fuel.core.interceptors
 
-import com.github.kittinunf.fuel.core.Blob
+import com.github.kittinunf.fuel.core.BlobDataPart
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.requests.DefaultRequest
@@ -132,7 +132,7 @@ class ParameterEncoderTest {
                 parameters = listOf("foo" to "bar")
             ).header(Headers.CONTENT_TYPE, "multipart/form-data")
             .upload()
-            .blob { _, _ -> Blob("test", 8) { ByteArrayInputStream("12345678".toByteArray()) } }
+            .add { BlobDataPart(ByteArrayInputStream("12345678".toByteArray()), name = "test", contentLength = 8L) }
 
             var executed = false
             ParameterEncoder { request ->
