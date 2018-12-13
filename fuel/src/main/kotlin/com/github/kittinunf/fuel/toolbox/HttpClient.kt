@@ -1,7 +1,14 @@
 package com.github.kittinunf.fuel.toolbox
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Client
 import com.github.kittinunf.fuel.core.requests.DefaultBody
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.HeaderName
+import com.github.kittinunf.fuel.core.Headers
+import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.requests.isCancelled
 import com.github.kittinunf.fuel.util.ProgressInputStream
 import com.github.kittinunf.fuel.util.ProgressOutputStream
@@ -68,23 +75,36 @@ internal class HttpClient(
     }
 
     /**
-     * When method is Method.PATCH, use reflection to set private field "method" on the HttpURLConnection instance
-     * For other methods, fall back to the public setter "setRequestMethod"
+     * Uses public setter "setRequestMethod" if method is support by HttpURLConnection
+     * When method is PATCH, use reflection to set private field "method" on the HttpURLConnection instance
+     * If reflection method fails, use "coerceMethod" and set appropriate "X-HTTP-Method-Override" header
      */
     private fun HttpURLConnection.forceMethod(method: Method) {
         when (method) {
             Method.PATCH -> {
                 try {
-                    (this.javaClass.getDeclaredField("delegate").apply { this.isAccessible = true }.get(this) as HttpURLConnection?)?.forceMethod(method)
+                    // If instance has private field "delegate" (HttpURLConnection), make the field accessible
+                    // and invoke "forceMethod" on that instance of HttpURLConnection
+                    (this.javaClass.getDeclaredField("delegate").apply {
+                        this.isAccessible = true
+                    }.get(this) as HttpURLConnection?)?.forceMethod(method)
                 } catch (ex: NoSuchFieldException) {
                     // ignore
                 }
-                (listOf(this.javaClass.superclass, this.javaClass)).forEach {
+                (arrayOf(this.javaClass.superclass, this.javaClass)).forEach {
                     try {
-                        it.getDeclaredField("method").apply { this.isAccessible = true }.set(this, method.value)
+                        it.getDeclaredField("method").apply {
+                            this.isAccessible = true
+                        }.set(this, method.value)
                     } catch (ex: NoSuchFieldException) {
                         // ignore
                     }
+                }
+                // If above reflection tricks failed, invoke "coerceMethod"
+                // and set "X-HTTP-Method-Override" header
+                if (this.requestMethod !== method.value) {
+                    this.requestMethod = coerceMethod(method).value
+                    this.setRequestProperty("X-HTTP-Method-Override", method.value)
                 }
             }
             else -> this.requestMethod = method.value
@@ -280,5 +300,6 @@ internal class HttpClient(
 
     companion object {
         private val SUPPORTED_DECODING = listOf("gzip", "deflate; q=0.5")
+        private fun coerceMethod(method: Method) = if (method == Method.PATCH) Method.POST else method
     }
 }
