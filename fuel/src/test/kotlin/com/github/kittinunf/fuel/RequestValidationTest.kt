@@ -1,8 +1,11 @@
 package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.test.MockHttpTestCase
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
@@ -121,5 +124,28 @@ class RequestValidationTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
 
         assertThat(response.statusCode, isEqualTo(preDefinedStatusCode))
+    }
+
+    @Test
+    fun httpAnyFailureWithCustomValidator() {
+        val manager = FuelManager()
+
+        mock.chain(
+                request = mock.request().withMethod(Method.GET.value),
+                response = mock.response().withStatusCode(200)
+        )
+
+        val (request, response, result) =
+                manager.request(Method.GET, mock.path("any"))
+                        .validate { false } // always fail
+                        .responseString()
+
+        val (_, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, notNullValue())
+        assertThat(error!!.exception as HttpException, isA(HttpException::class.java))
+        assertThat(error.exception.message, containsString("HTTP Exception 200"))
     }
 }
