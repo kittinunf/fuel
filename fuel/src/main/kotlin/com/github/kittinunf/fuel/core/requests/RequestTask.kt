@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import java.util.concurrent.Callable
@@ -28,6 +29,11 @@ internal class RequestTask(internal val request: Request) : Callable<Response> {
     private fun prepareResponse(result: RequestTaskResult): Response {
         val (request, response) = result
         return runCatching { executor.responseTransformer(request, response) }
+            .runCatching {
+                val valid = executor.responseValidator(response)
+                if (valid) response else
+                    throw HttpException(response.statusCode, response.responseMessage)
+            }
             .recover { error -> throw FuelError.wrap(error, response) }
             .getOrThrow()
     }

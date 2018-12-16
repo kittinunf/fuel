@@ -29,6 +29,9 @@ data class RequestExecutionOptions(
     var allowRedirects: Boolean? = null
     var useHttpCache: Boolean? = null
     var interruptCallbacks: MutableCollection<InterruptCallback> = mutableListOf()
+    var responseValidator: (Response) -> Boolean = { response ->
+        !(response.isServerError || response.isClientError)
+    }
 
     /**
      * Executes a callback [f] onto the [Executor]

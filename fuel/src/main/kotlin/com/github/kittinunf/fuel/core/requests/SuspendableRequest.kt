@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.core.requests
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.result.Result
@@ -25,6 +26,11 @@ class SuspendableRequest private constructor(private val wrapped: Request) : Req
     private fun prepareResponse(result: Pair<Request, Response>): Response {
         val (request, response) = result
         return runCatching { executor.responseTransformer(request, response) }
+            .runCatching {
+                val valid = executor.responseValidator(response)
+                if (valid) response else
+                    throw HttpException(response.statusCode, response.responseMessage)
+            }
             .recover { error -> throw FuelError.wrap(error, response) }
             .getOrThrow()
     }
