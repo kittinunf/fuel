@@ -24,30 +24,6 @@ class HttpClientTest : MockHttpTestCase() {
     }
 
     @Test
-    fun usesOverrideMethodForPatch() {
-        val request = Fuel.patch(mock.path("patch-with-override"))
-
-        mock.chain(
-            request = mock.request().withMethod(Method.POST.value).withPath("/patch-with-override"),
-            response = mock.reflect()
-        )
-
-        val (_, _, result) = request.responseObject(MockReflected.Deserializer())
-        val (data, error) = result
-
-        assertThat("Expected data, actual error $error", data, notNullValue())
-        assertThat(data!!.method, equalTo(Method.POST.value))
-        assertThat(data["X-HTTP-Method-Override"].firstOrNull(), equalTo(Method.PATCH.value))
-    }
-
-    @Test
-    fun usesReflectionForPatchMethod() {
-        val request = Fuel.patch(mock.path("patch-with-reflection"))
-
-        assertThat(request.method, equalTo(Method.PATCH))
-    }
-
-    @Test
     fun injectsAcceptTransferEncoding() {
         val request = reflectedRequest(Method.GET, "accept-transfer-encoding")
         val (_, _, result) = request.responseObject(MockReflected.Deserializer())
@@ -99,7 +75,7 @@ class HttpClientTest : MockHttpTestCase() {
             .body("my-body")
 
         mock.chain(
-            request = mock.request().withMethod(Method.POST.value).withPath("/patch-body-output"),
+            request = mock.request().withMethod(Method.PATCH.value).withPath("/patch-body-output"),
             response = mock.reflect()
         )
 
@@ -108,6 +84,7 @@ class HttpClientTest : MockHttpTestCase() {
 
         assertThat("Expected data, actual error $error", data, notNullValue())
         assertThat(data!!.body!!.string, equalTo("my-body"))
+        assert(data["X-HTTP-Method-Override"].isNullOrEmpty())
     }
 
     @Test
