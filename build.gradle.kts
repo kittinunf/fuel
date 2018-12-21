@@ -147,12 +147,12 @@ subprojects {
         apply {
             plugin(Release.MavenPublish.plugin)
             plugin(Release.Bintray.plugin)
-            plugin(Ktlint.plugin)
+//            plugin(Ktlint.plugin)
         }
 
-        configure<KotlinterExtension> {
-            reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
-        }
+//        configure<KotlinterExtension> {
+//            reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
+//        }
 
         version = Fuel.publishVersion
         group = Fuel.groupId
