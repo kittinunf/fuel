@@ -1,5 +1,8 @@
 pluginManagement {
     repositories {
+        maven(url = "https://dl.bintray.com/kotlin/kotlin-eap/") {
+            name = "Kotlin EAP"
+        }
         google()
         mavenCentral()
         jcenter()

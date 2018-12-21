@@ -9,7 +9,7 @@ object Fuel {
 
 // Core dependencies
 object Kotlin {
-    const val version = "1.3.11"
+    const val version = "1.3.20-eap-52"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Kotlin.version}"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
@@ -85,7 +85,7 @@ object KotlinX {
     }
 
     object Serialization {
-        const val version = "0.9.1"
+        const val version = "0.10.0-eap-1"
         const val dependency = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$version"
         const val plugin = "kotlinx-serialization"
     }
