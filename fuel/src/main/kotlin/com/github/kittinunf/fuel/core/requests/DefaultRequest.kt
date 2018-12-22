@@ -199,8 +199,8 @@ data class DefaultRequest(
      */
     override fun body(openStream: BodySource, calculateLength: BodyLength?, charset: Charset, repeatable: Boolean): Request {
         _body = DefaultBody
-                .from(openStream = openStream, calculateLength = calculateLength, charset = charset)
-                .let { body -> if (repeatable) body.asRepeatable() else body }
+            .from(openStream = openStream, calculateLength = calculateLength, charset = charset)
+            .let { body -> if (repeatable) body.asRepeatable() else body }
         return request
     }
 
@@ -218,7 +218,7 @@ data class DefaultRequest(
      * @return [Request] the request
      */
     override fun body(stream: InputStream, calculateLength: BodyLength?, charset: Charset, repeatable: Boolean) =
-            body(openStream = { stream }, calculateLength = calculateLength, charset = charset, repeatable = repeatable)
+        body(openStream = { stream }, calculateLength = calculateLength, charset = charset, repeatable = repeatable)
 
     /**
      * Sets the body from a byte array
@@ -228,7 +228,7 @@ data class DefaultRequest(
      * @return [Request] the request
      */
     override fun body(bytes: ByteArray, charset: Charset) =
-            body(stream = ByteArrayInputStream(bytes), calculateLength = { bytes.size.toLong() }, charset = charset, repeatable = true)
+        body(stream = ByteArrayInputStream(bytes), calculateLength = { bytes.size.toLong() }, charset = charset, repeatable = true)
 
     /**
      * Sets the body from a string
@@ -238,13 +238,12 @@ data class DefaultRequest(
      * @return [Request] the request
      */
     override fun body(body: String, charset: Charset): Request =
-            body(bytes = body.toByteArray(charset), charset = charset)
-                    .let {
-                        if (header(Headers.CONTENT_TYPE).lastOrNull().isNullOrBlank())
-                            header(Headers.CONTENT_TYPE, "text/plain; charset=${charset.name()}")
-                        else
-                            it
-                    }
+        body(bytes = body.toByteArray(charset), charset = charset)
+            .let {
+                if (header(Headers.CONTENT_TYPE).lastOrNull().isNullOrBlank())
+                    header(Headers.CONTENT_TYPE, "text/plain; charset=${charset.name()}")
+                else it
+            }
 
     /**
      * Sets the body to the contents of a file.
@@ -396,7 +395,6 @@ data class DefaultRequest(
      * @return [String] the string representation
      */
     override fun toString(): String = buildString {
-
         appendln("--> $method $url")
         appendln("Body : ${body.asString(header(Headers.CONTENT_TYPE).lastOrNull())}")
         appendln("Headers : (${headers.size})")
@@ -406,62 +404,61 @@ data class DefaultRequest(
     }
 
     override fun response(handler: ResponseResultHandler<ByteArray>) =
-            response(ByteArrayDeserializer(), handler)
+        response(ByteArrayDeserializer(), handler)
 
     override fun response(handler: ResultHandler<ByteArray>) =
-            response(ByteArrayDeserializer(), handler)
+        response(ByteArrayDeserializer(), handler)
 
     override fun response(handler: ResponseHandler<ByteArray>) =
-            response(ByteArrayDeserializer(), handler)
+        response(ByteArrayDeserializer(), handler)
 
     override fun response(handler: Handler<ByteArray>) =
-            response(ByteArrayDeserializer(), handler)
+        response(ByteArrayDeserializer(), handler)
 
     override fun response() =
-            response(ByteArrayDeserializer())
+        response(ByteArrayDeserializer())
 
     override fun responseString(charset: Charset, handler: ResponseResultHandler<String>) =
-            response(StringDeserializer(charset), handler)
+        response(StringDeserializer(charset), handler)
 
     override fun responseString(handler: ResponseResultHandler<String>) =
-            responseString(Charsets.UTF_8, handler)
+        responseString(Charsets.UTF_8, handler)
 
     override fun responseString(charset: Charset, handler: ResultHandler<String>) =
-            response(StringDeserializer(charset), handler)
+        response(StringDeserializer(charset), handler)
 
     override fun responseString(handler: ResultHandler<String>) =
-            responseString(Charsets.UTF_8, handler)
+        responseString(Charsets.UTF_8, handler)
 
     override fun responseString(charset: Charset, handler: ResponseHandler<String>) =
-            response(StringDeserializer(charset), handler)
+        response(StringDeserializer(charset), handler)
 
     override fun responseString(handler: ResponseHandler<String>) =
-            response(StringDeserializer(), handler)
+        response(StringDeserializer(), handler)
 
     override fun responseString(charset: Charset, handler: Handler<String>) =
-            response(StringDeserializer(charset), handler)
+        response(StringDeserializer(charset), handler)
 
     override fun responseString(handler: Handler<String>) =
-            response(StringDeserializer(), handler)
+        response(StringDeserializer(), handler)
 
     override fun responseString(charset: Charset) =
-            response(StringDeserializer(charset))
+        response(StringDeserializer(charset))
 
-    override fun responseString() =
-            response(StringDeserializer(Charsets.UTF_8))
+    override fun responseString() = response(StringDeserializer(Charsets.UTF_8))
 
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResponseResultHandler<T>) =
-            response(deserializer, handler)
+        response(deserializer, handler)
 
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResultHandler<T>) =
-            response(deserializer, handler)
+        response(deserializer, handler)
 
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResponseHandler<T>) =
-            response(deserializer, handler)
+        response(deserializer, handler)
 
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) =
-            response(deserializer, handler)
+        response(deserializer, handler)
 
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) =
-            response(deserializer)
+        response(deserializer)
 }
