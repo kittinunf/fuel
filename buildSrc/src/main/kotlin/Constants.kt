@@ -3,7 +3,7 @@ object Fuel {
     const val publishVersion = "1.16.0"
     const val groupId = "com.github.kittinunf.fuel"
 
-    const val compileSdkVersion = 27
+    const val compileSdkVersion = 28
     const val minSdkVersion = 19
 }
 
@@ -27,33 +27,37 @@ object Json {
 }
 
 object Android {
-    const val version = "3.1.3"
+    const val version = "3.2.1"
     const val appPlugin = "com.android.application"
     const val libPlugin = "com.android.library"
 
-    object Support {
-        const val version = "27.1.1"
-        val annotation = "com.android.support:support-annotations:$version"
-        val appCompat = "com.android.support:appcompat-v7:$version"
-    }
-
     object Arch {
         const val version = "1.1.1"
-        const val extensions = "android.arch.lifecycle:extensions:$version"
+        const val testingCore = "android.arch.core:core-testing:$version"
     }
+}
 
-    object Espresso {
-        const val version = "3.0.0"
-        const val core = "com.android.support.test.espresso:espresso-core:$version"
-        const val intents = "com.android.support.test.espresso:espresso-intents:$version"
+object AndroidX {
+	val annotation = "androidx.annotation:annotation:1.0.1"
+	val appCompat = "androidx.appcompat:appcompat:1.0.2"
+
+	object Arch {
+		const val version = "2.0.0"
+		const val extensions = "androidx.lifecycle:lifecycle-extensions:$version"
+	}
+
+	object Espresso {
+        const val version = "3.1.0"
+        const val core = "androidx.test.espresso:espresso-core:$version"
+        const val intents = "androidx.test.espresso:espresso-intents:$version"
     }
 
     // Testing dependencies
     object Test {
-        const val rulesVersion = "1.0.0"
-        const val runnerVersion = "1.0.0"
-        val rules = "com.android.support.test:rules:$rulesVersion"
-        val runner = "com.android.support.test:runner:$runnerVersion"
+        const val rulesVersion = "1.1.0"
+        const val junitVersion = "1.0.0"
+        const val rules = "androidx.test:rules:$rulesVersion"
+        const val junit = "androidx.test.ext:junit:$junitVersion"
     }
 }
 
@@ -106,7 +110,7 @@ object RxJava {
 
     object Android {
         const val version = "2.1.0"
-        val dependency = "io.reactivex.rxjava2:rxandroid:$version"
+        const val dependency = "io.reactivex.rxjava2:rxandroid:$version"
     }
 }
 

@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel.livedata
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.github.kittinunf.fuel.core.Deserializable
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
