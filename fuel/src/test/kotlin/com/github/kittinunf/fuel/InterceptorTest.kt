@@ -320,34 +320,6 @@ class InterceptorTest : MockHttpTestCase() {
     }
 
     @Test
-    fun testGetWrongUrl() {
-        val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
-
-        val firstResponse = mock.response()
-            .withHeader("Location", mock.path("not-found"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
-
-        val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/not-found")
-
-        val secondResponse = mock.response()
-            .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
-
-        mock.chain(request = firstRequest, response = firstResponse)
-        mock.chain(request = secondRequest, response = secondResponse)
-
-        val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mock.path("redirect")).responseString()
-        val (data, error) = result
-
-        assertThat(data, notNullValue())
-        assertThat(error, nullValue())
-    }
-
-    @Test
     fun testRemoveAllRequestInterceptors() {
         val firstRequest = mock.request()
             .withMethod(Method.GET.value)
