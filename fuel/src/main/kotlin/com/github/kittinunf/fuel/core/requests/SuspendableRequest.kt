@@ -26,10 +26,9 @@ class SuspendableRequest private constructor(private val wrapped: Request) : Req
     private fun prepareResponse(result: Pair<Request, Response>): Response {
         val (request, response) = result
         return runCatching { executor.responseTransformer(request, response) }
-            .runCatching {
-                val valid = executor.responseValidator(response)
-                if (valid) response else
-                    throw HttpException(response.statusCode, response.responseMessage)
+            .mapCatching {
+                val valid = executor.responseValidator(it)
+                if (valid) it else throw HttpException(response.statusCode, response.responseMessage)
             }
             .recover { error -> throw FuelError.wrap(error, response) }
             .getOrThrow()
