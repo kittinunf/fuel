@@ -364,7 +364,7 @@ You can have as many progress handlers of each type as you like.
 
 ```kotlin
 Fuel.post("/post")
-    .body(...)
+    .body(/*...*/)
     .requestProgress { readBytes, totalBytes ->
       val progress = readBytes.toFloat() / totalBytes.toFloat() * 100
       println("Bytes uploaded $readBytes / $totalBytes ($progress %)")
@@ -395,60 +395,71 @@ Fuel supports multipart uploads using the `.upload()` feature. You can turn _any
 
 | method | arguments | action |
 |----|----|----|
-| `request.source { }` | `(Request, URL) -> File` | Add a source file to the form-data |
-| `request.sources { }` | `(Request, URL) -> Iterable<File>` | Add a list of source files to the form data |
-| `request.name(name)` | `name: String` | the base field name |
-| `request.dataParts { }` | `(Request, URL) -> Iterable<DataPart>` | Add a list of `DataPart` to the form data |
+| `request.add { }` | `varargs dataparts: (Request) -> DataPart` | Add one or multiple DataParts lazily |
+| `request.add()` | `varargs dataparts: DataPart` | Add one or multiple DataParts |
 | `request.progress(handler)` | `hander: ProgressCallback` | Add a `requestProgress` handler |
 
 ```kotlin
 Fuel.upload("/post")
-    .source { request, url -> File.createTempFile("temp", ".tmp") }
-    .name { "temp" }
+    .add { FileDataPart(File("myfile.json"), name = "fieldname", filename="contents.json") }
     .response { result -> }
 ```
 
-#### `Content-Type` and field names using `DataPart`
+#### `DataPart` from `File`
+In order to add `DataPart`s that are sources from a `File`, you can use `FileDataPart`, which takes a `file: File`. There are some sane defaults for the field name `name: String`, and remote file name `filename: String`, as well as the `Content-Type` and `Content-Disposition` fields, but you can override them.
 
-The `DataPart` type can be used to add metadata to the files you're uploading. Currently supported are field name and `Content-Type`:
-
-```Kotlin
+In order to receive a list of files, for example in the field `files`, use the array notation:
+```kotlin
 Fuel.upload("/post")
-    .dataParts { request, url ->
-        listOf(
-            DataPart(File.createTempFile("temp1", ".tmp"), type = "image/jpeg"),
-            DataPart(File.createTempFile("temp2", ".tmp"), name = "file2"),
-            DataPart(File.createTempFile("temp3", ".tmp"), "third-file", "image/jpeg")
-        )
-    }
+    .add(
+        FileDataPart(File("myfile.json"), name = "files[]", filename="contents.json"),
+        FileDataPart(File("myfile2.json"), name = "files[]", filename="contents2.json"),
+        FileDataPart(File("myfile3.json"), name = "files[]", filename="contents3.json"),
+    )
     .response { result -> }
 ```
+
+Sending multiple files in a single datapart is _not_ supported as it's deprecated by the multipart/form-data RFCs, but to simulate this behaviour, give the same `name` to multiple parts.
+
+You can use the convenience constructors `FileDataPart.from(directory: , filename: , ...args)` to create a `FileDataPart` from `String` arguments.
+
+#### `DataPart` from inline content
+Sometimes you have some content inline that you want to turn into a `DataPart`. You can do this with `InlineDataPart`:
+
+```kotlin
+Fuel.upload("/post")
+    .add(
+        FileDataPart(File("myfile.json"), name = "file", filename="contents.json"),
+        InlineDataPart(myInlineContent, name = "metadata", filename="metadata.json", contentType = "application/json")
+    )
+    .response { result -> }
+```
+
+A `filename` is not mandatory and is empty by default; the `contentType` is `text/plain` by default.
+
+#### `DataPart` from `InputStream` (formely `Blob`)
+You can also add dataparts from arbitrary `InputStream`s, which you can do using `BlobDataPart`:
+
+ ```kotlin
+ Fuel.upload("/post")
+     .add(
+         FileDataPart(File("myfile.json"), name = "file", filename="contents.json"),
+         BlobDataPart(someInputStream, name = "metadata", filename="metadata.json", contentType = "application/json", contentLength = 555)
+     )
+     .response { result -> }
+ ```
+If you don't set the `contentLength` to a positive integer, your entire `Request` `Content-Length` will be undeterminable and the default `HttpClient` will switch to chunked streaming mode with an arbitrary stream buffer size.
 
 #### Multipart request without a file
 
-By providing an empty list you can make a request without any files:
+Simply don't call `add`. The parameters are encoded as parts!
 
 ```kotlin
 val formData = listOf("Email" to "mail@example.com", "Name" to "Joe Smith" )
 
 Fuel.upload("/post", param = formData)
-    .dataParts { request, url -> listOf<DataPart>() }
     .response { result -> }
 ```
-
-#### `InputStream` sources using `Blob`
-
-If your data comes from arbitrary `InpuStream`s, you can use `Blob` to add these to the form-data.
-
-```kotlin
-Fuel.upload("/post")
-    .blob { request, url -> Blob("filename.png", someObject.length) { someObject.getInputStream() } }
-```
-
-#### Limitations
-
-- The upload API will soon be overhauled to enable metadata for any source and therefore allowing uploads without the need to create temporary files.
-- If you set `Content-Type` using `.header()`, make sure to include a valid `boundary=`
 
 ### Getting a Response
 
@@ -580,12 +591,12 @@ FuelManager.instance.baseHeaders = mapOf("Device" to "Android")
 * `Headers` can be added to a request via various methods including
 
 ```kotlin
-fun header(name: String, value: Any): Request: request.header("foo", "a")
-fun header(pairs: Map<String, Any>): Request: request.header(mapOf("foo" to "a"))
-fun header(vararg pairs: Pair<String, Any>): Request: request.header("foo" to "a")
+fun header(name: String, value: Any): Request = request.header("foo", "a")
+fun header(pairs: Map<String, Any>): Request = request.header(mapOf("foo" to "a"))
+fun header(vararg pairs: Pair<String, Any>): Request = request.header("foo" to "a")
 
-operator fun set(header: String, value: Collection<Any>): Request: request["foo"] = listOf("a", "b")
-operator fun set(header: String, value: Any): Request: request["foo"] = "a"
+operator fun set(header: String, value: Collection<Any>): Request = request["foo"] = listOf("a", "b")
+operator fun set(header: String, value: Any): Request = request["foo"] = "a"
 ```
     
 * By default, all subsequent calls overwrite earlier calls, but you may use the `appendHeader` variant to append values to existing values.

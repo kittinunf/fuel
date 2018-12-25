@@ -2,10 +2,11 @@ package com.example.fuel
 
 import android.os.Bundle
 import android.os.Handler
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
@@ -174,7 +175,7 @@ class MainActivity : AppCompatActivity() {
     private fun httpDownload() {
         val n = 100
         Fuel.download("/bytes/${1024 * n}")
-            .destination { _, _ -> File(filesDir, "test.tmp") }
+            .fileDestination { _, _ -> File(filesDir, "test.tmp") }
             .progress { readBytes, totalBytes ->
                 val progress = "$readBytes / $totalBytes"
                 runOnUiThread { mainAuxText.text = progress }
@@ -186,7 +187,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun httpUpload() {
         Fuel.upload("/post")
-            .source { _, _ ->
+            .add {
                 // create random file with some non-sense string
                 val file = File(filesDir, "out.tmp")
                 file.writer().use { writer ->
@@ -194,7 +195,7 @@ class MainActivity : AppCompatActivity() {
                         writer.appendln("abcdefghijklmnopqrstuvwxyz")
                     }
                 }
-                file
+                FileDataPart(file)
             }
             .progress { writtenBytes, totalBytes ->
                 Log.v(TAG, "Upload: ${writtenBytes.toFloat() / totalBytes.toFloat()}")
@@ -211,13 +212,13 @@ class MainActivity : AppCompatActivity() {
             .authentication()
             .basic(username, password)
             .also { Log.d(TAG, it.cUrlString()) }
-            .responseString { request, _, result -> update(result) }
+            .responseString { _, _, result -> update(result) }
 
         "/basic-auth/$username/$password".httpGet()
             .authentication()
             .basic(username, password)
             .also { Log.d(TAG, it.cUrlString()) }
-            .responseString { request, _, result -> update(result) }
+            .responseString { _, _, result -> update(result) }
     }
 
     private fun httpRxSupport() {

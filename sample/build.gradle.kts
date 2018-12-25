@@ -9,7 +9,7 @@ plugins {
 
 dependencies {
     implementation(Kotlin.stdlib)
-    implementation(Android.Support.appCompat)
+    implementation(AndroidX.appCompat)
     implementation(KotlinX.Coroutines.android)
     implementation(RxJava.Android.dependency)
     implementation(Stetho.plugin)
@@ -22,11 +22,11 @@ dependencies {
     api(project(":fuel-coroutines"))
     api(project(":fuel-stetho"))
 
-    androidTestImplementation(Android.Support.annotation)
-    androidTestImplementation(Android.Test.runner)
-    androidTestImplementation(Android.Test.rules)
-    androidTestImplementation(Android.Espresso.core)
-    androidTestImplementation(Android.Espresso.intents)
+    androidTestImplementation(AndroidX.annotation)
+    androidTestImplementation(AndroidX.Test.junit)
+    androidTestImplementation(AndroidX.Test.rules)
+    androidTestImplementation(AndroidX.Espresso.core)
+    androidTestImplementation(AndroidX.Espresso.intents)
 }
 
 configure<BaseExtension> {
@@ -38,7 +38,7 @@ configure<BaseExtension> {
         targetSdkVersion(Fuel.compileSdkVersion)
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     sourceSets {
@@ -56,13 +56,5 @@ configure<BaseExtension> {
     packagingOptions {
         exclude("META-INF/LICENSE.txt")
         exclude("META-INF/NOTICE.txt")
-    }
-}
-
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "android.arch.lifecycle") {
-            useVersion("1.1.1")
-        }
     }
 }

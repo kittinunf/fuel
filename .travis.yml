@@ -6,10 +6,8 @@ env:
 android:
   components:
     - tools
-    - build-tools-27.0.3
-    - android-27
-    - extra-android-support
-    - extra-android-m2repository
+    - build-tools-28.0.3
+    - android-28
   licenses:
     - android-sdk-license-.+
 

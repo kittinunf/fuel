@@ -91,10 +91,11 @@ class StringTest : MockHttpTestCase() {
         val (_, res, result) = Fuel.get("http://127.0.0.1:80")
             .awaitStringResponseResult()
 
-        assertThat(res, notNullValue())
-        assertThat(result, notNullValue())
+        assertThat("Expected a response, actual null", res, notNullValue())
+
         val (data, error) = result
-        assertThat(error, notNullValue())
+        assertThat("Expected error, actual data $data", error, notNullValue())
+
         when (result) {
             is Result.Success -> fail("should catch connect exception")
             is Result.Failure -> {
