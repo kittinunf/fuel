@@ -323,7 +323,6 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
 
         mock.chain(request = firstRequest, response = firstResponse)
 
-        // TODO: should not be an error
         expectNotRedirected(
                 FuelManager().request(Method.GET, mock.path("not-modified")),
                 HttpURLConnection.HTTP_NOT_MODIFIED

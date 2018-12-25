@@ -29,9 +29,10 @@ internal class RequestTask(internal val request: Request) : Callable<Response> {
     private fun prepareResponse(result: RequestTaskResult): Response {
         val (request, response) = result
         return runCatching { executor.responseTransformer(request, response) }
-            .mapCatching {
-                val valid = executor.responseValidator(it)
-                if (valid) it else throw HttpException(response.statusCode, response.responseMessage)
+            .mapCatching { transformedResponse ->
+                val valid = executor.responseValidator(transformedResponse)
+                if (valid) transformedResponse
+                else throw HttpException(transformedResponse.statusCode, transformedResponse.responseMessage)
             }
             .recover { error -> throw FuelError.wrap(error, response) }
             .getOrThrow()
