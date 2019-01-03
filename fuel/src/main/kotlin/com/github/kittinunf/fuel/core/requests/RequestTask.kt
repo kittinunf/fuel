@@ -32,7 +32,7 @@ internal class RequestTask(internal val request: Request) : Callable<Response> {
             .mapCatching { transformedResponse ->
                 val valid = executor.responseValidator(transformedResponse)
                 if (valid) transformedResponse
-                else throw HttpException(transformedResponse.statusCode, transformedResponse.responseMessage)
+                else throw FuelError.wrap(HttpException(transformedResponse.statusCode, transformedResponse.responseMessage), transformedResponse)
             }
             .recover { error -> throw FuelError.wrap(error, response) }
             .getOrThrow()

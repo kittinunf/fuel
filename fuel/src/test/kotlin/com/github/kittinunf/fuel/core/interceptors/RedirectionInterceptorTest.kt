@@ -228,7 +228,14 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = secondResponse)
 
-        expectNotRedirected(FuelManager().request(Method.GET, mock.path("redirect")), HttpURLConnection.HTTP_NOT_FOUND)
+        val (request, response, result) = FuelManager().request(Method.GET, mock.path("redirect")).response()
+        val (data, error) = result
+
+        assertThat(data, nullValue())
+        assertThat(error, notNullValue())
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_NOT_FOUND))
     }
 
     @Test

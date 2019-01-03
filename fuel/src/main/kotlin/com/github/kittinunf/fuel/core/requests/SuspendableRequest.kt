@@ -29,7 +29,7 @@ class SuspendableRequest private constructor(private val wrapped: Request) : Req
             .mapCatching { transformedResponse ->
                 val valid = executor.responseValidator(transformedResponse)
                 if (valid) transformedResponse
-                else throw HttpException(transformedResponse.statusCode, transformedResponse.responseMessage)
+                else throw FuelError.wrap(HttpException(transformedResponse.statusCode, transformedResponse.responseMessage), transformedResponse)
             }
             .recover { error -> throw FuelError.wrap(error, response) }
             .getOrThrow()
