@@ -14,18 +14,26 @@ import com.github.kittinunf.result.Result
 import java.io.InputStream
 import java.io.Reader
 
-val mapper = ObjectMapper().registerKotlinModule()
+val defaultMapper = ObjectMapper().registerKotlinModule()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
 inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) {
     response(jacksonDeserializerOf(), handler)
 }
 
+inline fun <reified T : Any> Request.responseObject(mapper: ObjectMapper, noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) {
+    response(jacksonDeserializerOf(mapper), handler)
+}
+
+inline fun <reified T : Any> Request.responseObject(mapper: ObjectMapper, handler: ResponseHandler<T>) = response(jacksonDeserializerOf(mapper), handler)
+
 inline fun <reified T : Any> Request.responseObject(handler: ResponseHandler<T>) = response(jacksonDeserializerOf(), handler)
 
 inline fun <reified T : Any> Request.responseObject() = response(jacksonDeserializerOf<T>())
 
-inline fun <reified T : Any> jacksonDeserializerOf() = object : ResponseDeserializable<T> {
+inline fun <reified T : Any> Request.responseObject(mapper: ObjectMapper) = response(jacksonDeserializerOf<T>(mapper))
+
+inline fun <reified T : Any> jacksonDeserializerOf(mapper: ObjectMapper = defaultMapper) = object : ResponseDeserializable<T> {
     override fun deserialize(reader: Reader): T? {
         return mapper.readValue(reader)
     }
