@@ -45,6 +45,21 @@ class FuelJacksonTest : MockHttpTestCase() {
     }
 
     @Test
+    fun jacksonTestResponseObjectWithCustomMapper() {
+        mock.chain(
+                request = mock.request().withPath("/user-agent"),
+                response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("user-agent"))
+                .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>(createCustomMapper())) { _, _, result ->
+                    assertThat(result.component1(), instanceOf(HttpBinUserAgentModel::class.java))
+                    assertThat(result.component1()?.userAgent, not(""))
+                    assertThat(result.component2(), instanceOf(FuelError::class.java))
+                }
+    }
+
+    @Test
     fun jacksonTestResponseObjectError() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
@@ -56,6 +71,20 @@ class FuelJacksonTest : MockHttpTestCase() {
                 assertThat(result.component1(), notNullValue())
                 assertThat(result.component2(), instanceOf(Result.Failure::class.java))
             }
+    }
+
+    @Test
+    fun jacksonTestResponseObjectErrorWithCustomMapper() {
+        mock.chain(
+                request = mock.request().withPath("/user-agent"),
+                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+        )
+
+        Fuel.get(mock.path("user-agent"))
+                .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>(createCustomMapper())) { _, _, result ->
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
+                }
     }
 
     @Test
