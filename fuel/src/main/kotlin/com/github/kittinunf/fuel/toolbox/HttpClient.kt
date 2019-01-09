@@ -201,7 +201,7 @@ class HttpClient(
     private fun dataStream(connection: HttpURLConnection, hook: Hook?): InputStream? {
         return try {
             try {
-            	val inputStream = hook?.interpretResponseStream(connection.inputStream) ?: connection.inputStream
+                val inputStream = hook?.interpretResponseStream(connection.inputStream) ?: connection.inputStream
                 BufferedInputStream(inputStream)
             } catch (_: IOException) {
                 // The InputStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures
@@ -209,8 +209,8 @@ class HttpClient(
                 try { connection.inputStream?.close() } catch (_: IOException) {}
 
                 connection.errorStream?.let {
-                	val errorInputStream = hook?.interpretResponseStream(it) ?: it
-                	BufferedInputStream(errorInputStream)
+                    val errorInputStream = hook?.interpretResponseStream(it) ?: it
+                    BufferedInputStream(errorInputStream)
                 }
             } finally {
                 // We want the stream to live. Closing the stream is handled by Deserialize
