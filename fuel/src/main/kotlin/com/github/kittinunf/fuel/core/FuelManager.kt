@@ -27,12 +27,13 @@ typealias FoldableResponseInterceptor = (ResponseTransformer) -> ResponseTransfo
 
 class FuelManager : RequestFactory, RequestFactory.Convenience {
 
-    var client: Client by readWriteLazy { HttpClient(proxy) }
+    var client: Client by readWriteLazy { HttpClient(proxy, hookFactory = hookFactory) }
     var proxy: Proxy? = null
     var basePath: String? = null
     var timeoutInMillisecond: Int = 15_000
     var timeoutReadInMillisecond: Int = timeoutInMillisecond
     var progressBufferSize: Int = DEFAULT_BUFFER_SIZE
+    var hookFactory: (() -> HttpClient.Hook)? = null
 
     var baseHeaders: Map<String, String>? = null
     var baseParams: Parameters = emptyList()

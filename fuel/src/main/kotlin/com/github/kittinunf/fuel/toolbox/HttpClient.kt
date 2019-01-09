@@ -27,10 +27,11 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.max
 
-internal class HttpClient(
+class HttpClient(
     private val proxy: Proxy? = null,
     var useHttpCache: Boolean = true,
-    var decodeContent: Boolean = true
+    var decodeContent: Boolean = true,
+    var hookFactory: (() -> Hook)? = null
 ) : Client {
     override fun executeRequest(request: Request): Response {
         return try {
@@ -70,12 +71,13 @@ internal class HttpClient(
     @Throws
     private fun doRequest(request: Request): Response {
         val connection = establishConnection(request) as HttpURLConnection
-        sendRequest(request, connection)
-        return retrieveResponse(request, connection)
+        val hook = hookFactory?.invoke()
+        sendRequest(request, connection, hook)
+        return retrieveResponse(request, connection, hook)
     }
 
     @Throws(InterruptedException::class)
-    private fun sendRequest(request: Request, connection: HttpURLConnection) {
+    private fun sendRequest(request: Request, connection: HttpURLConnection, hook: Hook?) {
         ensureRequestActive(request, connection)
         connection.apply {
             connectTimeout = max(request.executionOptions.timeoutInMillisecond, 0)
@@ -115,14 +117,17 @@ internal class HttpClient(
                 setRequestProperty("X-HTTP-Method-Override", Method.PATCH.value)
             }
 
+            hook?.preConnect(connection, request)
             setDoOutput(connection, request.method)
             setBodyIfDoOutput(connection, request)
         }
     }
 
     @Throws
-    private fun retrieveResponse(request: Request, connection: HttpURLConnection): Response {
+    private fun retrieveResponse(request: Request, connection: HttpURLConnection, hook: Hook?): Response {
         ensureRequestActive(request, connection)
+
+        hook?.postConnect()
 
         val headers = Headers.from(connection.headerFields)
         val transferEncoding = headers[Headers.TRANSFER_ENCODING].flatMap { it.split(',') }.map { it.trim() }
@@ -168,7 +173,7 @@ internal class HttpClient(
             contentLength = -1
         }
 
-        val contentStream = dataStream(connection)?.decode(transferEncoding) ?: ByteArrayInputStream(ByteArray(0))
+        val contentStream = dataStream(connection, hook)?.decode(transferEncoding) ?: ByteArrayInputStream(ByteArray(0))
         val inputStream = if (shouldDecode && contentEncoding != null) contentStream.decode(contentEncoding) else contentStream
         val cancellationConnection = WeakReference<HttpURLConnection>(connection)
         val progressStream = ProgressInputStream(
@@ -193,16 +198,20 @@ internal class HttpClient(
         )
     }
 
-    private fun dataStream(connection: HttpURLConnection): InputStream? {
+    private fun dataStream(connection: HttpURLConnection, hook: Hook?): InputStream? {
         return try {
             try {
-                BufferedInputStream(connection.inputStream)
+            	val inputStream = hook?.interpretResponseStream(connection.inputStream) ?: connection.inputStream
+                BufferedInputStream(inputStream)
             } catch (_: IOException) {
                 // The InputStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures
                 // the InputStream ís actually always closed.
                 try { connection.inputStream?.close() } catch (_: IOException) {}
 
-                connection.errorStream?.let { BufferedInputStream(it) }
+                connection.errorStream?.let {
+                	val errorInputStream = hook?.interpretResponseStream(it) ?: it
+                	BufferedInputStream(errorInputStream)
+                }
             } finally {
                 // We want the stream to live. Closing the stream is handled by Deserialize
             }
@@ -210,6 +219,8 @@ internal class HttpClient(
             // The ErrorStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures the
             // ErrorStream ís actually always closed.
             try { connection.errorStream?.close() } catch (_: IOException) {}
+
+            hook?.httpExchangeFailed(exception)
 
             ByteArrayInputStream(exception.message?.toByteArray() ?: ByteArray(0))
         } finally {
@@ -269,5 +280,12 @@ internal class HttpClient(
     companion object {
         private val SUPPORTED_DECODING = listOf("gzip", "deflate; q=0.5")
         private fun coerceMethod(method: Method) = if (method == Method.PATCH) Method.POST else method
+    }
+
+    interface Hook {
+        fun preConnect(connection: HttpURLConnection, request: Request)
+        fun interpretResponseStream(inputStream: InputStream): InputStream
+        fun postConnect()
+        fun httpExchangeFailed(exception: IOException)
     }
 }
