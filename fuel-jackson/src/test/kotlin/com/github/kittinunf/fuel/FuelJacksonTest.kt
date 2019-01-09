@@ -73,6 +73,20 @@ class FuelJacksonTest : MockHttpTestCase() {
     }
 
     @Test
+    fun jacksonTestResponseDeserializerObjectWithCustomMapper() {
+        mock.chain(
+                request = mock.request().withPath("/user-agent"),
+                response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("user-agent"))
+                .responseObject<HttpBinUserAgentModel>(createCustomMapper()) { _, _, result ->
+                    assertThat(result.component1(), notNullValue())
+                    assertThat(result.component2(), notNullValue())
+                }
+    }
+
+    @Test
     fun jacksonTestResponseDeserializerObjectError() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
@@ -106,6 +120,25 @@ class FuelJacksonTest : MockHttpTestCase() {
     }
 
     @Test
+    fun jacksonTestResponseHandlerObjectWithCustomMapper() {
+        mock.chain(
+                request = mock.request().withPath("/user-agent"),
+                response = mock.reflect()
+        )
+
+        Fuel.get(mock.path("user-agent"))
+                .responseObject(createCustomMapper(), object : ResponseHandler<HttpBinUserAgentModel> {
+                    override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
+                        assertThat(value, notNullValue())
+                    }
+
+                    override fun failure(request: Request, response: Response, error: FuelError) {
+                        assertThat(error, notNullValue())
+                    }
+                })
+    }
+
+    @Test
     fun jacksonTestResponseHandlerObjectError() {
         mock.chain(
             request = mock.request().withPath("/user-agent"),
@@ -113,7 +146,7 @@ class FuelJacksonTest : MockHttpTestCase() {
         )
 
         Fuel.get(mock.path("user-agent"))
-            .responseObject(object : ResponseHandler<HttpBinUserAgentModel> {
+            .responseObject(createCustomMapper(), object : ResponseHandler<HttpBinUserAgentModel> {
                 override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
                     assertThat(value, notNullValue())
                 }
@@ -149,12 +182,7 @@ class FuelJacksonTest : MockHttpTestCase() {
                 ).withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        val mapper = ObjectMapper().registerKotlinModule()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-
-        mapper.propertyNamingStrategy = PropertyNamingStrategy.SNAKE_CASE
-
-        val (_, res, result) = Fuel.get(mock.path("issues/1")).responseObject<IssueInfo>(mapper)
+        val (_, res, result) = Fuel.get(mock.path("issues/1")).responseObject<IssueInfo>(createCustomMapper())
         assertThat(res, notNullValue())
         assertThat(result.get(), notNullValue())
         assertThat(result.get(), isA(IssueInfo::class.java))
@@ -231,5 +259,14 @@ class FuelJacksonTest : MockHttpTestCase() {
             val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
             assertThat(issueList[0], isA(IssueInfo::class.java))
         }
+    }
+
+    private fun createCustomMapper(): ObjectMapper {
+        val mapper = ObjectMapper().registerKotlinModule()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+        mapper.propertyNamingStrategy = PropertyNamingStrategy.SNAKE_CASE
+
+        return mapper
     }
 }
