@@ -158,13 +158,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
      * @return [UploadRequest] the request (extended for upload)
      */
     override fun upload(convertible: RequestConvertible): UploadRequest {
-        val request = Encoding(
-            httpMethod = convertible.request.method,
-            urlString = convertible.request.url.path,
-            baseUrlString = basePath,
-            parameters = if (convertible.request.parameters == null) baseParams else baseParams + convertible.request.parameters
-        ).request
-        return applyOptions(request).upload()
+        return applyOptions(convertible.request).upload()
     }
 
     fun addRequestInterceptor(interceptor: FoldableRequestInterceptor): FuelManager {
