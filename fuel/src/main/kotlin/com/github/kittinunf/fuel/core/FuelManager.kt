@@ -160,7 +160,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
     override fun upload(convertible: RequestConvertible): UploadRequest {
         val request = Encoding(
             httpMethod = convertible.request.method,
-            urlString = convertible.request.path,
+            urlString = convertible.request.url.path,
             baseUrlString = basePath,
             parameters = if (convertible.request.parameters == null) baseParams else baseParams + convertible.request.parameters
         ).request
