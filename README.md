@@ -76,7 +76,7 @@ dependencies {
 }
 ```
 
-### Configuration
+#### Configuration
 - `group` is made up of `com.github` as well as username and project name
 
 - `name` is the subproject, this may be any of the packages listed in the [installation instructions](https://github.com/kittinunf/fuel#installation)
@@ -85,7 +85,7 @@ eg. `fuel`, `fuel-coroutines`, `fuel-kotlinx-serialization`, etc
 
 We recommend _not_ using `SNAPSHOT` builds, but a specific commit in a specific branch (like a commit on master), because your build will then be stable.
 
-### Build time-out
+#### Build time-out
 Have patience when updating the version of fuel or building for the first time as jitpack will build it, and this may cause the request to jitpack to time out. Wait a few minutes and try again (or check the status on jitpack).
 
 **NOTE:** do _not_ forget to add the `kotlinx` repository when using `coroutines` or `serialization`
