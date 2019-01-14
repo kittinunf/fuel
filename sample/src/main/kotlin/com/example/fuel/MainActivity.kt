@@ -20,6 +20,7 @@ import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rxObject
+import com.github.kittinunf.fuel.stetho.StethoHook
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             basePath = "http://httpbin.org"
             baseHeaders = mapOf("Device" to "Android")
             baseParams = listOf("key" to "value")
+            hook = StethoHook("Fuel Sample App")
 //            addResponseInterceptor { loggingResponseInterceptor() }
         }
 
