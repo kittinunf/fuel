@@ -156,3 +156,13 @@ object Release {
         const val plugin = "com.jfrog.bintray"
     }
 }
+
+object Stetho {
+    const val version = "1.5.0"
+    const val plugin = "com.facebook.stetho:stetho:$version"
+
+    object StethoUrlConnection {
+        const val version = "1.5.0"
+        const val plugin = "com.facebook.stetho:stetho-urlconnection:$version"
+    }
+}

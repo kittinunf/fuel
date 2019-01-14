@@ -32,6 +32,7 @@ include(":fuel-kotlinx-serialization")
 include(":fuel-moshi")
 include(":fuel-test")
 include(":fuel-json")
+include(":fuel-stetho")
 
 val includeSample: String by settings
 if (includeSample == "true") {
