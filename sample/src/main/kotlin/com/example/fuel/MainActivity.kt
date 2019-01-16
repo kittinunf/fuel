@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelManager
@@ -15,11 +16,11 @@ import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpDelete
 import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.fuel.httpPatch
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rxObject
+import com.github.kittinunf.fuel.toolbox.HttpClient
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -163,12 +164,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun httpPatch() {
-        Fuel.patch("/patch", listOf("foo" to "foo", "bar" to "bar"))
-            .also { Log.d(TAG, it.cUrlString()) }
-            .responseString { _, _, result -> update(result) }
+        val manager = FuelManager().apply {
+            basePath = "http://httpbin.org"
+            baseHeaders = mapOf("Device" to "Android")
+            baseParams = listOf("key" to "value")
+        }
 
-        "/patch"
-            .httpPatch(listOf("foo" to "foo", "bar" to "bar"))
+        (manager.client as HttpClient).forceMethods = true
+
+        manager.request(Method.PATCH, "/patch", listOf("foo" to "foo", "bar" to "bar"))
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
     }

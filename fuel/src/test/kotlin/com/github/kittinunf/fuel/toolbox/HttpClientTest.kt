@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.test.MockHttpTestCase
@@ -70,8 +71,28 @@ class HttpClientTest : MockHttpTestCase() {
     }
 
     @Test
+    fun usesOverrideMethodForPatch() {
+        val request = Fuel.patch(mock.path("patch-with-override"))
+
+        mock.chain(
+                request = mock.request().withMethod(Method.POST.value).withPath("/patch-with-override"),
+                response = mock.reflect()
+        )
+
+        val (_, _, result) = request.responseObject(MockReflected.Deserializer())
+        val (data, error) = result
+
+        assertThat("Expected data, actual error $error", data, notNullValue())
+        assertThat(data!!.method, equalTo(Method.POST.value))
+        assertThat(data["X-HTTP-Method-Override"].firstOrNull(), equalTo(Method.PATCH.value))
+    }
+
+    @Test
     fun allowPatchWithBody() {
-        val request = Fuel.patch(mock.path("patch-body-output"))
+        val manager = FuelManager()
+        (manager.client as HttpClient).forceMethods = true
+
+        val request = manager.request(Method.PATCH, mock.path("patch-body-output"))
             .body("my-body")
 
         mock.chain(

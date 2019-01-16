@@ -27,10 +27,11 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.max
 
-internal class HttpClient(
+class HttpClient internal constructor(
     private val proxy: Proxy? = null,
     var useHttpCache: Boolean = true,
-    var decodeContent: Boolean = true
+    var decodeContent: Boolean = true,
+    var forceMethods: Boolean = false
 ) : Client {
     override fun executeRequest(request: Request): Response {
         return try {
@@ -117,7 +118,14 @@ internal class HttpClient(
         connection.apply {
             connectTimeout = max(request.executionOptions.timeoutInMillisecond, 0)
             readTimeout = max(request.executionOptions.timeoutReadInMillisecond, 0)
-            forceMethod(request.method)
+            if (forceMethods) {
+                forceMethod(request.method)
+            } else {
+                requestMethod = coerceMethod(request.method).value
+                if (request.method.value == "PATCH") {
+                    setRequestProperty("X-HTTP-Method-Override", request.method.value)
+                }
+            }
             doInput = true
             useCaches = request.executionOptions.useHttpCache ?: useHttpCache
             instanceFollowRedirects = false
