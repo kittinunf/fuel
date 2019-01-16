@@ -112,6 +112,26 @@ Fuel.patch("https://httpbin.org/patch")
  */
 ```
 
+**Experimental**
+
+As of version `1.16.x` you can **opt-in** to forcing a HTTP Method on the [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html) instance using reflection.
+
+```kotlin
+(FuelManager.instance.client as HttpClient).forceMethods = true
+
+Fuel.patch("https://httpbin.org/patch")
+    .also { println(it) }
+    .response { result -> }
+
+/* --> PATCH (https://httpbin.org/patch)
+ * "Body" : (empty)
+ * "Headers : (3)"
+ * Accept-Encoding : compress;q=0.5, gzip;q=1.0
+ * Content-Type : application/x-www-form-urlencoded
+ */
+```
+
+
 #### About `CONNECT` request
 Connect is not supported by the Java JVM via the regular HTTP clients, and is therefore not supported.
 
