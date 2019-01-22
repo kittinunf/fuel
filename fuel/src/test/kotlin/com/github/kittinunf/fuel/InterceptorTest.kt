@@ -255,7 +255,7 @@ class InterceptorTest : MockHttpTestCase() {
     }
 
     @Test
-    fun testHttpExceptionWithRemoveInterceptors() {
+    fun testHttpExceptionWithRemoveValidator() {
         val firstRequest = mock.request()
             .withMethod(Method.GET.value)
             .withPath("/invalid")
@@ -266,9 +266,11 @@ class InterceptorTest : MockHttpTestCase() {
         mock.chain(request = firstRequest, response = firstResponse)
 
         val manager = FuelManager()
-        manager.removeAllResponseInterceptors()
 
-        val (request, response, result) = manager.request(Method.GET, mock.path("invalid")).responseString(Charsets.UTF_8)
+        val (request, response, result) =
+                manager.request(Method.GET, mock.path("invalid"))
+                        .validate { true }
+                        .responseString()
 
         val (data, error) = result
         assertThat(request, notNullValue())
@@ -309,40 +311,12 @@ class InterceptorTest : MockHttpTestCase() {
 
         mock.chain(request = firstRequest, response = firstResponse)
         val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mock.path("not-modified")).responseString()
+        val (_, _, result) =
+                manager.request(Method.GET, mock.path("not-modified")).responseString()
         val (data, error) = result
 
-        // TODO: Not Modified should not be an error
-        assertThat(data, nullValue())
-        assertThat(error, notNullValue())
-    }
-
-    @Test
-    fun testGetWrongUrl() {
-        val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
-
-        val firstResponse = mock.response()
-            .withHeader("Location", mock.path("not-found"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
-
-        val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/not-found")
-
-        val secondResponse = mock.response()
-            .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
-
-        mock.chain(request = firstRequest, response = firstResponse)
-        mock.chain(request = secondRequest, response = secondResponse)
-
-        val manager = FuelManager()
-        val (_, _, result) = manager.request(Method.GET, mock.path("redirect")).responseString()
-        val (data, error) = result
-
-        assertThat(data, nullValue())
-        assertThat(error, notNullValue())
+        assertThat(data, notNullValue())
+        assertThat(error, nullValue())
     }
 
     @Test

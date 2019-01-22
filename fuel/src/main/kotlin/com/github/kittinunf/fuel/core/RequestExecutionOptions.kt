@@ -12,6 +12,8 @@ typealias ResponseTransformer = (Request, Response) -> Response
 
 typealias InterruptCallback = (Request) -> Unit
 
+typealias ResponseValidator = (Response) -> Boolean
+
 data class RequestExecutionOptions(
     val client: Client,
     val socketFactory: SSLSocketFactory? = null,
@@ -29,6 +31,9 @@ data class RequestExecutionOptions(
     var allowRedirects: Boolean? = null
     var useHttpCache: Boolean? = null
     var interruptCallbacks: MutableCollection<InterruptCallback> = mutableListOf()
+    var responseValidator: ResponseValidator = { response ->
+        !(response.isServerError || response.isClientError)
+    }
 
     /**
      * Executes a callback [f] onto the [Executor]

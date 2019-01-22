@@ -5,7 +5,6 @@ import com.github.kittinunf.fuel.core.RequestFactory.PathStringConvertible
 import com.github.kittinunf.fuel.core.RequestFactory.RequestConvertible
 import com.github.kittinunf.fuel.core.interceptors.ParameterEncoder
 import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
-import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import com.github.kittinunf.fuel.core.requests.DownloadRequest
 import com.github.kittinunf.fuel.core.requests.UploadRequest
 import com.github.kittinunf.fuel.core.requests.download
@@ -67,7 +66,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
     private val requestInterceptors: MutableList<FoldableRequestInterceptor> =
             mutableListOf(ParameterEncoder)
     private val responseInterceptors: MutableList<FoldableResponseInterceptor> =
-            mutableListOf(redirectResponseInterceptor(this), validatorResponseInterceptor(200..299))
+            mutableListOf(redirectResponseInterceptor(this))
 
     // callback executionOptions
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
