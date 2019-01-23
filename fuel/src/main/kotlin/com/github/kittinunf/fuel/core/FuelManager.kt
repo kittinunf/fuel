@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.core.Client.Hook
 import com.github.kittinunf.fuel.core.RequestFactory.PathStringConvertible
 import com.github.kittinunf.fuel.core.RequestFactory.RequestConvertible
 import com.github.kittinunf.fuel.core.interceptors.ParameterEncoder
@@ -27,12 +28,13 @@ typealias FoldableResponseInterceptor = (ResponseTransformer) -> ResponseTransfo
 
 class FuelManager : RequestFactory, RequestFactory.Convenience {
 
-    var client: Client by readWriteLazy { HttpClient(proxy) }
+    var client: Client by readWriteLazy { HttpClient(proxy, hook = hook) }
     var proxy: Proxy? = null
     var basePath: String? = null
     var timeoutInMillisecond: Int = 15_000
     var timeoutReadInMillisecond: Int = timeoutInMillisecond
     var progressBufferSize: Int = DEFAULT_BUFFER_SIZE
+    var hook: Hook = DefaultHook()
 
     var baseHeaders: Map<String, String>? = null
     var baseParams: Parameters = emptyList()
