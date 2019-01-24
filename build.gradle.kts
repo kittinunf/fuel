@@ -3,6 +3,7 @@ import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
 import org.jmailen.gradle.kotlinter.KotlinterExtension
 import org.jmailen.gradle.kotlinter.support.ReporterType
 import org.gradle.api.publish.maven.MavenPom
+import org.jmailen.gradle.kotlinter.tasks.LintTask
 
 plugins {
     java
@@ -20,7 +21,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven (url = "https://oss.sonatype.org/content/repositories/snapshots")
+        maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
         jcenter()
     }
 }
@@ -149,6 +150,14 @@ subprojects {
 
         configure<KotlinterExtension> {
             reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
+        }
+
+        tasks.named<LintTask>("lintKotlinMain") {
+            enabled = false
+        }
+
+        tasks.named<LintTask>("lintKotlinTest") {
+            enabled = false
         }
 
         version = Fuel.publishVersion

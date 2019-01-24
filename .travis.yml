@@ -23,7 +23,7 @@ before_script:
   - chmod +x add_review.sh
 
 script:
-  - ./gradlew lintKotlin
+#  - ./gradlew lintKotlin
   - ./gradlew -PincludeSample=false test
 
 after_failure:
