@@ -21,7 +21,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven (url = "https://oss.sonatype.org/content/repositories/snapshots")
+        maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
         jcenter()
     }
 }
@@ -152,6 +152,10 @@ subprojects {
             reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
         }
 
+        tasks.named<LintTask>("lintKotlinMain") {
+            enabled = false
+        }
+
         version = Fuel.publishVersion
         group = Fuel.groupId
         bintray {
@@ -214,8 +218,4 @@ subprojects {
             }
         }
     }
-}
-
-tasks.named<LintTask>("lintKotlinMain") {
-    enabled = false
 }
