@@ -3,6 +3,7 @@ import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
 import org.jmailen.gradle.kotlinter.KotlinterExtension
 import org.jmailen.gradle.kotlinter.support.ReporterType
 import org.gradle.api.publish.maven.MavenPom
+import org.jmailen.gradle.kotlinter.tasks.LintTask
 
 plugins {
     java
@@ -213,4 +214,8 @@ subprojects {
             }
         }
     }
+}
+
+tasks.named<LintTask>("lintKotlinMain") {
+    enabled = false
 }
