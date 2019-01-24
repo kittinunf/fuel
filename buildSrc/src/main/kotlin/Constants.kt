@@ -27,7 +27,7 @@ object Json {
 }
 
 object Android {
-    const val version = "3.2.1"
+    const val version = "3.3.0"
     const val appPlugin = "com.android.application"
     const val libPlugin = "com.android.library"
 

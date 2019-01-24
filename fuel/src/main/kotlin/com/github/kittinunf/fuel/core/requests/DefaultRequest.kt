@@ -16,6 +16,7 @@ import com.github.kittinunf.fuel.core.RequestFeatures
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.core.ResponseResultHandler
+import com.github.kittinunf.fuel.core.ResponseValidator
 import com.github.kittinunf.fuel.core.ResultHandler
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
@@ -241,8 +242,7 @@ data class DefaultRequest(
             .let {
                 if (header(Headers.CONTENT_TYPE).lastOrNull().isNullOrBlank())
                     header(Headers.CONTENT_TYPE, "text/plain; charset=${charset.name()}")
-                else
-                    it
+                else it
             }
 
     /**
@@ -371,6 +371,19 @@ data class DefaultRequest(
         it.executionOptions.useHttpCache = useHttpCache
     }
 
+    /**
+     * Overwrite [RequestExecutionOptions] response validator block
+     *
+     * @note The default responseValidator is to throw [com.github.kittinunf.fuel.core.HttpException]
+     * if the response http status code is not in the range of (100 - 399) which should consider as failure response
+     *
+     * @param validator [ResponseValidator]
+     * @return [Request] the modified request
+     */
+    override fun validate(validator: ResponseValidator) = request.also {
+        it.executionOptions.responseValidator = validator
+    }
+
     override val request: Request get() = this
 
     /**
@@ -382,7 +395,6 @@ data class DefaultRequest(
      * @return [String] the string representation
      */
     override fun toString(): String = buildString {
-
         appendln("--> $method $url")
         appendln("Body : ${body.asString(header(Headers.CONTENT_TYPE).lastOrNull())}")
         appendln("Headers : (${headers.size})")
@@ -393,44 +405,60 @@ data class DefaultRequest(
 
     override fun response(handler: ResponseResultHandler<ByteArray>) =
         response(ByteArrayDeserializer(), handler)
+
     override fun response(handler: ResultHandler<ByteArray>) =
         response(ByteArrayDeserializer(), handler)
+
     override fun response(handler: ResponseHandler<ByteArray>) =
         response(ByteArrayDeserializer(), handler)
+
     override fun response(handler: Handler<ByteArray>) =
         response(ByteArrayDeserializer(), handler)
+
     override fun response() =
         response(ByteArrayDeserializer())
 
     override fun responseString(charset: Charset, handler: ResponseResultHandler<String>) =
         response(StringDeserializer(charset), handler)
+
     override fun responseString(handler: ResponseResultHandler<String>) =
         responseString(Charsets.UTF_8, handler)
+
     override fun responseString(charset: Charset, handler: ResultHandler<String>) =
         response(StringDeserializer(charset), handler)
+
     override fun responseString(handler: ResultHandler<String>) =
-            responseString(Charsets.UTF_8, handler)
+        responseString(Charsets.UTF_8, handler)
+
     override fun responseString(charset: Charset, handler: ResponseHandler<String>) =
         response(StringDeserializer(charset), handler)
+
     override fun responseString(handler: ResponseHandler<String>) =
         response(StringDeserializer(), handler)
+
     override fun responseString(charset: Charset, handler: Handler<String>) =
         response(StringDeserializer(charset), handler)
+
     override fun responseString(handler: Handler<String>) =
         response(StringDeserializer(), handler)
+
     override fun responseString(charset: Charset) =
         response(StringDeserializer(charset))
-    override fun responseString() =
-        response(StringDeserializer(Charsets.UTF_8))
+
+    override fun responseString() = response(StringDeserializer(Charsets.UTF_8))
 
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResponseResultHandler<T>) =
         response(deserializer, handler)
+
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResultHandler<T>) =
         response(deserializer, handler)
+
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: ResponseHandler<T>) =
         response(deserializer, handler)
+
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>, handler: Handler<T>) =
         response(deserializer, handler)
+
     override fun <T : Any> responseObject(deserializer: ResponseDeserializable<T>) =
         response(deserializer)
 }
