@@ -156,6 +156,10 @@ subprojects {
             enabled = false
         }
 
+        tasks.named<LintTask>("lintKotlinTest") {
+            enabled = false
+        }
+
         version = Fuel.publishVersion
         group = Fuel.groupId
         bintray {
