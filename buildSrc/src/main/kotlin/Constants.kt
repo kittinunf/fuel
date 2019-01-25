@@ -38,7 +38,7 @@ object Android {
 }
 
 object AndroidX {
-    val annotation = "androidx.annotation:annotation:1.0.1"
+    val annotation = "androidx.annotation:annotation:1.0.0"
     val appCompat = "androidx.appcompat:appcompat:1.0.2"
 
     object Arch {
