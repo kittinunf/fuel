@@ -8,7 +8,7 @@ The kotlinx-serialization extension package for [`Fuel`](../README.md).
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-kotlinx-serialization` with `Maven` and `Gradle`. The kotlinx-serialization package has the following dependencies:
 * `fuel:fuel:<same-version>`
 * Kotlin: 1.3.10
-* [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serialization#gradlejvm): 0.9.0
+* [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serialization#gradle): 0.10.0
 
 ```groovy
 compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
@@ -29,13 +29,13 @@ Fuel.get("/user-agent")
 
 This is by default strict and will reject unknown keys, for that you can pass a custom JSOn instance
 
-`JSON(nonstrict = true)`
+`Json(nonstrict = true)`
 ```kotlin
 @Serializable
 data class HttpBinUserAgentModel(var userAgent: String = "")
 
 Fuel.get("/user-agent")
-    .responseObject<HttpBinUserAgentModel>(json = JSON(nonstrict = true)) { _, _, result -> }
+    .responseObject<HttpBinUserAgentModel>(json = Json(nonstrict = true)) { _, _, result -> }
 ```
 
 `kotlinx.serialization` can not always guess the correct serialzer to use, when generics are involved for example
