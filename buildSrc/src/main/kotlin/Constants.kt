@@ -132,7 +132,7 @@ object MockServer {
 }
 
 object Jacoco {
-    const val version = "0.8.3-SNAPSHOT"
+    const val version = "0.8.3"
     const val plugin = "jacoco"
 
     object Android {
