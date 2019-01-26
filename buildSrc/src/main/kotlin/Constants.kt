@@ -38,7 +38,7 @@ object Android {
 }
 
 object AndroidX {
-    val annotation = "androidx.annotation:annotation:1.0.1"
+    val annotation = "androidx.annotation:annotation:1.0.0"
     val appCompat = "androidx.appcompat:appcompat:1.0.2"
 
     object Arch {
@@ -79,7 +79,7 @@ object Jackson {
 
 object KotlinX {
     object Coroutines {
-        const val version = "1.0.1"
+        const val version = "1.1.1"
         val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         val jvm = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     }
@@ -132,7 +132,7 @@ object MockServer {
 }
 
 object Jacoco {
-    const val version = "0.8.3-SNAPSHOT"
+    const val version = "0.8.3"
     const val plugin = "jacoco"
 
     object Android {

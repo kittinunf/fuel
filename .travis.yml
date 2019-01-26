@@ -2,6 +2,9 @@ language: android
 
 env:
   - REVIEWDOG_VERSION=0.9.11
+  
+jdk:
+  - oraclejdk8
 
 android:
   components:
@@ -9,10 +12,10 @@ android:
     - build-tools-28.0.3
     - android-28
   licenses:
-    - android-sdk-license-.+
+    - 'android-sdk-license-.+'
 
-jdk:
-  - oraclejdk8
+before_install:
+ - yes | sdkmanager "platforms;android-28"
 
 cache:
   directories:
@@ -23,8 +26,7 @@ before_script:
   - chmod +x add_review.sh
 
 script:
-#  - ./gradlew lintKotlin
-  - ./gradlew -PincludeSample=false test
+  - ./gradlew lintKotlin test
 
 after_failure:
   - curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o ./reviewdog
