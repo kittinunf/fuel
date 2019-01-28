@@ -27,8 +27,8 @@ We offer maven and jitpack installations. Maven via bintray only has stable rele
 
 ### Maven
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `Fuel` with `Maven` and `Gradle`. The core package has the following dependencies:
-* Kotlin - 1.3.0
-* Coroutine - 1.0.0
+* Kotlin - 1.3.20
+* Coroutine - 1.1.1
 
 ```groovy
 compile 'com.github.kittinunf.fuel:<package>:<latest-version>'
