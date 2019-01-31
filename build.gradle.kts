@@ -215,6 +215,15 @@ subprojects {
                     artifactId = project.name
                     version = Fuel.publishVersion
 
+                    pom {
+                        licenses {
+                            license {
+                                name.set("MIT License")
+                                url.set("http://www.opensource.org/licenses/mit-license.php")
+                            }
+                        }
+                    }
+
                     if (project.hasProperty("android")) {
                         pom.addDependencies()
                     }
