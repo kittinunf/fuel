@@ -1,6 +1,6 @@
 // Library version
 object Fuel {
-    const val publishVersion = "1.16.0"
+    const val publishVersion = "2.0.1"
     const val groupId = "com.github.kittinunf.fuel"
 
     const val compileSdkVersion = 28
@@ -9,7 +9,7 @@ object Fuel {
 
 // Core dependencies
 object Kotlin {
-    const val version = "1.3.11"
+    const val version = "1.3.20"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Kotlin.version}"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
@@ -27,7 +27,7 @@ object Json {
 }
 
 object Android {
-    const val version = "3.2.1"
+    const val version = "3.3.0"
     const val appPlugin = "com.android.application"
     const val libPlugin = "com.android.library"
 
@@ -38,15 +38,15 @@ object Android {
 }
 
 object AndroidX {
-	val annotation = "androidx.annotation:annotation:1.0.1"
-	val appCompat = "androidx.appcompat:appcompat:1.0.2"
+    val annotation = "androidx.annotation:annotation:1.0.0"
+    val appCompat = "androidx.appcompat:appcompat:1.0.2"
 
-	object Arch {
-		const val version = "2.0.0"
-		const val extensions = "androidx.lifecycle:lifecycle-extensions:$version"
-	}
+    object Arch {
+        const val version = "2.0.0"
+        const val extensions = "androidx.lifecycle:lifecycle-extensions:$version"
+    }
 
-	object Espresso {
+    object Espresso {
         const val version = "3.1.0"
         const val core = "androidx.test.espresso:espresso-core:$version"
         const val intents = "androidx.test.espresso:espresso-intents:$version"
@@ -79,13 +79,13 @@ object Jackson {
 
 object KotlinX {
     object Coroutines {
-        const val version = "1.0.1"
+        const val version = "1.1.1"
         val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         val jvm = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     }
 
     object Serialization {
-        const val version = "0.9.1"
+        const val version = "0.10.0"
         const val dependency = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$version"
         const val plugin = "kotlinx-serialization"
     }
@@ -132,7 +132,7 @@ object MockServer {
 }
 
 object Jacoco {
-    const val version = "0.8.3-SNAPSHOT"
+    const val version = "0.8.3"
     const val plugin = "jacoco"
 
     object Android {

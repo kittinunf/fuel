@@ -1,5 +1,5 @@
 # fuel-reactor
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.10-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.20-blue.svg)](https://kotlinlang.org)
 
 The reactor extension package for [`Fuel`](../README.md).
 
@@ -7,7 +7,7 @@ The reactor extension package for [`Fuel`](../README.md).
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-reactor` with `Maven` and `Gradle`. The reactor package has the following dependencies:
 * `fuel:fuel:<same-version>`
-* Kotlin: 1.3.10
+* Kotlin: 1.3.20
 * Project Reactor: 3.2.2.RELEASE
 
 ```groovy
