@@ -2,8 +2,8 @@ package com.example.fuel
 
 import android.os.Bundle
 import android.os.Handler
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Method
@@ -20,6 +20,7 @@ import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rxObject
+import com.github.kittinunf.fuel.stetho.StethoHook
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             basePath = "http://httpbin.org"
             baseHeaders = mapOf("Device" to "Android")
             baseParams = listOf("key" to "value")
+            hook = StethoHook("Fuel Sample App")
 //            addResponseInterceptor { loggingResponseInterceptor() }
         }
 
@@ -190,7 +192,7 @@ class MainActivity : AppCompatActivity() {
     private fun httpDownload() {
         val n = 100
         Fuel.download("/bytes/${1024 * n}")
-            .destination { _, _ -> File(filesDir, "test.tmp") }
+            .fileDestination { _, _ -> File(filesDir, "test.tmp") }
             .progress { readBytes, totalBytes ->
                 val progress = "$readBytes / $totalBytes"
                 runOnUiThread { mainAuxText.text = progress }
@@ -227,13 +229,13 @@ class MainActivity : AppCompatActivity() {
             .authentication()
             .basic(username, password)
             .also { Log.d(TAG, it.cUrlString()) }
-            .responseString { request, _, result -> update(result) }
+            .responseString { _, _, result -> update(result) }
 
         "/basic-auth/$username/$password".httpGet()
             .authentication()
             .basic(username, password)
             .also { Log.d(TAG, it.cUrlString()) }
-            .responseString { request, _, result -> update(result) }
+            .responseString { _, _, result -> update(result) }
     }
 
     private fun httpRxSupport() {

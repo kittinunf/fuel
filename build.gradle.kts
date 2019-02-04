@@ -3,6 +3,7 @@ import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
 import org.jmailen.gradle.kotlinter.KotlinterExtension
 import org.jmailen.gradle.kotlinter.support.ReporterType
 import org.gradle.api.publish.maven.MavenPom
+import org.jmailen.gradle.kotlinter.tasks.LintTask
 
 plugins {
     java
@@ -20,11 +21,12 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
         jcenter()
     }
 }
 
-val androidModules = listOf("fuel-android", "fuel-livedata")
+val androidModules = listOf("fuel-android", "fuel-livedata", "fuel-stetho")
 val androidSampleModules = listOf("sample")
 
 subprojects {
@@ -150,6 +152,14 @@ subprojects {
             reporters = arrayOf(ReporterType.plain.name, ReporterType.checkstyle.name)
         }
 
+        tasks.named<LintTask>("lintKotlinMain") {
+            enabled = false
+        }
+
+        tasks.named<LintTask>("lintKotlinTest") {
+            enabled = false
+        }
+
         version = Fuel.publishVersion
         group = Fuel.groupId
         bintray {
@@ -204,6 +214,15 @@ subprojects {
                     groupId = Fuel.groupId
                     artifactId = project.name
                     version = Fuel.publishVersion
+
+                    pom {
+                        licenses {
+                            license {
+                                name.set("MIT License")
+                                url.set("http://www.opensource.org/licenses/mit-license.php")
+                            }
+                        }
+                    }
 
                     if (project.hasProperty("android")) {
                         pom.addDependencies()

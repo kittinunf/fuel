@@ -1,9 +1,11 @@
 package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.Client
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.test.MockReflected
 import org.hamcrest.CoreMatchers.equalTo
@@ -15,8 +17,27 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockserver.matchers.Times
 import org.mockserver.model.Header.header
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
 
 class HttpClientTest : MockHttpTestCase() {
+
+    class TestHook : Client.Hook {
+        override fun preConnect(connection: HttpURLConnection, request: Request) {
+            // no-op
+        }
+
+        override fun interpretResponseStream(inputStream: InputStream): InputStream = inputStream
+
+        override fun postConnect() {
+            // no-op
+        }
+
+        override fun httpExchangeFailed(exception: IOException) {
+            // no-op
+        }
+    }
 
     @Test
     fun httpClientIsTheDefaultClient() {
@@ -155,5 +176,17 @@ class HttpClientTest : MockHttpTestCase() {
 
         assertThat("Expected data, actual error $error2", data2, notNullValue())
         assertThat(data2, equalTo("fresh"))
+    }
+
+    @Test
+    fun changeClientHook() {
+
+        val request = Fuel.request(Method.GET, mock.path("change-hook")).apply {
+            val httpClient = executionOptions.client as HttpClient
+            httpClient.hook = TestHook()
+        }
+
+        val client = request.executionOptions.client as HttpClient
+        assertThat(client.hook, instanceOf(TestHook::class.java))
     }
 }

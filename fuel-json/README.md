@@ -1,5 +1,5 @@
 # fuel-json
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.10-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.20-blue.svg)](https://kotlinlang.org)
 
 The Json extension package for [`Fuel`](../README.md).
 
@@ -7,7 +7,7 @@ The Json extension package for [`Fuel`](../README.md).
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-json` with `Maven` and `Gradle`. The json package has the following dependencies:
 * `fuel:fuel:<same-version>`
-* Kotlin: 1.3.10
+* Kotlin: 1.3.20
 * Json: 20170516
 
 ```groovy

@@ -1,9 +1,9 @@
 # Fuel
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.20-blue.svg)](https://kotlinlang.org)
 [![bintray](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg)](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion)
-[![Build Status](https://travis-ci.org/kittinunf/Fuel.svg?branch=master)](https://travis-ci.org/kittinunf/Fuel)
-[![Codecov](https://codecov.io/github/kittinunf/Fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/Fuel)
+[![Build Status](https://travis-ci.org/kittinunf/fuel.svg?branch=master)](https://travis-ci.org/kittinunf/fuel)
+[![Codecov](https://codecov.io/github/kittinunf/fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/fuel)
 
 The easiest HTTP networking library for Kotlin/Android.
 
@@ -23,9 +23,12 @@ The easiest HTTP networking library for Kotlin/Android.
 
 ## Installation
 
+We offer maven and jitpack installations. Maven via bintray only has stable releases but jitpack can be used to build any branch, commit and version.
+
+### Maven
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `Fuel` with `Maven` and `Gradle`. The core package has the following dependencies:
-* Kotlin - 1.3.0
-* Coroutine - 1.0.0
+* Kotlin - 1.3.20
+* Coroutine - 1.1.1
 
 ```groovy
 compile 'com.github.kittinunf.fuel:<package>:<latest-version>'
@@ -47,6 +50,50 @@ Each of the extensions / integrations has to be installed separately.
 | [`fuel-forge`](./fuel-forge) | _Deserialization_: [`Forge`](https://github.com/kittinunf/Forge/) |
 | [`fuel-jackson`](./fuel-jackson) | _Deserialization_: [`Jackson`](https://github.com/FasterXML/jackson-module-kotlin)
 | [`fuel-moshi`](./fuel-moshi) | _Deserialization_: [`Moshi`](https://github.com/square/moshi)  |
+
+### Jitpack
+
+```kotlin
+repositories {
+  maven(url = "https://jitpack.io") {
+    name = "jitpack"
+  }
+}
+
+dependencies {
+  implementation(group = "com.github.kittinunf.fuel", name = "fuel", version = "-SNAPSHOT")
+  implementation(group = "com.github.kittinunf.fuel", name = "fuel-coroutines", version = "-SNAPSHOT")
+  implementation(group = "com.github.kittinunf.fuel", name = "fuel-kotlinx-serialization", version = "-SNAPSHOT")
+}
+```
+
+
+```kotlin
+dependencies {
+  listof("fuel", "fuel-coroutines", "fuel-kotlinx-serialization").forEach {
+    implementation(group = "com.github.kittinunf.fuel", name = it, version = "-SNAPSHOT")
+  }
+}
+```
+
+#### Configuration
+- `group` is made up of `com.github` as well as username and project name
+
+- `name` is the subproject, this may be any of the packages listed in the [installation instructions](https://github.com/kittinunf/fuel#installation)
+eg. `fuel`, `fuel-coroutines`, `fuel-kotlinx-serialization`, etc
+- `version` can be the latest `master-SMAPSHOT` or `-SNAPSHOT` which always points at the HEAD or any other branch, tag or commit hash, e.g. as listed on [jitpack.io](https://jitpack.io/#kittinunf/fuel).
+
+We recommend _not_ using `SNAPSHOT` builds, but a specific commit in a specific branch (like a commit on master), because your build will then be stable.
+
+#### Build time-out
+Have patience when updating the version of fuel or building for the first time as jitpack will build it, and this may cause the request to jitpack to time out. Wait a few minutes and try again (or check the status on jitpack).
+
+**NOTE:** do _not_ forget to add the `kotlinx` repository when using `coroutines` or `serialization`
+
+### Forks
+Jitpack also allows to build from `fuel` forks. If a fork's username is `$yourname`,
+- adjust `group` to `com.github.$yourName.fuel`
+- and look for `version` on `https://jitpack.io/#$yourName/Fuel`
 
 ## Quick start
 

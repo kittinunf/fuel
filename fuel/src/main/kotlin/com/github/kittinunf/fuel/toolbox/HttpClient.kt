@@ -27,10 +27,11 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.max
 
-internal class HttpClient internal constructor(
+class HttpClient(
     private val proxy: Proxy? = null,
     var useHttpCache: Boolean = true,
-    var decodeContent: Boolean = true
+    var decodeContent: Boolean = true,
+    var hook: Client.Hook
 ) : Client {
     override fun executeRequest(request: Request): Response {
         return try {
@@ -154,6 +155,7 @@ internal class HttpClient internal constructor(
                 Headers.collapse(HeaderName(Headers.ACCEPT_TRANSFER_ENCODING), SUPPORTED_DECODING)
             )
 
+            hook.preConnect(connection, request)
             setDoOutput(connection, request.method)
             setBodyIfDoOutput(connection, request)
         }
@@ -162,6 +164,8 @@ internal class HttpClient internal constructor(
     @Throws
     private fun retrieveResponse(request: Request, connection: HttpURLConnection): Response {
         ensureRequestActive(request, connection)
+
+        hook.postConnect()
 
         val headers = Headers.from(connection.headerFields)
         val transferEncoding = headers[Headers.TRANSFER_ENCODING].flatMap { it.split(',') }.map { it.trim() }
@@ -235,13 +239,16 @@ internal class HttpClient internal constructor(
     private fun dataStream(connection: HttpURLConnection): InputStream? {
         return try {
             try {
-                BufferedInputStream(connection.inputStream)
+                val inputStream = hook.interpretResponseStream(connection.inputStream)
+                BufferedInputStream(inputStream)
             } catch (_: IOException) {
                 // The InputStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures
                 // the InputStream ís actually always closed.
                 try { connection.inputStream?.close() } catch (_: IOException) {}
 
-                connection.errorStream?.let { BufferedInputStream(it) }
+                connection.errorStream?.let {
+                    BufferedInputStream(hook.interpretResponseStream(it))
+                }
             } finally {
                 // We want the stream to live. Closing the stream is handled by Deserialize
             }
@@ -249,6 +256,8 @@ internal class HttpClient internal constructor(
             // The ErrorStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures the
             // ErrorStream ís actually always closed.
             try { connection.errorStream?.close() } catch (_: IOException) {}
+
+            hook.httpExchangeFailed(exception)
 
             ByteArrayInputStream(exception.message?.toByteArray() ?: ByteArray(0))
         } finally {
