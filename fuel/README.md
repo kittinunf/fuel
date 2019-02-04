@@ -117,7 +117,7 @@ Fuel.patch("https://httpbin.org/patch")
 As of version `1.16.x` you can **opt-in** to forcing a HTTP Method on the [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html) instance using reflection.
 
 ```kotlin
-(FuelManager.instance.client as HttpClient).forceMethods = true
+FuelManager.instance.forceMethods = true
 
 Fuel.patch("https://httpbin.org/patch")
     .also { println(it) }

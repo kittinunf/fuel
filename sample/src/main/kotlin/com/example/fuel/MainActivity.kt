@@ -20,7 +20,6 @@ import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.fuel.livedata.liveDataObject
 import com.github.kittinunf.fuel.rx.rxObject
-import com.github.kittinunf.fuel.toolbox.HttpClient
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -170,7 +169,7 @@ class MainActivity : AppCompatActivity() {
             baseParams = listOf("key" to "value")
         }
 
-        (manager.client as HttpClient).forceMethods = true
+        manager.forceMethods = true
 
         manager.request(Method.PATCH, "/patch", listOf("foo" to "foo", "bar" to "bar"))
             .also { Log.d(TAG, it.cUrlString()) }

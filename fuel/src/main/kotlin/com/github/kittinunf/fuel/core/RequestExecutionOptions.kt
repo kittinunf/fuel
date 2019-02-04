@@ -29,6 +29,7 @@ data class RequestExecutionOptions(
     var allowRedirects: Boolean? = null
     var useHttpCache: Boolean? = null
     var interruptCallbacks: MutableCollection<InterruptCallback> = mutableListOf()
+    var forceMethods: Boolean = false
 
     /**
      * Executes a callback [f] onto the [Executor]

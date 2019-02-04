@@ -90,7 +90,7 @@ class HttpClientTest : MockHttpTestCase() {
     @Test
     fun allowPatchWithBody() {
         val manager = FuelManager()
-        (manager.client as HttpClient).forceMethods = true
+        manager.forceMethods = true
 
         val request = manager.request(Method.PATCH, mock.path("patch-body-output"))
             .body("my-body")
