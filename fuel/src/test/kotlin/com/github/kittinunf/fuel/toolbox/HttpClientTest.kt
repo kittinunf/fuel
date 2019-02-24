@@ -27,13 +27,13 @@ class HttpClientTest : MockHttpTestCase() {
             // no-op
         }
 
-        override fun interpretResponseStream(inputStream: InputStream): InputStream = inputStream
+        override fun interpretResponseStream(request: Request, inputStream: InputStream): InputStream = inputStream
 
-        override fun postConnect() {
+        override fun postConnect(request: Request) {
             // no-op
         }
 
-        override fun httpExchangeFailed(exception: IOException) {
+        override fun httpExchangeFailed(request: Request, exception: IOException) {
             // no-op
         }
     }
