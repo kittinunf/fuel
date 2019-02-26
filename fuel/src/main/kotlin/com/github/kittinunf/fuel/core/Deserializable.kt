@@ -248,7 +248,7 @@ suspend fun <T : Any, U : Deserializable<T>> Request.awaitResult(deserializable:
 suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponseResult(deserializable: U): ResponseResultOf<T> {
     val initialResult = suspendable().awaitResult()
     return initialResult.map { (it to deserializable.deserialize(it)) }
-        .mapError { FuelError.wrap(it) }
+        .mapError <Pair<Response, T>, Exception, FuelError> { FuelError.wrap(it) }
         .let {
             Triple(this,
                 it.fold({ (response, _) -> response }, { error -> error.response }),
