@@ -95,21 +95,19 @@ class StringTest : MockHttpTestCase() {
 
     @Test
     fun captureConnectException() = runBlocking {
-        val (_, res, result) = Fuel.get("http://127.0.0.1:80")
-                .awaitStringResponseResult()
+        val (req, res, result) = Fuel.get("http://127.0.0.1:80").awaitStringResponseResult()
 
-        assertThat("Expected a response, actual null", res, notNullValue())
+        assertThat(req, notNullValue())
+        assertThat(res, notNullValue())
+        assertThat(res.url.defaultPort, equalTo(80))
 
-        val (data, error) = result
-        assertThat("Expected error, actual data $data", error, notNullValue())
+        val (_, error) = result
+        assertThat(error, notNullValue())
 
         when (result) {
             is Result.Success -> fail("should catch connect exception")
             is Result.Failure -> {
-                assertThat(
-                        result.error.exception as? ConnectException,
-                        isA(ConnectException::class.java)
-                )
+                assertThat(result.error.exception as? ConnectException, isA(ConnectException::class.java))
             }
         }
     }

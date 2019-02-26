@@ -53,7 +53,7 @@ class ObjectTest : MockHttpTestCase() {
     fun awaitObject() = runBlocking {
         try {
             val data = randomUuid().awaitObject(UUIDResponseDeserializer)
-            assertThat("Expected data to be not null", data, notNullValue())
+            assertThat(data, notNullValue())
         } catch (exception: Exception) {
             fail("Expected pass, actual error $exception")
         }
@@ -69,9 +69,9 @@ class ObjectTest : MockHttpTestCase() {
     fun awaitObjectResponse() = runBlocking {
         try {
             val (request, response, data) = randomUuid().awaitObjectResponse(UUIDResponseDeserializer)
-            assertThat("Expected request to be not null", request, notNullValue())
-            assertThat("Expected response to be not null", response, notNullValue())
-            assertThat("Expected data to be not null", data, notNullValue())
+            assertThat(request, notNullValue())
+            assertThat(response, notNullValue())
+            assertThat(data, notNullValue())
         } catch (exception: Exception) {
             fail("Expected pass, actual error $exception")
         }
@@ -86,22 +86,22 @@ class ObjectTest : MockHttpTestCase() {
     @Test
     fun awaitObjectResult() = runBlocking {
         val (data, error) = randomUuid().awaitObjectResult(UUIDResponseDeserializer)
-        assertThat("Expected data, actual error $error", data, notNullValue())
+        assertThat(data, notNullValue())
     }
 
     @Test
     fun awaitObjectResultFailure() = runBlocking {
         val (data, error) = mocked404().awaitObjectResult(UUIDResponseDeserializer)
-        assertThat("Expected error, actual data $data", error, notNullValue())
+        assertThat(error, notNullValue())
     }
 
     @Test
     fun awaitObjectResponseResult() = runBlocking {
         val (request, response, result) = randomUuid().awaitObjectResponseResult(UUIDResponseDeserializer)
         val (data, error) = result
-        assertThat("Expected data, actual error $error", data, notNullValue())
-        assertThat("Expected request to be not null", request, notNullValue())
-        assertThat("Expected response to be not null", response, notNullValue())
+        assertThat(data, notNullValue())
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
     }
 
     @Test
@@ -109,7 +109,7 @@ class ObjectTest : MockHttpTestCase() {
         val (data, error) = mocked404().awaitObjectResponseResult(UUIDResponseDeserializer)
 
         assertThat(data, notNullValue())
-        assertThat("Expected error, actual data $data", error, notNullValue())
+        assertThat(error, notNullValue())
         assertThat(error.statusCode, equalTo(404))
         assertThat(error.isSuccessful, equalTo(false))
         assertThat(error.headers["foo"], equalTo(listOf("bar") as Collection<String>))
