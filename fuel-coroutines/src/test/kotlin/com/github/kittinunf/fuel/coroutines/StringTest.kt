@@ -21,8 +21,8 @@ class StringTest : MockHttpTestCase() {
 
     private fun mocked404(method: Method = Method.GET, path: String = "invalid/url"): Request {
         mock.chain(
-                request = mock.request().withPath("/$path"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND).withHeader("foo", "bar").withBody("error:unauthorized")
+            request = mock.request().withPath("/$path"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND).withHeader("foo", "bar").withBody("error:unauthorized")
         )
         return Fuel.request(method, mock.path(path))
     }

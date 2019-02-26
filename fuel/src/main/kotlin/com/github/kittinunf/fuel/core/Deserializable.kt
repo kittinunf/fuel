@@ -251,7 +251,8 @@ suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponseResult(deseria
         .mapError { FuelError.wrap(it) }
         .let {
             Triple(this,
-                    it.fold({ (response, _) -> response }, { error -> error.response }),
-                    it.map { (_, t) -> t })
+                it.fold({ (response, _) -> response }, { error -> error.response }),
+                it.map { (_, t) -> t }
+            )
         }
 }

@@ -5,8 +5,10 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.isSuccessful
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertThat
@@ -34,7 +36,7 @@ class ObjectTest : MockHttpTestCase() {
     private fun mocked404(method: Method = Method.GET, path: String = "invalid/url"): Request {
         mock.chain(
             request = mock.request().withPath("/$path"),
-            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND).withHeader("foo", "bar").withBody("error:unauthorized")
         )
         return Fuel.request(method, mock.path(path))
     }
@@ -105,7 +107,12 @@ class ObjectTest : MockHttpTestCase() {
     @Test
     fun awaitObjectResponseResultFailure() = runBlocking {
         val (data, error) = mocked404().awaitObjectResponseResult(UUIDResponseDeserializer)
+
+        assertThat(data, notNullValue())
         assertThat("Expected error, actual data $data", error, notNullValue())
+        assertThat(error.statusCode, equalTo(404))
+        assertThat(error.isSuccessful, equalTo(false))
+        assertThat(error.headers["foo"], equalTo(listOf("bar") as Collection<String>))
     }
 
     @Test
