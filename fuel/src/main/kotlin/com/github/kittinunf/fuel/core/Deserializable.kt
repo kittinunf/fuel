@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.core.requests.RequestTaskCallbacks
 import com.github.kittinunf.fuel.core.requests.suspendable
 import com.github.kittinunf.fuel.core.requests.toTask
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.getOrElse
 import com.github.kittinunf.result.map
 import com.github.kittinunf.result.mapError
 import java.io.InputStream
@@ -237,8 +238,7 @@ suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponse(deserializabl
  */
 suspend fun <T : Any, U : Deserializable<T>> Request.awaitResult(deserializable: U): Result<T, FuelError> {
     val initialResult = suspendable().awaitResult()
-    return initialResult.map { deserializable.deserialize(it) }
-        .mapError <T, Exception, FuelError> { FuelError.wrap(it) }
+    return serializeFor(initialResult, deserializable).map { (_, t) -> t }
 }
 
 /**
@@ -247,12 +247,14 @@ suspend fun <T : Any, U : Deserializable<T>> Request.awaitResult(deserializable:
  */
 suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponseResult(deserializable: U): ResponseResultOf<T> {
     val initialResult = suspendable().awaitResult()
-    return initialResult.map { (it to deserializable.deserialize(it)) }
-        .mapError <Pair<Response, T>, Exception, FuelError> { FuelError.wrap(it) }
-        .let {
+    return serializeFor(initialResult, deserializable).let {
             Triple(this,
                 it.fold({ (response, _) -> response }, { error -> error.response }),
                 it.map { (_, t) -> t }
             )
         }
 }
+
+private fun <T : Any, U : Deserializable<T>> serializeFor(result: Result<Response, FuelError>, deserializable: U) =
+    result.map { (it to deserializable.deserialize(it)) }
+        .mapError <Pair<Response, T>, Exception, FuelError> { FuelError.wrap(it, result.getOrElse(Response.error())) }

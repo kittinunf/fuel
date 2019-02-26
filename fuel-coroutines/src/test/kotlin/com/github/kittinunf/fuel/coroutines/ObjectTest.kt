@@ -125,11 +125,13 @@ class ObjectTest : MockHttpTestCase() {
                 }
             })
 
-        val (data, error) = result
-        assertThat("Expected error, actual $data", error, notNullValue())
-        assertThat("Expected response to be not null", response, notNullValue())
-        assertThat("Expected request to be not null", request, notNullValue())
+        val (_, error) = result
+        assertThat(error, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(request, notNullValue())
 
+        assertThat(response.statusCode, equalTo(200))
+        assertThat(response.responseMessage, equalTo("OK"))
         assertThat(error, isA(FuelError::class.java))
         assertThat((error as FuelError).exception as? IllegalStateException, isA(IllegalStateException::class.java))
     }
