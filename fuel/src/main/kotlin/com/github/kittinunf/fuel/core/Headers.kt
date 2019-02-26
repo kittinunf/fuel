@@ -1,5 +1,8 @@
 package com.github.kittinunf.fuel.core
 
+import java.util.HashMap
+import java.util.HashSet
+
 /**
  * Special case-insensitive string wrapper that can be used as key to lookup headers.
  *
