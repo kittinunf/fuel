@@ -9,7 +9,7 @@ object Fuel {
 
 // Core dependencies
 object Kotlin {
-    const val version = "1.3.20"
+    const val version = "1.3.21"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Kotlin.version}"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
@@ -27,7 +27,7 @@ object Json {
 }
 
 object Android {
-    const val version = "3.3.0"
+    const val version = "3.3.1"
     const val appPlugin = "com.android.application"
     const val libPlugin = "com.android.library"
 
@@ -73,7 +73,7 @@ object Gson {
 }
 
 object Jackson {
-    const val version = "2.9.7"
+    const val version = "2.9.8"
     const val dependency = "com.fasterxml.jackson.module:jackson-module-kotlin:$version"
 }
 
@@ -104,7 +104,7 @@ object Reactor {
 
 object RxJava {
     object Jvm {
-        const val version = "2.2.3"
+        const val version = "2.2.6"
         const val dependency = "io.reactivex.rxjava2:rxjava:$version"
     }
 
