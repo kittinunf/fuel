@@ -36,7 +36,7 @@ class ObjectTest : MockHttpTestCase() {
     private fun mocked404(method: Method = Method.GET, path: String = "invalid/url"): Request {
         mock.chain(
             request = mock.request().withPath("/$path"),
-            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND).withHeader("foo", "bar").withBody("error:unauthorized")
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED).withHeader("foo", "bar").withBody("error:unauthorized")
         )
         return Fuel.request(method, mock.path(path))
     }
@@ -110,7 +110,7 @@ class ObjectTest : MockHttpTestCase() {
 
         assertThat(data, notNullValue())
         assertThat(error, notNullValue())
-        assertThat(error.statusCode, equalTo(404))
+        assertThat(error.statusCode, equalTo(HttpURLConnection.HTTP_UNAUTHORIZED))
         assertThat(error.isSuccessful, equalTo(false))
         assertThat(error.headers["foo"], equalTo(listOf("bar") as Collection<String>))
     }
