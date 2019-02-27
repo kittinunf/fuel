@@ -33,7 +33,7 @@ private object UUIDResponseDeserializer : ResponseDeserializable<UUIDResponse> {
 
 class ObjectTest : MockHttpTestCase() {
 
-    private fun mocked404(method: Method = Method.GET, path: String = "invalid/url"): Request {
+    private fun mocked401(method: Method = Method.GET, path: String = "invalid/url"): Request {
         mock.chain(
             request = mock.request().withPath("/$path"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED).withHeader("foo", "bar").withBody("error:unauthorized")
@@ -61,7 +61,7 @@ class ObjectTest : MockHttpTestCase() {
 
     @Test(expected = FuelError::class)
     fun awaitObjectThrows() = runBlocking {
-        val data = mocked404().awaitObject(UUIDResponseDeserializer)
+        val data = mocked401().awaitObject(UUIDResponseDeserializer)
         fail("Expected error, actual data $data")
     }
 
@@ -79,7 +79,7 @@ class ObjectTest : MockHttpTestCase() {
 
     @Test(expected = FuelError::class)
     fun awaitObjectResponseThrows() = runBlocking {
-        val (_, _, data) = mocked404().awaitObjectResponse(UUIDResponseDeserializer)
+        val (_, _, data) = mocked401().awaitObjectResponse(UUIDResponseDeserializer)
         fail("Expected error, actual data $data")
     }
 
@@ -91,7 +91,7 @@ class ObjectTest : MockHttpTestCase() {
 
     @Test
     fun awaitObjectResultFailure() = runBlocking {
-        val (data, error) = mocked404().awaitObjectResult(UUIDResponseDeserializer)
+        val (data, error) = mocked401().awaitObjectResult(UUIDResponseDeserializer)
         assertThat(error, notNullValue())
     }
 
@@ -106,13 +106,18 @@ class ObjectTest : MockHttpTestCase() {
 
     @Test
     fun awaitObjectResponseResultFailure() = runBlocking {
-        val (data, error) = mocked404().awaitObjectResponseResult(UUIDResponseDeserializer)
+        val (data, response, result) = mocked401().awaitObjectResponseResult(UUIDResponseDeserializer)
 
         assertThat(data, notNullValue())
-        assertThat(error, notNullValue())
-        assertThat(error.statusCode, equalTo(HttpURLConnection.HTTP_UNAUTHORIZED))
-        assertThat(error.isSuccessful, equalTo(false))
-        assertThat(error.headers["foo"], equalTo(listOf("bar") as Collection<String>))
+        assertThat(response, notNullValue())
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_UNAUTHORIZED))
+        assertThat(response.isSuccessful, equalTo(false))
+        assertThat(response.headers["foo"], equalTo(listOf("bar") as Collection<String>))
+
+        val (_, error) = result
+        assertThat(error!!.response, equalTo(response))
+        assertThat(error.response.statusCode, equalTo(response.statusCode))
+        assertThat(error.response.body(), equalTo(response.body()))
     }
 
     @Test

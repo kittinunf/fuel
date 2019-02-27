@@ -19,7 +19,7 @@ import java.net.HttpURLConnection
 
 class StringTest : MockHttpTestCase() {
 
-    private fun mocked404(method: Method = Method.GET, path: String = "invalid/url"): Request {
+    private fun mocked401(method: Method = Method.GET, path: String = "invalid/url"): Request {
         mock.chain(
             request = mock.request().withPath("/$path"),
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED).withHeader("foo", "bar").withBody("error:unauthorized")
@@ -39,7 +39,7 @@ class StringTest : MockHttpTestCase() {
 
     @Test(expected = FuelError::class)
     fun awaitStringThrows() = runBlocking {
-        val data = mocked404().awaitString()
+        val data = mocked401().awaitString()
         fail("Expected error, actual data $data")
     }
 
@@ -57,7 +57,7 @@ class StringTest : MockHttpTestCase() {
 
     @Test(expected = FuelError::class)
     fun awaitStringResponseThrows() = runBlocking {
-        val (_, _, data) = mocked404().awaitStringResponse()
+        val (_, _, data) = mocked401().awaitStringResponse()
         fail("Expected error, actual data $data")
     }
 
@@ -69,7 +69,7 @@ class StringTest : MockHttpTestCase() {
 
     @Test
     fun awaitStringResultFailure() = runBlocking {
-        val (data, error) = mocked404().awaitStringResult()
+        val (data, error) = mocked401().awaitStringResult()
         assertThat(error, notNullValue())
     }
 
@@ -84,13 +84,18 @@ class StringTest : MockHttpTestCase() {
 
     @Test
     fun awaitStringResponseResultFailure() = runBlocking {
-        val (data, error) = mocked404().awaitStringResponseResult()
+        val (data, response , result) = mocked401().awaitStringResponseResult()
 
         assertThat(data, notNullValue())
-        assertThat(error, notNullValue())
-        assertThat(error.statusCode, equalTo(HttpURLConnection.HTTP_UNAUTHORIZED))
-        assertThat(error.isSuccessful, equalTo(false))
-        assertThat(error.headers["foo"], equalTo(listOf("bar") as Collection<String>))
+        assertThat(response, notNullValue())
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_UNAUTHORIZED))
+        assertThat(response.isSuccessful, equalTo(false))
+        assertThat(response.headers["foo"], equalTo(listOf("bar") as Collection<String>))
+
+        val (_, error) = result
+        assertThat(error!!.response, equalTo(response))
+        assertThat(error.response.statusCode, equalTo(response.statusCode))
+        assertThat(error.response.body(), equalTo(response.body()))
     }
 
     @Test
