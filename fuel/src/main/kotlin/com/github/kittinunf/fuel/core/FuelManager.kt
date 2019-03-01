@@ -1,10 +1,10 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.core.Client.Hook
 import com.github.kittinunf.fuel.core.RequestFactory.PathStringConvertible
 import com.github.kittinunf.fuel.core.RequestFactory.RequestConvertible
 import com.github.kittinunf.fuel.core.interceptors.ParameterEncoder
 import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
-import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import com.github.kittinunf.fuel.core.requests.DownloadRequest
 import com.github.kittinunf.fuel.core.requests.UploadRequest
 import com.github.kittinunf.fuel.core.requests.download
@@ -27,12 +27,13 @@ typealias FoldableResponseInterceptor = (ResponseTransformer) -> ResponseTransfo
 
 class FuelManager : RequestFactory, RequestFactory.Convenience {
 
-    var client: Client by readWriteLazy { HttpClient(proxy) }
+    var client: Client by readWriteLazy { HttpClient(proxy, hook = hook) }
     var proxy: Proxy? = null
     var basePath: String? = null
     var timeoutInMillisecond: Int = 15_000
     var timeoutReadInMillisecond: Int = timeoutInMillisecond
     var progressBufferSize: Int = DEFAULT_BUFFER_SIZE
+    var hook: Hook = DefaultHook()
 
     var baseHeaders: Map<String, String>? = null
     var baseParams: Parameters = emptyList()
@@ -65,7 +66,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
     private val requestInterceptors: MutableList<FoldableRequestInterceptor> =
             mutableListOf(ParameterEncoder)
     private val responseInterceptors: MutableList<FoldableResponseInterceptor> =
-            mutableListOf(redirectResponseInterceptor(this), validatorResponseInterceptor(200..299))
+            mutableListOf(redirectResponseInterceptor(this))
 
     // callback executionOptions
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }

@@ -461,4 +461,13 @@ interface Request : RequestFactory.RequestConvertible {
      * @return self
      */
     fun interrupt(interrupt: InterruptCallback): Request
+
+    /**
+     * Override a default [ResponseValidator] to the [RequestExecutionOptions]
+     *
+     * @see RequestExecutionOptions.responseValidator
+     *
+     * @return self
+     */
+    fun validate(validator: ResponseValidator): Request
 }

@@ -23,15 +23,15 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     private fun expectRedirectedUserAgent(baseRequest: Request): MockReflected {
         val randomUserAgent = "Fuel ${UUID.randomUUID()}"
         val (request, response, result) = baseRequest
-            .header(Headers.USER_AGENT to randomUserAgent)
-            .responseObject(MockReflected.Deserializer())
+                .header(Headers.USER_AGENT to randomUserAgent)
+                .responseObject(MockReflected.Deserializer())
 
         val (data, error) = result
         assertThat("Expected data, actual error $error [${error?.stackTrace?.joinToString("\n")}]", data, notNullValue())
-        assertThat("Expected request, actual null", request, notNullValue())
-        assertThat("Expected response, actual null", response, notNullValue())
-        assertThat(data!!.userAgent, equalTo(randomUserAgent))
 
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(data!!.userAgent, equalTo(randomUserAgent))
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
 
         return data
@@ -40,30 +40,31 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     private fun expectNotRedirected(baseRequest: Request, status: Int = HttpURLConnection.HTTP_MOVED_TEMP) {
         val randomUserAgent = "Fuel ${UUID.randomUUID()}"
         val (request, response, result) = baseRequest
-            .header(Headers.USER_AGENT to randomUserAgent)
-            .response()
+                .header(Headers.USER_AGENT to randomUserAgent)
+                .response()
 
         val (data, error) = result
-        assertThat("Expected error, actual data $data", error, notNullValue())
-        assertThat("Expected request, actual null", request, notNullValue())
-        assertThat("Expected response, actual null", response, notNullValue())
 
+        assertThat(data, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
         assertThat(response.statusCode, isEqualTo(status))
     }
 
     @Test
     fun followRedirectsViaLocation() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("redirected"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, mock.path("redirected"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val redirectedRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirected")
+                .withMethod(Method.GET.value)
+                .withPath("/redirected")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = redirectedRequest, response = mock.reflect())
@@ -74,16 +75,16 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     @Test
     fun followRedirectsViaContentLocation() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.CONTENT_LOCATION, mock.path("redirected"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.CONTENT_LOCATION, mock.path("redirected"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val redirectedRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirected")
+                .withMethod(Method.GET.value)
+                .withPath("/redirected")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = redirectedRequest, response = mock.reflect())
@@ -94,12 +95,12 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     @Test
     fun doNotFollowEmptyRedirects() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, "")
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, "")
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         mock.chain(request = firstRequest, response = firstResponse)
         expectNotRedirected(FuelManager().request(Method.GET, mock.path("redirect")), HttpURLConnection.HTTP_MOVED_TEMP)
@@ -108,16 +109,16 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     @Test
     fun followRelativeRedirect() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, "/redirected")
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, "/redirected")
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val redirectedRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirected")
+                .withMethod(Method.GET.value)
+                .withPath("/redirected")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = redirectedRequest, response = mock.reflect())
@@ -128,16 +129,16 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     @Test
     fun preserveRequestHeadersWithRedirects() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, "/redirected")
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, "/redirected")
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val redirectedRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirected")
+                .withMethod(Method.GET.value)
+                .withPath("/redirected")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = redirectedRequest, response = mock.reflect())
@@ -146,9 +147,9 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         manager.addRequestInterceptor(LogRequestAsCurlInterceptor)
 
         val data = expectRedirectedUserAgent(
-            FuelManager()
-                .request(Method.GET, mock.path("redirect"))
-                .header("Custom-Header" to "Fuel")
+                FuelManager()
+                        .request(Method.GET, mock.path("redirect"))
+                        .header("Custom-Header" to "Fuel")
         )
 
         assertThat(data.headers["Custom-Header"].lastOrNull(), equalTo("Fuel"))
@@ -157,16 +158,16 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     @Test
     fun preserveBaseHeadersWithRedirects() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, "/redirected")
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, "/redirected")
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val redirectedRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirected")
+                .withMethod(Method.GET.value)
+                .withPath("/redirected")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = redirectedRequest, response = mock.reflect())
@@ -181,24 +182,24 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     @Test
     fun followMultipleRedirects() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("intermediary"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, mock.path("intermediary"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/intermediary")
+                .withMethod(Method.GET.value)
+                .withPath("/intermediary")
 
         val secondResponse = mock.response()
-            .withHeader(Headers.CONTENT_LOCATION, mock.path("redirected"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.CONTENT_LOCATION, mock.path("redirected"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val redirectedRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirected")
+                .withMethod(Method.GET.value)
+                .withPath("/redirected")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = secondResponse)
@@ -210,24 +211,31 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     @Test
     fun followRedirectToNotFound() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("not-found"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, mock.path("not-found"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/not-found")
+                .withMethod(Method.GET.value)
+                .withPath("/not-found")
 
         val secondResponse = mock.response()
-            .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+                .withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = secondResponse)
 
-        expectNotRedirected(FuelManager().request(Method.GET, mock.path("redirect")), HttpURLConnection.HTTP_NOT_FOUND)
+        val (request, response, result) = FuelManager().request(Method.GET, mock.path("redirect")).response()
+        val (data, error) = result
+
+        assertThat(data, nullValue())
+        assertThat(error, notNullValue())
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_NOT_FOUND))
     }
 
     @Test
@@ -235,16 +243,16 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         val testValidator = "${Random().nextDouble()}"
 
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_PERM)
+                .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_PERM)
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/get")
+                .withMethod(Method.GET.value)
+                .withPath("/get")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
@@ -252,8 +260,8 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         val data = expectRedirectedUserAgent(FuelManager().request(Method.GET, mock.path("redirect")))
 
         assertThat("Expected query to contains validate=\"$testValidator\", actual ${data.query}",
-            data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
-            equalTo(true)
+                data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
+                equalTo(true)
         )
     }
 
@@ -262,16 +270,16 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         val testValidator = "${Random().nextDouble()}"
 
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/get")
+                .withMethod(Method.GET.value)
+                .withPath("/get")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
@@ -279,8 +287,8 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         val data = expectRedirectedUserAgent(FuelManager().request(Method.GET, mock.path("redirect")))
 
         assertThat("Expected query to contains validate=\"$testValidator\", actual ${data.query}",
-            data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
-            equalTo(true)
+                data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
+                equalTo(true)
         )
     }
 
@@ -289,16 +297,16 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         val testValidator = "${Random().nextDouble()}"
 
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
-            .withStatusCode(HttpURLConnection.HTTP_SEE_OTHER)
+                .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
+                .withStatusCode(HttpURLConnection.HTTP_SEE_OTHER)
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/get")
+                .withMethod(Method.GET.value)
+                .withPath("/get")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
@@ -306,41 +314,40 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         val data = expectRedirectedUserAgent(FuelManager().request(Method.GET, mock.path("redirect")))
 
         assertThat("Expected query to contains validate=\"$testValidator\", actual ${data.query}",
-            data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
-            equalTo(true)
+                data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
+                equalTo(true)
         )
     }
 
     @Test
     fun getWithNotModified() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/not-modified")
+                .withMethod(Method.GET.value)
+                .withPath("/not-modified")
 
         val firstResponse = mock.response()
-            .withStatusCode(HttpURLConnection.HTTP_NOT_MODIFIED)
+                .withStatusCode(HttpURLConnection.HTTP_NOT_MODIFIED)
 
         mock.chain(request = firstRequest, response = firstResponse)
 
-        // TODO: should not be an error
         expectNotRedirected(
-            FuelManager().request(Method.GET, mock.path("not-modified")),
-            HttpURLConnection.HTTP_NOT_MODIFIED
+                FuelManager().request(Method.GET, mock.path("not-modified")),
+                HttpURLConnection.HTTP_NOT_MODIFIED
         )
     }
 
     @Test
     fun doNotFollowRedirectWithMissingLocation() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/get")
+                .withMethod(Method.GET.value)
+                .withPath("/get")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
@@ -349,32 +356,32 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         val (_, _, result) = manager.request(Method.GET, mock.path("redirect")).responseString()
         val (data, error) = result
 
-        assertThat(data, nullValue())
-        assertThat(error, notNullValue())
+        assertThat(data, notNullValue())
+        assertThat(error, nullValue())
     }
 
     @Test
     fun postWithMovedPermanently() {
         val testValidator = "${Random().nextDouble()}"
         val firstRequest = mock.request()
-            .withMethod(Method.POST.value)
-            .withPath("/redirect")
+                .withMethod(Method.POST.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_PERM)
+                .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_PERM)
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/get")
+                .withMethod(Method.GET.value)
+                .withPath("/get")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
 
         val data = expectRedirectedUserAgent(FuelManager().request(Method.POST, mock.path("redirect")))
         assertThat("Expected query to contains validate=\"$testValidator\", actual ${data.query}",
-            data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
-            equalTo(true)
+                data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
+                equalTo(true)
         )
     }
 
@@ -382,24 +389,24 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     fun postWithMovedTemporarily() {
         val testValidator = "${Random().nextDouble()}"
         val firstRequest = mock.request()
-            .withMethod(Method.POST.value)
-            .withPath("/redirect")
+                .withMethod(Method.POST.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/get")
+                .withMethod(Method.GET.value)
+                .withPath("/get")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
 
         val data = expectRedirectedUserAgent(FuelManager().request(Method.POST, mock.path("redirect")))
         assertThat("Expected query to contains validate=\"$testValidator\", actual ${data.query}",
-            data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
-            equalTo(true)
+                data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
+                equalTo(true)
         )
     }
 
@@ -407,24 +414,24 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     fun postWithSeeOther() {
         val testValidator = "${Random().nextDouble()}"
         val firstRequest = mock.request()
-            .withMethod(Method.POST.value)
-            .withPath("/redirect")
+                .withMethod(Method.POST.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
-            .withStatusCode(HttpURLConnection.HTTP_SEE_OTHER)
+                .withHeader(Headers.LOCATION, mock.path("get?validate=$testValidator"))
+                .withStatusCode(HttpURLConnection.HTTP_SEE_OTHER)
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/get")
+                .withMethod(Method.GET.value)
+                .withPath("/get")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
 
         val data = expectRedirectedUserAgent(FuelManager().request(Method.POST, mock.path("redirect")))
         assertThat("Expected query to contains validate=\"$testValidator\", actual ${data.query}",
-            data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
-            equalTo(true)
+                data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
+                equalTo(true)
         )
     }
 
@@ -432,24 +439,24 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     fun postWithTemporaryRedirect() {
         val testValidator = "${Random().nextDouble()}"
         val firstRequest = mock.request()
-            .withMethod(Method.POST.value)
-            .withPath("/redirect")
+                .withMethod(Method.POST.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("post?validate=$testValidator"))
-            .withStatusCode(307)
+                .withHeader(Headers.LOCATION, mock.path("post?validate=$testValidator"))
+                .withStatusCode(307)
 
         val secondRequest = mock.request()
-            .withMethod(Method.POST.value)
-            .withPath("/post")
+                .withMethod(Method.POST.value)
+                .withPath("/post")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
 
         val data = expectRedirectedUserAgent(FuelManager().request(Method.POST, mock.path("redirect")))
         assertThat("Expected query to contains validate=\"$testValidator\", actual ${data.query}",
-            data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
-            equalTo(true)
+                data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
+                equalTo(true)
         )
     }
 
@@ -457,36 +464,36 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     fun postWithPermanentRedirect() {
         val testValidator = "${Random().nextDouble()}"
         val firstRequest = mock.request()
-            .withMethod(Method.POST.value)
-            .withPath("/redirect")
+                .withMethod(Method.POST.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("post?validate=$testValidator"))
-            .withStatusCode(308)
+                .withHeader(Headers.LOCATION, mock.path("post?validate=$testValidator"))
+                .withStatusCode(308)
 
         val secondRequest = mock.request()
-            .withMethod(Method.POST.value)
-            .withPath("/post")
+                .withMethod(Method.POST.value)
+                .withPath("/post")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
 
         val data = expectRedirectedUserAgent(FuelManager().request(Method.POST, mock.path("redirect")))
         assertThat("Expected query to contains validate=\"$testValidator\", actual ${data.query}",
-            data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
-            equalTo(true)
+                data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
+                equalTo(true)
         )
     }
 
     @Test
     fun authenticationForwardToSameHost() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("basic-auth/user/pass"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, mock.path("basic-auth/user/pass"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val username = UUID.randomUUID().toString()
         val password = UUID.randomUUID().toString()
@@ -494,44 +501,44 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
         val encodedAuth = auth.encodeBase64ToString()
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/basic-auth/user/pass")
-            .withHeader(Headers.AUTHORIZATION, "Basic $encodedAuth")
+                .withMethod(Method.GET.value)
+                .withPath("/basic-auth/user/pass")
+                .withHeader(Headers.AUTHORIZATION, "Basic $encodedAuth")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
 
         expectRedirectedUserAgent(
-            FuelManager().request(Method.GET, mock.path("redirect"))
-                .authentication()
-                .basic(username, password)
+                FuelManager().request(Method.GET, mock.path("redirect"))
+                        .authentication()
+                        .basic(username, password)
         )
     }
 
     @Test
     fun authenticationStrippedToDifferentHost() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("basic-auth/user/pass").replace("localhost", "127.0.0.1"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, mock.path("basic-auth/user/pass").replace("localhost", "127.0.0.1"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         val username = UUID.randomUUID().toString()
         val password = UUID.randomUUID().toString()
 
         val secondRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/basic-auth/user/pass")
+                .withMethod(Method.GET.value)
+                .withPath("/basic-auth/user/pass")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
 
         val data = expectRedirectedUserAgent(
-            FuelManager().request(Method.GET, mock.path("redirect"))
-                .authentication()
-                .basic(username, password)
+                FuelManager().request(Method.GET, mock.path("redirect"))
+                        .authentication()
+                        .basic(username, password)
         )
 
         println(data)
@@ -541,19 +548,19 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     @Test
     fun doNotFollowRedirectsViaRequest() {
         val firstRequest = mock.request()
-            .withMethod(Method.GET.value)
-            .withPath("/redirect")
+                .withMethod(Method.GET.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("get"))
-            .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
+                .withHeader(Headers.LOCATION, mock.path("get"))
+                .withStatusCode(HttpURLConnection.HTTP_MOVED_TEMP)
 
         mock.chain(request = firstRequest, response = firstResponse)
 
         expectNotRedirected(
-            FuelManager().request(Method.GET, mock.path("redirect"))
-                .allowRedirects(false),
-            HttpURLConnection.HTTP_MOVED_TEMP
+                FuelManager().request(Method.GET, mock.path("redirect"))
+                        .allowRedirects(false),
+                HttpURLConnection.HTTP_MOVED_TEMP
         )
     }
 
@@ -561,24 +568,24 @@ class RedirectionInterceptorTest : MockHttpTestCase() {
     fun repeatableBodiesAreForwardedIfNotGet() {
         val testValidator = "${Random().nextDouble()}"
         val firstRequest = mock.request()
-            .withMethod(Method.POST.value)
-            .withPath("/redirect")
+                .withMethod(Method.POST.value)
+                .withPath("/redirect")
 
         val firstResponse = mock.response()
-            .withHeader(Headers.LOCATION, mock.path("post?validate=$testValidator"))
-            .withStatusCode(308)
+                .withHeader(Headers.LOCATION, mock.path("post?validate=$testValidator"))
+                .withStatusCode(308)
 
         val secondRequest = mock.request()
-            .withMethod(Method.POST.value)
-            .withPath("/post")
+                .withMethod(Method.POST.value)
+                .withPath("/post")
 
         mock.chain(request = firstRequest, response = firstResponse)
         mock.chain(request = secondRequest, response = mock.reflect())
 
         val data = expectRedirectedUserAgent(FuelManager().request(Method.POST, mock.path("redirect")).body("body"))
         assertThat("Expected query to contains validate=\"$testValidator\", actual ${data.query}",
-            data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
-            equalTo(true)
+                data.query.any { it -> it.first == "validate" && (it.second as List<*>).first() == testValidator },
+                equalTo(true)
         )
         assertThat("Expected body to be forwarded", data.body!!.string, equalTo("body"))
     }

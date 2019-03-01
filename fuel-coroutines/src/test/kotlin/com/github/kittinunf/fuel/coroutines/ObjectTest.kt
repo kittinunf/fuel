@@ -5,8 +5,10 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.isSuccessful
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertThat
@@ -31,10 +33,10 @@ private object UUIDResponseDeserializer : ResponseDeserializable<UUIDResponse> {
 
 class ObjectTest : MockHttpTestCase() {
 
-    private fun mocked404(method: Method = Method.GET, path: String = "invalid/url"): Request {
+    private fun mocked401(method: Method = Method.GET, path: String = "invalid/url"): Request {
         mock.chain(
             request = mock.request().withPath("/$path"),
-            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED).withHeader("foo", "bar").withBody("error:unauthorized")
         )
         return Fuel.request(method, mock.path(path))
     }
@@ -51,7 +53,7 @@ class ObjectTest : MockHttpTestCase() {
     fun awaitObject() = runBlocking {
         try {
             val data = randomUuid().awaitObject(UUIDResponseDeserializer)
-            assertThat("Expected data to be not null", data, notNullValue())
+            assertThat(data, notNullValue())
         } catch (exception: Exception) {
             fail("Expected pass, actual error $exception")
         }
@@ -59,7 +61,7 @@ class ObjectTest : MockHttpTestCase() {
 
     @Test(expected = FuelError::class)
     fun awaitObjectThrows() = runBlocking {
-        val data = mocked404().awaitObject(UUIDResponseDeserializer)
+        val data = mocked401().awaitObject(UUIDResponseDeserializer)
         fail("Expected error, actual data $data")
     }
 
@@ -67,9 +69,9 @@ class ObjectTest : MockHttpTestCase() {
     fun awaitObjectResponse() = runBlocking {
         try {
             val (request, response, data) = randomUuid().awaitObjectResponse(UUIDResponseDeserializer)
-            assertThat("Expected request to be not null", request, notNullValue())
-            assertThat("Expected response to be not null", response, notNullValue())
-            assertThat("Expected data to be not null", data, notNullValue())
+            assertThat(request, notNullValue())
+            assertThat(response, notNullValue())
+            assertThat(data, notNullValue())
         } catch (exception: Exception) {
             fail("Expected pass, actual error $exception")
         }
@@ -77,35 +79,45 @@ class ObjectTest : MockHttpTestCase() {
 
     @Test(expected = FuelError::class)
     fun awaitObjectResponseThrows() = runBlocking {
-        val (_, _, data) = mocked404().awaitObjectResponse(UUIDResponseDeserializer)
+        val (_, _, data) = mocked401().awaitObjectResponse(UUIDResponseDeserializer)
         fail("Expected error, actual data $data")
     }
 
     @Test
     fun awaitObjectResult() = runBlocking {
         val (data, error) = randomUuid().awaitObjectResult(UUIDResponseDeserializer)
-        assertThat("Expected data, actual error $error", data, notNullValue())
+        assertThat(data, notNullValue())
     }
 
     @Test
     fun awaitObjectResultFailure() = runBlocking {
-        val (data, error) = mocked404().awaitObjectResult(UUIDResponseDeserializer)
-        assertThat("Expected error, actual data $data", error, notNullValue())
+        val (data, error) = mocked401().awaitObjectResult(UUIDResponseDeserializer)
+        assertThat(error, notNullValue())
     }
 
     @Test
     fun awaitObjectResponseResult() = runBlocking {
         val (request, response, result) = randomUuid().awaitObjectResponseResult(UUIDResponseDeserializer)
         val (data, error) = result
-        assertThat("Expected data, actual error $error", data, notNullValue())
-        assertThat("Expected request to be not null", request, notNullValue())
-        assertThat("Expected response to be not null", response, notNullValue())
+        assertThat(data, notNullValue())
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
     }
 
     @Test
     fun awaitObjectResponseResultFailure() = runBlocking {
-        val (data, error) = mocked404().awaitObjectResponseResult(UUIDResponseDeserializer)
-        assertThat("Expected error, actual data $data", error, notNullValue())
+        val (data, response, result) = mocked401().awaitObjectResponseResult(UUIDResponseDeserializer)
+
+        assertThat(data, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_UNAUTHORIZED))
+        assertThat(response.isSuccessful, equalTo(false))
+        assertThat(response.headers["foo"], equalTo(listOf("bar") as Collection<String>))
+
+        val (_, error) = result
+        assertThat(error!!.response, equalTo(response))
+        assertThat(error.response.statusCode, equalTo(response.statusCode))
+        assertThat(error.response.body(), equalTo(response.body()))
     }
 
     @Test
@@ -118,11 +130,13 @@ class ObjectTest : MockHttpTestCase() {
                 }
             })
 
-        val (data, error) = result
-        assertThat("Expected error, actual $data", error, notNullValue())
-        assertThat("Expected response to be not null", response, notNullValue())
-        assertThat("Expected request to be not null", request, notNullValue())
+        val (_, error) = result
+        assertThat(error, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(request, notNullValue())
 
+        assertThat(response.statusCode, equalTo(200))
+        assertThat(response.responseMessage, equalTo("OK"))
         assertThat(error, isA(FuelError::class.java))
         assertThat((error as FuelError).exception as? IllegalStateException, isA(IllegalStateException::class.java))
     }

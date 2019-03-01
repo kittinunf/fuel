@@ -1,12 +1,12 @@
 # Fuel (core)
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.10-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.20-blue.svg)](https://kotlinlang.org)
 
 The core package for [`Fuel`](../README.md). The documentation outlined here touches most subjects and functions but is not exhaustive. 
 
 ## Installation
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `Fuel` with `Maven` and `Gradle`. The core package has the following dependencies:
-* Kotlin - 1.3.10
+* Kotlin - 1.3.20
 * KotlinX Coroutines - 1.0.1
 
 ```groovy
@@ -88,7 +88,7 @@ The extensions and functions made available by the core package are listed here:
 | `Method.CONNECT` | _not supported_ | _not supported_ |
 
 #### About `PATCH` requests
-The default `client` is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html) does not support a [`PATCH`](https://download.java.net/jdk7/archive/b123/docs/api/java/net/HttpURLConnection.html#setRequestMethod(java.lang.String)) method. [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) converts `PATCH` requests to a `POST` request and adds a `X-HTTP-Method-Override: PATCH` header. While this is a semi-standard industry practice not all APIs are configured to accept this header by default.
+The default `client` is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). [`java.net.HttpUrlConnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html) does not support a [`PATCH`](https://download.java.net/jdk7/archive/b123/docs/api/java/net/HttpURLConnection.html#setRequestMethod(java.lang.String)) method. [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/toolbox/HttpClient.kt) converts `PATCH` requests to a `POST` request and adds a `X-HTTP-Method-Override: PATCH` header. While this is a semi-standard industry practice not all APIs are configured to accept this header by default.
 
 ```kotlin
 Fuel.patch("https://httpbin.org/patch")
@@ -701,7 +701,7 @@ Fuel.get("/get").response { request, response, result ->
 }
 ```
 
-* `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/core/Client.kt) protocol, and set back to `FuelManager.instance` to kick off the effect.
+* `client` is a raw HTTP client driver. Generally, it is responsible to make [`Request`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Request.kt) into [`Response`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/core/Response.kt). Default is [`HttpClient`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/fuel/toolbox/HttpClient.kt) which is a thin wrapper over [`java.net.HttpUrlConnection`](https://developer.android.com/reference/java/net/HttpURLConnection.html). You could use any httpClient of your choice by conforming to [`client`](https://github.com/kittinunf/Fuel/blob/master/fuel/src/main/kotlin/com/github/kittinunf/fuel/core/Client.kt) protocol, and set back to `FuelManager.instance` to kick off the effect.
 
 * `keyStore` is configurable by user. By default it is `null`.
 
