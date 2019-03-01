@@ -4,8 +4,10 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.isSuccessful
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertThat
 import org.junit.Assert.fail
@@ -14,10 +16,11 @@ import java.net.HttpURLConnection
 
 class ByteArrayTest : MockHttpTestCase() {
 
-    private fun mocked404(method: Method = Method.GET, path: String = "invalid/url"): Request {
+    private fun mocked401(method: Method = Method.GET, path: String = "invalid/url"): Request {
         mock.chain(
             request = mock.request().withPath("/$path"),
-            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_UNAUTHORIZED).withHeader("foo", "bar").withBody("error:unauthorized")
+
         )
         return Fuel.request(method, mock.path(path))
     }
@@ -34,7 +37,7 @@ class ByteArrayTest : MockHttpTestCase() {
 
     @Test(expected = FuelError::class)
     fun awaitByteArrayThrows() = runBlocking {
-        val data = mocked404().awaitByteArray()
+        val data = mocked401().awaitByteArray()
         fail("Expected error, actual data $data")
     }
 
@@ -52,7 +55,7 @@ class ByteArrayTest : MockHttpTestCase() {
 
     @Test(expected = FuelError::class)
     fun awaitByteArrayResponseThrows() = runBlocking {
-        val (_, _, data) = mocked404().awaitByteArrayResponse()
+        val (_, _, data) = mocked401().awaitByteArrayResponse()
         fail("Expected error, actual data $data")
     }
 
@@ -64,7 +67,7 @@ class ByteArrayTest : MockHttpTestCase() {
 
     @Test
     fun awaitByteArrayResultFailure() = runBlocking {
-        val (data, error) = mocked404().awaitByteArrayResult()
+        val (data, error) = mocked401().awaitByteArrayResult()
         assertThat("Expected error, actual data $data", error, notNullValue())
     }
 
@@ -79,7 +82,17 @@ class ByteArrayTest : MockHttpTestCase() {
 
     @Test
     fun awaitByteArrayResponseResultFailure() = runBlocking {
-        val (data, error) = mocked404().awaitByteArrayResponseResult()
-        assertThat("Expected error, actual data $data", error, notNullValue())
+        val (data, response, result) = mocked401().awaitByteArrayResponseResult()
+
+        assertThat(data, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(response.statusCode, equalTo(HttpURLConnection.HTTP_UNAUTHORIZED))
+        assertThat(response.isSuccessful, equalTo(false))
+        assertThat(response.headers["foo"], equalTo(listOf("bar") as Collection<String>))
+
+        val (_, error) = result
+        assertThat(error!!.response, equalTo(response))
+        assertThat(error.response.statusCode, equalTo(response.statusCode))
+        assertThat(error.response.body(), equalTo(response.body()))
     }
 }
