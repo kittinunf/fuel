@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
             basePath = "http://httpbin.org"
             baseHeaders = mapOf("Device" to "Android")
             baseParams = listOf("key" to "value")
-            hook = StethoHook()
+            hook = StethoHook("Fuel Sample App")
 //            addResponseInterceptor { loggingResponseInterceptor() }
         }
 
