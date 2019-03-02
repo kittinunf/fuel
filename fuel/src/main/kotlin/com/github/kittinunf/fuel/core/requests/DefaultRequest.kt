@@ -32,13 +32,13 @@ import java.nio.charset.Charset
 import kotlin.reflect.KClass
 
 data class DefaultRequest(
-        override val method: Method,
-        override var url: URL,
-        override val headers: Headers = Headers(),
-        override var parameters: Parameters = listOf(),
-        internal var _body: Body = DefaultBody(),
-        override val enabledFeatures: RequestFeatures = mutableMapOf(),
-        private val tags: Tags = mutableMapOf()
+    override val method: Method,
+    override var url: URL,
+    override val headers: Headers = Headers(),
+    override var parameters: Parameters = listOf(),
+    internal var _body: Body = DefaultBody(),
+    override val enabledFeatures: RequestFeatures = mutableMapOf(),
+    private val tags: Tags = mutableMapOf()
 ) : Request {
     override lateinit var executionOptions: RequestExecutionOptions
     override val body: Body get() = _body
