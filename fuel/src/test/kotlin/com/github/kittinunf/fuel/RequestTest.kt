@@ -22,8 +22,10 @@ import org.junit.Test
 import org.mockserver.model.BinaryBody
 import java.net.HttpURLConnection
 import java.util.Random
+import java.util.UUID
 
 class RequestTest : MockHttpTestCase() {
+
     private val manager: FuelManager by lazy { FuelManager() }
 
     class PathStringConvertibleImpl(url: String) : RequestFactory.PathStringConvertible {
@@ -220,8 +222,8 @@ class RequestTest : MockHttpTestCase() {
         )
 
         val (request, response, result) = manager.request(Method.POST, mock.path("post"))
-            .jsonBody(body)
-            .responseString()
+                .jsonBody(body)
+                .responseString()
         val (data, error) = result
 
         val string = data as String
@@ -504,5 +506,22 @@ class RequestTest : MockHttpTestCase() {
         assertThat(error, nullValue())
         assertEquals(JSONArray("[\"$lionel\"]").toString(), query.getJSONArray("bar").toString())
         assertEquals(list.toList(), query.getJSONArray("foo[]").map { it.toString() })
+    }
+
+    @Test
+    fun tagRequest() {
+        val t1 = "tag"
+        val t2 = 5
+        val t3 = UUID.randomUUID()
+
+        val (req, _) = mock.path("get").httpGet().tag(t1).tag(t2).tag(t3).response()
+
+        assertThat(req.getTag(String::class), equalTo(t1))
+        assertThat(req.getTag(Int::class), equalTo(t2))
+        assertThat(req.getTag(UUID::class), equalTo(t3))
+
+        val (anotherReq, _) = mock.path("get").httpGet().response()
+
+        assertThat(anotherReq.getTag(String::class), nullValue())
     }
 }

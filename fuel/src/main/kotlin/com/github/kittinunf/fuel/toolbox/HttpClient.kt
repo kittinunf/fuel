@@ -1,7 +1,6 @@
 package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.core.Client
-import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.HeaderName
@@ -9,6 +8,7 @@ import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.fuel.core.requests.isCancelled
 import com.github.kittinunf.fuel.util.ProgressInputStream
 import com.github.kittinunf.fuel.util.ProgressOutputStream
@@ -126,7 +126,7 @@ class HttpClient(
     private fun retrieveResponse(request: Request, connection: HttpURLConnection): Response {
         ensureRequestActive(request, connection)
 
-        hook.postConnect()
+        hook.postConnect(request)
 
         val headers = Headers.from(connection.headerFields)
         val transferEncoding = headers[Headers.TRANSFER_ENCODING].flatMap { it.split(',') }.map { it.trim() }
@@ -172,7 +172,7 @@ class HttpClient(
             contentLength = -1
         }
 
-        val contentStream = dataStream(connection)?.decode(transferEncoding) ?: ByteArrayInputStream(ByteArray(0))
+        val contentStream = dataStream(request, connection)?.decode(transferEncoding) ?: ByteArrayInputStream(ByteArray(0))
         val inputStream = if (shouldDecode && contentEncoding != null) contentStream.decode(contentEncoding) else contentStream
         val cancellationConnection = WeakReference<HttpURLConnection>(connection)
         val progressStream = ProgressInputStream(
@@ -197,10 +197,10 @@ class HttpClient(
         )
     }
 
-    private fun dataStream(connection: HttpURLConnection): InputStream? {
+    private fun dataStream(request: Request, connection: HttpURLConnection): InputStream? {
         return try {
             try {
-                val inputStream = hook.interpretResponseStream(connection.inputStream)
+                val inputStream = hook.interpretResponseStream(request, connection.inputStream)
                 BufferedInputStream(inputStream)
             } catch (_: IOException) {
                 // The InputStream SHOULD be closed, but just in case the backing implementation is faulty, this ensures
@@ -208,7 +208,7 @@ class HttpClient(
                 try { connection.inputStream?.close() } catch (_: IOException) {}
 
                 connection.errorStream?.let {
-                    BufferedInputStream(hook.interpretResponseStream(it))
+                    BufferedInputStream(hook.interpretResponseStream(request, it))
                 }
             } finally {
                 // We want the stream to live. Closing the stream is handled by Deserialize
@@ -218,7 +218,7 @@ class HttpClient(
             // ErrorStream ís actually always closed.
             try { connection.errorStream?.close() } catch (_: IOException) {}
 
-            hook.httpExchangeFailed(exception)
+            hook.httpExchangeFailed(request, exception)
 
             ByteArrayInputStream(exception.message?.toByteArray() ?: ByteArray(0))
         } finally {
