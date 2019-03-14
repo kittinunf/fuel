@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.FuelError
@@ -13,6 +12,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.cUrlString
+import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpDelete
 import com.github.kittinunf.fuel.httpGet
@@ -27,7 +27,11 @@ import com.google.gson.reflect.TypeToken
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.mainAuxText
+import kotlinx.android.synthetic.main.activity_main.mainClearButton
+import kotlinx.android.synthetic.main.activity_main.mainGoButton
+import kotlinx.android.synthetic.main.activity_main.mainGoCoroutineButton
+import kotlinx.android.synthetic.main.activity_main.mainResultText
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
