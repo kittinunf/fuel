@@ -1,7 +1,7 @@
 package com.github.kittinunf.fuel.core
 
 private val TEXT_CONTENT_TYPE = Regex(
-    "^(?:text/.*|application/(?:csv|javascript|json|typescript|xml|x-yaml|x-www-form-urlencoded|vnd\\.coffeescript)|.*\\+(?:xml|json))$"
+    "^(?:text/.*|application/(?:csv|javascript|json|typescript|xml|x-yaml|x-www-form-urlencoded|vnd\\.coffeescript)|.*\\+(?:xml|json))(; charset=.+)*$"
 )
 
 /**
