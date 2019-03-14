@@ -10,8 +10,8 @@ interface Client {
 
     interface Hook {
         fun preConnect(connection: HttpURLConnection, request: Request)
-        fun interpretResponseStream(inputStream: InputStream): InputStream
-        fun postConnect()
-        fun httpExchangeFailed(exception: IOException)
+        fun postConnect(request: Request)
+        fun interpretResponseStream(request: Request, inputStream: InputStream): InputStream
+        fun httpExchangeFailed(request: Request, exception: IOException)
     }
 }

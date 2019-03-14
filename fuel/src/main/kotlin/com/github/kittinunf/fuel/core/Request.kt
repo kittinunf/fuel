@@ -5,9 +5,11 @@ import java.io.File
 import java.io.InputStream
 import java.net.URL
 import java.nio.charset.Charset
+import kotlin.reflect.KClass
 
 typealias Parameters = List<Pair<String, Any?>>
 typealias RequestFeatures = MutableMap<String, Request>
+typealias Tags = MutableMap<KClass<*>, Any>
 
 interface Request : RequestFactory.RequestConvertible {
     val method: Method
@@ -470,4 +472,26 @@ interface Request : RequestFactory.RequestConvertible {
      * @return self
      */
     fun validate(validator: ResponseValidator): Request
+
+    /**
+     * Attach tag to the request
+     *
+     * @note tag is a generic purpose tagging for Request. This can be used to attach arbitrarily object to the Request instance.
+     * @note Tags internally is represented as hashMap that uses class as a key.
+     *
+     * @param t [Any]
+     * @return [Request] the modified request
+     */
+    fun tag(t: Any): Request
+
+    /**
+     * Return corresponding tag from the request
+     *
+     * @note tag is a generic purpose tagging for Request. This can be used to attach arbitrarily object to the Request instance.
+     * @note Tags internally is represented as hashMap that uses class as a key.
+     *
+     * @param clazz [KClass]
+     * @return [Any] previously attached tag if any, null otherwise
+     */
+    fun <T : Any> getTag(clazz: KClass<T>): T?
 }

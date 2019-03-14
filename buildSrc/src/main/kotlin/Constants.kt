@@ -116,7 +116,7 @@ object RxJava {
 
 // Lint
 object Ktlint {
-    const val version = "1.20.1"
+    const val version = "1.21.0"
     const val plugin = "org.jmailen.kotlinter"
 }
 
