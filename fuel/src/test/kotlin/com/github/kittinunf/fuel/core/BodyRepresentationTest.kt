@@ -152,6 +152,21 @@ class BodyRepresentationTest : MockHttpTestCase() {
     }
 
     @Test
+    fun textRepresentationOfJsonWithUtf8Charset() {
+        val contentTypes = listOf("application/json; charset=utf-8")
+        val content = "{ \"foo\": 42 }"
+
+        contentTypes.forEach { contentType ->
+            assertThat(
+                    DefaultBody
+                            .from({ ByteArrayInputStream(content.toByteArray()) }, { content.length.toLong() })
+                            .asString(contentType),
+                    equalTo(content)
+            )
+        }
+    }
+
+    @Test
     fun textRepresentationOfCsv() {
         val contentTypes = listOf("text/csv")
         val content = "function test()"
@@ -162,6 +177,21 @@ class BodyRepresentationTest : MockHttpTestCase() {
                     .from({ ByteArrayInputStream(content.toByteArray()) }, { content.length.toLong() })
                     .asString(contentType),
                 equalTo(content)
+            )
+        }
+    }
+
+    @Test
+    fun textRepresentationOfCsvWithUtf16beCharset() {
+        val contentTypes = listOf("application/csv; charset=utf-16be")
+        val content = String("hello,world!".toByteArray(Charsets.UTF_16BE))
+
+        contentTypes.forEach { contentType ->
+            assertThat(
+                    DefaultBody
+                            .from({ ByteArrayInputStream(content.toByteArray()) }, { content.length.toLong() })
+                            .asString(contentType),
+                    equalTo("hello,world!")
             )
         }
     }
