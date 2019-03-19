@@ -27,15 +27,14 @@ Fuel.get("/user-agent")
     .responseObject<HttpBinUserAgentModel> { _, _, result -> }
 ```
 
-This is by default strict and will reject unknown keys, for that you can pass a custom JSOn instance
+This is by default strict and will reject unknown keys, for that you can pass a custom Json instance `Json(strictMode = false)` or use a built-in alternate like `Json.nonstrict`
 
-`Json(nonstrict = true)`
 ```kotlin
 @Serializable
 data class HttpBinUserAgentModel(var userAgent: String = "")
 
 Fuel.get("/user-agent")
-    .responseObject<HttpBinUserAgentModel>(json = Json(nonstrict = true)) { _, _, result -> }
+    .responseObject<HttpBinUserAgentModel>(json = Json.nonstrict) { _, _, result -> }
 ```
 
 `kotlinx.serialization` can not always guess the correct serialzer to use, when generics are involved for example
@@ -45,10 +44,10 @@ Fuel.get("/user-agent")
 data class HttpBinUserAgentModel(var userAgent: String = "")
 
 Fuel.get("/list/user-agent")
-    .responseObject<HttpBinUserAgentModel>(loader = HttpBinUserAgentModel.serilaizer().list) { _, _, result -> }
+    .responseObject<HttpBinUserAgentModel>(loader = HttpBinUserAgentModel.serializer().list) { _, _, result -> }
 ```
 
-It can be used with coroutines by using `kotlinxDeserilaizerOf()` it takes the same `json` and `loader` as parameters
+It can be used with coroutines by using `kotlinxDeserializerOf()` it takes the same `json` and `loader` as parameters
 
 ```kotlin
 @Serializable
