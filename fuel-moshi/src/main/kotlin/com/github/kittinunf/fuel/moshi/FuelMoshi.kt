@@ -17,9 +17,9 @@ inline fun <reified T : Any> Request.responseObject(handler: ResponseHandler<T>)
 
 inline fun <reified T : Any> Request.responseObject() = response(moshiDeserializerOf(T::class.java))
 
-fun <T : Any> moshiDeserializerOf(clazz: Class<T>) = object : ResponseDeserializable<T> {
-    override fun deserialize(content: String): T? = Moshi.Builder()
-                .build()
+fun <T : Any> moshiDeserializerOf(clazz: Class<T>, moshi: Moshi? = null) = object : ResponseDeserializable<T> {
+    override fun deserialize(content: String): T? = (moshi ?: Moshi.Builder()
+                .build())
                 .adapter(clazz)
                 .fromJson(content)
 }
