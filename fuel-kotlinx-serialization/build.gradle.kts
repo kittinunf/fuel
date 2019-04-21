@@ -1,5 +1,4 @@
 plugins {
-    java
     id(KotlinX.Serialization.plugin)
 }
 
@@ -8,7 +7,9 @@ repositories {
 }
 
 dependencies {
-    compile(project(":fuel"))
-    compile(KotlinX.Serialization.dependency)
-    testCompile(project(":fuel-test"))
+    api(project(":fuel"))
+
+    implementation(KotlinX.Serialization.dependency)
+
+    testImplementation(project(":fuel-test"))
 }

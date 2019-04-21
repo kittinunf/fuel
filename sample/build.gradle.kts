@@ -7,7 +7,7 @@ plugins {
 }
 
 dependencies {
-
+    // fuel related libraries
     api(project(":fuel-rxjava"))
     api(project(":fuel-android"))
     api(project(":fuel-livedata"))
@@ -15,6 +15,7 @@ dependencies {
     api(project(":fuel-coroutines"))
     api(project(":fuel-stetho"))
 
+    // dependencies
     implementation(AndroidX.appCompat)
     implementation(Gson.dependency)
     implementation(Kotlin.stdlib)
@@ -23,6 +24,7 @@ dependencies {
     implementation(Stetho.StethoUrlConnection.plugin)
     implementation(Stetho.plugin)
 
+    // test dependencies
     androidTestImplementation(AndroidX.annotation)
     androidTestImplementation(AndroidX.Test.junit)
     androidTestImplementation(AndroidX.Test.rules)
