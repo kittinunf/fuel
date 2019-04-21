@@ -1,7 +1,6 @@
-plugins { java }
-
 dependencies {
-    compile(project(":fuel"))
-    compile(Gson.dependency)
-    testCompile(project(":fuel-test"))
+    api(project(":fuel"))
+
+    implementation(Gson.dependency)
+    testImplementation(project(":fuel-test"))
 }

@@ -1,7 +1,6 @@
-plugins { java }
-
 dependencies {
-    compile(Result.dependency)
-    testCompile(Json.dependency)
-    testCompile(project(":fuel-test"))
+    api(Result.dependency)
+
+    testImplementation(Json.dependency)
+    testImplementation(project(":fuel-test"))
 }

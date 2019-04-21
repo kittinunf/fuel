@@ -1,10 +1,7 @@
-
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
-
-plugins { java }
-
 dependencies {
-    compile(project(":fuel"))
-    compile(KotlinX.Coroutines.jvm)
-    testCompile(project(":fuel-test"))
+    api(project(":fuel"))
+
+    implementation(KotlinX.Coroutines.jvm)
+
+    testImplementation(project(":fuel-test"))
 }
