@@ -8,12 +8,12 @@ plugins {
 
 dependencies {
     // fuel related libraries
-    api(project(":fuel-rxjava"))
-    api(project(":fuel-android"))
-    api(project(":fuel-livedata"))
-    api(project(":fuel-gson"))
-    api(project(":fuel-coroutines"))
-    api(project(":fuel-stetho"))
+    api(project(Fuel.Android.name))
+    api(project(Fuel.Coroutines.name))
+    api(project(Fuel.Gson.name))
+    api(project(Fuel.LiveData.name))
+    api(project(Fuel.RxJava.name))
+    api(project(Fuel.Stetho.name))
 
     // dependencies
     implementation(AndroidX.appCompat)
