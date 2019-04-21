@@ -1,8 +1,9 @@
+
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
+import org.gradle.api.publish.maven.MavenPom
 import org.jmailen.gradle.kotlinter.KotlinterExtension
 import org.jmailen.gradle.kotlinter.support.ReporterType
-import org.gradle.api.publish.maven.MavenPom
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 
 plugins {
@@ -45,8 +46,9 @@ subprojects {
         }
 
         dependencies {
-            compile(Kotlin.stdlib)
-            testCompile(JUnit.dependency)
+            implementation(Kotlin.stdlib)
+
+            testImplementation(JUnit.dependency)
         }
 
         configure<JavaPluginConvention> {
@@ -132,6 +134,12 @@ subprojects {
                 classpath += files(bootClasspath.joinToString(File.pathSeparator))
                 classpath += configurations.compile
             }
+        }
+
+        dependencies {
+            implementation(Kotlin.stdlib)
+
+            testImplementation(JUnit.dependency)
         }
 
         configure<JacocoAndroidUnitTestReportExtension> {

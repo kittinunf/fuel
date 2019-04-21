@@ -5,6 +5,60 @@ object Fuel {
 
     const val compileSdkVersion = 28
     const val minSdkVersion = 19
+
+    const val name = ":fuel"
+
+    object Android {
+        const val name = ":fuel-android"
+    }
+
+    object Coroutines {
+        const val name = ":fuel-coroutines"
+    }
+
+    object Forge {
+        const val name = ":fuel-forge"
+    }
+
+    object Gson {
+        const val name = ":fuel-gson"
+    }
+
+    object Jackson {
+        const val name = ":fuel-jackson"
+    }
+
+    object Json {
+        const val name = ":fuel-json"
+    }
+
+    object KotlinSerialization {
+        const val name = ":fuel-kotlinx-serialization"
+    }
+
+    object LiveData {
+        const val name = ":fuel-livedata"
+    }
+
+    object Moshi {
+        const val name = ":fuel-moshi"
+    }
+
+    object Reactor {
+        const val name = ":fuel-reactor"
+    }
+
+    object RxJava {
+        const val name = ":fuel-rxjava"
+    }
+
+    object Stetho {
+        const val name = ":fuel-stetho"
+    }
+
+    object Test {
+        const val name = ":fuel-test"
+    }
 }
 
 // Core dependencies

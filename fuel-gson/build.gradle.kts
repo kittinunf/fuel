@@ -1,7 +1,7 @@
 dependencies {
-    api(project(":fuel"))
+    api(project(Fuel.name))
 
     implementation(Gson.dependency)
 
-    testImplementation(project(":fuel-test"))
+    testImplementation(project(Fuel.Test.name))
 }

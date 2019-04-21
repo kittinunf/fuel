@@ -1,8 +1,8 @@
 dependencies {
-    api(project(":fuel"))
+    api(project(Fuel.name))
 
     implementation(Stetho.plugin)
     implementation(Stetho.StethoUrlConnection.plugin)
 
-    testImplementation(project(":fuel-test"))
+    testImplementation(project(Fuel.Test.name))
 }

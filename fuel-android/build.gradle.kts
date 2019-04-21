@@ -1,7 +1,7 @@
 dependencies {
-    api(project(":fuel"))
+    api(project(Fuel.name))
 
-    testImplementation(project(":fuel-test"))
+    testImplementation(project(Fuel.Test.name))
     testImplementation(RoboElectric.dependency)
-    testImplementation(project(":fuel-json"))
+    testImplementation(project(Fuel.Json.name))
 }

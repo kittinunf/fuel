@@ -7,9 +7,9 @@ repositories {
 }
 
 dependencies {
-    api(project(":fuel"))
+    api(project(Fuel.name))
 
     implementation(KotlinX.Serialization.dependency)
 
-    testImplementation(project(":fuel-test"))
+    testImplementation(project(Fuel.Test.name))
 }

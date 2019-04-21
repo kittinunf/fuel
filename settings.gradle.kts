@@ -19,20 +19,24 @@ pluginManagement {
         }
     }
 }
-include(":fuel")
-include(":fuel-coroutines")
-include(":fuel-forge")
-include(":fuel-gson")
-include(":fuel-livedata")
-include(":fuel-reactor")
-include(":fuel-rxjava")
-include(":fuel-android")
-include(":fuel-jackson")
-include(":fuel-kotlinx-serialization")
-include(":fuel-moshi")
-include(":fuel-test")
-include(":fuel-json")
-include(":fuel-stetho")
+val projects = listOf(
+        Fuel.name,
+        Fuel.Android.name,
+        Fuel.Coroutines.name,
+        Fuel.Forge.name,
+        Fuel.Gson.name,
+        Fuel.Jackson.name,
+        Fuel.Json.name,
+        Fuel.KotlinSerialization.name,
+        Fuel.LiveData.name,
+        Fuel.Moshi.name,
+        Fuel.Reactor.name,
+        Fuel.RxJava.name,
+        Fuel.Stetho.name,
+        Fuel.Test.name
+)
+
+include(*(projects.toTypedArray()))
 
 val includeSample: String by settings
 if (includeSample == "true") {

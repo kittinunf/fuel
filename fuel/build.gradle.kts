@@ -1,6 +1,6 @@
 dependencies {
     api(Result.dependency)
 
-    testImplementation(project(":fuel-test"))
+    testImplementation(project(Fuel.Test.name))
     testImplementation(Json.dependency)
 }
