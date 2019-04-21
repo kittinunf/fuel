@@ -1,4 +1,3 @@
-
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
 import org.gradle.api.publish.maven.MavenPom

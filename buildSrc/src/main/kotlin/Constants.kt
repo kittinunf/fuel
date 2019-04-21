@@ -190,7 +190,7 @@ object Jacoco {
     const val plugin = "jacoco"
 
     object Android {
-        const val version = "0.1.3"
+        const val version = "0.1.4"
         const val plugin = "jacoco-android"
     }
 }
