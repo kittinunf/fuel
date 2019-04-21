@@ -1,6 +1,6 @@
 dependencies {
     api(project(":fuel"))
 
-    implementation(MockServer.dependency)
+    api(MockServer.dependency)
     implementation(Json.dependency)
 }
