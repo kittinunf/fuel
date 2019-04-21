@@ -1,7 +1,7 @@
 dependencies {
     api(project(":fuel"))
 
-    implementation(KotlinX.Coroutines.jvm)
+    api(KotlinX.Coroutines.jvm)
 
     testImplementation(project(":fuel-test"))
 }
