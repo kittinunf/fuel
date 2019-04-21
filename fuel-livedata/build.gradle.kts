@@ -6,6 +6,5 @@ dependencies {
     testImplementation(project(":fuel-test"))
     testImplementation(Android.Arch.testingCore)
     testImplementation(AndroidX.Test.junit)
-    testImplementation(JUnit.dependency)
     testImplementation(RoboElectric.dependency)
 }
