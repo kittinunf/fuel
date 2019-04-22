@@ -414,7 +414,7 @@ Fuel.upload("/post")
     .add(
         FileDataPart(File("myfile.json"), name = "files[]", filename="contents.json"),
         FileDataPart(File("myfile2.json"), name = "files[]", filename="contents2.json"),
-        FileDataPart(File("myfile3.json"), name = "files[]", filename="contents3.json"),
+        FileDataPart(File("myfile3.json"), name = "files[]", filename="contents3.json")
     )
     .response { result -> }
 ```
