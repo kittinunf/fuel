@@ -2,7 +2,7 @@ version: 2
 
 references:
   cache_key: &cache_key
-      key: jars-{{ .Branch }}-{{ checksum "build.gradle.kts" }}-{{ checksum  "buildSrc/src/main/kotlin/Constants.kt" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
+        key: jars-{{ .Branch }}-{{ checksum "build.gradle.kts" }}-{{ checksum  "buildSrc/src/main/kotlin/Constants.kt" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
 
 jobs:
   build:
