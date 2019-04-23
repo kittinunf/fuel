@@ -14,26 +14,26 @@ jobs:
 #         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
 #         command: sudo chmod +x ./gradlew
       - run:
-        name: Download Dependencies
-        command: ./gradlew dependencies
+          name: Download Dependencies
+          command: ./gradlew dependencies
       - save_cache:
           paths:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle.kts" }}-{{ checksum  "buildSrc/src/main/kotlin/Constants.kt" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
       - run:
-        name: Run Kotlin Lint & Tests
-        command: ./gradlew lintKotlin test
+          name: Run Kotlin Lint & Tests
+          command: ./gradlew lintKotlin test
       - run: curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o reviewdog && chmod +x ./reviewdog
       - run:
-        name: Run Add_Review Shell Files
-        command: ./add_review.sh
+          name: Run Add_Review Shell Files
+          command: ./add_review.sh
       - run:
-        name: Save test results
-        command: |
+          name: Save test results
+          command: |
             mkdir -p ~/test-results/junit/
             find . -type f -regex ".*/build/test-results/test/.*xml" -exec cp {} ~/test-results/junit/ \;
         when: always
       - store_test_results:
-        path: ~/test-results
+          path: ~/test-results
       - store_artifacts:
-        path: ~/test-results/junit
+          path: ~/test-results/junit
