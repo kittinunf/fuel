@@ -23,9 +23,7 @@ jobs:
       - run:
         name: Run Kotlin Lint & Tests
         command: ./gradlew lintKotlin test
-      - run:
-        name: Get and Run Review Dog Checks
-        command: curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o reviewdog && chmod +x ./reviewdog
+      - run: curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o reviewdog && chmod +x ./reviewdog
       - run:
         name: Run Add_Review Shell Files
         command: ./add_review.sh
