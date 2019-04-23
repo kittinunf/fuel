@@ -17,9 +17,9 @@ jobs:
         name: Download Dependencies
         command: ./gradlew dependencies
       - save_cache:
-        paths:
-          - ~/.gradle
-        key: jars-{{ checksum "build.gradle.kts" }}-{{ checksum  "buildSrc/src/main/kotlin/Constants.kt" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle.kts" }}-{{ checksum  "buildSrc/src/main/kotlin/Constants.kt" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
       - run:
         name: Run Kotlin Lint & Tests
         command: ./gradlew lintKotlin test
