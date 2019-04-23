@@ -6,7 +6,7 @@ jobs:
     environment:
       _JAVA_OPTIONS: -Xmx2g
       REVIEWDOG_VERSION: "0.9.11"
-      GRADLE_OPTS=-Dkotlin.compiler.execution.strategy=in-process
+      GRADLE_OPT: -Dkotlin.compiler.execution.strategy=in-process
     steps:
       - checkout
       - restore_cache:
