@@ -3,5 +3,4 @@ dependencies {
 
     testImplementation(project(Fuel.Test.name))
     testImplementation(RoboElectric.dependency)
-    testImplementation(project(Fuel.Json.name))
 }
