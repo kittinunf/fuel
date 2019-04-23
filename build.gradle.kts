@@ -27,7 +27,7 @@ allprojects {
 }
 
 tasks.withType<Test> {
-    maxHeapSize = "2048m"
+    maxHeapSize = "4g"
 }
 
 val androidModules = listOf("fuel-android", "fuel-livedata", "fuel-stetho")
