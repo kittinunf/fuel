@@ -44,12 +44,6 @@ subprojects {
             toolVersion = Jacoco.version
         }
 
-        dependencies {
-            implementation(Kotlin.stdlib)
-
-            testImplementation(JUnit.dependency)
-        }
-
         configure<JavaPluginConvention> {
             sourceCompatibility = JavaVersion.VERSION_1_7
             targetCompatibility = JavaVersion.VERSION_1_7
@@ -135,12 +129,6 @@ subprojects {
             }
         }
 
-        dependencies {
-            implementation(Kotlin.stdlib)
-
-            testImplementation(JUnit.dependency)
-        }
-
         configure<JacocoAndroidUnitTestReportExtension> {
             csv.enabled(false)
             html.enabled(true)
@@ -169,6 +157,12 @@ subprojects {
 
         tasks.withType<Test> {
             maxHeapSize = "4g"
+        }
+
+        dependencies {
+            implementation(Kotlin.stdlib)
+
+            testImplementation(JUnit.dependency)
         }
 
         version = Fuel.publishVersion

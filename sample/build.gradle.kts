@@ -8,12 +8,12 @@ plugins {
 
 dependencies {
     // fuel related libraries
-    api(project(Fuel.Android.name))
-    api(project(Fuel.Coroutines.name))
-    api(project(Fuel.Gson.name))
-    api(project(Fuel.LiveData.name))
-    api(project(Fuel.RxJava.name))
-    api(project(Fuel.Stetho.name))
+    implementation(project(Fuel.Android.name))
+    implementation(project(Fuel.Coroutines.name))
+    implementation(project(Fuel.Gson.name))
+    implementation(project(Fuel.LiveData.name))
+    implementation(project(Fuel.RxJava.name))
+    implementation(project(Fuel.Stetho.name))
 
     // dependencies
     implementation(AndroidX.appCompat)
@@ -21,8 +21,8 @@ dependencies {
     implementation(Kotlin.stdlib)
     implementation(KotlinX.Coroutines.android)
     implementation(RxJava.Android.dependency)
-    implementation(Stetho.StethoUrlConnection.plugin)
-    implementation(Stetho.plugin)
+    implementation(Stetho.StethoUrlConnection.dependency)
+    implementation(Stetho.dependency)
 
     // test dependencies
     androidTestImplementation(AndroidX.annotation)

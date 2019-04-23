@@ -213,10 +213,9 @@ object Release {
 
 object Stetho {
     const val version = "1.5.0"
-    const val plugin = "com.facebook.stetho:stetho:$version"
+    const val dependency = "com.facebook.stetho:stetho:$version"
 
     object StethoUrlConnection {
-        const val version = "1.5.0"
-        const val plugin = "com.facebook.stetho:stetho-urlconnection:$version"
+        const val dependency = "com.facebook.stetho:stetho-urlconnection:$version"
     }
 }
