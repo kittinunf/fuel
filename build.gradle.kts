@@ -26,10 +26,6 @@ allprojects {
     }
 }
 
-tasks.withType<Test> {
-    maxHeapSize = "4g"
-}
-
 val androidModules = listOf("fuel-android", "fuel-livedata", "fuel-stetho")
 val androidSampleModules = listOf("sample")
 
@@ -169,6 +165,10 @@ subprojects {
 
         tasks.named<LintTask>("lintKotlinTest") {
             enabled = false
+        }
+
+        tasks.withType<Test> {
+            maxHeapSize = "4g"
         }
 
         version = Fuel.publishVersion
