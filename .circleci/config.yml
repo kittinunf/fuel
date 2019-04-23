@@ -4,8 +4,9 @@ jobs:
     docker:
       - image: circleci/android:api-28-alpha
     environment:
-      JVM_OPTS: -Xmx1g
+      _JAVA_OPTIONS: -Xmx2g
       REVIEWDOG_VERSION: "0.9.11"
+      GRADLE_OPTS=-Dkotlin.compiler.execution.strategy=in-process
     steps:
       - checkout
       - restore_cache:
