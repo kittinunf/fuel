@@ -11,6 +11,7 @@ import com.github.kittinunf.fuel.test.MockHelper
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
+import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertThat
@@ -43,8 +44,8 @@ class FuelJsonTest {
     @Test
     fun httpSyncRequestStringTest() {
         mock.chain(
-                request = mock.request().withPath("/get"),
-                response = mock.reflect()
+            request = mock.request().withPath("/get"),
+            response = mock.reflect()
         )
 
         val (request, response, result) = mock.path("get").httpGet(listOf("hello" to "world")).responseString()
@@ -62,11 +63,12 @@ class FuelJsonTest {
     @Test
     fun httpSyncRequestJsonTest() {
         mock.chain(
-                request = mock.request().withPath("/get"),
-                response = mock.reflect()
+            request = mock.request().withPath("/get"),
+            response = mock.reflect()
         )
 
-        val (request, response, result) = mock.path("get").httpGet(listOf("hello" to "world")).responseJson()
+        val (request, response, result) =
+                mock.path("get").httpGet(listOf("hello" to "world")).responseJson()
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -80,10 +82,35 @@ class FuelJsonTest {
     }
 
     @Test
+    fun httpSyncRequestJsonArrayTest() {
+        mock.chain(
+            request = mock.request().withPath("/gets"),
+            response = mock.response().withBody("[ " +
+                    "{ \"id\": 1, \"foo\": \"foo 1\", \"bar\": null }, " +
+                    "{ \"id\": 2, \"foo\": \"foo 2\", \"bar\": 32 }, " +
+                    " ]").withStatusCode(HttpURLConnection.HTTP_OK)
+        )
+
+        val (request, response, result) =
+                mock.path("gets").httpGet().responseJson()
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+        assertThat(data as FuelJson, isA(FuelJson::class.java))
+        assertThat(data.array(), isA(JSONArray::class.java))
+        assertThat(data.array().length(), isEqualTo(2))
+
+        assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
+    }
+
+    @Test
     fun httpSyncRequestJsonWithHandlerTest() {
         mock.chain(
-                request = mock.request().withPath("/get"),
-                response = mock.reflect()
+            request = mock.request().withPath("/get"),
+            response = mock.reflect()
         )
 
         mock.path("get").httpGet(listOf("hello" to "world")).responseJson(object : ResponseHandler<FuelJson> {
@@ -108,8 +135,8 @@ class FuelJsonTest {
         var error: FuelError? = null
 
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
         )
 
         Fuel.get(mock.path("user-agent")).responseJson { req, res, result ->
@@ -145,8 +172,8 @@ class FuelJsonTest {
         var error: FuelError? = null
 
         mock.chain(
-                request = mock.request().withPath("/404"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/404"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         Fuel.get(mock.path("404")).responseString { req, res, result ->
