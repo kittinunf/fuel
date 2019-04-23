@@ -23,7 +23,7 @@ jobs:
           key: jars-{{ checksum "build.gradle.kts" }}-{{ checksum  "buildSrc/src/main/kotlin/Constants.kt" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
       - run:
           name: Run Kotlin Lint & Tests
-          command: ./gradlew --max-workers=2  lintKotlin test
+          command: ./gradlew --max-workers=2  --info lintKotlin test
       - run: curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o reviewdog && chmod +x ./reviewdog
       - run:
           name: Run Add_Review Shell Files
