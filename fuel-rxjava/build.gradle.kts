@@ -1,7 +1,7 @@
-plugins { java }
-
 dependencies {
-    compile(project(":fuel"))
-    compile(RxJava.Jvm.dependency)
-    testCompile(project(":fuel-test"))
+    api(project(Fuel.name))
+
+    implementation(RxJava.Jvm.dependency)
+
+    testImplementation(project(Fuel.Test.name))
 }
