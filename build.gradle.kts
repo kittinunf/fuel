@@ -156,7 +156,7 @@ subprojects {
         }
 
         tasks.withType<Test> {
-            maxHeapSize = "4g"
+            maxHeapSize = "3g"
         }
 
         dependencies {
