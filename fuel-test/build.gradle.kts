@@ -1,7 +1,6 @@
-plugins { java }
-
 dependencies {
-    compile(project(":fuel"))
-    compile(MockServer.dependency)
-    compile(Json.dependency)
+    api(project(Fuel.name))
+
+    api(MockServer.dependency)
+    implementation(Json.dependency)
 }

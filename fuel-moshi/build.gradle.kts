@@ -1,9 +1,7 @@
-plugins {
-    kotlin("jvm")
-}
-
 dependencies {
-    implementation(project(":fuel"))
+    api(project(Fuel.name))
+
     implementation(Moshi.dependency)
-    testCompile(project(":fuel-test"))
+
+    testImplementation(project(Fuel.Test.name))
 }

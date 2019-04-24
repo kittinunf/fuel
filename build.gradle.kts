@@ -1,8 +1,8 @@
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
+import org.gradle.api.publish.maven.MavenPom
 import org.jmailen.gradle.kotlinter.KotlinterExtension
 import org.jmailen.gradle.kotlinter.support.ReporterType
-import org.gradle.api.publish.maven.MavenPom
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 
 plugins {
@@ -42,11 +42,6 @@ subprojects {
 
         configure<JacocoPluginExtension> {
             toolVersion = Jacoco.version
-        }
-
-        dependencies {
-            compile(Kotlin.stdlib)
-            testCompile(JUnit.dependency)
         }
 
         configure<JavaPluginConvention> {
@@ -158,6 +153,16 @@ subprojects {
 
         tasks.named<LintTask>("lintKotlinTest") {
             enabled = false
+        }
+
+        tasks.withType<Test> {
+            maxHeapSize = "4g"
+        }
+
+        dependencies {
+            implementation(Kotlin.stdlib)
+
+            testImplementation(JUnit.dependency)
         }
 
         version = Fuel.publishVersion
