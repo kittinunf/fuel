@@ -63,7 +63,7 @@ object Fuel {
 
 // Core dependencies
 object Kotlin {
-    const val version = "1.3.21"
+    const val version = "1.3.30"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
@@ -81,7 +81,7 @@ object Json {
 }
 
 object Android {
-    const val version = "3.3.1"
+    const val version = "3.4.0"
     const val appPlugin = "com.android.application"
     const val libPlugin = "com.android.library"
 
