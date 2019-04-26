@@ -157,6 +157,7 @@ subprojects {
 
         tasks.withType<Test> {
             maxHeapSize = "4g"
+            jvmArgs = listOf("-XX:MaxPermSize=3200m")
         }
 
         dependencies {
