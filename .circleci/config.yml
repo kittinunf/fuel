@@ -7,7 +7,7 @@ jdk_env: &jdk_env
   environment:
     TERM: dumb
     REVIEWDOG_VERSION: "0.9.11"
-    GRADLE_OPTS: -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true -Dkotlin.compiler.execution.strategy=in-process -Dkotlin.incremental=false
+    GRADLE_OPTS: -Xmx2048m -XX:+HeapDumpOnOutOfMemoryError -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true -Dkotlin.compiler.execution.strategy=in-process -Dkotlin.incremental=false
 
 references:
   restore_gradle: &restore_gradle
