@@ -1,90 +1,58 @@
-version: 2
+version: 2.1
 
-jdk_env: &jdk_env
-  working_directory: ~/repo
-  docker:
-    - image: circleci/android:api-28
-  environment:
-    TERM: dumb
-    REVIEWDOG_VERSION: "0.9.11"
-    GRADLE_OPTS: -Xmx2048m -XX:+HeapDumpOnOutOfMemoryError -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true -Dkotlin.compiler.execution.strategy=in-process -Dkotlin.incremental=false
+executors:
+  default:
+    parameters:
+      api-version:
+        description: The Android API version to use.
+        type: string
+        default: "28"
+    docker:
+      - image: circleci/android:api-<<parameters.api-version>>
+        environment:
+          # kotlin.incremental=false and kotlin.compiler.execution.strategy=in-process are required due to an issue with the Kotlin compiler in
+          # memory constrained environments: https://youtrack.jetbrains.com/issue/KT-15562
+          GRADLE_OPTS: -Xmx2048m -XX:+HeapDumpOnOutOfMemoryError -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true -Dkotlin.compiler.execution.strategy=in-process -Dkotlin.incremental=false
 
-references:
-  restore_gradle: &restore_gradle
-    restore_cache:
-      keys:
-        - v1-dependencies-{{ checksum "buildSrc/src/main/kotlin/Constants.kt" }}
-        - v1-dependencies-
-
-  save_gradle: &save_gradle
-    save_cache:
-      key: v1-dependencies-{{ checksum "buildSrc/src/main/kotlin/Constants.kt" }}
-      paths:
-        - ~/.gradle
-
-jobs:
-  build:
-    <<: *jdk_env
+commands:
+  generate-gradle-checksums:
     steps:
-      - checkout
-
-      - *restore_gradle
-
       - run:
-          name: Download Dependencies
-          command: ./gradlew dependencies
+          name: Generate Gradle checksums
+          command: |
+            find . -mindepth 2 -name "*.gradle.kts" -type f | sort | xargs shasum > gradle-checksums.txt
+            cat gradle-checksums.txt
 
-      - *save_gradle
+  restore-gradle-cache:
+    description: Restore the cache of ~/.gradle based on the local build files.
+    parameters:
+      cache-prefix:
+        type: string
+        default: gradle-{{ .Environment.CIRCLE_JOB }}
+    steps:
+      - generate-gradle-checksums
+      - restore_cache:
+          keys:
+            - <<parameters.cache-prefix>>-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle-checksums.txt" }}
+            - <<parameters.cache-prefix>>-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle.kts" }}-
+            - <<parameters.cache-prefix>>-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-
 
+  save-gradle-cache:
+    description: Cache the contents of ~/.gradle based on the local build files.
+    parameters:
+      cache-prefix:
+        type: string
+        default: gradle-{{ .Environment.CIRCLE_JOB }}
+    steps:
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: <<parameters.cache-prefix>>-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle-checksums.txt" }}
+
+  lint:
+    description: Run lint
+
+    steps:
       - run:
           name: Lint
           command: ./gradlew lintKotlin
-
-      - run:
-          name: Review dog
-          command: curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o reviewdog && chmod +x ./reviewdog
-
-      - run:
-          name: Add review
-          command: chmod +x ./add_review.sh && ./add_review.sh
-
-      - run:
-          name: Test
-          command: ./gradlew test
-
-      - run:
-          name: Code Coverage
-          command: bash <(curl -s https://codecov.io/bash)
-          
-  deploy:
-    <<: *jdk_env
-    steps:
-      - checkout
-
-      - *restore_gradle
-
-      - run: ./gradlew dependencies
-
-      - *save_gradle
-
-      - run: ./gradlew clean build bintrayUpload -PBINTRAY_USER=$BINTRAY_USER -PBINTRAY_KEY=$BINTRAY_KEY -PdryRun=false -Ppublish=true
-
-workflows:
-  version: 2
-
-  build-and-deploy:
-    jobs:
-      - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
-
-  build:
-    jobs:
-      - build:
-          filters:
-            branches:
-              ignore: master
