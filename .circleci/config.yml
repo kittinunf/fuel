@@ -31,29 +31,31 @@ jobs:
       - *restore_gradle
 
       - run:
-        name: Download Dependencies
-        command: ./gradlew dependencies
+          name: Download Dependencies
+          command: ./gradlew dependencies
 
       - *save_gradle
 
       - run:
-        name: Lint
-        command: ./gradlew lintKotlin
+          name: Lint
+          command: ./gradlew lintKotlin
 
       - run:
-        name: Review dog
-        command: curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o reviewdog && chmod +x ./reviewdog
+          name: Review dog
+          command: curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o reviewdog && chmod +x ./reviewdog
 
       - run:
-        name: Add review
-        command: chmod +x ./add_review.sh && ./add_review.sh
+          name: Add review
+          command: chmod +x ./add_review.sh && ./add_review.sh
 
       - run:
-        name: Test
-        command: ./gradlew test
+          name: Test
+          command: ./gradlew test
 
-      - run: bash <(curl -s https://codecov.io/bash)
-
+      - run:
+          name: Code Coverage
+          command: bash <(curl -s https://codecov.io/bash)
+          
   deploy:
     <<: *jdk_env
     steps:
