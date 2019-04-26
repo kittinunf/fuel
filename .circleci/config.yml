@@ -3,7 +3,7 @@ version: 2
 android_env: &android_env
   working_directory: ~/repo
   docker:
-    - image: circleci/openjdk:8-jdk
+    - image: circleci/android:api-28
   environment:
     JVM_OPTS: -Xmx3200m
     GRADLE_OPTS: -Xmx3200m -XX:+HeapDumpOnOutOfMemoryError -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true -Dkotlin.compiler.execution.strategy=in-process -Dkotlin.incremental=false
