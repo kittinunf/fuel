@@ -56,3 +56,10 @@ commands:
       - run:
           name: Lint
           command: ./gradlew lintKotlin
+
+workflows:
+  version: 2
+
+  build:
+    jobs:
+      - generate-gradle-checksums:
