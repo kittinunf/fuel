@@ -1,65 +1,73 @@
-version: 2.1
+version: 2
 
-executors:
-  default:
-    parameters:
-      api-version:
-        description: The Android API version to use.
-        type: string
-        default: "28"
-    docker:
-      - image: circleci/android:api-<<parameters.api-version>>
-        environment:
-          # kotlin.incremental=false and kotlin.compiler.execution.strategy=in-process are required due to an issue with the Kotlin compiler in
-          # memory constrained environments: https://youtrack.jetbrains.com/issue/KT-15562
-          GRADLE_OPTS: -Xmx2048m -XX:+HeapDumpOnOutOfMemoryError -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true -Dkotlin.compiler.execution.strategy=in-process -Dkotlin.incremental=false
+android_env: &android_env
+  working_directory: ~/repo
+  docker:
+    - image: circleci/openjdk:8-jdk
+  environment:
+    JVM_OPTS: -Xmx3200m
+    GRADLE_OPTS: -Xmx3200m -XX:+HeapDumpOnOutOfMemoryError -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true -Dkotlin.compiler.execution.strategy=in-process -Dkotlin.incremental=false
 
-commands:
-  generate-gradle-checksums:
+references:
+  restore_gradle: &restore_gradle
+    restore_cache:
+      keys:
+        - v1-dependencies-{{ checksum "build.gradle.kts" }}
+        - v1-dependencies-
+
+  save_gradle: &save_gradle
+    save_cache:
+      key: v1-dependencies-{{ checksum "build.gradle.kts" }}
+      paths:
+        - ~/.gradle
+
+jobs:
+  build:
+    <<: *android_env
     steps:
-      - run:
-          name: Generate Gradle checksums
-          command: |
-            find . -mindepth 2 -name "*.gradle.kts" -type f | sort | xargs shasum > gradle-checksums.txt
-            cat gradle-checksums.txt
+      - checkout
 
-  restore-gradle-cache:
-    description: Restore the cache of ~/.gradle based on the local build files.
-    parameters:
-      cache-prefix:
-        type: string
-        default: gradle-{{ .Environment.CIRCLE_JOB }}
+      - *restore_gradle
+
+      - run: ./gradlew dependencies
+
+      - *save_gradle
+
+      - run: ./gradlew lintKotlin
+
+      - run: ./gradlew test
+
+      - run: bash <(curl -s https://codecov.io/bash)
+
+  deploy:
+    <<: *android_env
     steps:
-      - generate-gradle-checksums
-      - restore_cache:
-          keys:
-            - <<parameters.cache-prefix>>-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle-checksums.txt" }}
-            - <<parameters.cache-prefix>>-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle.kts" }}-
-            - <<parameters.cache-prefix>>-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-
+      - checkout
 
-  save-gradle-cache:
-    description: Cache the contents of ~/.gradle based on the local build files.
-    parameters:
-      cache-prefix:
-        type: string
-        default: gradle-{{ .Environment.CIRCLE_JOB }}
-    steps:
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: <<parameters.cache-prefix>>-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle.kts" }}-{{ checksum "gradle-checksums.txt" }}
+      - *restore_gradle
 
-  lint:
-    description: Run lint
+      - run: ./gradlew dependencies
 
-    steps:
-      - run:
-          name: Lint
-          command: ./gradlew lintKotlin
+      - *save_gradle
+
+      - run: ./gradlew clean build bintrayUpload -PBINTRAY_USER=$BINTRAY_USER -PBINTRAY_KEY=$BINTRAY_KEY -PdryRun=false -Ppublish=true
 
 workflows:
   version: 2
 
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+
   build:
     jobs:
-      - generate-gradle-checksums:
+      - build:
+          filters:
+            branches:
+              ignore: master
