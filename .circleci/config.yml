@@ -5,9 +5,9 @@ jdk_env: &jdk_env
   docker:
     - image: circleci/android:api-28
   environment:
-    JVM_OPTS: -Xmx3200m
     TERM: dumb
     REVIEWDOG_VERSION: "0.9.11"
+    GRADLE_OPTS: -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true -Dkotlin.compiler.execution.strategy=in-process -Dkotlin.incremental=false
 
 references:
   restore_gradle: &restore_gradle
