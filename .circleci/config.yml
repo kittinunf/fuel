@@ -1,46 +1,88 @@
 version: 2
 
+jdk_env: &jdk_env
+  working_directory: ~/repo
+  docker:
+    - image: circleci/android:api-28-alpha
+  environment:
+    JVM_OPTS: -Xmx3200m
+    TERM: dumb
+    REVIEWDOG_VERSION: "0.9.11"
+
 references:
-  cache_key: &cache_key
-    key: jars-{{ .Branch }}-{{ checksum "build.gradle.kts" }}-{{ checksum  "buildSrc/src/main/kotlin/Constants.kt" }}-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
+  restore_gradle: &restore_gradle
+    restore_cache:
+      keys:
+        - v1-dependencies-{{ checksum "buildSrc/src/main/kotlin/Constants.kt" }}
+        - v1-dependencies-
+
+  save_gradle: &save_gradle
+    save_cache:
+      key: v1-dependencies-{{ checksum "buildSrc/src/main/kotlin/Constants.kt" }}
+      paths:
+        - ~/.gradle
 
 jobs:
   build:
-    docker:
-      - image: circleci/android:api-28-alpha
-    environment:
-      JVM_OPTS: -Xmx3200m
-      REVIEWDOG_VERSION: "0.9.11"
+    <<: *jdk_env
     steps:
       - checkout
-      - restore_cache:
-        <<: *cache_key
-#      - run:
-#         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
-#         command: sudo chmod +x ./gradlew
+
+      - *restore_gradle
+
       - run:
         name: Download Dependencies
         command: ./gradlew dependencies
-      - save_cache:
-        paths:
-          - ~/.gradle
-        <<: *cache_key
+
+      - *save_gradle
+
       - run:
-        name: Run Kotlin Lint & Tests
-        command: ./gradlew lintKotlin test
+        name: Lint
+        command: ./gradlew lintKotlin
+
       - run:
-        name: Get and Run Review Dog Checks
+        name: Review dog
         command: curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o reviewdog && chmod +x ./reviewdog
+
       - run:
-        name: Run Add_Review Shell Files
-        command: ./add_review.sh
+        name: Add review
+        command: chmod +x ./add_review.sh && ./add_review.sh
+
       - run:
-        name: Save test results
-        command: |
-            mkdir -p ~/test-results/junit/
-            find . -type f -regex ".*/build/test-results/test/.*xml" -exec cp {} ~/test-results/junit/ \;
-        when: always
-      - store_test_results:
-        path: ~/test-results
-      - store_artifacts:
-        path: ~/test-results/junit
+        name: Test
+        command: ./gradlew test
+
+      - run: bash <(curl -s https://codecov.io/bash)
+
+  deploy:
+    <<: *jdk_env
+    steps:
+      - checkout
+
+      - *restore_gradle
+
+      - run: ./gradlew dependencies
+
+      - *save_gradle
+
+      - run: ./gradlew clean build bintrayUpload -PBINTRAY_USER=$BINTRAY_USER -PBINTRAY_KEY=$BINTRAY_KEY -PdryRun=false -Ppublish=true
+
+workflows:
+  version: 2
+
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+
+  build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: master
