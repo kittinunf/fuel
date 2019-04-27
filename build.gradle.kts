@@ -211,7 +211,7 @@ subprojects {
                 register(project.name, MavenPublication::class) {
                     if (project.hasProperty("android")) {
                         artifact("$buildDir/outputs/aar/${project.name}-release.aar") {
-                            builtBy assembleRelease
+                            builtBy(assembleRelease)
                         }
                     } else {
                         from(components["java"])
