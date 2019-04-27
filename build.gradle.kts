@@ -209,9 +209,9 @@ subprojects {
         publishing {
             publications {
                 register(project.name, MavenPublication::class) {
-                    if (project.hasProperty("android") && project.tasks.findByName("assembleRelease") != null) {
+                    if (project.hasProperty("android")) {
                         artifact("$buildDir/outputs/aar/${project.name}-release.aar") {
-                            builtBy(assembleRelease)
+                            builtBy(tasks.getByPath("assembleRelease"))
                         }
                     } else {
                         from(components["java"])
