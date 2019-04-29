@@ -5,7 +5,7 @@ The `LiveData` extension package for [`Fuel`](../README.md).
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-livedata` with `Maven` and `Gradle`. The livedata package has the following dependencies:
 * [`Fuel`](../fuel/README.md)
-* [AndroidX Livedata](https://developer.android.com/topic/libraries/architecture/livedata.html)
+* [AndroidX Livedata](https://developer.android.com/topic/libraries/architecture/livedata.html): 2.0.0
 
 ```groovy
 implementation 'com.github.kittinunf.fuel:fuel:<latest-version>'
