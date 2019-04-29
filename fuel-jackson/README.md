@@ -1,18 +1,16 @@
 # fuel-jackson
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.20-blue.svg)](https://kotlinlang.org)
 
 The jackson extension package for [`Fuel`](../README.md).
 
 ## Installation
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-jackson` with `Maven` and `Gradle`. The jackson package has the following dependencies:
-* `fuel:fuel:<same-version>`
-* Kotlin: 1.3.20
-* Jackson: 2.9.7
+* [`Fuel`](../fuel/README.md)
+* Jackson: 2.9.8
 
 ```groovy
-compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
-compile 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>'
+implementation 'com.github.kittinunf.fuel:fuel:<latest-version>'
+implementation 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>'
 ```
 
 ## Usage
@@ -48,10 +46,9 @@ Also, the `responseObject` overloads allows you to pass `Response Handlers` as l
 ```kotlin
 data class HttpBinUserAgentModel(var userAgent: String = "")
 
-Fuel.get("/user-agent")
-    .responseObject<HttpBinUserAgentModel> { request, response, result ->
-                    //handle here
-                }
+Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel> { request, response, result ->
+    //handle here
+}
 ```
 
 or `ResponseHandler<T>` instances.
