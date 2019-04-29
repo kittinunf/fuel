@@ -33,8 +33,8 @@ class FuelMoshiTest : MockHttpTestCase() {
     @Test
     fun moshiTestResponseObject() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
         )
 
         Fuel.get(mock.path("user-agent"))
@@ -47,8 +47,8 @@ class FuelMoshiTest : MockHttpTestCase() {
     @Test
     fun moshiTestResponseObjectError() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         Fuel.get(mock.path("user-agent")).responseObject(moshiDeserializerOf(HttpBinUserAgentModel::class.java)) { _, _, result ->
@@ -60,74 +60,70 @@ class FuelMoshiTest : MockHttpTestCase() {
     @Test
     fun moshiTestResponseDeserializerObject() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
         )
 
-        Fuel.get(mock.path("user-agent"))
-                .responseObject<HttpBinUserAgentModel> { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), notNullValue())
-                }
+        Fuel.get(mock.path("user-agent")).responseObject<HttpBinUserAgentModel> { _, _, result ->
+            assertThat(result.component1(), notNullValue())
+            assertThat(result.component2(), notNullValue())
+        }
     }
 
     @Test
     fun moshiTestResponseDeserializerObjectError() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        Fuel.get(mock.path("user-agent"))
-                .responseObject<HttpBinUserAgentModel> { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
-                }
+        Fuel.get(mock.path("user-agent")).responseObject<HttpBinUserAgentModel> { _, _, result ->
+            assertThat(result.component1(), notNullValue())
+            assertThat(result.component2(), instanceOf(Result.Failure::class.java))
+        }
     }
 
     @Test
     fun moshiTestResponseHandlerObject() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
         )
 
-        Fuel.get(mock.path("user-agent"))
-                .responseObject(object : ResponseHandler<HttpBinUserAgentModel> {
-                    override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                        assertThat(value, notNullValue())
-                    }
+        Fuel.get(mock.path("user-agent")).responseObject(object : ResponseHandler<HttpBinUserAgentModel> {
+            override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
+                assertThat(value, notNullValue())
+            }
 
-                    override fun failure(request: Request, response: Response, error: FuelError) {
-                        assertThat(error, notNullValue())
-                    }
-                })
+            override fun failure(request: Request, response: Response, error: FuelError) {
+                assertThat(error, notNullValue())
+            }
+        })
     }
 
     @Test
     fun moshiTestResponseHandlerObjectError() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
-        Fuel.get(mock.path("user-agent"))
-                .responseObject(object : ResponseHandler<HttpBinUserAgentModel> {
-                    override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                        assertThat(value, notNullValue())
-                    }
+        Fuel.get(mock.path("user-agent")).responseObject(object : ResponseHandler<HttpBinUserAgentModel> {
+            override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
+                assertThat(value, notNullValue())
+            }
 
-                    override fun failure(request: Request, response: Response, error: FuelError) {
-                        assertThat(error, instanceOf(Result.Failure::class.java))
-                    }
-                })
+            override fun failure(request: Request, response: Response, error: FuelError) {
+                assertThat(error, instanceOf(Result.Failure::class.java))
+            }
+        })
     }
 
     @Test
     fun moshiTestResponseSyncObject() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
         )
 
         val triple = Fuel.get(mock.path("user-agent")).responseObject<HttpBinUserAgentModel>()
@@ -138,8 +134,8 @@ class FuelMoshiTest : MockHttpTestCase() {
     @Test
     fun moshiTestResponseSyncObjectError() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
+            request = mock.request().withPath("/user-agent"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_NOT_FOUND)
         )
 
         val triple = Fuel.get(mock.path("user-agent")).responseObject<HttpBinUserAgentModel>()
@@ -149,18 +145,17 @@ class FuelMoshiTest : MockHttpTestCase() {
     @Test
     fun moshiTestResponseObjectErrorWithGivenAdapter() {
         mock.chain(
-                request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
         )
 
         val moshi = Moshi.Builder().build()
         val adapter = moshi.adapter(HttpBinUserAgentModel::class.java)
 
-        Fuel.get(mock.path("user-agent"))
-                .responseObject(moshiDeserializerOf(adapter)) { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), notNullValue())
-                }
+        Fuel.get(mock.path("user-agent")).responseObject(moshiDeserializerOf(adapter)) { _, _, result ->
+            assertThat(result.component1(), notNullValue())
+            assertThat(result.component2(), notNullValue())
+        }
     }
 
     data class IssueInfo(val id: Int, val title: String, val number: Int)
@@ -171,11 +166,11 @@ class FuelMoshiTest : MockHttpTestCase() {
     @Test
     fun moshiTestProcessingGenericList() {
         mock.chain(
-                request = mock.request().withPath("/issues"),
-                response = mock.response().withBody("[ " +
-                        "{ \"id\": 1, \"title\": \"issue 1\", \"number\": null }, " +
-                        "{ \"id\": 2, \"title\": \"issue 2\", \"number\": 32 }, " +
-                        " ]").withStatusCode(HttpURLConnection.HTTP_OK)
+            request = mock.request().withPath("/issues"),
+            response = mock.response().withBody("[ " +
+                    "{ \"id\": 1, \"title\": \"issue 1\", \"number\": null }, " +
+                    "{ \"id\": 2, \"title\": \"issue 2\", \"number\": 32 }, " +
+                    " ]").withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
         Fuel.get(mock.path("issues")).responseObject<List<IssueInfo>> { _, _, result ->
@@ -215,12 +210,18 @@ class FuelMoshiTest : MockHttpTestCase() {
         defaultMoshi.add(TypeToken.of(Stage::class.java).type, StageMoshiAdapter())
 
         mock.apply {
-            chain(request = mock.request().withPath("/stage1"),
-                    response = mock.response().withBody(""" { "stage" : "na" } """.trimIndent()))
-            chain(request = mock.request().withPath("/stage2"),
-                    response = mock.response().withBody(""" { "stage" : "in_progress" } """.trimIndent()))
-            chain(request = mock.request().withPath("/stage3"),
-                    response = mock.response().withBody(""" { "stage" : "finished" } """.trimIndent()))
+            chain(
+                request = mock.request().withPath("/stage1"),
+                response = mock.response().withBody(""" { "stage" : "na" } """.trimIndent())
+            )
+            chain(
+                request = mock.request().withPath("/stage2"),
+                response = mock.response().withBody(""" { "stage" : "in_progress" } """.trimIndent())
+            )
+            chain(
+                request = mock.request().withPath("/stage3"),
+                response = mock.response().withBody(""" { "stage" : "finished" } """.trimIndent())
+            )
         }
 
         val (req, res, res1) = Fuel.get(mock.path("stage1")).responseObject<StageDTO>()
@@ -246,8 +247,10 @@ class FuelMoshiTest : MockHttpTestCase() {
         defaultMoshi.add(TypeToken.of(Stage::class.java).type, StageMoshiAdapter())
 
         mock.apply {
-            chain(request = mock.request().withPath("/stage-error"),
-                    response = mock.response().withBody(""" { "stage" : "abcdef" } """.trimIndent()))
+            chain(
+                request = mock.request().withPath("/stage-error"),
+                response = mock.response().withBody(""" { "stage" : "abcdef" } """.trimIndent())
+            )
         }
 
         val (req, res, res1) = Fuel.get(mock.path("stage-error")).responseObject<StageDTO>()
