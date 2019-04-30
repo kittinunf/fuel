@@ -28,10 +28,12 @@ allprojects {
 
 val androidModules = listOf("fuel-android", "fuel-livedata", "fuel-stetho")
 val androidSampleModules = listOf("sample")
+val testModules = listOf("fuel-test")
 
 subprojects {
     val isAndroidModule = project.name in androidModules
     val isSample = project.name in androidSampleModules
+    val isTest = project.name in testModules
     val isJvmModule = !isAndroidModule && !isSample
 
     if (isJvmModule) {
@@ -136,7 +138,7 @@ subprojects {
         }
     }
 
-    if (!isSample) {
+    if (!isSample && !isTest) {
         apply {
             plugin(Release.MavenPublish.plugin)
             plugin(Release.Bintray.plugin)
