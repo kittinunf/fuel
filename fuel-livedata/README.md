@@ -1,18 +1,15 @@
 # fuel-livedata
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.20-blue.svg)](https://kotlinlang.org)
-
 The `LiveData` extension package for [`Fuel`](../README.md).
 
 ## Installation
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-livedata` with `Maven` and `Gradle`. The livedata package has the following dependencies:
-* `fuel:fuel:<same-version>`
-* Kotlin: 1.3.20
-* [AndroidX Livedata](https://developer.android.com/topic/libraries/architecture/livedata.html)
+* [`Fuel`](../fuel/README.md)
+* [AndroidX Livedata](https://developer.android.com/topic/libraries/architecture/livedata.html): 2.0.0
 
 ```groovy
-compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
-compile 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>'
+implementation 'com.github.kittinunf.fuel:fuel:<latest-version>'
+implementation 'com.github.kittinunf.fuel:fuel-livedata:<latest-version>'
 ```
 
 ## Usage
