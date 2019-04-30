@@ -81,6 +81,7 @@ or
 ```kotlin
 dependencies {
   //core and/or packages
+  // replace <package> with the package name e.g. fuel-coroutines
   listof("fuel", "<package>").forEach {
     implementation(group = "com.github.kittinunf.fuel", name = it, version = "-SNAPSHOT")
   }
