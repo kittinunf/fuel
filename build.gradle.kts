@@ -138,7 +138,7 @@ subprojects {
         }
     }
 
-    if (!isSample && !isTest) {
+    if (!isSample) {
         apply {
             plugin(Release.MavenPublish.plugin)
             plugin(Release.Bintray.plugin)
@@ -167,74 +167,76 @@ subprojects {
             testImplementation(JUnit.dependency)
         }
 
-        version = Fuel.publishVersion
-        group = Fuel.groupId
-        bintray {
-            user = findProperty("BINTRAY_USER") as? String
-            key = findProperty("BINTRAY_KEY") as? String
-            setPublications(project.name)
-            with(pkg) {
-                repo = "maven"
-                name = "Fuel-Android"
-                desc = "The easiest HTTP networking library in Kotlin/Android"
-                userOrg = "kittinunf"
-                websiteUrl = "https://github.com/kittinunf/Fuel"
-                vcsUrl = "https://github.com/kittinunf/Fuel"
-                setLicenses("MIT")
-                with(version) {
-                    name = Fuel.publishVersion
-                }
-            }
-        }
-
-        fun MavenPom.addDependencies() = withXml {
-            asNode().appendNode("dependencies").let { depNode ->
-                configurations.implementation.allDependencies.forEach {
-                    depNode.appendNode("dependency").apply {
-                        appendNode("groupId", it.group)
-                        appendNode("artifactId", it.name)
-                        appendNode("version", it.version)
+        if (!isTest) {
+            version = Fuel.publishVersion
+            group = Fuel.groupId
+            bintray {
+                user = findProperty("BINTRAY_USER") as? String
+                key = findProperty("BINTRAY_KEY") as? String
+                setPublications(project.name)
+                with(pkg) {
+                    repo = "maven"
+                    name = "Fuel-Android"
+                    desc = "The easiest HTTP networking library in Kotlin/Android"
+                    userOrg = "kittinunf"
+                    websiteUrl = "https://github.com/kittinunf/Fuel"
+                    vcsUrl = "https://github.com/kittinunf/Fuel"
+                    setLicenses("MIT")
+                    with(version) {
+                        name = Fuel.publishVersion
                     }
                 }
             }
-        }
 
-        val javadocJar by tasks.creating(Jar::class) {
-            val doc by tasks
-            dependsOn(doc)
-            from(doc)
-
-            classifier = "javadoc"
-        }
-
-        val sourcesJar by tasks
-        publishing {
-            publications {
-                register(project.name, MavenPublication::class) {
-                    if (project.hasProperty("android")) {
-                        artifact("$buildDir/outputs/aar/${project.name}-release.aar") {
-                            builtBy(tasks.getByPath("assemble"))
+            fun MavenPom.addDependencies() = withXml {
+                asNode().appendNode("dependencies").let { depNode ->
+                    configurations.implementation.allDependencies.forEach {
+                        depNode.appendNode("dependency").apply {
+                            appendNode("groupId", it.group)
+                            appendNode("artifactId", it.name)
+                            appendNode("version", it.version)
                         }
-                    } else {
-                        from(components["java"])
                     }
-                    artifact(sourcesJar)
-                    artifact(javadocJar)
-                    groupId = Fuel.groupId
-                    artifactId = project.name
-                    version = Fuel.publishVersion
+                }
+            }
 
-                    pom {
-                        licenses {
-                            license {
-                                name.set("MIT License")
-                                url.set("http://www.opensource.org/licenses/mit-license.php")
+            val javadocJar by tasks.creating(Jar::class) {
+                val doc by tasks
+                dependsOn(doc)
+                from(doc)
+
+                classifier = "javadoc"
+            }
+
+            val sourcesJar by tasks
+            publishing {
+                publications {
+                    register(project.name, MavenPublication::class) {
+                        if (project.hasProperty("android")) {
+                            artifact("$buildDir/outputs/aar/${project.name}-release.aar") {
+                                builtBy(tasks.getByPath("assemble"))
+                            }
+                        } else {
+                            from(components["java"])
+                        }
+                        artifact(sourcesJar)
+                        artifact(javadocJar)
+                        groupId = Fuel.groupId
+                        artifactId = project.name
+                        version = Fuel.publishVersion
+
+                        pom {
+                            licenses {
+                                license {
+                                    name.set("MIT License")
+                                    url.set("http://www.opensource.org/licenses/mit-license.php")
+                                }
                             }
                         }
-                    }
 
-                    if (project.hasProperty("android")) {
-                        pom.addDependencies()
+                        if (project.hasProperty("android")) {
+                            pom.addDependencies()
+                        }
                     }
                 }
             }
