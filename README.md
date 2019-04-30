@@ -71,6 +71,7 @@ dependencies {
   implementation(group = "com.github.kittinunf.fuel", name = "fuel", version = "-SNAPSHOT")
   
   //packages
+  // replace <package> with the package name e.g. fuel-coroutines
   implementation(group = "com.github.kittinunf.fuel", name = "<package>", version = "-SNAPSHOT")
 }
 ```
