@@ -1,18 +1,15 @@
 # fuel-coroutines
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.0-blue.svg)](https://kotlinlang.org)
-
 The coroutines extension package for [`Fuel`](../README.md).
 
 ## Installation
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-coroutines` with `Maven` and `Gradle`. The android package has the following dependencies:
-* `fuel:fuel:<same-version>`
-* Kotlin: 1.3.20
+* [`Fuel`](../fuel/README.md)
 * KotlinX Coroutines: 1.1.1
 
 ```groovy
-compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
-compile 'com.github.kittinunf.fuel:fuel-coroutines:<latest-version>'
+implementation 'com.github.kittinunf.fuel:fuel:<latest-version>'
+implementation 'com.github.kittinunf.fuel:fuel-coroutines:<latest-version>'
 ```
 
 ## Usage
