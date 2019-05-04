@@ -133,7 +133,7 @@ object Jackson {
 
 object KotlinX {
     object Coroutines {
-        const val version = "1.1.1"
+        const val version = "1.2.1"
         val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         val jvm = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     }
@@ -151,14 +151,14 @@ object Moshi {
 }
 
 object Reactor {
-    const val version = "3.2.2.RELEASE"
+    const val version = "3.2.8.RELEASE"
     const val core = "io.projectreactor:reactor-core:$version"
     const val test = "io.projectreactor:reactor-test:$version"
 }
 
 object RxJava {
     object Jvm {
-        const val version = "2.2.6"
+        const val version = "2.2.8"
         const val dependency = "io.reactivex.rxjava2:rxjava:$version"
     }
 
@@ -170,7 +170,7 @@ object RxJava {
 
 // Lint
 object Ktlint {
-    const val version = "1.21.0"
+    const val version = "1.24.0"
     const val plugin = "org.jmailen.kotlinter"
 }
 
@@ -181,7 +181,7 @@ object JUnit {
 }
 
 object MockServer {
-    const val version = "5.4.1"
+    const val version = "5.4.4"
     const val dependency = "org.mock-server:mockserver-netty:$version"
 }
 
@@ -196,7 +196,7 @@ object Jacoco {
 }
 
 object RoboElectric {
-    const val version = "3.8"
+    const val version = "4.2.1"
     const val dependency = "org.robolectric:robolectric:$version"
 }
 
@@ -212,7 +212,7 @@ object Release {
 }
 
 object Stetho {
-    const val version = "1.5.0"
+    const val version = "1.5.1"
     const val dependency = "com.facebook.stetho:stetho:$version"
 
     object StethoUrlConnection {
