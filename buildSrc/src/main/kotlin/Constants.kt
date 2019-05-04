@@ -181,7 +181,7 @@ object JUnit {
 }
 
 object MockServer {
-    const val version = "5.5.4"
+    const val version = "5.4.1"
     const val dependency = "org.mock-server:mockserver-netty:$version"
 }
 
