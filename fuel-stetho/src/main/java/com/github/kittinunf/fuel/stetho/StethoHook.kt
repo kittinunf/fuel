@@ -29,7 +29,7 @@ class StethoHook(val friendlyName: String = "StethoFuelConnectionManager") : Cli
     }
 
     // means the connection ended with success, allow stetho to intercept response, remove it from the cache
-    override fun interpretResponseStream(request: Request, inputStream: InputStream): InputStream {
+    override fun interpretResponseStream(request: Request, inputStream: InputStream?): InputStream? {
         val stetho = stethoCache.remove(request.getTag(UUID::class))
         return stetho?.interpretResponseStream(inputStream) ?: inputStream
     }
