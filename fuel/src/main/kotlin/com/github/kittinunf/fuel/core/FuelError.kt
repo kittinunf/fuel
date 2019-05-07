@@ -81,7 +81,7 @@ open class FuelError internal constructor(
 
     companion object {
         fun wrap(it: Throwable, response: Response = Response.error()): FuelError = when (it) {
-            is BubbleFuelError -> BubbleFuelError(it.inner)
+            is BubbleFuelError -> BubbleFuelError(it.inner) // we use underlying FuelError to prevent multiple wrap of BubbleFuelError
             is FuelError -> BubbleFuelError(it)
             else -> FuelError(it, response = response)
         }
