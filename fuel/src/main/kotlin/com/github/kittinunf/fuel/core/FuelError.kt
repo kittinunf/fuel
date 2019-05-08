@@ -7,7 +7,7 @@ private typealias StackTrace = Array<out StackTraceElement>
 /**
  * Indicates a call to [FuelError.wrap] passing in a [FuelError]
  */
-private class BubbleFuelError(inner: FuelError) : FuelError(inner, inner.response)
+private class BubbleFuelError(val inner: FuelError) : FuelError(inner, inner.response)
 
 /**
  * Error wrapper for all caught [Throwable] in fuel
@@ -81,7 +81,7 @@ open class FuelError internal constructor(
 
     companion object {
         fun wrap(it: Throwable, response: Response = Response.error()): FuelError = when (it) {
-            is BubbleFuelError -> BubbleFuelError(FuelError(it.exception, it.response))
+            is BubbleFuelError -> BubbleFuelError(it.inner) // we use underlying FuelError to prevent multiple wrap of BubbleFuelError
             is FuelError -> BubbleFuelError(it)
             else -> FuelError(it, response = response)
         }
