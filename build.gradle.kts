@@ -66,7 +66,7 @@ subprojects {
 
         val sourcesJar by tasks.registering(Jar::class) {
             from(sourceSets["main"].allSource)
-            classifier = "sources"
+            archiveClassifier.set("sources")
         }
 
         val doc by tasks.creating(Javadoc::class) {
@@ -120,7 +120,7 @@ subprojects {
 
             val sourcesJar by tasks.registering(Jar::class) {
                 from(sourceSets["main"].java.srcDirs)
-                classifier = "sources"
+                archiveClassifier.set("sources")
             }
 
             val doc by tasks.creating(Javadoc::class) {
@@ -205,7 +205,7 @@ subprojects {
                 dependsOn(doc)
                 from(doc)
 
-                classifier = "javadoc"
+                archiveClassifier.set("javadoc")
             }
 
             val sourcesJar by tasks
