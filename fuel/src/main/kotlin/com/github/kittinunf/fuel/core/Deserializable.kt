@@ -172,8 +172,8 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Respon
         .getOrThrow()
 
     // By this time it should have a response, but deserialization might fail
-    return runCatching { Triple(this, rawResponse, Result.Success<T, FuelError>(deserializable.deserialize(rawResponse))) }
-        .recover { error -> Triple(this, rawResponse, Result.Failure<T, FuelError>(FuelError.wrap(error, rawResponse))) }
+    return runCatching { Triple(this, rawResponse, Result.Success(deserializable.deserialize(rawResponse))) }
+        .recover { error -> Triple(this, rawResponse, Result.Failure(FuelError.wrap(error, rawResponse))) }
         .getOrThrow()
 }
 
