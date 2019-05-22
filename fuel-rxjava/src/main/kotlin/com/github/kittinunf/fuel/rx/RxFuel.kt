@@ -68,10 +68,24 @@ private fun <T : Any> Request.rxResultTriple(deserializable: Deserializable<T>):
  * Returns a reactive stream for a [Single] value response [ByteArray]
  *
  * @see rxBytes
- * @return [Single<T>] the [ByteArray] wrapped into a [Pair] and [Result]
+ * @return [Single<ByteArray>]
  */
 fun Request.rxResponse() = rxResponseSingle(ByteArrayDeserializer())
+
+/**
+ * Returns a reactive stream for a [Single] value response [ByteArray]
+ *
+ * @see rxBytes
+ * @return [Single<Pair<Response, ByteArray>>] the [ByteArray] wrapped into a [Pair] with [Response]
+ */
 fun Request.rxResponsePair() = rxResponsePair(ByteArrayDeserializer())
+
+/**
+ * Returns a reactive stream for a [Single] value response [ByteArray]
+ *
+ * @see rxBytes
+ * @return [Single<Triple<Request, Response, ByteArray>>] the [ByteArray] wrapped into a [Triple] with [Response] and [Request]
+ */
 fun Request.rxResponseTriple() = rxResponseTriple(ByteArrayDeserializer())
 
 /**
@@ -80,10 +94,28 @@ fun Request.rxResponseTriple() = rxResponseTriple(ByteArrayDeserializer())
  * @see rxString
  *
  * @param charset [Charset] the character set to deserialize with
- * @return [Single<String>] the [String] wrapped into a [Pair] and [Result]
+ * @return [Single<String>]
  */
 fun Request.rxResponseString(charset: Charset = Charsets.UTF_8) = rxResponseSingle(StringDeserializer(charset))
+
+/**
+ * Returns a reactive stream for a [Single] value response [String]
+ *
+ * @see rxString
+ *
+ * @param charset [Charset] the character set to deserialize with
+ * @return [Single<Pair<Response, String>>] the [String] wrapped into a [Pair] with [Response]
+ */
 fun Request.rxResponseStringPair(charset: Charset = Charsets.UTF_8) = rxResponsePair(StringDeserializer(charset))
+
+/**
+ * Returns a reactive stream for a [Single] value response [String]
+ *
+ * @see rxString
+ *
+ * @param charset [Charset] the character set to deserialize with
+ * @return [Single<Triple<Request, Response, String>>] the [String] wrapped into a [Triple] with [Response] and [Request]
+ */
 fun Request.rxResponseStringTriple(charset: Charset = Charsets.UTF_8) = rxResponseTriple(StringDeserializer(charset))
 
 /**
@@ -92,24 +124,56 @@ fun Request.rxResponseStringTriple(charset: Charset = Charsets.UTF_8) = rxRespon
  * @see rxObject
  *
  * @param deserializable [Deserializable<T>] something that can deserialize the [Response] to a [T]
- * @return [Single<T>] the [T] wrapped into a [Pair] and [Result]
+ * @return [Single<T>]
  */
 fun <T : Any> Request.rxResponseObject(deserializable: Deserializable<T>) = rxResponseSingle(deserializable)
+
+/**
+ * Returns a reactive stream for a [Single] value response object [T]
+ *
+ * @see rxObject
+ *
+ * @param deserializable [Deserializable<T>] something that can deserialize the [Response] to a [T]
+ * @return [Single<Pair<Response, T>>] the [T] wrapped into a [Pair] with [Response]
+ */
 fun <T : Any> Request.rxResponseObjectPair(deserializable: Deserializable<T>) = rxResponsePair(deserializable)
+
+/**
+ * Returns a reactive stream for a [Single] value response object [T]
+ *
+ * @see rxObject
+ *
+ * @param deserializable [Deserializable<T>] something that can deserialize the [Response] to a [T]
+ * @return [Single<Triple<Request, Response, T>>] the [T] wrapped into a [Triple] with [Response] and [Request]
+ */
 fun <T : Any> Request.rxResponseObjectTriple(deserializable: Deserializable<T>) = rxResponseTriple(deserializable)
 
 /**
- * Returns a reactive stream for a [Single] value response [ByteArray]
+ * Returns a reactive stream for a [Single] value result of [ByteArray]
  *
  * @see rxResponse
  * @return [Single<Result<ByteArray, FuelError>>] the [ByteArray] wrapped into a [Result]
  */
 fun Request.rxBytes() = rxResultSingle(ByteArrayDeserializer())
+
+/**
+ * Returns a reactive stream for a [Single] value result of [ByteArray]
+ *
+ * @see rxResponse
+ * @return [Single<Pair<Response, Result<ByteArray, FuelError>>>] the [ByteArray] wrapped into a [Result] together with a [Pair] with [Response]
+ */
 fun Request.rxBytesPair() = rxResultPair(ByteArrayDeserializer())
+
+/**
+ * Returns a reactive stream for a [Single] value result of [ByteArray]
+ *
+ * @see rxResponse
+ * @return [Single<Triple<Request, Response, Result<ByteArray, FuelError>>>] the [ByteArray] wrapped into a [Result] together with a [Triple] with [Response] and [Request]
+ */
 fun Request.rxBytesTriple() = rxResultTriple(ByteArrayDeserializer())
 
 /**
- * Returns a reactive stream for a [Single] value response [ByteArray]
+ * Returns a reactive stream for a [Single] value result of [ByteArray]
  *
  * @see rxResponseString
  *
@@ -117,11 +181,25 @@ fun Request.rxBytesTriple() = rxResultTriple(ByteArrayDeserializer())
  * @return [Single<Result<String, FuelError>>] the [String] wrapped into a [Result]
  */
 fun Request.rxString(charset: Charset = Charsets.UTF_8) = rxResultSingle(StringDeserializer(charset))
+
+/**
+ * Returns a reactive stream for a [Single] value result of [String]
+ *
+ * @see rxResponseString
+ * @return [Single<Pair<Response, Result<String, FuelError>>>] the [String] wrapped into a [Result] together with a [Pair] with [Response]
+ */
 fun Request.rxStringPair(charset: Charset = Charsets.UTF_8) = rxResultPair(StringDeserializer(charset))
+
+/**
+ * Returns a reactive stream for a [Single] value result of [String]
+ *
+ * @see rxResponseString
+ * @return [Single<Triple<Request, Response, Result<String, FuelError>>>] the [String] wrapped into a [Result] together with a [Triple] with [Response] and [Request]
+ */
 fun Request.rxStringTriple(charset: Charset = Charsets.UTF_8) = rxResultTriple(StringDeserializer(charset))
 
 /**
- * Returns a reactive stream for a [Single] value response [T]
+ * Returns a reactive stream for a [Single] value result of [T]
  *
  * @see rxResponseObject
  *
@@ -129,7 +207,21 @@ fun Request.rxStringTriple(charset: Charset = Charsets.UTF_8) = rxResultTriple(S
  * @return [Single<Result<T, FuelError>>] the [T] wrapped into a [Result]
  */
 fun <T : Any> Request.rxObject(deserializable: Deserializable<T>) = rxResultSingle(deserializable)
+
+/**
+ * Returns a reactive stream for a [Single] value result of [T]
+ *
+ * @see rxResponseObject
+ * @return [Single<Pair<Response, Result<T, FuelError>>>] the [T] wrapped into a [Result] together with a [Pair] with [Response]
+ */
 fun <T : Any> Request.rxObjectPair(deserializable: Deserializable<T>) = rxResultPair(deserializable)
+
+/**
+ * Returns a reactive stream for a [Single] value result of [T]
+ *
+ * @see rxResponseObject
+ * @return [Single<Triple<Request, Response, Result<T, FuelError>>>] the [T] wrapped into a [Result] together with a [Triple] with [Response] and [Request]
+ */
 fun <T : Any> Request.rxObjectTriple(deserializable: Deserializable<T>) = rxResultTriple(deserializable)
 
 /**
