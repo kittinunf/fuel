@@ -14,24 +14,24 @@ import io.reactivex.Single
 import java.nio.charset.Charset
 
 private fun <T : Any> Request.rxResponseSingle(deserializable: Deserializable<T>): Single<T> =
-        rx { onSuccess, onFailure ->
-            response(deserializable) { _, _, result ->
-                result.fold(
-                    success = { t -> t.also { onSuccess(t) } },
-                    failure = { e -> onFailure(e) }
-                )
-            }
+    rx { onSuccess, onFailure ->
+        response(deserializable) { _, _, result ->
+            result.fold(
+                success = { t -> t.also { onSuccess(t) } },
+                failure = { e -> onFailure(e) }
+            )
         }
+    }
 
 private fun <T : Any> Request.rxResponsePair(deserializable: Deserializable<T>): Single<Pair<Response, T>> =
-        rx { onSuccess, onFailure ->
-            response(deserializable) { _, response, result ->
-                result.fold(
-                        success = { t -> t.also { onSuccess(Pair(response, t)) } },
-                        failure = { e -> onFailure(e) }
-                )
-            }
+    rx { onSuccess, onFailure ->
+        response(deserializable) { _, response, result ->
+            result.fold(
+                    success = { t -> t.also { onSuccess(Pair(response, t)) } },
+                    failure = { e -> onFailure(e) }
+            )
         }
+    }
 
 private fun <T : Any> Request.rxResponseTriple(deserializable: Deserializable<T>): Single<Triple<Request, Response, T>> =
     rx { onSuccess, onFailure ->
@@ -43,8 +43,26 @@ private fun <T : Any> Request.rxResponseTriple(deserializable: Deserializable<T>
         }
     }
 
-private fun <T : Any> Request.rxResult(deserializable: Deserializable<T>): Single<Result<T, FuelError>> =
-    rx { onSuccess, _ -> response(deserializable) { _, _, result -> onSuccess(result) } }
+private fun <T : Any> Request.rxResultSingle(deserializable: Deserializable<T>): Single<Result<T, FuelError>> =
+    rx { onSuccess ->
+        response(deserializable) { _, _, result ->
+            onSuccess(result)
+        }
+    }
+
+private fun <T : Any> Request.rxResultPair(deserializable: Deserializable<T>): Single<Pair<Response, Result<T, FuelError>>> =
+    rx { onSuccess ->
+        response(deserializable) { _, response, result ->
+            onSuccess(response to result)
+        }
+    }
+
+private fun <T : Any> Request.rxResultTriple(deserializable: Deserializable<T>): Single<Triple<Request, Response, Result<T, FuelError>>> =
+    rx { onSuccess ->
+        response(deserializable) { request, response, result ->
+            onSuccess(Triple(request, response, result))
+        }
+    }
 
 /**
  * Returns a reactive stream for a [Single] value response [ByteArray]
@@ -62,7 +80,7 @@ fun Request.rxResponseTriple() = rxResponseTriple(ByteArrayDeserializer())
  * @see rxString
  *
  * @param charset [Charset] the character set to deserialize with
- * @return [Single<Pair<Response, Result<String, FuelError>>>] the [String] wrapped into a [Pair] and [Result]
+ * @return [Single<String>] the [String] wrapped into a [Pair] and [Result]
  */
 fun Request.rxResponseString(charset: Charset = Charsets.UTF_8) = rxResponseSingle(StringDeserializer(charset))
 fun Request.rxResponseStringPair(charset: Charset = Charsets.UTF_8) = rxResponsePair(StringDeserializer(charset))
@@ -74,7 +92,7 @@ fun Request.rxResponseStringTriple(charset: Charset = Charsets.UTF_8) = rxRespon
  * @see rxObject
  *
  * @param deserializable [Deserializable<T>] something that can deserialize the [Response] to a [T]
- * @return [Single<Pair<Response, Result<T, FuelError>>>] the [T] wrapped into a [Pair] and [Result]
+ * @return [Single<T>] the [T] wrapped into a [Pair] and [Result]
  */
 fun <T : Any> Request.rxResponseObject(deserializable: Deserializable<T>) = rxResponseSingle(deserializable)
 fun <T : Any> Request.rxResponseObjectPair(deserializable: Deserializable<T>) = rxResponsePair(deserializable)
@@ -86,7 +104,9 @@ fun <T : Any> Request.rxResponseObjectTriple(deserializable: Deserializable<T>) 
  * @see rxResponse
  * @return [Single<Result<ByteArray, FuelError>>] the [ByteArray] wrapped into a [Result]
  */
-fun Request.rxBytes() = rxResult(ByteArrayDeserializer())
+fun Request.rxBytes() = rxResultSingle(ByteArrayDeserializer())
+fun Request.rxBytesPair() = rxResultPair(ByteArrayDeserializer())
+fun Request.rxBytesTriple() = rxResultTriple(ByteArrayDeserializer())
 
 /**
  * Returns a reactive stream for a [Single] value response [ByteArray]
@@ -96,7 +116,9 @@ fun Request.rxBytes() = rxResult(ByteArrayDeserializer())
  * @param charset [Charset] the character set to deserialize with
  * @return [Single<Result<String, FuelError>>] the [String] wrapped into a [Result]
  */
-fun Request.rxString(charset: Charset = Charsets.UTF_8) = rxResult(StringDeserializer(charset))
+fun Request.rxString(charset: Charset = Charsets.UTF_8) = rxResultSingle(StringDeserializer(charset))
+fun Request.rxStringPair(charset: Charset = Charsets.UTF_8) = rxResultPair(StringDeserializer(charset))
+fun Request.rxStringTriple(charset: Charset = Charsets.UTF_8) = rxResultTriple(StringDeserializer(charset))
 
 /**
  * Returns a reactive stream for a [Single] value response [T]
@@ -106,10 +128,16 @@ fun Request.rxString(charset: Charset = Charsets.UTF_8) = rxResult(StringDeseria
  * @param deserializable [Deserializable<T>] something that can deserialize the [Response] to a [T]
  * @return [Single<Result<T, FuelError>>] the [T] wrapped into a [Result]
  */
-fun <T : Any> Request.rxObject(deserializable: Deserializable<T>) = rxResult(deserializable)
+fun <T : Any> Request.rxObject(deserializable: Deserializable<T>) = rxResultSingle(deserializable)
+fun <T : Any> Request.rxObjectPair(deserializable: Deserializable<T>) = rxResultPair(deserializable)
+fun <T : Any> Request.rxObjectTriple(deserializable: Deserializable<T>) = rxResultTriple(deserializable)
 
 /**
  * Generic [Single] wrapper that executes [resultBlock] and emits its result [R] to the [Single]
+ *
+ * This wrapper is a [io.reactivex.Single] wrapper that uses onError to signal the error that occurs
+ * in the stream. If you wish to receive an Error in the format of [com.github.kittinunf.result.Result],
+ * please use [rx] instead.
  *
  * @param resultBlock [() -> R] function that returns [R]
  * @return [Single] the reactive stream for a [Single] with response [R]
@@ -120,10 +148,19 @@ fun <R : Any> Request.rx(resultBlock: Request.((R) -> Unit, (Throwable) -> Unit)
         emitter.setCancellable { cancellableRequest.cancel() }
     }
 
-fun <R : Any> Request.rx(resultBlock: Request.() -> R): Single<R> =
+/**
+ * Generic [Single] wrapper that executes [resultBlock] and emits its result [R] to the [Single]
+ *
+ * This wrapper is a [io.reactivex.Single] wrapper that uses onSuccess in the format of [com.github.kittinunf.result.Result]
+ * as a value in the stream.
+ *
+ * @param resultBlock [() -> R] function that returns [R]
+ * @return [Single] the reactive stream for a [Single] with response [R]
+ */
+fun <R : Any> Request.rx(resultBlock: Request.((R) -> Unit) -> CancellableRequest): Single<R> =
     Single.create { emitter ->
-        val result = resultBlock()
-        emitter.onSuccess(result)
+        val cancellableRequest = resultBlock(emitter::onSuccess)
+        emitter.setCancellable { cancellableRequest.cancel() }
     }
 
 @Suppress("FunctionName")
