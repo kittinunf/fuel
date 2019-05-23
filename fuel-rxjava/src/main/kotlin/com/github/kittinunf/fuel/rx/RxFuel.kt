@@ -229,7 +229,7 @@ fun <T : Any> Request.rxObjectTriple(deserializable: Deserializable<T>) = rxResu
  *
  * This wrapper is a [io.reactivex.Single] wrapper that uses onError to signal the error that occurs
  * in the stream. If you wish to receive an Error in the format of [com.github.kittinunf.result.Result],
- * please use [rx] instead.
+ * please use [rx(Request.((R) -> Unit) -> CancellableRequest)] instead.
  *
  * @param resultBlock [() -> R] function that returns [R]
  * @return [Single] the reactive stream for a [Single] with response [R]
