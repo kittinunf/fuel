@@ -75,7 +75,7 @@ class HttpClient(
 
     @Throws(IOException::class, InterruptedException::class)
     private fun doRequest(request: Request): Response {
-        val connection = establishConnection(request) as HttpURLConnection
+        val connection = establishConnection(request)
         sendRequest(request, connection)
         return retrieveResponse(request, connection)
     }
@@ -86,8 +86,13 @@ class HttpClient(
         connection.apply {
             connectTimeout = max(request.executionOptions.timeoutInMillisecond, 0)
             readTimeout = max(request.executionOptions.timeoutReadInMillisecond, 0)
+
+            if (this is HttpsURLConnection) {
+            	sslSocketFactory = request.executionOptions.socketFactory
+            	hostnameVerifier = request.executionOptions.hostnameVerifier
+            }
+
             requestMethod = HttpClient.coerceMethod(request.method).value
-            doInput = true
             useCaches = request.executionOptions.useHttpCache ?: useHttpCache
             instanceFollowRedirects = false
 
@@ -212,17 +217,10 @@ class HttpClient(
         hook.interpretResponseStream(request, connection.errorStream)?.buffered()
     }
 
-    private fun establishConnection(request: Request): URLConnection {
+    private fun establishConnection(request: Request): HttpURLConnection {
         val url = request.url
-        val urlConnection = proxy?.let { url.openConnection(it) } ?: url.openConnection()
-        return if (url.protocol == "https") {
-            (urlConnection as HttpsURLConnection).apply {
-                sslSocketFactory = request.executionOptions.socketFactory
-                hostnameVerifier = request.executionOptions.hostnameVerifier
-            }
-        } else {
-            urlConnection as HttpURLConnection
-        }
+        val connection = proxy?.let { url.openConnection(it) } ?: url.openConnection()
+        return connection as HttpURLConnection
     }
 
     private fun setBodyIfDoOutput(connection: HttpURLConnection, request: Request) {
