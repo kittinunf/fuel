@@ -54,8 +54,8 @@ class SuspendableRequest private constructor(private val wrapped: Request) : Req
                     interruptCallback.invoke(request)
                 }
             }
-            .map { Result.Success<Response, FuelError>(it) }
-            .recover { Result.Failure<Response, FuelError>(it as FuelError) }
+            .map { Result.Success(it) }
+            .recover { Result.Failure(it as FuelError) }
             .getOrThrow()
     }
 
