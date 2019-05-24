@@ -344,7 +344,7 @@ class RxFuelTest : MockHttpTestCase() {
         assertThat(data, notNullValue())
         assertThat(data.first.statusCode, equalTo(HttpURLConnection.HTTP_OK))
         assertThat(data.second as Result.Success, isA(Result.Success::class.java))
-        val (value, error) = data
+        val (value, error) = data.second
         assertThat(value, notNullValue())
         assertThat(error, nullValue())
     }
@@ -369,7 +369,7 @@ class RxFuelTest : MockHttpTestCase() {
         assertThat(data.first, notNullValue())
         assertThat(data.second.statusCode, equalTo(HttpURLConnection.HTTP_OK))
         assertThat(data.third as Result.Success, isA(Result.Success::class.java))
-        val (value, error) = data
+        val (value, error) = data.third
         assertThat(value, notNullValue())
         assertThat(error, nullValue())
     }
