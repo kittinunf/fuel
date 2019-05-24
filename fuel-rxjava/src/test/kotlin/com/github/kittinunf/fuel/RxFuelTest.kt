@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.rx.rxBytes
 import com.github.kittinunf.fuel.rx.rxBytesPair
+import com.github.kittinunf.fuel.rx.rxBytesTriple
 import com.github.kittinunf.fuel.rx.rxObject
 import com.github.kittinunf.fuel.rx.rxResponse
 import com.github.kittinunf.fuel.rx.rxResponseObject
@@ -257,7 +258,7 @@ class RxFuelTest : MockHttpTestCase() {
             response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(ByteArray(555) { 0 })
         )
 
-        val data = Fuel.get(mock.path("bytes"))
+        val (resp, result) = Fuel.get(mock.path("bytes"))
             .rxBytesPair()
             .test()
             .apply { awaitTerminalEvent() }
@@ -266,10 +267,35 @@ class RxFuelTest : MockHttpTestCase() {
             .assertComplete()
             .values()[0]
 
-        assertThat(data, notNullValue())
-        assertThat(data.first.statusCode, equalTo(HttpURLConnection.HTTP_OK))
-        assertThat(data.second as Result.Success, isA(Result.Success::class.java))
-        val (value, error) = data
+        assertThat(resp, notNullValue())
+        assertThat(resp.statusCode, equalTo(HttpURLConnection.HTTP_OK))
+        assertThat(result as Result.Success, isA(Result.Success::class.java))
+        val (value, error) = result
+        assertThat(value, notNullValue())
+        assertThat(error, nullValue())
+    }
+
+    @Test
+    fun rxBytesTriple() {
+        mock.chain(
+                request = mock.request().withPath("/bytes"),
+                response = mock.response().withStatusCode(HttpURLConnection.HTTP_OK).withBody(ByteArray(555) { 0 })
+        )
+
+        val (req, resp, result) = Fuel.get(mock.path("bytes"))
+                .rxBytesTriple()
+                .test()
+                .apply { awaitTerminalEvent() }
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertComplete()
+                .values()[0]
+
+        assertThat(req, notNullValue())
+        assertThat(resp, notNullValue())
+        assertThat(resp.statusCode, equalTo(HttpURLConnection.HTTP_OK))
+        assertThat(result as Result.Success, isA(Result.Success::class.java))
+        val (value, error) = result
         assertThat(value, notNullValue())
         assertThat(error, nullValue())
     }
