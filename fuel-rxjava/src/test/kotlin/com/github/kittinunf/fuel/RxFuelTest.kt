@@ -19,6 +19,8 @@ import com.github.kittinunf.fuel.rx.rxResponseStringPair
 import com.github.kittinunf.fuel.rx.rxResponseStringTriple
 import com.github.kittinunf.fuel.rx.rxResponseTriple
 import com.github.kittinunf.fuel.rx.rxString
+import com.github.kittinunf.fuel.rx.rxStringPair
+import com.github.kittinunf.fuel.rx.rxStringTriple
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.result.Result
 import org.hamcrest.CoreMatchers.containsString
@@ -323,6 +325,54 @@ class RxFuelTest : MockHttpTestCase() {
         assertThat(error, nullValue())
     }
 
+    @Test
+    fun rxStringPair() {
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+        val data = Fuel.get(mock.path("user-agent"))
+            .rxStringPair()
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertValueCount(1)
+            .assertComplete()
+            .values()[0]
+
+        assertThat(data, notNullValue())
+        assertThat(data.first.statusCode, equalTo(HttpURLConnection.HTTP_OK))
+        assertThat(data.second as Result.Success, isA(Result.Success::class.java))
+        val (value, error) = data
+        assertThat(value, notNullValue())
+        assertThat(error, nullValue())
+    }
+
+    @Test
+    fun rxStringTriple() {
+        mock.chain(
+                request = mock.request().withPath("/user-agent"),
+                response = mock.reflect()
+        )
+
+        val data = Fuel.get(mock.path("user-agent"))
+                .rxStringTriple()
+                .test()
+                .apply { awaitTerminalEvent() }
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertComplete()
+                .values()[0]
+
+        assertThat(data, notNullValue())
+        assertThat(data.first, notNullValue())
+        assertThat(data.second.statusCode, equalTo(HttpURLConnection.HTTP_OK))
+        assertThat(data.third as Result.Success, isA(Result.Success::class.java))
+        val (value, error) = data
+        assertThat(value, notNullValue())
+        assertThat(error, nullValue())
+    }
     @Test
     fun rxStringWithError() {
         mock.chain(
