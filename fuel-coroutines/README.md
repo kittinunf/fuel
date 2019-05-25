@@ -3,7 +3,7 @@ The coroutines extension package for [`Fuel`](../README.md).
 
 ## Installation
 
-You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-coroutines` with `Maven` and `Gradle`. The android package has the following dependencies:
+You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-coroutines` with `Maven` and `Gradle`. The coroutines package has the following dependencies:
 * [`Fuel`](../fuel/README.md)
 * KotlinX Coroutines: 1.1.1
 
