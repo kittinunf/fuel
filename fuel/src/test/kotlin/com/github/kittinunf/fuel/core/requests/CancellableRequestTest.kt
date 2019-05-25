@@ -94,7 +94,7 @@ class CancellableRequestTest : MockHttpTestCase() {
     }
 
     // Random Test Failure when interruptSemaphore didn't acquired on 5 secs
-    @Test(expected = AssertionError::class)
+    @Test
     fun testCancellationInline() {
         val interruptSemaphore = Semaphore(0)
         val bodyReadSemaphore = Semaphore(0)
