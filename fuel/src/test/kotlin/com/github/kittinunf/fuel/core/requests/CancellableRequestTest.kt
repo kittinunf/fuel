@@ -76,10 +76,6 @@ class CancellableRequestTest : MockHttpTestCase() {
             }
             .interrupt { interruptedSemaphore.acquire() }
             .response(expectNoResponseCallbackHandler())
-        
-        assertsThat(1, interruptedSemaphore.availablePermits())
-        
-        interruptedSemaphore.release()
 
         assertThat("Expected body to be at least ${3 * manager.progressBufferSize} bytes",
             responseWrittenSemaphore.tryAcquire(3, 5, TimeUnit.SECONDS)
@@ -87,6 +83,10 @@ class CancellableRequestTest : MockHttpTestCase() {
 
         // Cancel while writing body
         running.cancel()
+        
+        assertThat(1, interruptedSemaphore.availablePermits())
+        
+        interruptedSemaphore.release()
 
         // Run the request
         assertThat("Expected request to be cancelled via interruption",
@@ -115,16 +115,16 @@ class CancellableRequestTest : MockHttpTestCase() {
                 { ByteArrayInputStream("my-body".toByteArray()).also { bodyReadSemaphore.release() } },
                 { "my-body".length.toLong() }
             )
-            .interrupt { interruptSemaphore.acquire() }
+            .interrupt { iinterruptSemaphore.acquire() }
             .response(expectNoResponseCallbackHandler())
-        
-        assertsThat(1, interruptedSemaphore.availablePermits())
-        
-        interruptedSemaphore.release()
-
+       
         assertThat("Expected body to be serialized", bodyReadSemaphore.tryAcquire(5, TimeUnit.SECONDS))
 
         running.cancel()
+        
+        assertThat(1, interruptSemaphore.availablePermits())
+        
+        interruptSemaphore.release()
 
         assertThat("Expected request to be cancelled via interruption $running",
             interruptSemaphore.tryAcquire()
@@ -158,7 +158,7 @@ class CancellableRequestTest : MockHttpTestCase() {
                 responseWrittenCallback.release()
                 Thread.sleep(200)
             }
-            .interrupt { interruptSemaphore.release() }
+            .interrupt { interruptSemaphore.acquire() }
             .response(expectNoResponseCallbackHandler())
 
         assertThat("Expected response to be partially written",
@@ -166,6 +166,10 @@ class CancellableRequestTest : MockHttpTestCase() {
         )
 
         running.cancel()
+        
+        assertThat(1, interruptSemaphore.availablePermits())
+        
+        interruptSemaphore.release()
 
         assertThat("Expected request to be cancelled via interruption",
             interruptSemaphore.tryAcquire(5, TimeUnit.SECONDS)
