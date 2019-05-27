@@ -42,7 +42,7 @@ class CancellableRequestTest : MockHttpTestCase() {
             .interrupt { semaphore.release() }
             .response(expectNoResponseCallbackHandler())
 
-        assertThat("Expected request to be cancelled via interruption $running", semaphore.tryAcquire(0))
+        assertThat("Expected request to be cancelled via interruption $running", semaphore.tryAcquire())
 
         assertThat("Fuel isDone true", running.isDone, equalTo(true))
         assertThat("Fuel isCancelled true", running.isCancelled, equalTo(true))
@@ -115,7 +115,7 @@ class CancellableRequestTest : MockHttpTestCase() {
         running.cancel()
 
         assertThat("Expected request to be cancelled via interruption $running",
-            interruptSemaphore.tryAcquire(0)
+            interruptSemaphore.tryAcquire()
         )
 
         assertThat("FuelManager isDone true", running.isDone, equalTo(true))
