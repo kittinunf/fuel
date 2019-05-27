@@ -28,7 +28,7 @@ class CancellableRequestTest : MockHttpTestCase() {
 
     @Test
     fun testCancellationDuringSendingRequest() {
-        val semaphore = Semaphore(0)
+        val semaphore = Semaphore(-1)
 
         mock.chain(
             request = mock.request().withMethod(Method.POST.value).withPath("/cancel-during-request"),
@@ -51,7 +51,7 @@ class CancellableRequestTest : MockHttpTestCase() {
     @Test
     fun testCancellationDuringReceivingResponse() {
         val manager = FuelManager()
-        val interruptedSemaphore = Semaphore(0)
+        val interruptedSemaphore = Semaphore(-1)
         val responseWrittenSemaphore = Semaphore(0)
         val bytes = ByteArray(10 * manager.progressBufferSize).apply { Random().nextBytes(this) }
         val file = File.createTempFile("random-bytes", ".bin")
@@ -92,7 +92,7 @@ class CancellableRequestTest : MockHttpTestCase() {
 
     @Test
     fun testCancellationInline() {
-        val interruptSemaphore = Semaphore(0)
+        val interruptSemaphore = Semaphore(-1)
         val bodyReadSemaphore = Semaphore(0)
 
         mock.chain(
