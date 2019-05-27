@@ -42,13 +42,12 @@ class CancellableRequestTest : MockHttpTestCase() {
             .interrupt { semaphore.release() }
             .response(expectNoResponseCallbackHandler())
 
-        // Run the request
-        if (!semaphore.tryAcquire(5, TimeUnit.SECONDS)) {
-            fail("Expected request to be cancelled via interruption")
-        }
+        assertThat("Expected request to be cancelled via interruption",
+            semaphore.tryAcquire(5, TimeUnit.SECONDS)
+        )
 
-        assertThat(running.isDone, equalTo(true))
-        assertThat(running.isCancelled, equalTo(true))
+        assertThat("Fuel isDone true", running.isDone, equalTo(true))
+        assertThat("Fuel isCancelled true", running.isCancelled, equalTo(true))
     }
 
     @Test
@@ -76,20 +75,20 @@ class CancellableRequestTest : MockHttpTestCase() {
             .interrupt { interruptedSemaphore.release() }
             .response(expectNoResponseCallbackHandler())
 
-        if (!responseWrittenSemaphore.tryAcquire(3, 5, TimeUnit.SECONDS)) {
-            fail("Expected body to be at least ${3 * manager.progressBufferSize} bytes")
-        }
+        assertThat("Expected body to be at least ${3 * manager.progressBufferSize} bytes",
+            responseWrittenSemaphore.tryAcquire(3, 5, TimeUnit.SECONDS)
+        )
 
         // Cancel while writing body
         running.cancel()
 
         // Run the request
-        if (!interruptedSemaphore.tryAcquire(5, TimeUnit.SECONDS)) {
-            fail("Expected request to be cancelled via interruption")
-        }
+        assertThat("Expected request to be cancelled via interruption",
+            interruptedSemaphore.tryAcquire(5, TimeUnit.SECONDS)
+        )
 
-        assertThat(running.isDone, equalTo(true))
-        assertThat(running.isCancelled, equalTo(true))
+        assertThat("FuelManager isDone true", running.isDone, equalTo(true))
+        assertThat("FuelManager isCancelled true", running.isCancelled, equalTo(true))
         assertThat("Expected file to be incomplete", file.length() < bytes.size, equalTo(true))
     }
 
@@ -113,18 +112,16 @@ class CancellableRequestTest : MockHttpTestCase() {
             .interrupt { interruptSemaphore.release() }
             .response(expectNoResponseCallbackHandler())
 
-        if (!bodyReadSemaphore.tryAcquire(5, TimeUnit.SECONDS)) {
-            fail("Expected body to be serialized")
-        }
+        assertThat("Expected body to be serialized", bodyReadSemaphore.tryAcquire(5, TimeUnit.SECONDS))
 
         running.cancel()
 
-        if (!interruptSemaphore.tryAcquire(5, TimeUnit.SECONDS)) {
-            fail("Expected request to be cancelled via interruption")
-        }
+        assertThat("Expected request to be cancelled via interruption $running",
+            interruptSemaphore.tryAcquire(0)
+        )
 
-        assertThat(running.isDone, equalTo(true))
-        assertThat(running.isCancelled, equalTo(true))
+        assertThat("FuelManager isDone true", running.isDone, equalTo(true))
+        assertThat("FuelManager isCancelled true", running.isCancelled, equalTo(true))
     }
 
     @Test
@@ -154,17 +151,17 @@ class CancellableRequestTest : MockHttpTestCase() {
             .interrupt { interruptSemaphore.release() }
             .response(expectNoResponseCallbackHandler())
 
-        if (!responseWrittenCallback.tryAcquire(5, TimeUnit.SECONDS)) {
-            fail("Expected response to be partially written")
-        }
+        assertThat("Expected response to be partially written",
+            responseWrittenCallback.tryAcquire(5, TimeUnit.SECONDS)
+        )
 
         running.cancel()
 
-        if (!interruptSemaphore.tryAcquire(5, TimeUnit.SECONDS)) {
-            fail("Expected request to be cancelled via interruption")
-        }
+        assertThat("Expected request to be cancelled via interruption",
+            interruptSemaphore.tryAcquire(5, TimeUnit.SECONDS)
+        )
 
-        assertThat(running.isDone, equalTo(true))
-        assertThat(running.isCancelled, equalTo(true))
+        assertThat("FuelManager isDone true", running.isDone, equalTo(true))
+        assertThat("FuelManager isCancelled true", running.isCancelled, equalTo(true))
     }
 }
