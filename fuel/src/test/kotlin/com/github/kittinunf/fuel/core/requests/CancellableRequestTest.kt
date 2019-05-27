@@ -28,7 +28,7 @@ class CancellableRequestTest : MockHttpTestCase() {
 
     @Test
     fun testCancellationDuringSendingRequest() {
-        val semaphore = Semaphore(-1)
+        val semaphore = Semaphore(0)
 
         mock.chain(
             request = mock.request().withMethod(Method.POST.value).withPath("/cancel-during-request"),
@@ -39,8 +39,12 @@ class CancellableRequestTest : MockHttpTestCase() {
         val running = request
             .requestProgress { _, _ -> request.tryCancel() }
             .body("my-body")
-            .interrupt { semaphore.release() }
+            .interrupt { semaphore.acquire() }
             .response(expectNoResponseCallbackHandler())
+        
+        assertsThat(1, semaphore.availablePermits())
+        
+        semaphore.release()
 
         assertThat("Expected request to be cancelled via interruption $running", semaphore.tryAcquire())
 
@@ -51,7 +55,7 @@ class CancellableRequestTest : MockHttpTestCase() {
     @Test
     fun testCancellationDuringReceivingResponse() {
         val manager = FuelManager()
-        val interruptedSemaphore = Semaphore(-1)
+        val interruptedSemaphore = Semaphore(0)
         val responseWrittenSemaphore = Semaphore(0)
         val bytes = ByteArray(10 * manager.progressBufferSize).apply { Random().nextBytes(this) }
         val file = File.createTempFile("random-bytes", ".bin")
@@ -70,8 +74,12 @@ class CancellableRequestTest : MockHttpTestCase() {
                 if (readBytes > 9 * manager.progressBufferSize)
                     fail("Expected request to be cancelled by now")
             }
-            .interrupt { interruptedSemaphore.release() }
+            .interrupt { interruptedSemaphore.acquire() }
             .response(expectNoResponseCallbackHandler())
+        
+        assertsThat(1, interruptedSemaphore.availablePermits())
+        
+        interruptedSemaphore.release()
 
         assertThat("Expected body to be at least ${3 * manager.progressBufferSize} bytes",
             responseWrittenSemaphore.tryAcquire(3, 5, TimeUnit.SECONDS)
@@ -92,7 +100,7 @@ class CancellableRequestTest : MockHttpTestCase() {
 
     @Test
     fun testCancellationInline() {
-        val interruptSemaphore = Semaphore(-1)
+        val interruptSemaphore = Semaphore(0)
         val bodyReadSemaphore = Semaphore(0)
 
         mock.chain(
@@ -107,8 +115,12 @@ class CancellableRequestTest : MockHttpTestCase() {
                 { ByteArrayInputStream("my-body".toByteArray()).also { bodyReadSemaphore.release() } },
                 { "my-body".length.toLong() }
             )
-            .interrupt { interruptSemaphore.release() }
+            .interrupt { interruptSemaphore.acquire() }
             .response(expectNoResponseCallbackHandler())
+        
+        assertsThat(1, interruptedSemaphore.availablePermits())
+        
+        interruptedSemaphore.release()
 
         assertThat("Expected body to be serialized", bodyReadSemaphore.tryAcquire(5, TimeUnit.SECONDS))
 
