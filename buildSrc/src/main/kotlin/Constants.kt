@@ -76,7 +76,7 @@ object Result {
 }
 
 object Json {
-    const val version = "20170516"
+    const val version = "20180813"
     const val dependency = "org.json:json:$version"
 }
 
@@ -127,7 +127,7 @@ object Gson {
 }
 
 object Jackson {
-    const val version = "2.9.8"
+    const val version = "2.9.9"
     const val dependency = "com.fasterxml.jackson.module:jackson-module-kotlin:$version"
 }
 
@@ -186,7 +186,7 @@ object MockServer {
 }
 
 object Jacoco {
-    const val version = "0.8.3"
+    const val version = "0.8.4"
     const val plugin = "jacoco"
 
     object Android {
