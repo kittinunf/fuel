@@ -64,7 +64,6 @@ private sealed class IssueType {
 
 private typealias IssueTypeList = List<IssueType>
 
-
 class FuelGsonTest : MockHttpTestCase() {
 
     data class HttpBinUserAgentModel(var userAgent: String = "")
