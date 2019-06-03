@@ -19,7 +19,6 @@ import java.io.InputStream
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
 import java.net.Proxy
-import java.net.URLConnection
 import javax.net.ssl.HttpsURLConnection
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -48,7 +47,7 @@ class HttpClient(
     }
 
     @Throws(InterruptedException::class)
-    private fun ensureRequestActive(request: Request, connection: HttpURLConnection? = null) {
+    private fun ensureRequestActive(request: Request, connection: HttpURLConnection?) {
         val cancelled = request.isCancelled
         if (!cancelled && !Thread.currentThread().isInterrupted) {
             return
@@ -203,7 +202,7 @@ class HttpClient(
             headers = headers,
             contentLength = contentLength ?: -1,
             statusCode = connection.responseCode,
-            responseMessage = connection.responseMessage.orEmpty(),
+            responseMessage = connection.responseMessage,
             body = DefaultBody.from(
                 { progressStream.buffered(FuelManager.progressBufferSize) },
                 { contentLength ?: -1 }
