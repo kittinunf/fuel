@@ -73,15 +73,11 @@ inline fun <reified T : Any> Request.responseObject(gson: Gson) =
  *
  * @return [ResponseDeserializable<T>] the deserializer
  */
-inline fun <reified T : Any> gsonDeserializerOf(clazz: Class<T>) = object : ResponseDeserializable<T> {
-    override fun deserialize(reader: Reader): T? = Gson().fromJson<T>(reader, clazz)
-}
+inline fun <reified T : Any> gsonDeserializerOf(clazz: Class<T>) = gsonDeserializer<T>()
 
-inline fun <reified T : Any> gsonDeserializer(gson: Gson) = object : ResponseDeserializable<T> {
+inline fun <reified T : Any> gsonDeserializer(gson: Gson = Gson()) = object : ResponseDeserializable<T> {
     override fun deserialize(reader: Reader): T? = gson.fromJson<T>(reader, object : TypeToken<T>() {}.type)
 }
-
-inline fun <reified T : Any> gsonDeserializer() = gsonDeserializer<T>(Gson())
 
 /**
  * Serializes [src] to json and sets the body as application/json
