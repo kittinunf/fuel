@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         FuelManager.instance.apply {
             basePath = "http://httpbin.org"
             baseHeaders = mapOf("Device" to "Android")
