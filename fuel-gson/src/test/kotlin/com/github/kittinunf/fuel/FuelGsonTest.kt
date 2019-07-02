@@ -11,6 +11,13 @@ import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.fuel.test.MockReflected
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
@@ -18,6 +25,7 @@ import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertThat
 import org.junit.Assert.fail
 import org.junit.Test
+import java.lang.reflect.Type
 import java.net.HttpURLConnection
 
 private typealias IssuesList = List<IssueInfo>
@@ -29,6 +37,32 @@ private data class IssueInfo(
 ) {
     fun specialMethod() = "$id: $title"
 }
+
+private sealed class IssueType {
+    object Bug : IssueType()
+    object Feature : IssueType()
+
+    companion object : JsonSerializer<IssueType>, JsonDeserializer<IssueType> {
+        override fun serialize(src: IssueType, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
+            when (src) {
+                is Bug -> JsonPrimitive("bug")
+                is Feature -> JsonPrimitive("feature")
+            }
+
+        override fun deserialize(json: JsonElement, typeOfT: Type?, context: JsonDeserializationContext?): IssueType =
+            if (json.isJsonPrimitive() && (json as JsonPrimitive).isString) {
+                when (json.asString) {
+                    "bug" -> Bug
+                    "feature" -> Feature
+                    else -> throw Error("Not a bug or a feature, what is it?")
+                }
+            } else {
+                throw Error("String expected")
+            }
+    }
+}
+
+private typealias IssueTypeList = List<IssueType>
 
 class FuelGsonTest : MockHttpTestCase() {
 
@@ -251,5 +285,29 @@ class FuelGsonTest : MockHttpTestCase() {
         assertThat("Expected issues, actual error $error", issues, notNullValue())
         assertThat(issues.size, equalTo(data.size))
         assertThat(issues.first().specialMethod(), equalTo("1: issue 1"))
+    }
+
+    @Test
+    fun testCustomGsonInstance() {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(IssueType::class.java, IssueType.Companion)
+            .create()
+
+        val data = listOf(
+            IssueType.Bug,
+            IssueType.Feature
+        )
+
+        val (_, _, result) = reflectedRequest(Method.POST, "json-body")
+            .jsonBody(data, gson)
+            .responseObject<MockReflected>()
+
+        val (reflected, error) = result
+        val body = reflected!!.body!!.string!!
+        val types: IssueTypeList = gson.fromJson(body, object : TypeToken<IssueTypeList>() {}.type)
+        assertThat("Expected types, actual error $error", types, notNullValue())
+        assertThat(body, equalTo("[\"bug\",\"feature\"]"))
+        assertThat(types.size, equalTo(data.size))
+        assertThat(types.first(), equalTo<IssueType>(IssueType.Bug))
     }
 }
