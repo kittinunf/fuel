@@ -111,19 +111,56 @@ Jitpack.io also allows to build from `fuel` forks. If a fork's username is `$you
 
 Fuel requests can be made on the `Fuel` namespace object, any `FuelManager` or using one of the `String` extension methods. If you specify a callback the call is `async`, if you don't it's `blocking`.
 
+#### Async Usage Example
+
 ```kotlin
-"https://httpbin.org/get"
-  .httpGet()
-  .responseString { request, response, result ->
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.result.Result;
+
+fun main(args: Array<String>) {
+
+    val httpAsync = "https://httpbin.org/get"
+        .httpGet()
+        .responseString { request, response, result ->
+            when (result) {
+                is Result.Failure -> {
+                    val ex = result.getException()
+                    println(ex)
+                }
+                is Result.Success -> {
+                    val data = result.get()
+                    println(data)
+                }
+            }
+        }
+
+    httpAsync.join()
+}
+```
+#### Blocking Usage Example
+```kotlin
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.result.Result;
+
+fun main(args: Array<String>) {
+
+    val (request, response, result) = "https://httpbin.org/get"
+        .httpGet()
+        .responseString()
+
     when (result) {
-      is Result.Failure -> {
-        val ex = result.getException()
-      }
-      is Result.Success -> {
-        val data = result.get()
-      }
+        is Result.Failure -> {
+            val ex = result.getException()
+            println(ex)
+        }
+        is Result.Success -> {
+            val data = result.get()
+            println(data)
+        }
     }
-  }
+
+}
+```
 
 // You can also use Fuel.get("https://httpbin.org/get").responseString { ... }
 // You can also use FuelManager.instance.get("...").responseString { ... }
