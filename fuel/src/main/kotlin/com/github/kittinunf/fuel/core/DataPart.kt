@@ -100,7 +100,7 @@ data class InlineDataPart(
     override val contentDisposition: String = "form-data; name=\"$name\"${if (filename != null) "; filename=\"$filename\"" else "" }"
 ) : DataPart() {
     override fun inputStream() = content.byteInputStream()
-    override val contentLength get() = content.length.toLong()
+    override val contentLength get() = content.toByteArray(Charsets.UTF_8).size.toLong()
 }
 
 /**
