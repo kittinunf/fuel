@@ -231,16 +231,10 @@ class HttpClient(
         val contentLength = body.length
         if (contentLength != null && contentLength != -1L) {
             // The content has a known length, so no need to chunk
-            with(connection) {
-            	addRequestProperty(Headers.CONTENT_LENGTH, contentLength.toString())
-            	setFixedLengthStreamingMode(contentLength.toInt())
-            }
+            connection.setFixedLengthStreamingMode(contentLength.toLong())
         } else {
             // The content doesn't have a known length, so turn it into chunked
-            with(connection) {
-            	addRequestProperty(Headers.TRANSFER_ENCODING, "chunked")
-            	setChunkedStreamingMode(0)
-            }
+            connection.setChunkedStreamingMode(4096)
         }
 
         val totalBytes = if ((contentLength ?: -1L).toLong() > 0) { contentLength!!.toLong() } else { null }
