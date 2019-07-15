@@ -3,9 +3,11 @@ repositories {
 }
 
 dependencies {
-    compile(project(":fuel"))
-    compile(Reactor.core)
-    testCompile(Reactor.test)
-    testCompile(project(":fuel-test"))
-    testCompile(project(":fuel-jackson"))
+    api(project(Fuel.name))
+
+    implementation(Reactor.core)
+
+    testImplementation(project(Fuel.Test.name))
+    testImplementation(Jackson.dependency)
+    testImplementation(Reactor.test)
 }
