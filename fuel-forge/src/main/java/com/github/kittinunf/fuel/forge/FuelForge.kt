@@ -29,11 +29,10 @@ inline fun <reified T : Any> Request.responseObjects(noinline deserializer: JSON
 
 fun <T : Any> forgeDeserializerOf(deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<T> {
     override fun deserialize(content: String): T? {
-        val forge =  Forge.modelFromJson(content, deserializer)
-        forge.component2()?.let {
-            throw it
+        when (val result = Forge.modelFromJson(content, deserializer)) {
+            is DeserializedResult.Success -> return result.value
+            is DeserializedResult.Failure -> throw result.error
         }
-        return forge.component1()
     }
 }
 fun <T : Any> forgesDeserializerOf(deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<List<T>> {
