@@ -1,18 +1,15 @@
 # fuel-gson
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.20-blue.svg)](https://kotlinlang.org)
-
 The gson extension package for [`Fuel`](../README.md).
 
 ## Installation
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-gson` with `Maven` and `Gradle`. The gson package has the following dependencies:
-* `fuel:fuel:<same-version>`
-* Kotlin: 1.3.20
+* [`Fuel`](../fuel/README.md)
 * Gson: 2.8.5
 
 ```groovy
-compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
-compile 'com.github.kittinunf.fuel:fuel-gson:<latest-version>'
+implementation 'com.github.kittinunf.fuel:fuel:<latest-version>'
+implementation 'com.github.kittinunf.fuel:fuel-gson:<latest-version>'
 ```
 
 ## Usage
@@ -26,6 +23,7 @@ See `FuelGson.kt`
 ```kotlin
 data class HttpBinUserAgentModel(var userAgent: String = "")
 
-Fuel.get("/user-agent")
-    .responseObject<HttpBinUserAgentModel> { _, _, result -> }
+Fuel.get("/user-agent").responseObject<HttpBinUserAgentModel> { _, _, result -> 
+  // handle result similarly as it is shown by the core module
+}
 ```

@@ -1,5 +1,4 @@
 import com.android.build.gradle.BaseExtension
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
 plugins {
     id(Android.appPlugin)
@@ -8,20 +7,24 @@ plugins {
 }
 
 dependencies {
-    implementation(Kotlin.stdlib)
+    // fuel related libraries
+    implementation(project(Fuel.Android.name))
+    implementation(project(Fuel.Coroutines.name))
+    implementation(project(Fuel.Gson.name))
+    implementation(project(Fuel.LiveData.name))
+    implementation(project(Fuel.RxJava.name))
+    implementation(project(Fuel.Stetho.name))
+
+    // dependencies
     implementation(AndroidX.appCompat)
+    implementation(Gson.dependency)
+    implementation(Kotlin.stdlib)
     implementation(KotlinX.Coroutines.android)
     implementation(RxJava.Android.dependency)
-    implementation(Stetho.plugin)
-    implementation(Stetho.StethoUrlConnection.plugin)
+    implementation(Stetho.StethoUrlConnection.dependency)
+    implementation(Stetho.dependency)
 
-    api(project(":fuel-rxjava"))
-    api(project(":fuel-android"))
-    api(project(":fuel-livedata"))
-    api(project(":fuel-gson"))
-    api(project(":fuel-coroutines"))
-    api(project(":fuel-stetho"))
-
+    // test dependencies
     androidTestImplementation(AndroidX.annotation)
     androidTestImplementation(AndroidX.Test.junit)
     androidTestImplementation(AndroidX.Test.rules)

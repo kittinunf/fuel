@@ -1,8 +1,8 @@
 dependencies {
-    api(project(":fuel"))
-    implementation(Kotlin.stdlib)
-    implementation(Stetho.plugin)
-    implementation(Stetho.StethoUrlConnection.plugin)
+    api(project(Fuel.name))
 
-    testCompile(project(":fuel-test"))
+    implementation(Stetho.dependency)
+    implementation(Stetho.StethoUrlConnection.dependency)
+
+    testImplementation(project(Fuel.Test.name))
 }

@@ -1,10 +1,10 @@
 dependencies {
-    api(project(":fuel"))
-    implementation(Kotlin.stdlib)
+    api(project(Fuel.name))
+
     implementation(AndroidX.Arch.extensions)
-    testImplementation(RoboElectric.dependency)
-    testImplementation(JUnit.dependency)
-    testImplementation(project(":fuel-test"))
+
+    testImplementation(project(Fuel.Test.name))
     testImplementation(Android.Arch.testingCore)
     testImplementation(AndroidX.Test.junit)
+    testImplementation(RoboElectric.dependency)
 }

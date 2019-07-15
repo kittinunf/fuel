@@ -1,19 +1,16 @@
 # fuel-android
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.3.20-blue.svg)](https://kotlinlang.org)
-
 The android package for [`Fuel`](../README.md).
 
 ## Installation
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-android` with `Maven` and `Gradle`. The android package has the following dependencies:
-* `fuel:fuel:<same-version>`
-* Kotlin: 1.3.20
+* [`Fuel`](../fuel/README.md)
 * Android SDK: 19+
 
 
 ```groovy
-compile 'com.github.kittinunf.fuel:fuel:<latest-version>'
-compile 'com.github.kittinunf.fuel:fuel-android:<latest-version>'
+implementation 'com.github.kittinunf.fuel:fuel:<latest-version>'
+implementation 'com.github.kittinunf.fuel:fuel-android:<latest-version>'
 ```
 
 ## Usage

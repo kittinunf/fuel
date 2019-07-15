@@ -1,33 +1,87 @@
 // Library version
 object Fuel {
-    const val publishVersion = "2.0.1"
+    const val publishVersion = "2.1.0"
     const val groupId = "com.github.kittinunf.fuel"
 
     const val compileSdkVersion = 28
     const val minSdkVersion = 19
+
+    const val name = ":fuel"
+
+    object Android {
+        const val name = ":fuel-android"
+    }
+
+    object Coroutines {
+        const val name = ":fuel-coroutines"
+    }
+
+    object Forge {
+        const val name = ":fuel-forge"
+    }
+
+    object Gson {
+        const val name = ":fuel-gson"
+    }
+
+    object Jackson {
+        const val name = ":fuel-jackson"
+    }
+
+    object Json {
+        const val name = ":fuel-json"
+    }
+
+    object KotlinSerialization {
+        const val name = ":fuel-kotlinx-serialization"
+    }
+
+    object LiveData {
+        const val name = ":fuel-livedata"
+    }
+
+    object Moshi {
+        const val name = ":fuel-moshi"
+    }
+
+    object Reactor {
+        const val name = ":fuel-reactor"
+    }
+
+    object RxJava {
+        const val name = ":fuel-rxjava"
+    }
+
+    object Stetho {
+        const val name = ":fuel-stetho"
+    }
+
+    object Test {
+        const val name = ":fuel-test"
+    }
 }
 
 // Core dependencies
 object Kotlin {
-    const val version = "1.3.21"
-    const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Kotlin.version}"
+    const val version = "1.3.30"
+    const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
     const val androidExtensionsPlugin = "kotlin-android-extensions"
 }
 
 object Result {
-    const val version = "2.0.0"
+    const val version = "2.2.0"
     const val dependency = "com.github.kittinunf.result:result:$version"
 }
 
 object Json {
-    const val version = "20170516"
+    const val version = "20180813"
     const val dependency = "org.json:json:$version"
 }
 
 object Android {
-    const val version = "3.3.1"
+    const val version = "3.4.0"
     const val appPlugin = "com.android.application"
     const val libPlugin = "com.android.library"
 
@@ -73,13 +127,13 @@ object Gson {
 }
 
 object Jackson {
-    const val version = "2.9.8"
+    const val version = "2.9.9"
     const val dependency = "com.fasterxml.jackson.module:jackson-module-kotlin:$version"
 }
 
 object KotlinX {
     object Coroutines {
-        const val version = "1.1.1"
+        const val version = "1.2.1"
         val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         val jvm = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     }
@@ -97,14 +151,14 @@ object Moshi {
 }
 
 object Reactor {
-    const val version = "3.2.2.RELEASE"
+    const val version = "3.2.8.RELEASE"
     const val core = "io.projectreactor:reactor-core:$version"
     const val test = "io.projectreactor:reactor-test:$version"
 }
 
 object RxJava {
     object Jvm {
-        const val version = "2.2.6"
+        const val version = "2.2.8"
         const val dependency = "io.reactivex.rxjava2:rxjava:$version"
     }
 
@@ -116,7 +170,7 @@ object RxJava {
 
 // Lint
 object Ktlint {
-    const val version = "1.21.0"
+    const val version = "1.24.0"
     const val plugin = "org.jmailen.kotlinter"
 }
 
@@ -132,17 +186,17 @@ object MockServer {
 }
 
 object Jacoco {
-    const val version = "0.8.3"
+    const val version = "0.8.4"
     const val plugin = "jacoco"
 
     object Android {
-        const val version = "0.1.3"
+        const val version = "0.1.4"
         const val plugin = "jacoco-android"
     }
 }
 
 object RoboElectric {
-    const val version = "3.8"
+    const val version = "4.2.1"
     const val dependency = "org.robolectric:robolectric:$version"
 }
 
@@ -158,11 +212,10 @@ object Release {
 }
 
 object Stetho {
-    const val version = "1.5.0"
-    const val plugin = "com.facebook.stetho:stetho:$version"
+    const val version = "1.5.1"
+    const val dependency = "com.facebook.stetho:stetho:$version"
 
     object StethoUrlConnection {
-        const val version = "1.5.0"
-        const val plugin = "com.facebook.stetho:stetho-urlconnection:$version"
+        const val dependency = "com.facebook.stetho:stetho-urlconnection:$version"
     }
 }

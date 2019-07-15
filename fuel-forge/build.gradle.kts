@@ -1,7 +1,7 @@
-plugins { java }
-
 dependencies {
-    compile(project(":fuel"))
-    compile(Forge.dependency)
-    testCompile(project(":fuel-test"))
+    api(project(Fuel.name))
+
+    implementation(Forge.dependency)
+
+    testImplementation(project(Fuel.Test.name))
 }
