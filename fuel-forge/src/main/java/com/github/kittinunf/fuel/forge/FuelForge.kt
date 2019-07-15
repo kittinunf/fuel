@@ -28,7 +28,13 @@ inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.
 inline fun <reified T : Any> Request.responseObjects(noinline deserializer: JSON.() -> DeserializedResult<T>) = response(forgesDeserializerOf(deserializer))
 
 fun <T : Any> forgeDeserializerOf(deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<T> {
-    override fun deserialize(content: String): T? = Forge.modelFromJson(content, deserializer).component1()
+    override fun deserialize(content: String): T? {
+        val forge =  Forge.modelFromJson(content, deserializer)
+        forge.component2()?.let {
+            throw it
+        }
+        return forge.component1()
+    }
 }
 fun <T : Any> forgesDeserializerOf(deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<List<T>> {
     override fun deserialize(content: String): List<T>? = Forge.modelsFromJson(content, deserializer).map { it.get<T>() }
