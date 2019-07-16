@@ -117,7 +117,7 @@ object AndroidX {
 
 // Modules dependencies
 object Forge {
-    const val version = "0.3.0"
+    const val version = "1.0.0-alpha2"
     const val dependency = "com.github.kittinunf.forge:forge:$version"
 }
 
