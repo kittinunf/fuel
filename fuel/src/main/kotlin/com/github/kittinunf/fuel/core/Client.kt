@@ -11,7 +11,7 @@ interface Client {
     interface Hook {
         fun preConnect(connection: HttpURLConnection, request: Request)
         fun postConnect(request: Request)
-        fun interpretResponseStream(request: Request, inputStream: InputStream): InputStream
+        fun interpretResponseStream(request: Request, inputStream: InputStream?): InputStream?
         fun httpExchangeFailed(request: Request, exception: IOException)
     }
 }
