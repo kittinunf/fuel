@@ -5,7 +5,7 @@ The forge extension package for [`Fuel`](../README.md).
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-forge` with `Maven` and `Gradle`. The forge package has the following dependencies:
 * [`Fuel`](../fuel/README.md)
-* Forge: 0.3.0
+* Forge: 1.0.0-alpha2
 
 ```groovy
 implementation 'com.github.kittinunf.fuel:fuel:<latest-version>'
