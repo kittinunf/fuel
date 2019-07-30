@@ -22,6 +22,7 @@ fun Request.httpString(): String = buildString {
     headers.transformIterate(appendHeaderWithValue)
 
     // body
+    body(body.asRepeatable())
     appendln()
     appendln(String(body.toByteArray()))
 }
@@ -43,6 +44,7 @@ fun Request.cUrlString(): String = buildString {
     }
 
     // body
+    body(body.asRepeatable())
     val escapedBody = String(body.toByteArray()).replace("\"", "\\\"")
     if (escapedBody.isNotEmpty()) {
         append(" -d \"$escapedBody\"")
