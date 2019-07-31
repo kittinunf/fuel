@@ -1,3 +1,4 @@
+dist: xenial
 language: android
 jdk: openjdk8
 env:
