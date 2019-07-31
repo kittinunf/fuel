@@ -14,9 +14,6 @@ android:
   licenses:
     - 'android-sdk-license-.+'
 
-before_install:
- - yes | sdkmanager "platforms;android-28"
-
 cache:
   directories:
     - $HOME/.gradle
