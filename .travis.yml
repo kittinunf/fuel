@@ -1,6 +1,6 @@
-dist: xenial
 language: android
-jdk: openjdk8
+dist: trusty
+
 env:
   - REVIEWDOG_VERSION=0.9.11
 
