@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.core.requests.RepeatableBody
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -57,6 +58,12 @@ interface Body {
      * @return [Long?] the length in bytes, null if it is unknown
      */
     val length: Long?
+
+    /**
+     * Makes the body repeatable by e.g. loading its contents into memory
+     * @return [RepeatableBody] the body to be repeated
+     */
+    fun asRepeatable(): RepeatableBody = RepeatableBody(this)
 
     /**
      * Represents this body as a string
