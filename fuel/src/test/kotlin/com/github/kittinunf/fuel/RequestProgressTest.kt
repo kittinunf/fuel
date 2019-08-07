@@ -7,6 +7,8 @@ import com.github.kittinunf.fuel.test.MockHttpTestCase
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 import java.net.HttpURLConnection
@@ -38,6 +40,8 @@ class RequestProgressTest : MockHttpTestCase() {
             .also { println("Request body is $expectedLength bytes ($length bytes of file data)") }
             .responseString()
 
+        assertFalse(request.executionOptions.requestProgress.isNotSet())
+
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -67,6 +71,8 @@ class RequestProgressTest : MockHttpTestCase() {
             .requestProgress { _, _ -> progressCalls += 1 }
             .responseString()
 
+        assertFalse(request.executionOptions.requestProgress.isNotSet())
+
         val (data, error) = result
 
         assertThat(request, notNullValue())
@@ -80,5 +86,21 @@ class RequestProgressTest : MockHttpTestCase() {
         )
 
         println(progressCalls)
+    }
+
+    @Test
+    fun ensureProgressIsNotSetWhenNoCallbackIsGiven() {
+        mock.chain(
+            request = mock.request().withMethod(Method.POST.value).withPath("/upload"),
+            response = mock.response().withStatusCode(HttpURLConnection.HTTP_ACCEPTED)
+        )
+
+        val file = File(currentDir, "lorem_ipsum_long.tmp")
+
+        val (request, _, _) = threadSafeFuel.upload(mock.path("upload"))
+            .add(FileDataPart(file))
+            .responseString()
+
+        assertTrue(request.executionOptions.requestProgress.isNotSet())
     }
 }
