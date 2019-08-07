@@ -237,11 +237,16 @@ class HttpClient(
             connection.setChunkedStreamingMode(4096)
         }
 
-        val totalBytes = if ((contentLength ?: -1L).toLong() > 0) { contentLength!!.toLong() } else { null }
+        val noProgressHandler = request.executionOptions.requestProgress.isNotSet()
+        val outputStream = if (noProgressHandler) {
+            // No need to report progress, let's just send the payload without buffering
+            connection.outputStream
+        } else {
+            // The input and output streams returned by connection are not buffered. In order to give consistent progress
+            // reporting, by means of flushing, the output stream here is buffered.
 
-        // The input and output streams returned by connection are not buffered. In order to give consistent progress
-        // reporting, by means of flushing, the output stream here is buffered.
-        body.writeTo(
+            val totalBytes = if ((contentLength ?: -1L).toLong() > 0) { contentLength!!.toLong() } else { null }
+
             ProgressOutputStream(
                 connection.outputStream,
                 onProgress = { writtenBytes ->
@@ -249,7 +254,9 @@ class HttpClient(
                     ensureRequestActive(request, connection)
                 }
             ).buffered(FuelManager.progressBufferSize)
-        )
+        }
+
+        body.writeTo(outputStream)
 
         connection.outputStream.flush()
     }
