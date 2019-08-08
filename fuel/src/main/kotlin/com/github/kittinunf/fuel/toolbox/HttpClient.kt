@@ -202,7 +202,7 @@ class HttpClient(
             headers = headers,
             contentLength = contentLength ?: -1,
             statusCode = connection.responseCode,
-            responseMessage = connection.responseMessage,
+            responseMessage = connection.responseMessage.orEmpty(),
             body = DefaultBody.from(
                 { progressStream.buffered(FuelManager.progressBufferSize) },
                 { contentLength ?: -1 }
