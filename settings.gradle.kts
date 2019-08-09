@@ -3,7 +3,7 @@ pluginManagement {
         google()
         mavenCentral()
         jcenter()
-        maven(url = "https://plugins.gradle.org/m2/")
+        gradlePluginPortal()
     }
     resolutionStrategy {
         eachPlugin {
