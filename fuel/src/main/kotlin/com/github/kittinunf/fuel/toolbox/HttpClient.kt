@@ -9,6 +9,7 @@ import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.requests.DefaultBody
+import com.github.kittinunf.fuel.core.requests.UploadRequest
 import com.github.kittinunf.fuel.core.requests.isCancelled
 import com.github.kittinunf.fuel.util.ProgressInputStream
 import com.github.kittinunf.fuel.util.ProgressOutputStream
