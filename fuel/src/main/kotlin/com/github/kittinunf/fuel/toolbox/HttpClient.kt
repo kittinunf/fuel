@@ -229,12 +229,14 @@ class HttpClient(
         }
 
         val contentLength = body.length
-        if (contentLength != null && contentLength != -1L) {
-            // The content has a known length, so no need to chunk
-            connection.setFixedLengthStreamingMode(contentLength.toLong())
-        } else {
-            // The content doesn't have a known length, so turn it into chunked
-            connection.setChunkedStreamingMode(4096)
+        if (request is UploadRequest) {
+            if (contentLength != null && contentLength != -1L) {
+                // The content has a known length, so no need to chunk
+                connection.setFixedLengthStreamingMode(contentLength.toLong())
+            } else {
+                // The content doesn't have a known length, so turn it into chunked
+                connection.setChunkedStreamingMode(4096)
+            }
         }
 
         val noProgressHandler = request.executionOptions.requestProgress.isNotSet()
