@@ -113,8 +113,12 @@ class HttpClientTest : MockHttpTestCase() {
         val manager = FuelManager()
         manager.forceMethods = true
 
+        assertThat(manager.forceMethods, equalTo(true))
+
         val request = manager.request(Method.PATCH, mock.path("patch-body-output"))
             .body("my-body")
+
+        assertThat(request.executionOptions.forceMethods, equalTo(true))
 
         mock.chain(
             request = mock.request().withMethod(Method.PATCH.value).withPath("/patch-body-output"),
@@ -126,6 +130,7 @@ class HttpClientTest : MockHttpTestCase() {
 
         assertThat("Expected data, actual error $error", data, notNullValue())
         assertThat(data!!.body!!.string, equalTo("my-body"))
+        assertThat(data.method, equalTo(Method.PATCH.value))
         assert(data["X-HTTP-Method-Override"].isNullOrEmpty())
     }
 

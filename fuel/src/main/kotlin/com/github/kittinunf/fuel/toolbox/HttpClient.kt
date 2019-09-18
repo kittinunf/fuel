@@ -10,6 +10,7 @@ import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.fuel.core.requests.isCancelled
+import com.github.kittinunf.fuel.toolbox.extensions.forceMethod
 import com.github.kittinunf.fuel.util.ProgressInputStream
 import com.github.kittinunf.fuel.util.ProgressOutputStream
 import com.github.kittinunf.fuel.util.decode
@@ -79,43 +80,6 @@ class HttpClient(
         return retrieveResponse(request, connection)
     }
 
-    /**
-     * Uses public setter "setRequestMethod" if method is support by HttpURLConnection
-     * When method is PATCH, use reflection to set private field "method" on the HttpURLConnection instance
-     * If reflection method fails, use "coerceMethod" and set appropriate "X-HTTP-Method-Override" header
-     */
-    private fun HttpURLConnection.forceMethod(method: Method) {
-        when (method) {
-            Method.PATCH -> {
-                try {
-                    // If instance has private field "delegate" (HttpURLConnection), make the field accessible
-                    // and invoke "forceMethod" on that instance of HttpURLConnection
-                    (this.javaClass.getDeclaredField("delegate").apply {
-                        this.isAccessible = true
-                    }.get(this) as HttpURLConnection?)?.forceMethod(method)
-                } catch (ex: NoSuchFieldException) {
-                    // ignore
-                }
-                (arrayOf(this.javaClass.superclass, this.javaClass)).forEach {
-                    try {
-                        it.getDeclaredField("method").apply {
-                            this.isAccessible = true
-                        }.set(this, method.value)
-                    } catch (ex: NoSuchFieldException) {
-                        // ignore
-                    }
-                }
-                // If above reflection tricks failed, invoke "coerceMethod"
-                // and set "X-HTTP-Method-Override" header
-                if (this.requestMethod !== method.value) {
-                    this.requestMethod = coerceMethod(method).value
-                    this.setRequestProperty("X-HTTP-Method-Override", method.value)
-                }
-            }
-            else -> this.requestMethod = method.value
-        }
-    }
-
     @Throws(IOException::class, InterruptedException::class)
     private fun sendRequest(request: Request, connection: HttpURLConnection) {
         ensureRequestActive(request, connection)
@@ -128,9 +92,14 @@ class HttpClient(
             	hostnameVerifier = request.executionOptions.hostnameVerifier
             }
 
-            requestMethod = HttpClient.coerceMethod(request.method).value
             if (request.executionOptions.forceMethods) {
                 forceMethod(request.method)
+                // If setting method via reflection failed, invoke "coerceMethod"
+                // and set "X-HTTP-Method-Override" header
+                if (this.requestMethod !== request.method.value) {
+                    this.requestMethod = coerceMethod(request.method).value
+                    this.setRequestProperty("X-HTTP-Method-Override", request.method.value)
+                }
             } else {
                 requestMethod = coerceMethod(request.method).value
                 if (request.method.value == "PATCH") {
