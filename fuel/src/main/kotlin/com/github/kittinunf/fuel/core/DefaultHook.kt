@@ -9,7 +9,7 @@ internal class DefaultHook : Client.Hook {
         // no-op
     }
 
-    override fun interpretResponseStream(request: Request, inputStream: InputStream): InputStream = inputStream
+    override fun interpretResponseStream(request: Request, inputStream: InputStream?): InputStream? = inputStream
 
     override fun postConnect(request: Request) {
         // no-op

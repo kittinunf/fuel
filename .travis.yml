@@ -1,10 +1,8 @@
 language: android
+dist: trusty
 
 env:
   - REVIEWDOG_VERSION=0.9.11
-  
-jdk:
-  - oraclejdk8
 
 android:
   components:
@@ -13,9 +11,6 @@ android:
     - android-28
   licenses:
     - 'android-sdk-license-.+'
-
-before_install:
- - yes | sdkmanager "platforms;android-28"
 
 cache:
   directories:

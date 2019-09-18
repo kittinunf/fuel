@@ -1,6 +1,6 @@
 // Library version
 object Fuel {
-    const val publishVersion = "2.1.0"
+    const val publishVersion = "2.2.1"
     const val groupId = "com.github.kittinunf.fuel"
 
     const val compileSdkVersion = 28
@@ -63,7 +63,7 @@ object Fuel {
 
 // Core dependencies
 object Kotlin {
-    const val version = "1.3.30"
+    const val version = "1.3.50"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
@@ -117,7 +117,7 @@ object AndroidX {
 
 // Modules dependencies
 object Forge {
-    const val version = "0.3.0"
+    const val version = "1.0.0-alpha2"
     const val dependency = "com.github.kittinunf.forge:forge:$version"
 }
 

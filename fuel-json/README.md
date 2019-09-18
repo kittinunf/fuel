@@ -15,7 +15,7 @@ implementation 'com.github.kittinunf.fuel:fuel-json:<latest-version>'
 ## Usage
 
 ```kotlin
-fun responseJson(handler: (Request, Response, Result<Json, FuelError>) -> Unit)
+fun responseJson(handler: (Request, Response, Result<FuelJson, FuelError>) -> Unit)
 
 val jsonObject = json.obj() //JSONObject
 val jsonArray = json.array() //JSONArray

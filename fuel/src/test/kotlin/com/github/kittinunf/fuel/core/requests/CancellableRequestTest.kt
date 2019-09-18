@@ -93,6 +93,7 @@ class CancellableRequestTest : MockHttpTestCase() {
         assertThat("Expected file to be incomplete", file.length() < bytes.size, equalTo(true))
     }
 
+    // Random Test Failure when interruptSemaphore didn't acquired on 5 secs
     @Test
     fun testCancellationInline() {
         val interruptSemaphore = Semaphore(0)

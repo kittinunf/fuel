@@ -26,7 +26,7 @@ class ProgressOutputStream(stream: OutputStream, val onProgress: WriteProgress) 
     // function is called, instead of relying on some arbitrary, but fake, progress.
     //
     override fun write(b: ByteArray?, off: Int, len: Int) {
-        super.write(b, off, len)
+        out.write(b, off, len)
         position += len
         onProgress.invoke(position)
     }

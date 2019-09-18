@@ -13,6 +13,8 @@ data class Progress(private val handlers: MutableCollection<ProgressCallback> = 
         return this
     }
 
+    fun isNotSet(): Boolean = handlers.isEmpty()
+
     override operator fun invoke(readBytes: Long, totalBytes: Long) {
         handlers.forEach {
             it.invoke(readBytes, totalBytes)

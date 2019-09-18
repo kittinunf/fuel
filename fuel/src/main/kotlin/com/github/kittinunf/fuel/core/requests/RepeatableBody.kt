@@ -75,4 +75,10 @@ data class RepeatableBody(
      * @return [Long?] the length in bytes, null if it is unknown
      */
     override val length = body.length
+
+    /**
+     * Makes the body repeatable by e.g. loading its contents into memory
+     * @return [RepeatableBody] the body to be repeated
+     */
+    override fun asRepeatable(): RepeatableBody = this
 }
