@@ -61,7 +61,7 @@ If you want a SNAPSHOT distribution, you can use [`Jitpack`](https://jitpack.io/
 
 ```kotlin
 repositories {
-  maven(url = "https://jitpack.io") {
+  maven(url = "https://www.jitpack.io") {
     name = "jitpack"
   }
 }
