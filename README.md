@@ -160,7 +160,6 @@ fun main(args: Array<String>) {
     }
 
 }
-```
 
 // You can also use Fuel.get("https://httpbin.org/get").responseString { ... }
 // You can also use FuelManager.instance.get("...").responseString { ... }
