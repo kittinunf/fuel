@@ -202,6 +202,19 @@ class ReactorTest : MockHttpTestCase() {
         assertThat(running.isCancelled, equalTo(true))
     }
 
+    @Test
+    fun monoUnit() {
+        mock.chain(
+            request = mock.request().withPath("/ip"),
+            response = mock.response().withBody("127.0.0.1")
+        )
+
+        Fuel.get(mock.path("ip")).monoIgnored()
+            .test()
+            .assertNext { assertThat(it, equalTo(Unit)) }
+            .verifyComplete()
+    }
+
     private data class IpLong(val origin: Long)
 
     private object IpLongDeserializer : ResponseDeserializable<IpLong> {

@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
+import com.github.kittinunf.fuel.core.deserializers.EmptyDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
 import com.github.kittinunf.fuel.core.response
@@ -223,6 +224,11 @@ fun <T : Any> Request.rxObjectPair(deserializable: Deserializable<T>) = rxResult
  * @return [Single<Triple<Request, Response, Result<T, FuelError>>>] the [T] wrapped into a [Result] together with a [Triple] with [Response] and [Request]
  */
 fun <T : Any> Request.rxObjectTriple(deserializable: Deserializable<T>) = rxResultTriple(deserializable)
+
+/**
+ * Returns a reactive stream for a [Single] value with only complete(success with [Unit]) or error signal
+ */
+fun Request.rxIgnored(): Single<Unit> = rxResponseSingle(EmptyDeserializer)
 
 /**
  * Generic [Single] wrapper that executes [resultBlock] and emits its result [R] to the [Single]

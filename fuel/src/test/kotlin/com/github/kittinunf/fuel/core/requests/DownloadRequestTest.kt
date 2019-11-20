@@ -3,6 +3,7 @@ package com.github.kittinunf.fuel.core.requests
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.ResponseResultOf
+import com.github.kittinunf.fuel.core.responseIgnored
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.google.common.net.MediaType
 import org.hamcrest.CoreMatchers.equalTo
@@ -220,6 +221,34 @@ class DownloadRequestTest : MockHttpTestCase() {
             .fileDestination { _, _ -> file }
             .progress { readBytes, totalBytes -> read = readBytes; total = totalBytes }
             .response()
+
+        assertDownloadedBytesToFile(triple, file, numberOfBytes)
+        assertThat("Progress read bytes and total bytes should be equal",
+                read == total && read != -1L && total != -1L,
+                equalTo(true)
+        )
+    }
+
+    @Test
+    fun awaitDownloadBigFileIgnored() {
+        val manager = FuelManager()
+
+        val numberOfBytes = 1024 * 1024 * 10 // 10 MB
+        val file = File.createTempFile(numberOfBytes.toString(), null)
+        val bytes = ByteArray(numberOfBytes).apply { Random().nextBytes(this) }
+
+        mock.chain(
+            request = mock.request().withMethod(Method.GET.value).withPath("/bytes"),
+            response = mock.response().withDelay(Delay.seconds(1)).withBody(BinaryBody(bytes, MediaType.OCTET_STREAM))
+        )
+
+        var read = -1L
+        var total = -1L
+
+        val triple = manager.download(mock.path("bytes"))
+            .fileDestination { _, _ -> file }
+            .progress { readBytes, totalBytes -> read = readBytes; total = totalBytes }
+            .responseIgnored()
 
         assertDownloadedBytesToFile(triple, file, numberOfBytes)
         assertThat("Progress read bytes and total bytes should be equal",
