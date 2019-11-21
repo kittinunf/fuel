@@ -71,6 +71,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
     // callback executionOptions
     var callbackExecutor: Executor by readWriteLazy { createEnvironment().callbackExecutor }
 
+    var forceMethods: Boolean = false
     /**
      * Make a request using [method] to [path] with [parameters]
      *
@@ -200,6 +201,7 @@ class FuelManager : RequestFactory, RequestFactory.Convenience {
             ).also { executor ->
                 executor.timeoutInMillisecond = timeoutInMillisecond
                 executor.timeoutReadInMillisecond = timeoutReadInMillisecond
+                executor.forceMethods = forceMethods
             }
         }
     }

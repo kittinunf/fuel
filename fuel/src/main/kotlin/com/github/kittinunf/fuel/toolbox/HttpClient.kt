@@ -10,6 +10,7 @@ import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.fuel.core.requests.isCancelled
+import com.github.kittinunf.fuel.toolbox.extensions.forceMethod
 import com.github.kittinunf.fuel.util.ProgressInputStream
 import com.github.kittinunf.fuel.util.ProgressOutputStream
 import com.github.kittinunf.fuel.util.decode
@@ -91,7 +92,21 @@ class HttpClient(
             	hostnameVerifier = request.executionOptions.hostnameVerifier
             }
 
-            requestMethod = HttpClient.coerceMethod(request.method).value
+            if (request.executionOptions.forceMethods) {
+                forceMethod(request.method)
+                // If setting method via reflection failed, invoke "coerceMethod"
+                // and set "X-HTTP-Method-Override" header
+                if (this.requestMethod !== request.method.value) {
+                    this.requestMethod = coerceMethod(request.method).value
+                    this.setRequestProperty("X-HTTP-Method-Override", request.method.value)
+                }
+            } else {
+                requestMethod = coerceMethod(request.method).value
+                if (request.method.value == "PATCH") {
+                    setRequestProperty("X-HTTP-Method-Override", request.method.value)
+                }
+            }
+            doInput = true
             useCaches = request.executionOptions.useHttpCache ?: useHttpCache
             instanceFollowRedirects = false
 
@@ -119,11 +134,6 @@ class HttpClient(
                 Headers.ACCEPT_TRANSFER_ENCODING,
                 Headers.collapse(HeaderName(Headers.ACCEPT_TRANSFER_ENCODING), SUPPORTED_DECODING)
             )
-
-            // The underlying HttpURLConnection does not support PATCH.
-            if (request.method == Method.PATCH) {
-                setRequestProperty("X-HTTP-Method-Override", Method.PATCH.value)
-            }
 
             hook.preConnect(connection, request)
             setDoOutput(connection, request.method)

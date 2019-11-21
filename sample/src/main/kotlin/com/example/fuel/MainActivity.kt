@@ -5,8 +5,9 @@ import android.os.Handler
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.FileDataPart
+import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.extensions.authentication
@@ -81,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         httpGet()
         httpPut()
         httpPost()
+        httpPatch()
         httpDelete()
         httpDownload()
         httpUpload()
@@ -162,6 +164,20 @@ class MainActivity : AppCompatActivity() {
 
         "/post"
             .httpPost(listOf("foo" to "foo", "bar" to "bar"))
+            .also { Log.d(TAG, it.cUrlString()) }
+            .responseString { _, _, result -> update(result) }
+    }
+
+    private fun httpPatch() {
+        val manager = FuelManager().apply {
+            basePath = "http://httpbin.org"
+            baseHeaders = mapOf("Device" to "Android")
+            baseParams = listOf("key" to "value")
+        }
+
+        manager.forceMethods = true
+
+        manager.request(Method.PATCH, "/patch", listOf("foo" to "foo", "bar" to "bar"))
             .also { Log.d(TAG, it.cUrlString()) }
             .responseString { _, _, result -> update(result) }
     }

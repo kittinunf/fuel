@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Client
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
@@ -42,23 +43,6 @@ class HttpClientTest : MockHttpTestCase() {
     fun httpClientIsTheDefaultClient() {
         val request = Fuel.request(Method.GET, mock.path("default-client"))
         assertThat(request.executionOptions.client, instanceOf(HttpClient::class.java))
-    }
-
-    @Test
-    fun usesOverrideMethodForPatch() {
-        val request = Fuel.patch(mock.path("patch-with-override"))
-
-        mock.chain(
-            request = mock.request().withMethod(Method.POST.value).withPath("/patch-with-override"),
-            response = mock.reflect()
-        )
-
-        val (_, _, result) = request.responseObject(MockReflected.Deserializer())
-        val (data, error) = result
-
-        assertThat("Expected data, actual error $error", data, notNullValue())
-        assertThat(data!!.method, equalTo(Method.POST.value))
-        assertThat(data["X-HTTP-Method-Override"].firstOrNull(), equalTo(Method.PATCH.value))
     }
 
     @Test
@@ -108,12 +92,36 @@ class HttpClientTest : MockHttpTestCase() {
     }
 
     @Test
-    fun allowPatchWithBody() {
-        val request = Fuel.patch(mock.path("patch-body-output"))
-            .body("my-body")
+    fun usesOverrideMethodForPatch() {
+        val request = Fuel.patch(mock.path("patch-with-override"))
 
         mock.chain(
-            request = mock.request().withMethod(Method.POST.value).withPath("/patch-body-output"),
+                request = mock.request().withMethod(Method.POST.value).withPath("/patch-with-override"),
+                response = mock.reflect()
+        )
+
+        val (_, _, result) = request.responseObject(MockReflected.Deserializer())
+        val (data, error) = result
+
+        assertThat("Expected data, actual error $error", data, notNullValue())
+        assertThat(data!!.method, equalTo(Method.POST.value))
+        assertThat(data["X-HTTP-Method-Override"].firstOrNull(), equalTo(Method.PATCH.value))
+    }
+
+    @Test
+    fun allowPatchWithBody() {
+        val manager = FuelManager()
+        manager.forceMethods = true
+
+        assertThat(manager.forceMethods, equalTo(true))
+
+        val request = manager.request(Method.PATCH, mock.path("patch-body-output"))
+            .body("my-body")
+
+        assertThat(request.executionOptions.forceMethods, equalTo(true))
+
+        mock.chain(
+            request = mock.request().withMethod(Method.PATCH.value).withPath("/patch-body-output"),
             response = mock.reflect()
         )
 
@@ -122,6 +130,8 @@ class HttpClientTest : MockHttpTestCase() {
 
         assertThat("Expected data, actual error $error", data, notNullValue())
         assertThat(data!!.body!!.string, equalTo("my-body"))
+        assertThat(data.method, equalTo(Method.PATCH.value))
+        assert(data["X-HTTP-Method-Override"].isNullOrEmpty())
     }
 
     @Test
