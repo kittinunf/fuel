@@ -8,7 +8,7 @@ import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.rx.rxBytes
 import com.github.kittinunf.fuel.rx.rxBytesPair
 import com.github.kittinunf.fuel.rx.rxBytesTriple
-import com.github.kittinunf.fuel.rx.rxIgnored
+import com.github.kittinunf.fuel.rx.rxUnit
 import com.github.kittinunf.fuel.rx.rxObject
 import com.github.kittinunf.fuel.rx.rxResponse
 import com.github.kittinunf.fuel.rx.rxResponseObject
@@ -509,7 +509,7 @@ class RxFuelTest : MockHttpTestCase() {
         )
 
         val data = Fuel.get(mock.path("user-agent"))
-            .rxIgnored()
+            .rxUnit()
             .test()
             .apply { awaitTerminalEvent() }
             .assertNoErrors()

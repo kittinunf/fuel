@@ -40,7 +40,7 @@ suspend inline fun <T : Any, U : Deserializable<T>> Request.await(deserializable
  * @param scope [CoroutineContext] the context to run within
  */
 @Throws
-suspend fun Request.awaitIgnored(scope: CoroutineContext = Dispatchers.IO): Unit = await(EmptyDeserializer, scope)
+suspend fun Request.awaitUnit(scope: CoroutineContext = Dispatchers.IO): Unit = await(EmptyDeserializer, scope)
 
 /**
  * Await the [T] using a [scope], defaulting to [Dispatchers.IO], wrapped in [Result]

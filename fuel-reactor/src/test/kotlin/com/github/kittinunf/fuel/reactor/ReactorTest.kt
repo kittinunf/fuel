@@ -209,7 +209,7 @@ class ReactorTest : MockHttpTestCase() {
             response = mock.response().withBody("127.0.0.1")
         )
 
-        Fuel.get(mock.path("ip")).monoIgnored()
+        Fuel.get(mock.path("ip")).monoUnit()
             .test()
             .assertNext { assertThat(it, equalTo(Unit)) }
             .verifyComplete()

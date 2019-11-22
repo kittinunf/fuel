@@ -3,7 +3,7 @@ package com.github.kittinunf.fuel.core.requests
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.ResponseResultOf
-import com.github.kittinunf.fuel.core.responseIgnored
+import com.github.kittinunf.fuel.core.responseUnit
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.google.common.net.MediaType
 import org.hamcrest.CoreMatchers.equalTo
@@ -230,7 +230,7 @@ class DownloadRequestTest : MockHttpTestCase() {
     }
 
     @Test
-    fun awaitDownloadBigFileIgnored() {
+    fun downloadBigFileResponseUnit() {
         val manager = FuelManager()
 
         val numberOfBytes = 1024 * 1024 * 10 // 10 MB
@@ -248,7 +248,7 @@ class DownloadRequestTest : MockHttpTestCase() {
         val triple = manager.download(mock.path("bytes"))
             .fileDestination { _, _ -> file }
             .progress { readBytes, totalBytes -> read = readBytes; total = totalBytes }
-            .responseIgnored()
+            .responseUnit()
 
         assertDownloadedBytesToFile(triple, file, numberOfBytes)
         assertThat("Progress read bytes and total bytes should be equal",

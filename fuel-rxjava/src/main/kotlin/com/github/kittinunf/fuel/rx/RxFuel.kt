@@ -228,7 +228,7 @@ fun <T : Any> Request.rxObjectTriple(deserializable: Deserializable<T>) = rxResu
 /**
  * Returns a reactive stream for a [Single] value with only complete(success with [Unit]) or error signal
  */
-fun Request.rxIgnored(): Single<Unit> = rxResponseSingle(EmptyDeserializer)
+fun Request.rxUnit(): Single<Unit> = rxResponseSingle(EmptyDeserializer)
 
 /**
  * Generic [Single] wrapper that executes [resultBlock] and emits its result [R] to the [Single]

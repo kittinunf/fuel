@@ -121,9 +121,9 @@ class ObjectTest : MockHttpTestCase() {
     }
 
     @Test
-    fun awaitIgnored() = runBlocking {
+    fun awaitUnit() = runBlocking {
         runCatching {
-            val data = randomUuid().awaitIgnored()
+            val data = randomUuid().awaitUnit()
             assertThat(data, notNullValue())
             assertThat(data, equalTo(Unit))
         }.getOrElse {

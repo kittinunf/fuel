@@ -99,4 +99,4 @@ fun <T : Any> Request.monoResultObject(mapper: Deserializable<T>): Mono<Result<T
 /**
  * Get a complete signal(success with [Unit]) via a [MonoSink.success], or any [FuelError] via [MonoSink.error]
  */
-fun Request.monoIgnored(): Mono<Unit> = monoResultFold(EmptyDeserializer)
+fun Request.monoUnit(): Mono<Unit> = monoResultFold(EmptyDeserializer)

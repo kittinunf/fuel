@@ -190,7 +190,7 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Respon
  *
  * @throws Exception if there is an internal library error, not related to Network
  */
-fun Request.responseIgnored(): ResponseResultOf<Unit> = response(EmptyDeserializer)
+fun Request.responseUnit(): ResponseResultOf<Unit> = response(EmptyDeserializer)
 
 private fun <T : Any, U : Deserializable<T>> Request.response(
     deserializable: U,
@@ -241,10 +241,10 @@ suspend fun <T : Any, U : Deserializable<T>> Request.await(deserializable: U): T
  * Use this method to avoid huge memory allocation when using [com.github.kittinunf.fuel.core.requests.download]
  * to a large file without using response result
  *
- * To run method in different coroutine context, use `com.github.kittinunf.fuel.coroutines.awaitIgnored` in `fuel-coroutines` module
+ * To run method in different coroutine context, use `com.github.kittinunf.fuel.coroutines.awaitUnit` in `fuel-coroutines` module
  */
 @Throws(FuelError::class)
-suspend fun Request.awaitIgnored(): Unit = await(EmptyDeserializer)
+suspend fun Request.awaitUnit(): Unit = await(EmptyDeserializer)
 
 /**
  * Await [T] or [FuelError]
