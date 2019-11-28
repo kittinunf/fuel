@@ -1,16 +1,12 @@
-
 package com.github.kittinunf.fuel.rx
 
-import com.github.kittinunf.fuel.core.Deserializable
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.EmptyDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
-import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
+import io.reactivex.Completable
 import io.reactivex.Single
 import java.nio.charset.Charset
 
@@ -226,9 +222,17 @@ fun <T : Any> Request.rxObjectPair(deserializable: Deserializable<T>) = rxResult
 fun <T : Any> Request.rxObjectTriple(deserializable: Deserializable<T>) = rxResultTriple(deserializable)
 
 /**
- * Returns a reactive stream for a [Single] value with only complete(success with [Unit]) or error signal
+ * Returns a reactive stream for a [Completable] value with complete or error signal
  */
-fun Request.rxUnit(): Single<Unit> = rxResponseSingle(EmptyDeserializer)
+fun Request.rxCompletable(): Completable =
+    rxCompletable { onComplete, onError ->
+        response(EmptyDeserializer) { _, _, result ->
+            result.fold(
+                success = { onComplete() },
+                failure = { onError(it) }
+            )
+        }
+    }
 
 /**
  * Generic [Single] wrapper that executes [resultBlock] and emits its result [R] to the [Single]
@@ -258,6 +262,37 @@ fun <R : Any> Request.rx(resultBlock: Request.((R) -> Unit, (Throwable) -> Unit)
 fun <R : Any> Request.rx(resultBlock: Request.((R) -> Unit) -> CancellableRequest): Single<R> =
     Single.create { emitter ->
         val cancellableRequest = resultBlock(emitter::onSuccess)
+        emitter.setCancellable { cancellableRequest.cancel() }
+    }
+
+/**
+ * [Completable] wrapper that executes [resultBlock] and emits complete or error signal
+ *
+ * This wrapper is a [Completable] wrapper that uses [io.reactivex.CompletableEmitter.onError] to signal the error that occurs
+ * in the stream. If you wish to receive an Error in the format of [com.github.kittinunf.result.Result],
+ * please use `rxCompletable(Request.(() -> Unit) -> CancellableRequest)` instead.
+ *
+ * @param resultBlock functions that emits complete or error signal to [Completable]
+ * @return The reactive stream [Completable] with complete or error signal
+ */
+fun Request.rxCompletable(resultBlock: Request.(onComplete: () -> Unit, onError: (Throwable) -> Unit) -> CancellableRequest): Completable =
+    Completable.create { emitter ->
+        val cancellableRequest = resultBlock(emitter::onComplete, emitter::onError)
+        emitter.setCancellable { cancellableRequest.cancel() }
+    }
+
+/**
+ * [Completable] wrapper that executes [resultBlock] and emits complete or error signal
+ *
+ * This wrapper is a [Completable] wrapper that uses [io.reactivex.CompletableEmitter.onComplete] in the format of [com.github.kittinunf.result.Result]
+ * as a value in the stream.
+ *
+ * @param resultBlock function that emits complete signal to [Completable]
+ * @return The reactive stream [Completable] with complete or error signal
+ */
+fun Request.rxCompletable(resultBlock: Request.(onComplete: () -> Unit) -> CancellableRequest): Completable =
+    Completable.create { emitter ->
+        val cancellableRequest = resultBlock(emitter::onComplete)
         emitter.setCancellable { cancellableRequest.cancel() }
     }
 
