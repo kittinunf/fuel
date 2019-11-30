@@ -31,6 +31,7 @@ data class RequestExecutionOptions(
     var allowRedirects: Boolean? = null
     var useHttpCache: Boolean? = null
     var interruptCallbacks: MutableCollection<InterruptCallback> = mutableListOf()
+    var forceMethods: Boolean = false
     var responseValidator: ResponseValidator = { response ->
         !(response.isServerError || response.isClientError)
     }
