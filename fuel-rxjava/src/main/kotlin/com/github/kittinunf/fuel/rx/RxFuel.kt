@@ -1,10 +1,14 @@
 package com.github.kittinunf.fuel.rx
 
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.Deserializable
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
 import com.github.kittinunf.fuel.core.deserializers.EmptyDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
+import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 import io.reactivex.Completable
 import io.reactivex.Single
