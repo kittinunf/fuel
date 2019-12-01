@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
+import com.github.kittinunf.fuel.core.deserializers.EmptyDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
 import com.github.kittinunf.fuel.core.response
@@ -98,3 +99,8 @@ fun Request.monoResultString(charset: Charset = Charsets.UTF_8): Mono<Result<Str
  */
 fun <T : Any> Request.monoResultObject(mapper: Deserializable<T>): Mono<Result<T, FuelError>> =
     monoResultUnFolded(mapper)
+
+/**
+ * Get a complete signal(success with [Unit]) via a [MonoSink.success], or any [FuelError] via [MonoSink.error]
+ */
+fun Request.monoUnit(): Mono<Unit> = monoResultFold(EmptyDeserializer)

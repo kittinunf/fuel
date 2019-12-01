@@ -1,6 +1,7 @@
 package com.github.kittinunf.fuel.core
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.deserializers.EmptyDeserializer
 import com.github.kittinunf.fuel.core.requests.CancellableRequest
 import com.github.kittinunf.fuel.core.requests.DefaultBody
 import com.github.kittinunf.fuel.core.requests.RequestTaskCallbacks
@@ -177,6 +178,20 @@ fun <T : Any, U : Deserializable<T>> Request.response(deserializable: U): Respon
         .getOrThrow()
 }
 
+/**
+ * Ignore the response result
+ *
+ * Use this method to avoid huge memory allocation when using [com.github.kittinunf.fuel.core.requests.download]
+ * to a large download and without using the result [ByteArray]
+ *
+ * @see [com.github.kittinunf.fuel.core.Request.response]
+ *
+ * @note not async, use the variations with a handler instead.
+ *
+ * @throws Exception if there is an internal library error, not related to Network
+ */
+fun Request.responseUnit(): ResponseResultOf<Unit> = response(EmptyDeserializer)
+
 private fun <T : Any, U : Deserializable<T>> Request.response(
     deserializable: U,
     success: (Request, Response, T) -> Unit,
@@ -219,6 +234,17 @@ suspend fun <T : Any, U : Deserializable<T>> Request.await(deserializable: U): T
         .onFailure { throw FuelError.wrap(it, response) }
         .getOrThrow()
 }
+
+/**
+ * Await the task or throws [FuelError] in current coroutine context.
+ *
+ * Use this method to avoid huge memory allocation when using [com.github.kittinunf.fuel.core.requests.download]
+ * to a large file without using response result
+ *
+ * To run method in different coroutine context, use `com.github.kittinunf.fuel.coroutines.awaitUnit` in `fuel-coroutines` module
+ */
+@Throws(FuelError::class)
+suspend fun Request.awaitUnit(): Unit = await(EmptyDeserializer)
 
 /**
  * Await [T] or [FuelError]

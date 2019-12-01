@@ -121,6 +121,17 @@ class ObjectTest : MockHttpTestCase() {
     }
 
     @Test
+    fun awaitUnit() = runBlocking {
+        runCatching {
+            val data = randomUuid().awaitUnit()
+            assertThat(data, notNullValue())
+            assertThat(data, equalTo(Unit))
+        }.getOrElse {
+            fail("Expected pass, actual error $it")
+        }
+    }
+
+    @Test
     fun captureDeserializationException() = runBlocking {
 
         val (request, response, result) = reflectedRequest(Method.GET, "reflected")

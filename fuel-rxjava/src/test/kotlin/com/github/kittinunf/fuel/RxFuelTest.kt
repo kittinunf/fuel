@@ -8,6 +8,7 @@ import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.rx.rxBytes
 import com.github.kittinunf.fuel.rx.rxBytesPair
 import com.github.kittinunf.fuel.rx.rxBytesTriple
+import com.github.kittinunf.fuel.rx.rxCompletable
 import com.github.kittinunf.fuel.rx.rxObject
 import com.github.kittinunf.fuel.rx.rxResponse
 import com.github.kittinunf.fuel.rx.rxResponseObject
@@ -498,5 +499,20 @@ class RxFuelTest : MockHttpTestCase() {
         val (value, error) = data
         assertThat(value, notNullValue())
         assertThat(error, nullValue())
+    }
+
+    @Test
+    fun rxCompletable() {
+        mock.chain(
+            request = mock.request().withPath("/user-agent"),
+            response = mock.reflect()
+        )
+
+       Fuel.get(mock.path("user-agent"))
+            .rxCompletable()
+            .test()
+            .apply { awaitTerminalEvent() }
+            .assertNoErrors()
+            .assertComplete()
     }
 }

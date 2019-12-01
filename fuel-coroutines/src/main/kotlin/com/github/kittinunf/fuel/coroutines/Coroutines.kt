@@ -10,6 +10,7 @@ import com.github.kittinunf.fuel.core.awaitResponse
 import com.github.kittinunf.fuel.core.awaitResponseResult
 import com.github.kittinunf.fuel.core.awaitResult
 import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
+import com.github.kittinunf.fuel.core.deserializers.EmptyDeserializer
 import com.github.kittinunf.fuel.core.deserializers.StringDeserializer
 import com.github.kittinunf.result.Result
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +31,16 @@ import kotlin.coroutines.CoroutineContext
 @Throws
 suspend inline fun <T : Any, U : Deserializable<T>> Request.await(deserializable: U, scope: CoroutineContext = Dispatchers.IO): T =
     withContext(scope) { await(deserializable) }
+
+/**
+ * Await the task finish without getting result using a [scope], defaulting to [Dispatchers.IO]
+ *
+ * @throws FuelError if deserialization fails, if network fails, other internal exception is thrown
+ *
+ * @param scope [CoroutineContext] the context to run within
+ */
+@Throws
+suspend fun Request.awaitUnit(scope: CoroutineContext = Dispatchers.IO): Unit = await(EmptyDeserializer, scope)
 
 /**
  * Await the [T] using a [scope], defaulting to [Dispatchers.IO], wrapped in [Result]
