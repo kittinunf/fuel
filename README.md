@@ -187,8 +187,8 @@ Check each of the packages documentations or the Wiki for more features, usages 
 
 ### Responses
 - [`fuel-livedata`: Responses as LiveData](./fuel-livedata/README.md)
-- [`fuel-reactor`: Responses as Mono](./fuel-coroutines/README.md)
-- [`fuel-rxjava`: Responses as Single](./fuel-coroutines/README.md)
+- [`fuel-reactor`: Responses as Mono](./fuel-reactor/README.md)
+- [`fuel-rxjava`: Responses as Single](./fuel-rxjava/README.md)
 
 ### (De)serialization
 - [`fuel-forge`: Deserialization with Forge](./fuel-forge/README.md)
