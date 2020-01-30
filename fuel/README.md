@@ -165,7 +165,7 @@ All the `String` extensions listed above, as well as the `Fuel` and `FuelManager
         .also { println(it.url) }
         .also { println(String(it.body().toByteArray())) }
 
-    // https://httpbin.org/post
+    // https://httpbin.org/put
     // "foo=foo&bar=bar"
     ```
     
