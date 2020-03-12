@@ -400,6 +400,26 @@ Fuel.get("/get")
     .response { result -> }
 ```
 
+#### Throttling progress output
+
+Often the progress of a download will be shown as [notification](https://developer.android.com/guide/topics/ui/notifiers/notifications). Since Android Nougat (API 24), only 10 notification updates per second per app are allowed. Anything more than that will result in a log error like `E/NotificationService: Package enqueue rate is 10.062265. Shedding events. package=...`.
+
+It is the responsibility of the library user _– not of fuel –_ to remedy this limit. A simple solution could look like this:
+
+```kotlin
+var lastUpdate = 0L
+Fuel.get("/get")
+   .progress { readBytes, totalBytes ->
+      // allow 2 updates/second max - more than 10/second will be blocked
+      if (System.currentTimeMillis() - lastUpdate > 500) {
+         lastUpdate = System.currentTimeMillis()
+         val progress = readBytes.toFloat() / totalBytes.toFloat() * 100
+         myNotificationHelper.notifyDownloadProgress(progress)
+      }
+   }
+   .response { result -> }
+```
+
 #### Why does totalBytes increase?
 
 Not all source `Body` or `Response` `Body` report their total size. If the size is not known, the current size will be reported. This means that you will constantly get an increasing amount of totalBytes that equals readBytes.
