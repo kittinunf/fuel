@@ -3,7 +3,7 @@ object Fuel {
     const val publishVersion = "2.2.1"
     const val groupId = "com.github.kittinunf.fuel"
 
-    const val compileSdkVersion = 28
+    const val compileSdkVersion = 29
     const val minSdkVersion = 19
 
     const val name = ":fuel"
