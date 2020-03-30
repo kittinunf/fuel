@@ -7,9 +7,28 @@ You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersi
 * [`Fuel`](../fuel/README.md)
 * KotlinX Coroutines: 1.1.1
 
+### Gradle
+
 ```groovy
 implementation 'com.github.kittinunf.fuel:fuel:<latest-version>'
 implementation 'com.github.kittinunf.fuel:fuel-coroutines:<latest-version>'
+```
+
+### Maven
+
+```xml
+<dependency>
+    <groupId>com.github.kittinunf.fuel</groupId>
+    <artifactId>fuel</artifactId>
+    <version>[LATEST_VERSION]</version>
+</dependency>
+
+<dependency>
+    <groupId>com.github.kittinunf.fuel</groupId>
+    <artifactId>fuel-coroutines</artifactId>
+    <version>[LATEST_VERSION]</version>
+</dependency>
+
 ```
 
 ## Usage
