@@ -196,7 +196,7 @@ object Jacoco {
 }
 
 object RoboElectric {
-    const val version = "4.2.1"
+    const val version = "4.3.1"
     const val dependency = "org.robolectric:robolectric:$version"
 }
 
