@@ -158,7 +158,7 @@ object Reactor {
 
 object RxJava {
     object Jvm {
-        const val version = "2.2.8"
+        const val version = "2.2.19"
         const val dependency = "io.reactivex.rxjava2:rxjava:$version"
     }
 
