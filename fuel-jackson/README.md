@@ -15,8 +15,47 @@ implementation 'com.github.kittinunf.fuel:fuel-jackson:<latest-version>'
 
 ## Usage
 
-The Fuel-Jackson module provides a built in support for Jackson deserialization.
-This is done by adding the `responseObject` extension function into Fuel `Request` interface.
+The Fuel-Jackson module provides a built in support for Jackson serialization and deserialization.
+
+### Serialization
+
+The serialization is done by adding the `objectBody` extension function into Fuel `Request` interface.
+
+By default, the `objectBody` call will use the `Charsets.UTF-8` charset and the `defaultMapper` property defined in `FuelJackson.kt`.
+
+```kotlin
+data class FakeObject(val foo: String = "foo")
+
+Fuel.post("/fooBar")
+    .objectBody(FakeObject())
+```
+
+Alternatively, you can provide a custom `charset` as a parameter to it.
+
+```kotlin
+data class FakeObject(val foo: String = "foo")
+
+Fuel.post("/fooBar")
+    .objectBody(FakeObject(), Charsets.UTF_16)
+```
+
+You can also provide your own `ObjectMapper` as a parameter.
+
+```kotlin
+data class FakeObject(val foo: String = "foo")
+
+val mapper = ObjectMapper().registerKotlinModule()
+                           .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+mapper.propertyNamingStrategy = PropertyNamingStrategy.SNAKE_CASE
+
+Fuel.post("/fooBar")
+    .objectBody(FakeObject(), mapper = mapper)
+```
+
+### Deserialization
+
+The deserialization is done by adding the `responseObject` extension function into Fuel `Request` interface.
 
 By default, the `responseObject` call will use the `defaultMapper` property defined in `FuelJackson.kt`.
 
