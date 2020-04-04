@@ -11,7 +11,6 @@ import com.github.kittinunf.result.Result
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.list
-import kotlinx.serialization.list
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.isA
