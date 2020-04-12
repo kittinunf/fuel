@@ -1,6 +1,6 @@
 // Library version
 object Fuel {
-    const val publishVersion = "2.2.1"
+    const val publishVersion = "2.2.2"
     const val groupId = "com.github.kittinunf.fuel"
 
     const val compileSdkVersion = 28
@@ -63,7 +63,7 @@ object Fuel {
 
 // Core dependencies
 object Kotlin {
-    const val version = "1.3.61"
+    const val version = "1.3.70"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
@@ -139,7 +139,7 @@ object KotlinX {
     }
 
     object Serialization {
-        const val version = "0.14.0"
+        const val version = "0.20.0"
         const val dependency = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$version"
         const val plugin = "kotlinx-serialization"
     }
@@ -158,7 +158,7 @@ object Reactor {
 
 object RxJava {
     object Jvm {
-        const val version = "2.2.8"
+        const val version = "2.2.19"
         const val dependency = "io.reactivex.rxjava2:rxjava:$version"
     }
 
