@@ -1,0 +1,16 @@
+# Java class files
+*.class
+
+# generated files
+build/
+
+# IDEA/Android Studio project files, because
+# the project can be imported from settings.gradle
+.idea
+*.iml
+
+# Other
+.DS_Store
+
+# Gradle
+.gradle
