@@ -1,10 +1,10 @@
 object Library {
     const val KOTLIN_VERSION = "1.3.72"
 
-    private const val COROUTINES_VERSION = "1.3.5"
+    private const val COROUTINES_VERSION = "1.3.6"
     const val KOTLINX_COROUTINES_CORE = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$COROUTINES_VERSION"
 
-    private const val OKHTTP_VERSION = "4.5.0"
+    private const val OKHTTP_VERSION = "4.6.0"
     const val OKHTTP = "com.squareup.okhttp3:okhttp:$OKHTTP_VERSION"
     const val OKHTTP_MOCK_WEB_SERVER = "com.squareup.okhttp3:mockwebserver:$OKHTTP_VERSION"
 
