@@ -17,7 +17,7 @@ private val UNSUPPORTED_DECODE_ENCODING: DecodeFallbackCallback = { _, encoding 
  * @return [InputStream] the wrapped [InputStream] that is decoded when it's being read
  */
 fun InputStream.decode(encoding: String, unsupported: DecodeFallbackCallback = UNSUPPORTED_DECODE_ENCODING) =
-    when (encoding.trim()) {
+    when (encoding.trim().toLowerCase()) {
         "gzip" -> GZIPInputStream(this)
         "deflate" -> InflaterInputStream(this)
         // HTTPClient handles chunked, but does not remove the Transfer-Encoding Header
