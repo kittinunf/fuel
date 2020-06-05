@@ -19,7 +19,7 @@ fun Body.representationOfBytes(contentType: String?): String {
         var charset = Charsets.UTF_8
         val charsetGroup = TEXT_CONTENT_TYPE.find(actualContentType)!!.groupValues[1]
         if (charsetGroup.isNotEmpty()) {
-            val charsetName = charsetGroup.substringAfter('=').toUpperCase()
+            val charsetName = charsetGroup.substringAfter('=').substringBefore(';').toUpperCase()
             charset = Charset.forName(charsetName)
         }
         return String(toByteArray(), charset)
