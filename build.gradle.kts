@@ -225,12 +225,38 @@ subprojects {
                         artifactId = project.name
                         version = Fuel.publishVersion
 
+                        val projectUrl = "https://github.com/kittinunf/fuel"
+                        val projectScmUri = "git@github.com:kittinunf/fuel.git"
                         pom {
+                            name.set(project.name)
+                            description.set("The easiest HTTP networking library for Kotlin/Android")
+                            packaging = "jar"
+                            url.set(projectUrl)
                             licenses {
                                 license {
                                     name.set("MIT License")
                                     url.set("http://www.opensource.org/licenses/mit-license.php")
                                 }
+                            }
+                            developers {
+                                // I only added @kittinunf, but there should be all the maintainers here
+                                developer {
+                                    name.set("Kittinun Vantasin")
+                                    // This should get enriched with email and url where applicable
+                                }
+                            }
+                            // Contributors can/should get listed as well
+                            contributors {
+                                contributor {
+                                    name.set("Danilo Pianini")
+                                    email.set("danilo.pianini@gmail.com")
+                                    url.set("http://www.danilopianini.org/")
+                                }
+                            }
+                            scm {
+                                url.set(projectUrl)
+                                connection.set(projectScmUri)
+                                developerConnection.set(projectScmUri)
                             }
                         }
 
