@@ -8,6 +8,18 @@ object Fuel {
 
     const val name = ":fuel"
 
+    object Package {
+
+        const val repo = "maven"
+        const val name = "Fuel-Android"
+        const val desc = "The easiest HTTP networking library in Kotlin/Android"
+        const val userOrg = "kittinunf"
+        const val url = "https://github.com/kittinunf/Fuel"
+        const val scm = "git@github.com:kittinunf/fuel.git"
+        const val licenseName = "MIT License"
+        const val licenseUrl = "http://www.opensource.org/licenses/mit-license.php"
+    }
+
     object Android {
         const val name = ":fuel-android"
     }

@@ -175,13 +175,13 @@ subprojects {
                 key = findProperty("BINTRAY_KEY") as? String
                 setPublications(project.name)
                 with(pkg) {
-                    repo = "maven"
-                    name = "Fuel-Android"
-                    desc = "The easiest HTTP networking library in Kotlin/Android"
-                    userOrg = "kittinunf"
-                    websiteUrl = "https://github.com/kittinunf/Fuel"
-                    vcsUrl = "https://github.com/kittinunf/Fuel"
-                    setLicenses("MIT")
+                    repo = Fuel.Package.repo
+                    name = Fuel.Package.name
+                    desc = Fuel.Package.desc
+                    userOrg = Fuel.Package.userOrg
+                    websiteUrl = Fuel.Package.url
+                    vcsUrl = Fuel.Package.url
+                    setLicenses(Fuel.Package.licenseName)
                     with(version) {
                         name = Fuel.publishVersion
                     }
@@ -225,38 +225,60 @@ subprojects {
                         artifactId = project.name
                         version = Fuel.publishVersion
 
-                        val projectUrl = "https://github.com/kittinunf/fuel"
-                        val projectScmUri = "git@github.com:kittinunf/fuel.git"
                         pom {
                             name.set(project.name)
-                            description.set("The easiest HTTP networking library for Kotlin/Android")
-                            packaging = "jar"
-                            url.set(projectUrl)
+                            description.set(Fuel.Package.desc)
+
+                            packaging = if (project.hasProperty("android")) "aar" else "jar"
+                            url.set(Fuel.Package.url)
+
                             licenses {
                                 license {
-                                    name.set("MIT License")
-                                    url.set("http://www.opensource.org/licenses/mit-license.php")
+                                    name.set(Fuel.Package.licenseName)
+                                    url.set(Fuel.Package.licenseUrl)
                                 }
                             }
+
                             developers {
-                                // I only added @kittinunf, but there should be all the maintainers here
                                 developer {
-                                    name.set("Kittinun Vantasin")
-                                    // This should get enriched with email and url where applicable
+                                    name.set("kittinunf")
+                                }
+
+                                developer {
+                                    name.set("iNoles")
+                                }
+
+                                developer {
+                                    name.set("KucherenkoIhor")
+                                }
+
+                                developer {
+                                    name.set("lucasqueiroz")
+                                }
+
+                                developer {
+                                    name.set("lucasvalenteds")
+                                }
+
+                                developer {
+                                    name.set("NikkyAI")
+                                }
+
+                                developer {
+                                    name.set("SleeplessByte")
                                 }
                             }
-                            // Contributors can/should get listed as well
+
                             contributors {
+                                // https://github.com/kittinunf/fuel/graphs/contributors
                                 contributor {
                                     name.set("Danilo Pianini")
-                                    email.set("danilo.pianini@gmail.com")
-                                    url.set("http://www.danilopianini.org/")
                                 }
                             }
                             scm {
-                                url.set(projectUrl)
-                                connection.set(projectScmUri)
-                                developerConnection.set(projectScmUri)
+                                url.set(Fuel.Package.url)
+                                connection.set(Fuel.Package.scm)
+                                developerConnection.set(Fuel.Package.scm)
                             }
                         }
 
