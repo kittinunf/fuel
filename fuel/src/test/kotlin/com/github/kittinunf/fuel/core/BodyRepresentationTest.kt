@@ -172,7 +172,51 @@ class BodyRepresentationTest : MockHttpTestCase() {
                 "application/json;charset=utf-8;api-version=5.1",
                 "application/json; charset=utf-8; api-version=5.1",
                 "application/json;charset=utf-8;api-version=5.1;test=true",
-                "application/json; charset=utf-8; api-version=5.1; test=true"
+                "application/json; charset=utf-8; api-version=5.1; test=true",
+                "charset=utf-8; application/json; api-version=5.1",
+                "test=true; application/json; api-version=5.1; charset=utf-8",
+                "charset=utf-8;application/json;api-version=5.1",
+                "test=true;application/json;api-version=5.1;charset=utf-8"
+        )
+        val content = "{ \"foo\": 42 }"
+
+        contentTypes.forEach { contentType ->
+            assertThat(
+                    DefaultBody
+                            .from({ ByteArrayInputStream(content.toByteArray()) }, { content.length.toLong() })
+                            .asString(contentType),
+                    equalTo(content)
+            )
+        }
+    }
+
+    @Test
+    fun textRepresentationOfJsonWithDifferentCharsets() {
+        val contentString = "{ \"foo\": 42 }"
+
+        val contentMap = mapOf(
+                "application/json; charset=utf-8" to Charsets.UTF_8,
+                "application/json; charset=utf-16" to Charsets.UTF_16,
+                "application/json; charset=utf-32" to Charsets.UTF_32,
+                "application/json; charset=iso-8859-1" to Charsets.ISO_8859_1,
+                "application/json; charset=ascii" to Charsets.US_ASCII
+        )
+
+        contentMap.forEach { (contentType, charset) ->
+            assertThat(
+                    DefaultBody
+                            .from({ ByteArrayInputStream(contentString.toByteArray(charset)) }, { contentString.length.toLong() })
+                            .asString(contentType),
+                    equalTo(contentString)
+            )
+        }
+    }
+
+    @Test
+    fun textRepresentationOfJsonWithoutCharset() {
+        val contentTypes = listOf(
+                "application/json;api-version=5.1",
+                "application/json; api-version=5.1"
         )
         val content = "{ \"foo\": 42 }"
 
