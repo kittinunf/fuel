@@ -167,6 +167,26 @@ class BodyRepresentationTest : MockHttpTestCase() {
     }
 
     @Test
+    fun textRepresentationOfJsonWithUtf8AndOtherParameters() {
+        val contentTypes = listOf(
+                "application/json;charset=utf-8;api-version=5.1",
+                "application/json; charset=utf-8; api-version=5.1",
+                "application/json;charset=utf-8;api-version=5.1;test=true",
+                "application/json; charset=utf-8; api-version=5.1; test=true"
+        )
+        val content = "{ \"foo\": 42 }"
+
+        contentTypes.forEach { contentType ->
+            assertThat(
+                    DefaultBody
+                            .from({ ByteArrayInputStream(content.toByteArray()) }, { content.length.toLong() })
+                            .asString(contentType),
+                    equalTo(content)
+            )
+        }
+    }
+
+    @Test
     fun textRepresentationOfCsv() {
         val contentTypes = listOf("text/csv")
         val content = "function test()"
