@@ -1,6 +1,6 @@
 // Library version
 object Fuel {
-    const val publishVersion = "2.2.2"
+    const val publishVersion = "2.2.3"
     const val groupId = "com.github.kittinunf.fuel"
 
     const val compileSdkVersion = 29
