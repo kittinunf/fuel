@@ -17,6 +17,7 @@ cache:
     - $HOME/.gradle
 
 before_script:
+  - yes | sdkmanager --licenses
   - chmod +x deploy_bintray.sh
   - chmod +x add_review.sh
 
