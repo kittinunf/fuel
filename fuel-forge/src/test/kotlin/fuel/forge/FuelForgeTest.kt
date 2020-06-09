@@ -22,8 +22,8 @@ class FuelForgeTest {
 
     private val httpBinUserDeserializer = { json: JSON ->
         ::HttpBinUserAgentModel.create
-                .map(json at "userAgent")
-                .apply(json at "status")
+            .map(json at "userAgent")
+            .apply(json at "status")
     }
 
     @Test

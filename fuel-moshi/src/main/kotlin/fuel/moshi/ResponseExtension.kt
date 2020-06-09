@@ -2,8 +2,8 @@ package fuel.moshi
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.lang.reflect.Type
 import okhttp3.Response
+import java.lang.reflect.Type
 
 val defaultMoshi = Moshi.Builder()
 

@@ -9,4 +9,4 @@ suspend inline fun String.httpPatch(requestBody: RequestBody) = Fuel.patch(this,
 suspend inline fun String.httpDelete(requestBody: RequestBody?) = Fuel.delete(this, requestBody)
 suspend inline fun String.httpHead() = Fuel.head(this)
 suspend inline fun String.httpMethod(method: String, requestBody: RequestBody?) =
-        Fuel.method(this, method, requestBody)
+    Fuel.method(this, method, requestBody)

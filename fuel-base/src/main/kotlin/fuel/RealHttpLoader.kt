@@ -16,21 +16,21 @@ internal class RealHttpLoader(callFactory: Call.Factory) : HttpLoader {
 
     override suspend fun post(request: Request): Response {
         val requestBody = request.requestBody
-                ?: throw IllegalArgumentException("RequestBody should not be null")
+            ?: throw IllegalArgumentException("RequestBody should not be null")
         val requestBuilder = Builder().headers(request.headers).post(requestBody)
         return fetcher.fetch(request.data, requestBuilder)
     }
 
     override suspend fun put(request: Request): Response {
         val requestBody = request.requestBody
-                ?: throw IllegalArgumentException("RequestBody should not be null")
+            ?: throw IllegalArgumentException("RequestBody should not be null")
         val requestBuilder = Builder().headers(request.headers).put(requestBody)
         return fetcher.fetch(request.data, requestBuilder)
     }
 
     override suspend fun patch(request: Request): Response {
         val requestBody = request.requestBody
-                ?: throw IllegalArgumentException("RequestBody should not be null")
+            ?: throw IllegalArgumentException("RequestBody should not be null")
         val requestBuilder = Builder().headers(request.headers).patch(requestBody)
         return fetcher.fetch(request.data, requestBuilder)
     }

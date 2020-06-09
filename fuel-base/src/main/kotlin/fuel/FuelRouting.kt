@@ -28,9 +28,9 @@ interface FuelRouting : RequestConvertible {
 
     override val request: Request
         get() = Request(
-                "$basePath/$path".toHttpUrl(),
-                headers?.build().orEmpty(),
-                body,
-                method
+            "$basePath/$path".toHttpUrl(),
+            headers?.build().orEmpty(),
+            body,
+            method
         )
 }

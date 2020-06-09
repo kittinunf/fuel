@@ -89,10 +89,10 @@ class Request internal constructor(
          * Create a new [Request] instance.
          */
         fun build() = Request(
-                checkNotNull(data) { "data == null" },
-                headers?.build().orEmpty(),
-                requestBody,
-                method
+            checkNotNull(data) { "data == null" },
+            headers?.build().orEmpty(),
+            requestBody,
+            method
         )
     }
 }

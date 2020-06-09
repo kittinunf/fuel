@@ -75,4 +75,4 @@ suspend inline fun Fuel.method(
 ) = httpLoader().method(uri, method, requestBody)
 
 suspend inline fun Fuel.request(convertible: RequestConvertible) =
-        httpLoader().method(convertible.request)
+    httpLoader().method(convertible.request)
