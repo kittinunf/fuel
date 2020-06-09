@@ -186,6 +186,7 @@ subprojects {
                         name = Fuel.publishVersion
                         gpg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.GpgConfig> {
                             sign = true
+                            passphrase = System.getenv("GPG_PASSPHRASE") ?: ""
                         })
                     }
                 }
