@@ -171,12 +171,10 @@ class BodyRepresentationTest : MockHttpTestCase() {
         val contentTypes = listOf(
                 "application/json;charset=utf-8;api-version=5.1",
                 "application/json; charset=utf-8; api-version=5.1",
-                "application/json;charset=utf-8;api-version=5.1;test=true",
-                "application/json; charset=utf-8; api-version=5.1; test=true",
-                "charset=utf-8; application/json; api-version=5.1",
-                "test=true; application/json; api-version=5.1; charset=utf-8",
-                "charset=utf-8;application/json;api-version=5.1",
-                "test=true;application/json;api-version=5.1;charset=utf-8"
+                "application/json;api-version=5.1;charset=utf-8",
+                "application/json; api-version=5.1; charset=utf-8",
+                "application/json;test=true;charset=utf-8;api-version=5.1",
+                "application/json; test=true; charset=utf-8; api-version=5.1"
         )
         val content = "{ \"foo\": 42 }"
 

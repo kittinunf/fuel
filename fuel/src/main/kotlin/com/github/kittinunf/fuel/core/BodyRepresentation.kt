@@ -4,7 +4,7 @@ import java.nio.charset.Charset
 import java.nio.charset.IllegalCharsetNameException
 
 private val TEXT_CONTENT_TYPE = Regex(
-        "(?:text/.*|application/(?:csv|javascript|json|typescript|xml|x-yaml|x-www-form-urlencoded|vnd\\.coffeescript)|.*\\+(?:xml|json))"
+        "^(?:text/.*|application/(?:csv|javascript|json|typescript|xml|x-yaml|x-www-form-urlencoded|vnd\\.coffeescript)|.*\\+(?:xml|json))"
 )
 
 /**
