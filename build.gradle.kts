@@ -184,6 +184,9 @@ subprojects {
                     setLicenses(Fuel.Package.licenseName)
                     with(version) {
                         name = Fuel.publishVersion
+                        gpg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.GpgConfig> {
+                            sign = true
+                        })
                     }
                 }
             }
