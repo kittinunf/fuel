@@ -1,9 +1,9 @@
 // Library version
 object Fuel {
-    const val publishVersion = "2.2.2"
+    const val publishVersion = "2.2.3"
     const val groupId = "com.github.kittinunf.fuel"
 
-    const val compileSdkVersion = 28
+    const val compileSdkVersion = 29
     const val minSdkVersion = 19
 
     const val name = ":fuel"
@@ -208,7 +208,7 @@ object Jacoco {
 }
 
 object RoboElectric {
-    const val version = "4.2.1"
+    const val version = "4.3.1"
     const val dependency = "org.robolectric:robolectric:$version"
 }
 

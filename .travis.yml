@@ -7,10 +7,14 @@ env:
 android:
   components:
     - tools
-    - build-tools-28.0.3
-    - android-28
-  licenses:
-    - 'android-sdk-license-.+'
+    - platform-tools
+
+sudo: false
+
+before_install:
+  # Install SDK license so Android Gradle plugin can install deps.
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" >> "$ANDROID_HOME/licenses/android-sdk-license"
 
 cache:
   directories:
