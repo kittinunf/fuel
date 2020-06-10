@@ -8,6 +8,4 @@ import okhttp3.Response
 fun <T : Any> Response.toJson(
     json: Json = Json(JsonConfiguration.Stable),
     deserialization: DeserializationStrategy<T>
-) = body?.use {
-    json.parse(deserialization, it.string())
-}
+) = json.parse(deserialization, body!!.string())

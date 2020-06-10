@@ -7,14 +7,11 @@ import java.lang.reflect.Type
 
 val defaultMoshi = Moshi.Builder()
 
-fun <T : Any> Response.toMoshi(clazz: Class<T>) = body?.use {
-    defaultMoshi.build().adapter(clazz).fromJson(it.source())
-}
+fun <T : Any> Response.toMoshi(clazz: Class<T>) = 
+    defaultMoshi.build().adapter(clazz).fromJson(body!!.source())
 
-fun <T : Any> Response.toMoshi(type: Type) = body?.use {
-    defaultMoshi.build().adapter<T>(type).fromJson(it.source())
-}
+fun <T : Any> Response.toMoshi(type: Type) =
+    defaultMoshi.build().adapter<T>(type).fromJson(body!!.source())
 
-fun <T : Any> Response.toMoshi(jsonAdapter: JsonAdapter<T>) = body?.use {
-    jsonAdapter.fromJson(it.source())
-}
+fun <T : Any> Response.toMoshi(jsonAdapter: JsonAdapter<T>) =
+    jsonAdapter.fromJson(body!!.source())

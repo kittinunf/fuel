@@ -26,7 +26,7 @@ class FuelKotlinxSerializationTest {
         }
 
         val response = HttpLoader().get(mockWebServer.url("user-agent"))
-        val json = response.toJson(deserialization = HttpBinUserAgentModel.serializer())!!
+        val json = response.toJson(deserialization = HttpBinUserAgentModel.serializer())
         assertEquals("Fuel", json.userAgent)
 
         withContext(Dispatchers.IO) {

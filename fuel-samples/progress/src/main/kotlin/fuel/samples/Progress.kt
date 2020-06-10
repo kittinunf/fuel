@@ -41,8 +41,6 @@ fun main() = runBlocking {
     val httpLoader = HttpLoader.Builder().okHttpClient(client).build()
     val url = "https://publicobject.com/helloworld.txt".toHttpUrlOrNull()
     val request = Request.Builder().data(url).build()
-    val string = httpLoader.get(request).body?.use {
-        it.string()
-    }
+    val string = httpLoader.get(request).body!!.string()
     println(string)
 }
