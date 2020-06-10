@@ -41,17 +41,21 @@ class FuelMoshiTest {
     @Test
     fun testMoshiGenericList() = runBlocking {
         val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse().setBody("[{"
-        + "    \"rank\": \"4\","
-        + "    \"suit\": \"CLUBS\""
-        + "  }, {"
-        + "    \"rank\": \"A\","
-        + "    \"suit\": \"HEARTS\""
-        + "  }, {"
-        + "    \"rank\": \"J\","
-        + "    \"suit\": \"SPADES\""
-        + "  }"
-        + "]"))
+            enqueue(
+                MockResponse().setBody(
+                    "[{" +
+                        "    \"rank\": \"4\"," +
+                        "    \"suit\": \"CLUBS\"" +
+                        "  }, {" +
+                        "    \"rank\": \"A\"," +
+                        "    \"suit\": \"HEARTS\"" +
+                        "  }, {" +
+                        "    \"rank\": \"J\"," +
+                        "    \"suit\": \"SPADES\"" +
+                        "  }" +
+                        "]"
+                )
+            )
         }
 
         withContext(Dispatchers.IO) {
@@ -72,17 +76,21 @@ class FuelMoshiTest {
     @Test
     fun CustomMoshiAdapterWithGenericList() = runBlocking {
         val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse().setBody("[{"
-        + "    \"rank\": \"4\","
-        + "    \"suit\": \"CLUBS\""
-        + "  }, {"
-        + "    \"rank\": \"A\","
-        + "    \"suit\": \"HEARTS\""
-        + "  }, {"
-        + "    \"rank\": \"J\","
-        + "    \"suit\": \"SPADES\""
-        + "  }"
-        + "]"))
+            enqueue(
+                MockResponse().setBody(
+                    "[{" +
+                        "    \"rank\": \"4\"," +
+                        "    \"suit\": \"CLUBS\"" +
+                        "  }, {" +
+                        "    \"rank\": \"A\"," +
+                        "    \"suit\": \"HEARTS\"" +
+                        "  }, {" +
+                        "    \"rank\": \"J\"," +
+                        "    \"suit\": \"SPADES\"" +
+                        "  }" +
+                        "]"
+                )
+            )
         }
 
         withContext(Dispatchers.IO) {
