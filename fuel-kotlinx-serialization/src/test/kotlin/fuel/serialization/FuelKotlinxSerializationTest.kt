@@ -1,6 +1,6 @@
 package fuel.serialization
 
-import fuel.HttpLoader
+import fuel.Fuel
 import fuel.get
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -25,7 +25,7 @@ class FuelKotlinxSerializationTest {
             mockWebServer.start()
         }
 
-        val response = HttpLoader().get(mockWebServer.url("user-agent"))
+        val response = Fuel.get(mockWebServer.url("user-agent"))
         val json = response.toJson(deserialization = HttpBinUserAgentModel.serializer())
         assertEquals("Fuel", json.userAgent)
 

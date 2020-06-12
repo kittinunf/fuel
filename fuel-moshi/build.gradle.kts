@@ -10,6 +10,7 @@ dependencies {
 
     kaptTest(Library.MOSHI_KOTLIN_CODEGEN)
 
+    testImplementation (project(":fuel-default"))
     testImplementation (Library.JUNIT)
     testImplementation (Library.OKHTTP_MOCK_WEB_SERVER)
 }

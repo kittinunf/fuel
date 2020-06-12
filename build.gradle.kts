@@ -15,6 +15,7 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
+        maven(url="https://oss.sonatype.org/content/repositories/snapshots")
     }
 
     tasks.withType<KotlinCompile> {
@@ -24,7 +25,7 @@ allprojects {
     }
 
     jacoco {
-        toolVersion = "0.8.5"
+        toolVersion = "0.8.6-SNAPSHOT"
     }
 
     tasks.jacocoTestReport {

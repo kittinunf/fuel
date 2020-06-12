@@ -2,7 +2,7 @@ package fuel.moshi
 
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Types
-import fuel.HttpLoader
+import fuel.Fuel
 import fuel.get
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -29,7 +29,7 @@ class FuelMoshiTest {
             mockWebServer.start()
         }
 
-        val response = HttpLoader().get(mockWebServer.url("user-agent"))
+        val response = Fuel.get(mockWebServer.url("user-agent"))
         val moshi = response.toMoshi(HttpBinUserAgentModel::class.java)!!
         assertEquals("Fuel", moshi.userAgent)
 
@@ -62,7 +62,7 @@ class FuelMoshiTest {
             mockWebServer.start()
         }
 
-        val response = HttpLoader().get(mockWebServer.url("user-agent"))
+        val response = Fuel.get(mockWebServer.url("user-agent"))
         val listOfCardsType = Types.newParameterizedType(List::class.java, Card::class.java)
         val cards = response.toMoshi<List<Card>>(listOfCardsType)!!
         assertEquals(3, cards.size)
@@ -97,7 +97,7 @@ class FuelMoshiTest {
             mockWebServer.start()
         }
 
-        val response = HttpLoader().get(mockWebServer.url("user-agent"))
+        val response = Fuel.get(mockWebServer.url("user-agent"))
         val listOfCardsType = Types.newParameterizedType(List::class.java, Card::class.java)
         val adapter = defaultMoshi.build().adapter<List<Card>>(listOfCardsType)
         val cards = response.toMoshi<List<Card>>(adapter)!!

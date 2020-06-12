@@ -4,75 +4,76 @@
 package fuel
 
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.RequestBody
 
 suspend inline fun Fuel.get(
     uri: String
-) = httpLoader().get(uri)
+) = httpLoader().get(Request.Builder().data(uri.toHttpUrlOrNull()).build())
 
 suspend inline fun Fuel.get(
     url: HttpUrl
-) = httpLoader().get(url)
+) = httpLoader().get(Request.Builder().data(url).build())
 
 suspend inline fun Fuel.post(
     uri: String,
     requestBody: RequestBody
-) = httpLoader().post(uri, requestBody)
+) = httpLoader().post(Request.Builder().data(uri.toHttpUrlOrNull()).requestBody(requestBody).build())
 
 suspend inline fun Fuel.post(
     url: HttpUrl,
     requestBody: RequestBody
-) = httpLoader().post(url, requestBody)
+) = httpLoader().post(Request.Builder().data(url).requestBody(requestBody).build())
 
 suspend inline fun Fuel.put(
     uri: String,
     requestBody: RequestBody
-) = httpLoader().put(uri, requestBody)
+) = httpLoader().put(Request.Builder().data(uri.toHttpUrlOrNull()).requestBody(requestBody).build())
 
 suspend inline fun Fuel.put(
     url: HttpUrl,
     requestBody: RequestBody
-) = httpLoader().put(url, requestBody)
+) = httpLoader().put(Request.Builder().data(url).requestBody(requestBody).build())
 
 suspend inline fun Fuel.patch(
     url: HttpUrl,
     requestBody: RequestBody
-) = httpLoader().patch(url, requestBody)
+) = httpLoader().patch(Request.Builder().data(url).requestBody(requestBody).build())
 
 suspend inline fun Fuel.patch(
     uri: String,
     requestBody: RequestBody
-) = httpLoader().patch(uri, requestBody)
+) = httpLoader().patch(Request.Builder().data(uri.toHttpUrlOrNull()).requestBody(requestBody).build())
 
 suspend inline fun Fuel.delete(
     url: HttpUrl,
     requestBody: RequestBody?
-) = httpLoader().delete(url, requestBody)
+) = httpLoader().delete(Request.Builder().data(url).requestBody(requestBody).build())
 
 suspend inline fun Fuel.delete(
     uri: String,
     requestBody: RequestBody?
-) = httpLoader().delete(uri, requestBody)
+) = httpLoader().delete(Request.Builder().data(uri.toHttpUrlOrNull()).requestBody(requestBody).build())
 
 suspend inline fun Fuel.head(
     url: HttpUrl
-) = httpLoader().head(url)
+) = httpLoader().head(Request.Builder().data(url).build())
 
 suspend inline fun Fuel.head(
     uri: String
-) = httpLoader().head(uri)
+) = httpLoader().head(Request.Builder().data(uri.toHttpUrlOrNull()).build())
 
 suspend inline fun Fuel.method(
     url: HttpUrl,
     method: String?,
     requestBody: RequestBody?
-) = httpLoader().method(url, method, requestBody)
+) = httpLoader().method(Request.Builder().data(url).method(method).requestBody(requestBody).build())
 
 suspend inline fun Fuel.method(
     uri: String,
     method: String?,
     requestBody: RequestBody?
-) = httpLoader().method(uri, method, requestBody)
+) = httpLoader().method(Request.Builder().data(uri.toHttpUrlOrNull()).method(method).requestBody(requestBody).build())
 
 suspend inline fun Fuel.request(convertible: RequestConvertible) =
     httpLoader().method(convertible.request)

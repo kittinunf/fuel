@@ -37,15 +37,17 @@ class RealHttpLoaderTest {
             mockWebServer.start()
         }
 
+        val request = Request.Builder().data(mockWebServer.url("get")).build()
+
         val string = withContext(Dispatchers.IO) {
-            realHttpLoader.get(mockWebServer.url("get")).body!!.string()
+            realHttpLoader.get(request).body!!.string()
         }
 
-        val request = withContext(Dispatchers.IO) {
+        val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()
         }
 
-        assertEquals("GET", request.method)
+        assertEquals("GET", request1.method)
         assertEquals(string, "Hello World")
     }
 
@@ -57,15 +59,17 @@ class RealHttpLoaderTest {
             mockWebServer.start()
         }
 
+        val request = Request.Builder().data(mockWebServer.url("get")).build()
+
         val string = withContext(Dispatchers.IO) {
-            realHttpLoader.get(mockWebServer.url("get")).body!!.string()
+            realHttpLoader.get(request).body!!.string()
         }
 
-        val request = withContext(Dispatchers.IO) {
+        val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()
         }
 
-        assertEquals("GET", request.method)
+        assertEquals("GET", request1.method)
         assertEquals(string, "Hello World")
     }
 
@@ -78,18 +82,22 @@ class RealHttpLoaderTest {
         }
 
         val requestBody = "Hi?".toRequestBody("text/html".toMediaType())
+        val request = Request.Builder()
+            .data(mockWebServer.url("post"))
+            .requestBody(requestBody)
+            .build()
 
         withContext(Dispatchers.IO) {
-            realHttpLoader.post(mockWebServer.url("post"), requestBody)
+            realHttpLoader.post(request)
         }
 
-        val request = withContext(Dispatchers.IO) {
+        val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()
         }
 
-        assertEquals("POST", request.method)
+        assertEquals("POST", request1.method)
         val utf8 = withContext(Dispatchers.IO) {
-            request.body.readUtf8()
+            request1.body.readUtf8()
         }
         assertEquals("Hi?", utf8)
     }
@@ -124,18 +132,22 @@ class RealHttpLoaderTest {
         }
 
         val requestBody = "Hello There".toRequestBody("text/html".toMediaType())
+        val request = Request.Builder()
+            .data(mockWebServer.url("put"))
+            .requestBody(requestBody)
+            .build()
 
         withContext(Dispatchers.IO) {
-            realHttpLoader.put(mockWebServer.url("put"), requestBody)
+            realHttpLoader.put(request)
         }
 
-        val request = withContext(Dispatchers.IO) {
+        val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()
         }
 
-        assertEquals("PUT", request.method)
+        assertEquals("PUT", request1.method)
         val utf8 = withContext(Dispatchers.IO) {
-            request.body.readUtf8()
+            request1.body.readUtf8()
         }
         assertEquals("Hello There", utf8)
     }
@@ -170,18 +182,22 @@ class RealHttpLoaderTest {
         }
 
         val requestBody = "Hello There".toRequestBody("text/html".toMediaType())
+        val request = Request.Builder()
+            .data(mockWebServer.url("patch"))
+            .requestBody(requestBody)
+            .build()
 
         withContext(Dispatchers.IO) {
-            realHttpLoader.patch(mockWebServer.url("patch"), requestBody)
+            realHttpLoader.patch(request)
         }
 
-        val request = withContext(Dispatchers.IO) {
+        val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()
         }
 
-        assertEquals("PATCH", request.method)
+        assertEquals("PATCH", request1.method)
         val utf8 = withContext(Dispatchers.IO) {
-            request.body.readUtf8()
+            request1.body.readUtf8()
         }
         assertEquals("Hello There", utf8)
     }
@@ -215,15 +231,20 @@ class RealHttpLoaderTest {
             mockWebServer.start()
         }
 
+        val request = Request.Builder()
+            .data(mockWebServer.url("delete"))
+            .requestBody(null)
+            .build()
+
         val string = withContext(Dispatchers.IO) {
-            realHttpLoader.delete(mockWebServer.url("delete"), null).body!!.string()
+            realHttpLoader.delete(request).body!!.string()
         }
 
-        val request = withContext(Dispatchers.IO) {
+        val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()
         }
 
-        assertEquals("DELETE", request.method)
+        assertEquals("DELETE", request1.method)
         assertEquals(string, "Hello World")
     }
 
@@ -235,15 +256,17 @@ class RealHttpLoaderTest {
             mockWebServer.start()
         }
 
+        val request = Request.Builder().data(mockWebServer.url("head")).build()
+
         withContext(Dispatchers.IO) {
-            realHttpLoader.head(mockWebServer.url("head"))
+            realHttpLoader.head(request)
         }
 
-        val request = withContext(Dispatchers.IO) {
+        val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()
         }
 
-        assertEquals("GET", request.method)
+        assertEquals("GET", request1.method)
     }
 
     @Test
@@ -254,15 +277,21 @@ class RealHttpLoaderTest {
             mockWebServer.start()
         }
 
+        val request = Request.Builder()
+            .data(mockWebServer.url("connect"))
+            .method("CONNECT")
+            .requestBody(null)
+            .build()
+
         withContext(Dispatchers.IO) {
-            realHttpLoader.method(mockWebServer.url("connect"), "CONNECT", null)
+            realHttpLoader.method(request)
         }
 
-        val request = withContext(Dispatchers.IO) {
+        val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()
         }
 
-        assertEquals("CONNECT", request.method)
+        assertEquals("CONNECT", request1.method)
     }
 
     @Test(expected = IllegalArgumentException::class)

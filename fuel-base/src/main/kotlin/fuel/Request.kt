@@ -25,7 +25,7 @@ class Request internal constructor(
             method = null
         }
 
-        internal constructor(request: Request) {
+        constructor(request: Request) {
             data = request.data
             headers = request.headers.newBuilder()
             requestBody = request.requestBody
