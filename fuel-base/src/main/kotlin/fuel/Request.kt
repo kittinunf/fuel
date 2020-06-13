@@ -13,24 +13,10 @@ class Request internal constructor(
     val method: String?
 ) {
     open class Builder {
-        private var data: HttpUrl?
-        private var headers: Headers.Builder?
-        private var requestBody: RequestBody?
-        private var method: String?
-
-        constructor() {
-            data = null
-            headers = null
-            requestBody = null
-            method = null
-        }
-
-        constructor(request: Request) {
-            data = request.data
-            headers = request.headers.newBuilder()
-            requestBody = request.requestBody
-            method = request.method
-        }
+        private var data: HttpUrl? = null
+        private var headers = Headers.Builder()
+        private var requestBody: RequestBody? = null
+        private var method: String? = null
 
         /**
          * Set the data to load.
@@ -53,7 +39,7 @@ class Request internal constructor(
          * @see Headers.Builder.add
          */
         fun addHeader(name: String, value: String): Builder {
-            this.headers = (this.headers ?: Headers.Builder()).add(name, value)
+            this.headers = this.headers.add(name, value)
             return this
         }
 
@@ -63,7 +49,7 @@ class Request internal constructor(
          * @see Headers.Builder.set
          */
         fun setHeader(name: String, value: String): Builder {
-            this.headers = (this.headers ?: Headers.Builder()).set(name, value)
+            this.headers = this.headers.set(name, value)
             return this
         }
 
@@ -71,7 +57,7 @@ class Request internal constructor(
          * Remove all network headers with the key [name].
          */
         fun removeHeader(name: String): Builder {
-            this.headers = this.headers?.removeAll(name)
+            this.headers = this.headers.removeAll(name)
             return this
         }
 
@@ -90,7 +76,7 @@ class Request internal constructor(
          */
         fun build() = Request(
             checkNotNull(data) { "data == null" },
-            headers?.build().orEmpty(),
+            headers.build(),
             requestBody,
             method
         )

@@ -8,7 +8,7 @@ import okhttp3.Headers
 import okhttp3.Request
 import okhttp3.Response
 
-internal suspend inline fun Call.await(): Response = suspendCancellableCoroutine { continuation ->
+internal suspend fun Call.await(): Response = suspendCancellableCoroutine { continuation ->
     val callback = ContinuationCallback(this, continuation)
     enqueue(callback)
     continuation.invokeOnCancellation(callback)
