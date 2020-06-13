@@ -40,9 +40,9 @@ class RoutingTest {
 
         override val headers: Headers.Builder?
             get() {
-                return when(this) {
-                   is GetTest -> null
-                   is GetParamsTest -> Headers.Builder().add("X-Test", "true")
+                return when (this) {
+                    is GetTest -> null
+                    is GetParamsTest -> Headers.Builder().add("X-Test", "true")
                 }
             }
     }
