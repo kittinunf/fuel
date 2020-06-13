@@ -42,7 +42,7 @@ class HttpLoaderBuilderTest {
 
         val httpLoader = HttpLoader.Builder()
             .okHttpClient {
-                OkHttpClient.Builder().callTimeout(30L, TimeUnit.MILLISECONDS).build()
+                OkHttpClient.Builder().connectTimeout(30L, TimeUnit.MILLISECONDS).build()
             }
             .build()
         val request = Request.Builder().data(mockWebServer.url("hello")).build()
