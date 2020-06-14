@@ -21,14 +21,12 @@ internal class ContinuationCallback(
     }
 
     override fun onFailure(call: Call, e: IOException) {
-        if (!call.isCanceled()) {
-            continuation.resumeWithException(e)
-        }
+        // Don't bother with resuming the continuation if it is already cancelled.
+        if (continuation.isCancelled) return
+        continuation.resumeWithException(e)
     }
 
     override fun invoke(cause: Throwable?) {
-        try {
-            call.cancel()
-        } catch (_: Throwable) {}
+        call.cancel()
     }
 }
