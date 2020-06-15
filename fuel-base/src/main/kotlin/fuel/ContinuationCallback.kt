@@ -1,5 +1,3 @@
-// Copied by https://github.com/coil-kt/coil/blob/master/coil-base/src/main/java/coil/util/ContinuationCallback.kt
-
 package fuel
 
 import kotlinx.coroutines.CancellableContinuation
