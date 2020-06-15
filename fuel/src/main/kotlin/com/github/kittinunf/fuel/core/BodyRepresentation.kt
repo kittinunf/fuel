@@ -1,9 +1,10 @@
 package com.github.kittinunf.fuel.core
 
 import java.nio.charset.Charset
+import java.nio.charset.IllegalCharsetNameException
 
 private val TEXT_CONTENT_TYPE = Regex(
-    "^(?:text/.*|application/(?:csv|javascript|json|typescript|xml|x-yaml|x-www-form-urlencoded|vnd\\.coffeescript)|.*\\+(?:xml|json))(;(?: |)charset=.+)*$"
+        "^(?:text/.*|application/(?:csv|javascript|json|typescript|xml|x-yaml|x-www-form-urlencoded|vnd\\.coffeescript)|.*\\+(?:xml|json))"
 )
 
 /**
@@ -15,18 +16,24 @@ private val TEXT_CONTENT_TYPE = Regex(
 fun Body.representationOfBytes(contentType: String?): String {
     val actualContentType = if (contentType.isNullOrEmpty()) "(unknown)" else contentType
 
-    if (TEXT_CONTENT_TYPE.matches(actualContentType)) {
-        var charset = Charsets.UTF_8
-        val charsetGroup = TEXT_CONTENT_TYPE.find(actualContentType)!!.groupValues[1]
-        if (charsetGroup.isNotEmpty()) {
-            val charsetName = charsetGroup.substringAfter('=').substringBefore(';').toUpperCase()
-            charset = Charset.forName(charsetName)
+    if (TEXT_CONTENT_TYPE.containsMatchIn(actualContentType)) {
+        val charsetRegex = Regex("^CHARSET=.*")
+        val parameters = actualContentType
+                .toUpperCase()
+                .split(';')
+                .map { it.trim() }
+
+        val charset: Charset = try {
+            Charset.forName(parameters.find { charsetRegex.matches(it) }?.substringAfter("CHARSET=") ?: "")
+        } catch (e: IllegalCharsetNameException) {
+            Charsets.US_ASCII
         }
+
         return String(toByteArray(), charset)
     }
 
     val lengthLabel = (length ?: -1L).let {
-        when (true) {
+        when {
             it == 0L -> return "(empty)"
             it < 0L -> "unknown number of bytes"
             else -> "$it bytes"
