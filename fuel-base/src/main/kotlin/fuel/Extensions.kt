@@ -27,8 +27,6 @@ internal suspend fun Call.await(): Response = suspendCancellableCoroutine { cont
         }
 
         override fun onFailure(call: Call, e: IOException) {
-            // Don't bother with resuming the continuation if it is already cancelled.
-            if (continuation.isCancelled) return
             continuation.resumeWithException(e)
         }
     })
