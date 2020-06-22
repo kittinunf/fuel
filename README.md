@@ -37,7 +37,7 @@ You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersi
   implementation 'com.github.kittinunf.fuel:<package>:<latest-version>'
 ```
 
-Make sure to include `jcenter()` in your repositories 
+Make sure to include `jcenter()` or `mavenCentral()` in your repositories 
 ```groovy
 repositories {
   jcenter()
