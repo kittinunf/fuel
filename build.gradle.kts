@@ -10,7 +10,6 @@ plugins {
 allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "jacoco")
-    apply(from = "$rootDir/ktlint.gradle.kts")
 
     repositories {
         mavenCentral()
