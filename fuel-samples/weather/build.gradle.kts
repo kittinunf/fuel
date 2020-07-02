@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation (project(":fuel-default"))
+    implementation (project(":fuel-singleton"))
     implementation (project(":fuel-moshi"))
     kapt (Library.MOSHI_KOTLIN_CODEGEN)
 }

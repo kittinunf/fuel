@@ -1,3 +1,3 @@
 dependencies {
-    implementation (project(":fuel-default"))
+    implementation (project(":fuel-singleton"))
 }

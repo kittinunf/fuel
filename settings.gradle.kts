@@ -1,10 +1,11 @@
 rootProject.name = "Fuel"
 
 include (":fuel-base")
-include (":fuel-default")
+include (":fuel-singleton")
 include (":fuel-moshi")
 include (":fuel-kotlinx-serialization")
 include (":fuel-forge")
+include (":fuel-ktor")
 
 include (":fuel-samples:simple-client")
 include (":fuel-samples:progress")
