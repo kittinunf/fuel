@@ -1,7 +1,7 @@
 /*
  * Copyright 2014-2019 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
  */
-// Inspired By https://github.com/ktorio/ktor/blob/master/ktor-client/ktor-client-okhttp/jvm/src/io/ktor/client/engine/okhttp/OkHttpConfig.kt
+// Copied By https://github.com/ktorio/ktor/blob/master/ktor-client/ktor-client-okhttp/jvm/src/io/ktor/client/engine/okhttp/OkHttpConfig.kt
 
 package fuel.ktor
 
@@ -15,6 +15,11 @@ class FuelConfig : HttpClientEngineConfig() {
         followSslRedirects(false)
         retryOnConnectionFailure(false)
     }
+
+    /**
+     * Preconfigured [OkHttpClient] instance instead of configuring one.
+     */
+    var preconfigured: OkHttpClient? = null
 
     /**
      * Size of the cache that keeps least recently used [OkHttpClient] instances. Set "0" to avoid caching.

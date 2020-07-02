@@ -5,7 +5,6 @@
 
 package fuel.ktor
 
-import fuel.Fuel
 import fuel.HttpLoader
 import fuel.Request
 import io.ktor.client.call.UnsupportedContentTypeException
@@ -28,12 +27,14 @@ import io.ktor.util.date.GMTDate
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.core.Closeable
 import io.ktor.utils.io.writer
+import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -85,22 +86,50 @@ class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-f
         }
     }
 
+    @ObsoleteCoroutinesApi
     override suspend fun execute(data: HttpRequestData): HttpResponseData {
         val requestEngine = clientCache[data.getCapabilityOrNull(HttpTimeout)]
             ?: error("OkHttpClient can't be constructed because HttpTimeout feature is not installed")
-        val httpLoader = HttpLoader.Builder().okHttpClient(requestEngine).build()
-        Fuel.setHttpLoader(httpLoader)
 
         val callContext = callContext()
         val engineRequest = data.convertToFuelRequest(callContext)
+        val httpLoader = HttpLoader.Builder().okHttpClient(requestEngine).build()
 
+        return executeHttpRequest(httpLoader, engineRequest, callContext, data)
+    }
+
+    override fun close() {
+        super.close()
+        (requestsJob[Job] as CompletableJob).complete()
+    }
+
+    //@ObsoleteCoroutinesApi
+    /*private suspend fun executeWebSocketRequest(
+        engine: HttpLoader,
+        engineRequest: Request,
+        callContext: CoroutineContext
+    ): HttpResponseData {
         val requestTime = GMTDate()
-        val engineResponse = Fuel.method(engineRequest)
-        val body = engineResponse.body
+        val session = OkHttpWebSocketSession(engine, engineRequest, callContext).apply { start() }
+
+        val originResponse = session.originResponse.await()
+        return buildResponseData(originResponse, requestTime, session, callContext)
+    }*/
+
+    private suspend fun executeHttpRequest(
+        engine: HttpLoader,
+        engineRequest: Request,
+        callContext: CoroutineContext,
+        requestData: HttpRequestData
+    ): HttpResponseData {
+        val requestTime = GMTDate()
+        val response = engine.method(engineRequest)
+
+        val body = response.body
         callContext[Job]!!.invokeOnCompletion { body?.close() }
 
-        val responseContent = body?.source()?.toChannel(callContext, data) ?: ByteReadChannel.Empty
-        return buildResponseData(engineResponse, requestTime, responseContent, callContext)
+        val responseContent = body?.source()?.toChannel(callContext, requestData) ?: ByteReadChannel.Empty
+        return buildResponseData(response, requestTime, responseContent, callContext)
     }
 
     private fun buildResponseData(
@@ -113,8 +142,19 @@ class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-f
         return HttpResponseData(status, requestTime, headers, version, body, callContext)
     }
 
+    private companion object {
+        /**
+         * It's an artificial prototype object to be used to create actual clients and eliminate the following issue:
+         * https://github.com/square/okhttp/issues/3372.
+         */
+        val okHttpClientPrototype: OkHttpClient by lazy {
+            OkHttpClient.Builder().build()
+        }
+    }
+
     private fun createOkHttpClient(timeoutExtension: HttpTimeout.HttpTimeoutCapabilityConfiguration?): OkHttpClient {
-        val builder = OkHttpClient.Builder()
+        val builder = (config.preconfigured ?: okHttpClientPrototype).newBuilder()
+
         builder.apply(config.config)
         config.proxy?.let { builder.proxy(it) }
         timeoutExtension?.let {

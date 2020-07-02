@@ -5,12 +5,9 @@
 
 package fuel.ktor
 
-import fuel.Fuel
-import fuel.Request
 import io.ktor.http.HttpProtocolVersion
 import okhttp3.Headers
 import okhttp3.Protocol
-import okhttp3.Response
 
 internal fun Headers.fromOkHttp(): io.ktor.http.Headers = object : io.ktor.http.Headers {
     override val caseInsensitiveName: Boolean = true
@@ -33,6 +30,3 @@ internal fun Protocol.fromOkHttp(): HttpProtocolVersion = when (this) {
     Protocol.H2_PRIOR_KNOWLEDGE -> HttpProtocolVersion.HTTP_2_0
     Protocol.QUIC -> HttpProtocolVersion.QUIC
 }
-
-internal suspend fun Fuel.method(request: Request): Response =
-    httpLoader().method(request)
