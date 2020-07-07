@@ -3,7 +3,6 @@ package fuel.samples
 import fuel.HttpLoader
 import fuel.Request
 import kotlinx.coroutines.runBlocking
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 
 val progressListener = object : ProgressListener {
@@ -39,8 +38,7 @@ fun main() = runBlocking {
                 .build()
         }.build()
     val httpLoader = HttpLoader.Builder().okHttpClient(client).build()
-    val url = "https://publicobject.com/helloworld.txt".toHttpUrlOrNull()
-    val request = Request.Builder().data(url).build()
+    val request = Request.Builder().data("https://publicobject.com/helloworld.txt").build()
     val string = httpLoader.get(request).body!!.string()
     println(string)
 }

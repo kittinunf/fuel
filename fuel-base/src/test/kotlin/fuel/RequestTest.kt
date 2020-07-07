@@ -1,7 +1,6 @@
 package fuel
 
 import okhttp3.Headers
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -12,25 +11,25 @@ class RequestTest {
             .add("X-Test", "true")
             .build()
         val request = Request.Builder()
-            .data("http://example.com".toHttpUrlOrNull())
+            .data("http://example.com")
             .headers(header)
             .build()
-        assertEquals("true", request.headers.get("X-Test"))
+        assertEquals("true", request.headers["X-Test"])
     }
 
     @Test
     fun `add headers`() {
         val request = Request.Builder()
-            .data("http://example.com".toHttpUrlOrNull())
+            .data("http://example.com")
             .addHeader("X-Test", "true")
             .build()
-        assertEquals("true", request.headers.get("X-Test"))
+        assertEquals("true", request.headers["X-Test"])
     }
 
     @Test
     fun `set headers`() {
         val request = Request.Builder()
-            .data("http://example.com".toHttpUrlOrNull())
+            .data("http://example.com")
             .setHeader("X-Test", "true")
             .build()
         assertEquals("true", request.headers.get("X-Test"))
@@ -39,11 +38,11 @@ class RequestTest {
     @Test
     fun `remove headers`() {
         val request = Request.Builder()
-            .data("http://example.com".toHttpUrlOrNull())
+            .data("http://example.com")
             .setHeader("X-Test", "true")
             .removeHeader("X-Test")
             .build()
-        assertEquals(null, request.headers.get("X-Test"))
+        assertEquals(null, request.headers["X-Test"])
     }
 
     @Test

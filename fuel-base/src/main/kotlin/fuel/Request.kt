@@ -4,6 +4,7 @@ package fuel
 
 import okhttp3.Headers
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.RequestBody
 
 class Request internal constructor(
@@ -21,8 +22,22 @@ class Request internal constructor(
         /**
          * Set the data to load.
          */
-        fun data(data: HttpUrl?) = apply {
+        fun data(data: HttpUrl) = apply {
             this.data = data
+        }
+
+        fun data(data: String) = apply {
+            // Silently replace web socket URLs with HTTP URLs.
+            val finalUrl: String = when {
+                data.startsWith("ws:", ignoreCase = true) -> {
+                    "http:${data.substring(3)}"
+                }
+                data.startsWith("wss:", ignoreCase = true) -> {
+                    "https:${data.substring(4)}"
+                }
+                else -> data
+            }
+            this.data = finalUrl.toHttpUrl()
         }
 
         /**

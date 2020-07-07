@@ -4,12 +4,11 @@
 package fuel
 
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.RequestBody
 
 suspend inline fun Fuel.get(
     uri: String
-) = httpLoader().get(Request.Builder().data(uri.toHttpUrlOrNull()).build())
+) = httpLoader().get(Request.Builder().data(uri).build())
 
 suspend inline fun Fuel.get(
     url: HttpUrl
@@ -18,7 +17,7 @@ suspend inline fun Fuel.get(
 suspend inline fun Fuel.post(
     uri: String,
     requestBody: RequestBody
-) = httpLoader().post(Request.Builder().data(uri.toHttpUrlOrNull()).requestBody(requestBody).build())
+) = httpLoader().post(Request.Builder().data(uri).requestBody(requestBody).build())
 
 suspend inline fun Fuel.post(
     url: HttpUrl,
@@ -28,7 +27,7 @@ suspend inline fun Fuel.post(
 suspend inline fun Fuel.put(
     uri: String,
     requestBody: RequestBody
-) = httpLoader().put(Request.Builder().data(uri.toHttpUrlOrNull()).requestBody(requestBody).build())
+) = httpLoader().put(Request.Builder().data(uri).requestBody(requestBody).build())
 
 suspend inline fun Fuel.put(
     url: HttpUrl,
@@ -43,7 +42,7 @@ suspend inline fun Fuel.patch(
 suspend inline fun Fuel.patch(
     uri: String,
     requestBody: RequestBody
-) = httpLoader().patch(Request.Builder().data(uri.toHttpUrlOrNull()).requestBody(requestBody).build())
+) = httpLoader().patch(Request.Builder().data(uri).requestBody(requestBody).build())
 
 suspend inline fun Fuel.delete(
     url: HttpUrl,
@@ -53,7 +52,7 @@ suspend inline fun Fuel.delete(
 suspend inline fun Fuel.delete(
     uri: String,
     requestBody: RequestBody?
-) = httpLoader().delete(Request.Builder().data(uri.toHttpUrlOrNull()).requestBody(requestBody).build())
+) = httpLoader().delete(Request.Builder().data(uri).requestBody(requestBody).build())
 
 suspend inline fun Fuel.head(
     url: HttpUrl
@@ -61,7 +60,7 @@ suspend inline fun Fuel.head(
 
 suspend inline fun Fuel.head(
     uri: String
-) = httpLoader().head(Request.Builder().data(uri.toHttpUrlOrNull()).build())
+) = httpLoader().head(Request.Builder().data(uri).build())
 
 suspend inline fun Fuel.method(
     url: HttpUrl,
@@ -73,7 +72,7 @@ suspend inline fun Fuel.method(
     uri: String,
     method: String?,
     requestBody: RequestBody?
-) = httpLoader().method(Request.Builder().data(uri.toHttpUrlOrNull()).method(method).requestBody(requestBody).build())
+) = httpLoader().method(Request.Builder().data(uri).method(method).requestBody(requestBody).build())
 
 suspend inline fun Fuel.request(convertible: RequestConvertible) =
     httpLoader().method(convertible.request)

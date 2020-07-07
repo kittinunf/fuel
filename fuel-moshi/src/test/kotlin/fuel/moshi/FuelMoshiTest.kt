@@ -74,7 +74,7 @@ class FuelMoshiTest {
     }
 
     @Test
-    fun CustomMoshiAdapterWithGenericList() = runBlocking {
+    fun customMoshiAdapterWithGenericList() = runBlocking {
         val mockWebServer = MockWebServer().apply {
             enqueue(
                 MockResponse().setBody(
