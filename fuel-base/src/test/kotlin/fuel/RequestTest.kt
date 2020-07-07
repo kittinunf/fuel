@@ -32,7 +32,7 @@ class RequestTest {
             .data("http://example.com")
             .setHeader("X-Test", "true")
             .build()
-        assertEquals("true", request.headers.get("X-Test"))
+        assertEquals("true", request.headers["X-Test"])
     }
 
     @Test

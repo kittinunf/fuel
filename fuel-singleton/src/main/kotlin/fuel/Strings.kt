@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package fuel
 
 import okhttp3.RequestBody
