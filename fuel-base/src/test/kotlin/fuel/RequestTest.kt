@@ -1,6 +1,7 @@
 package fuel
 
 import okhttp3.Headers
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -52,5 +53,21 @@ class RequestTest {
         } catch (ise: IllegalStateException) {
             assertEquals("data == null", ise.message)
         }
+    }
+
+    @Test
+    fun `invalid web socket as non secure url`() {
+        val request = Request.Builder()
+            .data("ws://google.com")
+            .build()
+        assertEquals("http://google.com".toHttpUrl(), request.data)
+    }
+
+    @Test
+    fun `invalid web socket as secure url`() {
+        val request = Request.Builder()
+            .data("wss://google.com")
+            .build()
+        assertEquals("https://google.com".toHttpUrl(), request.data)
     }
 }

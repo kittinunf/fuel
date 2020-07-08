@@ -16,6 +16,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.concurrent.TimeUnit
@@ -38,6 +39,22 @@ class OkHttpEngineTests {
     }
 
     @Test
+    fun threadLeakTest() = runBlocking {
+        val initialNumberOfThreads = Thread.getAllStackTraces().size
+
+        repeat(25) {
+            HttpClient(Fuel).use { client ->
+                val response = client.get<String>("http://www.google.com")
+                assertNotNull(response)
+            }
+        }
+
+        val totalNumberOfThreads = Thread.getAllStackTraces().size
+        val threadsCreated = totalNumberOfThreads - initialNumberOfThreads
+        assertTrue(threadsCreated < 25)
+    }
+
+    @Test
     fun preconfiguresTest() = runBlocking {
         var preconfiguredClientCalled = false
         val okHttpClient = OkHttpClient().newBuilder().addInterceptor(object : Interceptor {
@@ -53,5 +70,11 @@ class OkHttpEngineTests {
             runCatching { client.get<String>("http://www.httpbin.org") }
             assertTrue(preconfiguredClientCalled)
         }
+    }
+
+    @Test
+    fun `HttpClient without parameter for not null`() {
+        val httpClient = HttpClient()
+        assertNotNull(httpClient)
     }
 }
