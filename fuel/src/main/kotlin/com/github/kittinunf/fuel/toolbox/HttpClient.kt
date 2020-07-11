@@ -234,7 +234,11 @@ class HttpClient(
 
     private fun setBodyIfDoOutput(connection: HttpURLConnection, request: Request) {
         val body = request.body
-        if (!connection.doOutput || body.isEmpty()) {
+        if (!connection.doOutput) {
+            return
+        }
+        if (body.isEmpty()) {
+            connection.setFixedLengthStreamingMode(0L)
             return
         }
 

@@ -56,7 +56,19 @@ class HttpClientTest : MockHttpTestCase() {
     }
 
     @Test
-    fun setsContentLengthIfKnown() {
+    fun setsContentLengthIfKnownZero() {
+        val request = reflectedRequest(Method.POST, "content-length-test")
+                .body("")
+
+        val (_, _, result) = request.responseObject(MockReflected.Deserializer())
+        val (data, error) = result
+
+        assertThat("Expected data, actual error $error", data, notNullValue())
+        assertThat(data!![Headers.CONTENT_LENGTH].firstOrNull(), equalTo("0"))
+    }
+
+    @Test
+    fun setsContentLengthIfKnownNonZero() {
         val request = reflectedRequest(Method.POST, "content-length-test")
             .body("my-body")
 
