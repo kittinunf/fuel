@@ -71,10 +71,4 @@ class OkHttpEngineTests {
             assertTrue(preconfiguredClientCalled)
         }
     }
-
-    @Test
-    fun `HttpClient without parameter for not null`() {
-        val httpClient = HttpClient()
-        assertNotNull(httpClient)
-    }
 }

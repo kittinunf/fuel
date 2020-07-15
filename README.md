@@ -32,7 +32,7 @@ runBlocking {
 
 Please note it will throw Exceptions. Make sure you catch it on the production apps. 
 
-Fuel requires Java 8 bytecode.
+Fuel requires Java 8 byte code.
 
 ## Requirements
 - If you are using Android, It needs to be Android 5+.
@@ -44,9 +44,9 @@ Fuel is fully compatible with R8 out of the box and doesn't require adding any e
 
 If you use Proguard, you may need to add rules for [Coroutines](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/resources/META-INF/proguard/coroutines.pro), [OkHttp](https://github.com/square/okhttp/blob/master/okhttp/src/main/resources/META-INF/proguard/okhttp3.pro) and [Okio](https://github.com/square/okio/blob/master/okio/src/jvmMain/resources/META-INF/proguard/okio.pro).
 
-If you uses the fuel-serialization modules, you may need to add rules for [Serialization](https://github.com/Kotlin/kotlinx.serialization#androidjvm).
+If you use the fuel-serialization modules, you may need to add rules for [Serialization](https://github.com/Kotlin/kotlinx.serialization#androidjvm).
 
-If you uses the fuel-moshi modules, you may need to add rules for [Moshi](https://github.com/square/moshi/blob/master/moshi/src/main/resources/META-INF/proguard/moshi.pro) and [Moshi-Kotlin](https://github.com/square/moshi/blob/master/kotlin/reflect/src/main/resources/META-INF/proguard/moshi-kotlin.pro)
+If you use the fuel-moshi modules, you may need to add rules for [Moshi](https://github.com/square/moshi/blob/master/moshi/src/main/resources/META-INF/proguard/moshi.pro) and [Moshi-Kotlin](https://github.com/square/moshi/blob/master/kotlin/reflect/src/main/resources/META-INF/proguard/moshi-kotlin.pro)
 
 ## Other libraries
 
@@ -58,8 +58,8 @@ If you like Fuel, you might also like other libraries of mine;
 
 ## Credits
 
-Fuel is brought to you by [contributors](https://github.com/kittinunf/Fuel/graphs/contributors).
+Fuel brought to you by [contributors](https://github.com/kittinunf/Fuel/graphs/contributors).
 
 ## Licenses
 
-Fuel is released under the [MIT](https://opensource.org/licenses/MIT) license.
+Fuel released under the [MIT](https://opensource.org/licenses/MIT) license.
