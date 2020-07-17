@@ -1,7 +1,7 @@
 object Library {
     const val KOTLIN_VERSION = "1.3.72"
 
-    private const val COROUTINES_VERSION = "1.3.7"
+    private const val COROUTINES_VERSION = "1.3.8"
     const val KOTLINX_COROUTINES_CORE = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$COROUTINES_VERSION"
 
     private const val OKHTTP_VERSION = "4.8.0"
