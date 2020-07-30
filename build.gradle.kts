@@ -14,8 +14,8 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        maven ("https://oss.sonatype.org/content/repositories/snapshots")
-        maven ("https://dl.bintray.com/kotlin/kotlin-eap") 
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
+        maven("https://dl.bintray.com/kotlin/kotlin-eap")
     }
 
     tasks.withType<KotlinCompile> {

@@ -30,7 +30,7 @@ runBlocking {
 
 ```
 
-Please note it will throw Exceptions. Make sure you catch it on the production apps. 
+Please note it will throw Exceptions. Make sure you catch it on the production apps.
 
 Fuel requires Java 8 byte code.
 
