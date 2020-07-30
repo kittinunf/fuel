@@ -15,16 +15,17 @@ data class Contributor(
     val contributions: Int
 )
 
-fun main() = runBlocking {
-    val types = Types.newParameterizedType(MutableList::class.java, Contributor::class.java)
-    val contributors = Fuel.get(ENDPOINT).toMoshi<List<Contributor>>(types)
+fun main() {
+    runBlocking {
+        val types = Types.newParameterizedType(MutableList::class.java, Contributor::class.java)
+        val contributors = Fuel.get(ENDPOINT).toMoshi<List<Contributor>>(types)
 
-    val newContributor = contributors?.sortedByDescending { contributor ->
-        contributor.contributions
-    }
+        val newContributor = contributors?.sortedByDescending { contributor ->
+            contributor.contributions
+        }
 
-    newContributor?.forEach { contributor ->
-        println("${contributor.login} : ${contributor.contributions}")
+        newContributor?.forEach { contributor ->
+            println("${contributor.login} : ${contributor.contributions}")
+        }
     }
-    Unit
 }

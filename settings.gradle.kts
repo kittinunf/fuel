@@ -1,3 +1,10 @@
+pluginManagement { 
+    repositories { 
+        mavenCentral() 
+        gradlePluginPortal() 
+        maven ("https://dl.bintray.com/kotlin/kotlin-eap") 
+    }
+}
 rootProject.name = "Fuel"
 
 include (":fuel-base")

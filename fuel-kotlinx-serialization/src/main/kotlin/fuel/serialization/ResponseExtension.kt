@@ -2,10 +2,9 @@ package fuel.serialization
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import okhttp3.Response
 
 fun <T : Any> Response.toJson(
-    json: Json = Json(JsonConfiguration.Stable),
+    json: Json = Json { allowStructuredMapKeys = true },
     deserialization: DeserializationStrategy<T>
-) = json.parse(deserialization, body!!.string())
+) = json.decodeFromString(deserialization, body!!.string())

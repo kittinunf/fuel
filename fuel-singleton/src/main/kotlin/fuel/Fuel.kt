@@ -16,9 +16,7 @@ object Fuel {
      * Set the default [HttpLoader]. Shutdown the current instance if there is one.
      */
     fun setHttpLoader(loader: HttpLoader) {
-        setHttpLoader(object : HttpLoaderFactory {
-            override fun newHttpLoader(): HttpLoader = loader
-        })
+        setHttpLoader { loader }
     }
 
     /**

@@ -34,7 +34,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -47,11 +46,11 @@ import okio.BufferedSource
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
-@ExperimentalCoroutinesApi
 @KtorExperimentalAPI
+@ExperimentalCoroutinesApi
 @InternalAPI
 class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-fuel") {
-
+    @KtorExperimentalAPI
     override val dispatcher: CoroutineDispatcher by lazy {
         Dispatchers.clientDispatcher(
             config.threadsCount,
@@ -86,7 +85,6 @@ class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-f
         }
     }
 
-    @ObsoleteCoroutinesApi
     override suspend fun execute(data: HttpRequestData): HttpResponseData {
         val requestEngine = clientCache[data.getCapabilityOrNull(HttpTimeout)]
             ?: error("OkHttpClient can't be constructed because HttpTimeout feature is not installed")
@@ -103,7 +101,6 @@ class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-f
         (requestsJob[Job] as CompletableJob).complete()
     }
 
-    //@ObsoleteCoroutinesApi
     /*private suspend fun executeWebSocketRequest(
         engine: HttpLoader,
         engineRequest: Request,

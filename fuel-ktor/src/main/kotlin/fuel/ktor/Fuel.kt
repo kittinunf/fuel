@@ -17,8 +17,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  * with the the associated configuration [FuelConfig].
  */
 object Fuel : HttpClientEngineFactory<FuelConfig> {
-    @KtorExperimentalAPI
     @ExperimentalCoroutinesApi
+    @KtorExperimentalAPI
     @InternalAPI
     override fun create(block: FuelConfig.() -> Unit): HttpClientEngine =
         FuelEngine(FuelConfig().apply(block))
