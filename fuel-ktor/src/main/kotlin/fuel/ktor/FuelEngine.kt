@@ -50,7 +50,6 @@ import kotlin.coroutines.CoroutineContext
 @ExperimentalCoroutinesApi
 @InternalAPI
 class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-fuel") {
-    @KtorExperimentalAPI
     override val dispatcher: CoroutineDispatcher by lazy {
         Dispatchers.clientDispatcher(
             config.threadsCount,
@@ -130,7 +129,10 @@ class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-f
     }
 
     private fun buildResponseData(
-        response: Response, requestTime: GMTDate, body: Any, callContext: CoroutineContext
+        response: Response,
+        requestTime: GMTDate,
+        body: Any,
+        callContext: CoroutineContext
     ): HttpResponseData {
         val status = HttpStatusCode(response.code, response.message)
         val version = response.protocol.fromOkHttp()
