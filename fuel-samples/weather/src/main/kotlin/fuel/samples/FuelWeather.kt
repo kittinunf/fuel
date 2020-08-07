@@ -13,11 +13,12 @@ data class Weather(
     val latt_long: String
 )
 
-fun main() = runBlocking {
-    val types = Types.newParameterizedType(MutableList::class.java, Weather::class.java)
-    val weathers = Fuel.request(WeatherApi.WeatherFor("london")).toMoshi<List<Weather>>(types)
-    weathers?.forEach {
-        println("${it.title} - ${it.latt_long}")
+fun main() {
+    runBlocking {
+        val types = Types.newParameterizedType(MutableList::class.java, Weather::class.java)
+        val weathers = Fuel.request(WeatherApi.WeatherFor("london")).toMoshi<List<Weather>>(types)
+        weathers?.forEach {
+            println("${it.title} - ${it.latt_long}")
+        }
     }
-    Unit
 }
