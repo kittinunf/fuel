@@ -13,6 +13,7 @@ import com.github.kittinunf.result.map
 import com.github.kittinunf.result.mapError
 import java.io.InputStream
 import java.io.Reader
+import kotlin.jvm.Throws
 
 /**
  * Generic interface for [Response] deserialization.
@@ -283,4 +284,6 @@ suspend fun <T : Any, U : Deserializable<T>> Request.awaitResponseResult(deseria
 
 private fun <T : Any, U : Deserializable<T>> serializeFor(result: Result<Response, FuelError>, deserializable: U) =
     result.map { (it to deserializable.deserialize(it)) }
-        .mapError <Pair<Response, T>, Exception, FuelError> { FuelError.wrap(it, result.getOrElse(Response.error())) }
+        .mapError <Pair<Response, T>, Exception, FuelError> {
+            FuelError.wrap(it, result.getOrElse { Response.error() })
+        }

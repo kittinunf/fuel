@@ -75,7 +75,7 @@ object Fuel {
 
 // Core dependencies
 object Kotlin {
-    const val version = "1.3.70"
+    const val version = "1.4.0"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
@@ -83,7 +83,7 @@ object Kotlin {
 }
 
 object Result {
-    const val version = "2.2.0"
+    const val version = "3.1.0"
     const val dependency = "com.github.kittinunf.result:result:$version"
 }
 
@@ -145,14 +145,14 @@ object Jackson {
 
 object KotlinX {
     object Coroutines {
-        const val version = "1.3.3"
+        const val version = "1.3.9"
         val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         val jvm = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     }
 
     object Serialization {
-        const val version = "0.20.0"
-        const val dependency = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$version"
+        const val version = "1.0.0-RC"
+        const val dependency = "org.jetbrains.kotlinx:kotlinx-serialization-core:$version"
         const val plugin = "kotlinx-serialization"
     }
 }
