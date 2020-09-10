@@ -88,7 +88,7 @@ object Result {
 }
 
 object Json {
-    const val version = "20180813"
+    const val version = "20200518"
     const val dependency = "org.json:json:$version"
 }
 
@@ -129,17 +129,17 @@ object AndroidX {
 
 // Modules dependencies
 object Forge {
-    const val version = "1.0.0-alpha2"
+    const val version = "1.0.0-alpha3"
     const val dependency = "com.github.kittinunf.forge:forge:$version"
 }
 
 object Gson {
-    const val version = "2.8.5"
+    const val version = "2.8.6"
     const val dependency = "com.google.code.gson:gson:$version"
 }
 
 object Jackson {
-    const val version = "2.9.9"
+    const val version = "2.11.2"
     const val dependency = "com.fasterxml.jackson.module:jackson-module-kotlin:$version"
 }
 
@@ -158,7 +158,7 @@ object KotlinX {
 }
 
 object Moshi {
-    const val version = "1.8.0"
+    const val version = "1.10.0"
     const val dependency = "com.squareup.moshi:moshi:$version"
 }
 
