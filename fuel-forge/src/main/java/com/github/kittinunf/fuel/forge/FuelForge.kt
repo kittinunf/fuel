@@ -4,10 +4,10 @@ import com.github.kittinunf.forge.Forge
 import com.github.kittinunf.forge.core.DeserializedResult
 import com.github.kittinunf.forge.core.JSON
 import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.ResponseHandler
 import com.github.kittinunf.fuel.core.response
 import com.github.kittinunf.result.Result
 
@@ -28,13 +28,9 @@ inline fun <reified T : Any> Request.responseObject(noinline deserializer: JSON.
 inline fun <reified T : Any> Request.responseObjects(noinline deserializer: JSON.() -> DeserializedResult<T>) = response(forgesDeserializerOf(deserializer))
 
 fun <T : Any> forgeDeserializerOf(deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<T> {
-    override fun deserialize(content: String): T? {
-        when (val result = Forge.modelFromJson(content, deserializer)) {
-            is DeserializedResult.Success -> return result.value
-            is DeserializedResult.Failure -> throw result.error
-        }
-    }
+    override fun deserialize(content: String): T? = Forge.modelFromJson(content, deserializer).get()
 }
+
 fun <T : Any> forgesDeserializerOf(deserializer: JSON.() -> DeserializedResult<T>) = object : ResponseDeserializable<List<T>> {
-    override fun deserialize(content: String): List<T>? = Forge.modelsFromJson(content, deserializer).map { it.get<T>() }
+    override fun deserialize(content: String): List<T>? = Forge.modelsFromJson(content, deserializer).get()
 }
