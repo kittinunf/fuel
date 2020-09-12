@@ -13,7 +13,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -57,11 +56,9 @@ class OkHttpEngineTests {
     @Test
     fun preconfiguresTest() = runBlocking {
         var preconfiguredClientCalled = false
-        val okHttpClient = OkHttpClient().newBuilder().addInterceptor(object : Interceptor {
-            override fun intercept(chain: Interceptor.Chain): Response {
-                preconfiguredClientCalled = true
-                return chain.proceed(chain.request())
-            }
+        val okHttpClient = OkHttpClient().newBuilder().addInterceptor(Interceptor { chain ->
+            preconfiguredClientCalled = true
+            chain.proceed(chain.request())
         }).connectTimeout(1, TimeUnit.MILLISECONDS).build()
 
         HttpClient(Fuel) {

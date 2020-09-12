@@ -1,10 +1,10 @@
 object Library {
-    const val KOTLIN_VERSION = "1.4.0"
+    const val KOTLIN_VERSION = "1.4.10"
 
     private const val COROUTINES_VERSION = "1.3.9"
     const val KOTLINX_COROUTINES_CORE = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$COROUTINES_VERSION"
 
-    private const val OKHTTP_VERSION = "4.8.1"
+    private const val OKHTTP_VERSION = "4.9.0"
     const val OKHTTP = "com.squareup.okhttp3:okhttp:$OKHTTP_VERSION"
     const val OKHTTP_MOCK_WEB_SERVER = "com.squareup.okhttp3:mockwebserver:$OKHTTP_VERSION"
 
@@ -14,7 +14,7 @@ object Library {
     private const val SERIALIZATION_VERSION = "1.0.0-RC"
     const val KOTLINX_SERIALIZATION_RUNTIME = "org.jetbrains.kotlinx:kotlinx-serialization-core:$SERIALIZATION_VERSION"
 
-    private const val MOSHI_VERSION = "1.9.3"
+    private const val MOSHI_VERSION = "1.10.0"
     const val MOSHI = "com.squareup.moshi:moshi:$MOSHI_VERSION"
     const val MOSHI_KOTLIN_CODEGEN = "com.squareup.moshi:moshi-kotlin-codegen:$MOSHI_VERSION"
 
