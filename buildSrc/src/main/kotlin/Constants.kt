@@ -160,6 +160,8 @@ object KotlinX {
 object Moshi {
     const val version = "1.10.0"
     const val dependency = "com.squareup.moshi:moshi:$version"
+
+    const val codegen = "com.squareup.moshi:moshi-kotlin-codegen:$version"
 }
 
 object Reactor {

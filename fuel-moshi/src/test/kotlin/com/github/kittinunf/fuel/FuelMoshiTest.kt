@@ -9,14 +9,14 @@ import com.github.kittinunf.fuel.moshi.moshiDeserializerOf
 import com.github.kittinunf.fuel.moshi.responseObject
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.Result.Failure
-import com.github.kittinunf.result.Result.Success
-import com.google.common.reflect.TypeToken
+import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.ToJson
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.isA
@@ -28,6 +28,7 @@ import java.net.HttpURLConnection
 
 class FuelMoshiTest : MockHttpTestCase() {
 
+    @JsonClass(generateAdapter = true)
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
     @Test
@@ -158,6 +159,7 @@ class FuelMoshiTest : MockHttpTestCase() {
         }
     }
 
+    @JsonClass(generateAdapter = true)
     data class IssueInfo(val id: Int, val title: String, val number: Int)
 
     /**
@@ -187,12 +189,14 @@ class FuelMoshiTest : MockHttpTestCase() {
         FINISHED
     }
 
+    @JsonClass(generateAdapter = true)
     data class StageDTO(val stage: Stage)
 
-    class StageMoshiAdapter : JsonAdapter<Stage>() {
+    private class StageAdapter : JsonAdapter<Stage>() {
+
+        @FromJson
         override fun fromJson(reader: JsonReader): Stage? {
             val value = reader.nextString()
-
             return when (value) {
                 "na" -> Stage.UNKNOWN
                 "in_progress" -> Stage.IN_PROGRESS
@@ -201,13 +205,15 @@ class FuelMoshiTest : MockHttpTestCase() {
             }
         }
 
+        @ToJson
         override fun toJson(writer: JsonWriter, value: Stage?) {
+            TODO("not implemented")
         }
     }
 
     @Test
     fun moshiTestCustomAdapterSuccess() {
-        defaultMoshi.add(TypeToken.of(Stage::class.java).type, StageMoshiAdapter())
+        defaultMoshi.add(StageAdapter())
 
         mock.apply {
             chain(
@@ -228,23 +234,23 @@ class FuelMoshiTest : MockHttpTestCase() {
 
         assertThat(req, notNullValue())
         assertThat(res, notNullValue())
-        assertThat(res1 as Success, isA(Result.Success::class.java))
+        assertThat(res1 as Result.Success, isA(Result.Success::class.java))
         assertThat(res1.value.stage, equalTo(Stage.UNKNOWN))
 
         val (_, _, res2) = Fuel.get(mock.path("stage2")).responseObject<StageDTO>()
 
-        assertThat(res2 as Success, isA(Result.Success::class.java))
+        assertThat(res2 as Result.Success, isA(Result.Success::class.java))
         assertThat(res2.value.stage, equalTo(Stage.IN_PROGRESS))
 
         val (_, _, res3) = Fuel.get(mock.path("stage3")).responseObject<StageDTO>()
 
-        assertThat(res3 as Success, isA(Result.Success::class.java))
+        assertThat(res3 as Result.Success, isA(Result.Success::class.java))
         assertThat(res3.value.stage, equalTo(Stage.FINISHED))
     }
 
     @Test
     fun moshiTestCustomAdapterFailure() {
-        defaultMoshi.add(TypeToken.of(Stage::class.java).type, StageMoshiAdapter())
+        defaultMoshi.add(StageAdapter())
 
         mock.apply {
             chain(
@@ -257,7 +263,6 @@ class FuelMoshiTest : MockHttpTestCase() {
 
         assertThat(req, notNullValue())
         assertThat(res, notNullValue())
-        assertThat(res1 as Failure, isA(Result.Failure::class.java))
-        assertThat(res1.error.exception as IllegalStateException, isA(IllegalStateException::class.java))
+        assertThat(res1 as Result.Failure, isA(Result.Failure::class.java))
     }
 }
