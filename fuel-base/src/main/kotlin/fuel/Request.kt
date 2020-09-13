@@ -22,11 +22,11 @@ public class Request internal constructor(
         /**
          * Set the data to load.
          */
-        public fun data(data: HttpUrl) : Builder = apply {
+        public fun data(data: HttpUrl): Builder = apply {
             this.data = data
         }
 
-        public fun data(data: String) : Builder = apply {
+        public fun data(data: String): Builder = apply {
             // Silently replace web socket URLs with HTTP URLs.
             val finalUrl: String = when {
                 data.startsWith("ws:", ignoreCase = true) -> {

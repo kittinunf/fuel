@@ -30,21 +30,21 @@ public interface HttpLoader {
          *
          * This is a convenience function for calling `callFactory(Call.Factory)`.
          */
-        public fun okHttpClient(okHttpClient: OkHttpClient) : Builder = callFactory(okHttpClient)
+        public fun okHttpClient(okHttpClient: OkHttpClient): Builder = callFactory(okHttpClient)
 
         /**
          * Set a lazy callback to create the [OkHttpClient] used for network requests.
          *
          * This is a convenience function for calling `callFactory(() -> Call.Factory)`.
          */
-        public fun okHttpClient(initializer: () -> OkHttpClient) : Builder = callFactory(initializer)
+        public fun okHttpClient(initializer: () -> OkHttpClient): Builder = callFactory(initializer)
 
         /**
          * Set the [Call.Factory] used for network requests.
          *
          * Calling [okHttpClient] automatically sets this value.
          */
-        public fun callFactory(callFactory: Call.Factory) : Builder = apply {
+        public fun callFactory(callFactory: Call.Factory): Builder = apply {
             this.callFactory = callFactory
         }
 
@@ -58,7 +58,7 @@ public interface HttpLoader {
          *
          * Calling [okHttpClient] automatically sets this value.
          */
-        public fun callFactory(initializer: () -> Call.Factory) : Builder = apply {
+        public fun callFactory(initializer: () -> Call.Factory): Builder = apply {
             this.callFactory = lazyCallFactory(initializer)
         }
 

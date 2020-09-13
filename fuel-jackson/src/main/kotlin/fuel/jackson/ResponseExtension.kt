@@ -9,5 +9,5 @@ import okhttp3.Response
 public val defaultMapper: ObjectMapper = ObjectMapper().registerKotlinModule()
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-public inline fun <reified T: Any> Response.toJackson(mapper: ObjectMapper = defaultMapper) : T =
+public inline fun <reified T: Any> Response.toJackson(mapper: ObjectMapper = defaultMapper): T =
     mapper.readValue(body!!.string())
