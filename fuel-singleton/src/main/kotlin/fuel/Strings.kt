@@ -3,12 +3,13 @@
 package fuel
 
 import okhttp3.RequestBody
+import okhttp3.Response
 
-suspend inline fun String.httpGet() = Fuel.get(this)
-suspend inline fun String.httpPost(requestBody: RequestBody) = Fuel.post(this, requestBody)
-suspend inline fun String.httpPut(requestBody: RequestBody) = Fuel.put(this, requestBody)
-suspend inline fun String.httpPatch(requestBody: RequestBody) = Fuel.patch(this, requestBody)
-suspend inline fun String.httpDelete(requestBody: RequestBody?) = Fuel.delete(this, requestBody)
-suspend inline fun String.httpHead() = Fuel.head(this)
-suspend inline fun String.httpMethod(method: String, requestBody: RequestBody?) =
+public suspend inline fun String.httpGet(): Response = Fuel.get(this)
+public suspend inline fun String.httpPost(requestBody: RequestBody): Response = Fuel.post(this, requestBody)
+public suspend inline fun String.httpPut(requestBody: RequestBody): Response = Fuel.put(this, requestBody)
+public suspend inline fun String.httpPatch(requestBody: RequestBody): Response = Fuel.patch(this, requestBody)
+public suspend inline fun String.httpDelete(requestBody: RequestBody?): Response = Fuel.delete(this, requestBody)
+public suspend inline fun String.httpHead(): Response = Fuel.head(this)
+public suspend inline fun String.httpMethod(method: String, requestBody: RequestBody?): Response =
     Fuel.method(this, method, requestBody)

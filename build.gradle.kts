@@ -7,6 +7,8 @@ plugins {
     jacoco
 }
 
+val sampleModules = listOf("progress", "simple-client", "weather")
+
 allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "jacoco")
@@ -21,6 +23,14 @@ allprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "1.8"
+        }
+    }
+
+    val isSample = project.name in sampleModules
+    if (!isSample) {
+        kotlin {
+            // for strict mode
+            explicitApi()
         }
     }
 
