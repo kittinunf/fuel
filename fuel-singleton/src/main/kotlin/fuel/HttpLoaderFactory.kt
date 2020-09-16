@@ -2,9 +2,9 @@
 
 package fuel
 
-fun interface HttpLoaderFactory {
+public fun interface HttpLoaderFactory {
     /**
      * Return a new [HttpLoader]
      */
-    fun newHttpLoader(): HttpLoader
+    public fun newHttpLoader(): HttpLoader
 }

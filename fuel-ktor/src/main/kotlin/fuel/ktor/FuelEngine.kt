@@ -49,7 +49,7 @@ import kotlin.coroutines.CoroutineContext
 @KtorExperimentalAPI
 @ExperimentalCoroutinesApi
 @InternalAPI
-class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-fuel") {
+public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-fuel") {
     override val dispatcher: CoroutineDispatcher by lazy {
         Dispatchers.clientDispatcher(
             config.threadsCount,
@@ -57,7 +57,7 @@ class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-f
         )
     }
 
-    override val supportedCapabilities = setOf(HttpTimeout)
+    public override val supportedCapabilities: Set<HttpTimeout.Feature> = setOf(HttpTimeout)
 
     private val requestsJob: CoroutineContext
 

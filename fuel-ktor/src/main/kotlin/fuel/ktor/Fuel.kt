@@ -16,7 +16,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  * [HttpClientEngineFactory] using a [Fuel] based backend implementation
  * with the the associated configuration [FuelConfig].
  */
-object Fuel : HttpClientEngineFactory<FuelConfig> {
+public object Fuel : HttpClientEngineFactory<FuelConfig> {
     @ExperimentalCoroutinesApi
     @KtorExperimentalAPI
     @InternalAPI
@@ -25,7 +25,7 @@ object Fuel : HttpClientEngineFactory<FuelConfig> {
 }
 
 @Suppress("KDocMissingDocumentation")
-class FuelEngineContainer : HttpClientEngineContainer {
+public class FuelEngineContainer : HttpClientEngineContainer {
     override val factory: HttpClientEngineFactory<*> = Fuel
 
     override fun toString(): String = "Fuel"

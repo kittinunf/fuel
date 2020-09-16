@@ -3,19 +3,19 @@
 
 package fuel
 
-object Fuel {
+public object Fuel {
     private var httpLoader: HttpLoader? = null
     private var httpLoaderFactory: HttpLoaderFactory? = null
 
     /**
      * Get the default [HttpLoader]. Creates a new instance if none has been set.
      */
-    fun httpLoader(): HttpLoader = httpLoader ?: newHttpLoader()
+    public fun httpLoader(): HttpLoader = httpLoader ?: newHttpLoader()
 
     /**
      * Set the default [HttpLoader]. Shutdown the current instance if there is one.
      */
-    fun setHttpLoader(loader: HttpLoader) {
+    public fun setHttpLoader(loader: HttpLoader) {
         setHttpLoader { loader }
     }
 
@@ -24,7 +24,7 @@ object Fuel {
      * Shutdown the current instance if there is one. The [factory] is guaranteed to be called at most once.
      */
     @Synchronized
-    fun setHttpLoader(factory: HttpLoaderFactory) {
+    public fun setHttpLoader(factory: HttpLoaderFactory) {
         httpLoaderFactory = factory
         httpLoader = null
     }

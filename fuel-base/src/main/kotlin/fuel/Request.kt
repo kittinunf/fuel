@@ -7,13 +7,13 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.RequestBody
 
-class Request internal constructor(
-    val data: HttpUrl,
-    val headers: Headers,
-    val requestBody: RequestBody?,
-    val method: String?
+public class Request internal constructor(
+    public val data: HttpUrl,
+    public val headers: Headers,
+    public val requestBody: RequestBody?,
+    public val method: String?
 ) {
-    open class Builder {
+    public open class Builder {
         private var data: HttpUrl? = null
         private var headers = Headers.Builder()
         private var requestBody: RequestBody? = null
@@ -22,11 +22,11 @@ class Request internal constructor(
         /**
          * Set the data to load.
          */
-        fun data(data: HttpUrl) = apply {
+        public fun data(data: HttpUrl): Builder = apply {
             this.data = data
         }
 
-        fun data(data: String) = apply {
+        public fun data(data: String): Builder = apply {
             // Silently replace web socket URLs with HTTP URLs.
             val finalUrl: String = when {
                 data.startsWith("ws:", ignoreCase = true) -> {
@@ -43,7 +43,7 @@ class Request internal constructor(
         /**
          * Set the [Headers] for any network operations performed by this request.
          */
-        fun headers(headers: Headers): Builder {
+        public fun headers(headers: Headers): Builder {
             this.headers = headers.newBuilder()
             return this
         }
@@ -53,7 +53,7 @@ class Request internal constructor(
          *
          * @see Headers.Builder.add
          */
-        fun addHeader(name: String, value: String): Builder {
+        public fun addHeader(name: String, value: String): Builder {
             this.headers = this.headers.add(name, value)
             return this
         }
@@ -63,7 +63,7 @@ class Request internal constructor(
          *
          * @see Headers.Builder.set
          */
-        fun setHeader(name: String, value: String): Builder {
+        public fun setHeader(name: String, value: String): Builder {
             this.headers = this.headers.set(name, value)
             return this
         }
@@ -71,17 +71,17 @@ class Request internal constructor(
         /**
          * Remove all network headers with the key [name].
          */
-        fun removeHeader(name: String): Builder {
+        public fun removeHeader(name: String): Builder {
             this.headers = this.headers.removeAll(name)
             return this
         }
 
-        fun requestBody(requestBody: RequestBody?): Builder {
+        public fun requestBody(requestBody: RequestBody?): Builder {
             this.requestBody = requestBody
             return this
         }
 
-        fun method(method: String?): Builder {
+        public fun method(method: String?): Builder {
             this.method = method
             return this
         }
@@ -89,7 +89,7 @@ class Request internal constructor(
         /**
          * Create a new [Request] instance.
          */
-        fun build() = Request(
+        public fun build(): Request = Request(
             checkNotNull(data) { "data == null" },
             headers.build(),
             requestBody,

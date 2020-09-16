@@ -5,13 +5,13 @@ import com.squareup.moshi.Moshi
 import okhttp3.Response
 import java.lang.reflect.Type
 
-val defaultMoshi = Moshi.Builder()
+public val defaultMoshi: Moshi.Builder = Moshi.Builder()
 
-fun <T : Any> Response.toMoshi(clazz: Class<T>) =
+public fun <T : Any> Response.toMoshi(clazz: Class<T>): T? =
     defaultMoshi.build().adapter(clazz).fromJson(body!!.source())
 
-fun <T : Any> Response.toMoshi(type: Type) =
+public fun <T : Any> Response.toMoshi(type: Type): T? =
     defaultMoshi.build().adapter<T>(type).fromJson(body!!.source())
 
-fun <T : Any> Response.toMoshi(jsonAdapter: JsonAdapter<T>) =
+public fun <T : Any> Response.toMoshi(jsonAdapter: JsonAdapter<T>): T? =
     jsonAdapter.fromJson(body!!.source())
