@@ -35,7 +35,7 @@ allprojects {
     }
 
     jacoco {
-        toolVersion = "0.8.6-SNAPSHOT"
+        toolVersion = "0.8.6"
     }
 
     tasks.jacocoTestReport {
