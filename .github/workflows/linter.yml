@@ -45,4 +45,5 @@ jobs:
       - name: Lint Code Base
         uses: docker://github/super-linter:v3
         env:
+          VALIDATE_BASH: false
           DEFAULT_BRANCH: 3.x
