@@ -1,5 +1,5 @@
 apply(plugin = "com.vanniktech.maven.publish")
 
 dependencies {
-    api (project(":fuel-base"))
+    api(project(":fuel-base"))
 }

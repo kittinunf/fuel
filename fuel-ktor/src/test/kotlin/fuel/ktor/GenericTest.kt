@@ -50,9 +50,7 @@ class GenericTest {
     fun `throws error for HttpTimeout Feature not installed`() = runBlocking {
         val client = HttpClient()
         client.get<String>("https://www.google.com") {
-            timeout {
-
-            }
+            timeout {}
         }
         assertNotNull(client)
     }
