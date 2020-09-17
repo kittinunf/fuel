@@ -7,6 +7,8 @@ plugins {
     jacoco
 }
 
+val sampleModules = listOf("progress", "simple-client", "weather")
+
 allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "jacoco")
@@ -24,8 +26,16 @@ allprojects {
         }
     }
 
+    val isSample = project.name in sampleModules
+    if (!isSample) {
+        kotlin {
+            // for strict mode
+            explicitApi()
+        }
+    }
+
     jacoco {
-        toolVersion = "0.8.6-SNAPSHOT"
+        toolVersion = "0.8.6"
     }
 
     tasks.jacocoTestReport {

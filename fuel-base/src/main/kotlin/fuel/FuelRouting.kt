@@ -4,27 +4,27 @@ import okhttp3.Headers
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.RequestBody
 
-interface FuelRouting : RequestConvertible {
+public interface FuelRouting : RequestConvertible {
     /**
      * Base path handler for the remote call.
      */
-    val basePath: String
+    public val basePath: String
     /**
      * Method handler for the remote requests.
      */
-    val method: String
+    public val method: String
     /**
      * Path handler for the request.
      */
-    val path: String
+    public val path: String
     /**
      * Headers for remote call.
      */
-    val headers: Headers.Builder?
+    public val headers: Headers.Builder?
     /**
      * Body to handle other type of request (e.g. application/json )
      */
-    val body: RequestBody?
+    public val body: RequestBody?
 
     override val request: Request
         get() = Request(
