@@ -4,11 +4,13 @@ import io.ktor.client.HttpClient
 import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.timeout
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import java.lang.IllegalArgumentException
+import java.net.SocketTimeoutException
 
 class GenericTest {
     @Test
@@ -56,12 +58,25 @@ class GenericTest {
     }
 
     @Test
-    fun `setting socket timeout for not null`() {
+    fun `setting socket timeout for not null`() = runBlocking {
         val client = HttpClient {
-            install(HttpTimeout) {
-                socketTimeoutMillis = 1500
-            }
+            install(HttpTimeout)
         }
-        assertNotNull(client)
+        val response = client.get<String>("https://www.google.com") {
+            parameter("delay", "5000")
+            timeout { socketTimeoutMillis = 1000 }
+        }
+        assertNotNull(response)
+    }
+
+    @Test(expected = SocketTimeoutException::class)
+    fun testConnectTimeoutPerRequestAttributes() = runBlocking {
+        val client = HttpClient {
+            install(HttpTimeout)
+        }
+        val response = client.get<String>("http://www.google.com:81") {
+            timeout { connectTimeoutMillis = 1000 }
+        }
+        assertNotNull(response)
     }
 }

@@ -12,7 +12,6 @@ import io.ktor.client.engine.HttpClientEngineBase
 import io.ktor.client.engine.callContext
 import io.ktor.client.engine.mergeHeaders
 import io.ktor.client.features.HttpTimeout
-import io.ktor.client.features.SocketTimeoutException
 import io.ktor.client.features.convertLongTimeoutToLongWithInfiniteAsZero
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
@@ -79,6 +78,7 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
                 clientCache.forEach { (_, client) ->
                     client.connectionPool.evictAll()
                 }
+                @Suppress("BlockingMethodInNonBlockingContext")
                 (dispatcher as Closeable).close()
             }
         }
@@ -92,7 +92,7 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
         val engineRequest = data.convertToFuelRequest(callContext)
         val httpLoader = HttpLoader.Builder().okHttpClient(requestEngine).build()
 
-        return executeHttpRequest(httpLoader, engineRequest, callContext, data)
+        return executeHttpRequest(httpLoader, engineRequest, callContext)
     }
 
     override fun close() {
@@ -116,7 +116,6 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
         engine: HttpLoader,
         engineRequest: Request,
         callContext: CoroutineContext,
-        requestData: HttpRequestData
     ): HttpResponseData {
         val requestTime = GMTDate()
         val response = engine.method(engineRequest)
@@ -124,7 +123,7 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
         val body = response.body
         callContext[Job]!!.invokeOnCompletion { body?.close() }
 
-        val responseContent = body?.source()?.toChannel(callContext, requestData) ?: ByteReadChannel.Empty
+        val responseContent = body?.source()?.toChannel(callContext) ?: ByteReadChannel.Empty
         return buildResponseData(response, requestTime, responseContent, callContext)
     }
 
@@ -164,26 +163,17 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
     }
 }
 
-private fun BufferedSource.toChannel(context: CoroutineContext, requestData: HttpRequestData): ByteReadChannel =
+private fun BufferedSource.toChannel(context: CoroutineContext): ByteReadChannel =
     GlobalScope.writer(context) {
+        var lastRead = 0
         use { source ->
-            var lastRead = 0
             while (source.isOpen && context.isActive && lastRead >= 0) {
                 channel.write { buffer ->
-                    lastRead = try {
-                        source.read(buffer)
-                    } catch (cause: Throwable) {
-                        throw mapExceptions(cause, requestData)
-                    }
+                    lastRead = source.read(buffer)
                 }
             }
         }
     }.channel
-
-private fun mapExceptions(cause: Throwable, request: HttpRequestData): Throwable = when (cause) {
-    is java.net.SocketTimeoutException -> SocketTimeoutException(request, cause)
-    else -> cause
-}
 
 @InternalAPI
 private fun HttpRequestData.convertToFuelRequest(callContext: CoroutineContext): Request {
