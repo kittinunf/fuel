@@ -66,7 +66,9 @@ class UploadRequest private constructor(private val wrapped: Request) : Request 
      * Add all [dataParts] to be written to the [UploadBody]
      * @param dataParts [Iterable<DataPart>] the iterable that yields [DataPart]s
      */
-    operator fun plus(dataParts: Iterable<DataPart>) = dataParts.fold(this, UploadRequest::plus)
+    operator fun plus(dataParts: Iterable<DataPart>) = dataParts.fold(this) { acc, dataPart ->
+        acc.plus(dataPart)
+    }
 
     /**
      * Add a [ProgressCallback] to the [requestProgress]

@@ -22,10 +22,9 @@ inline fun <reified T : Any> Request.responseObject(handler: ResponseHandler<T>)
 inline fun <reified T : Any> Request.responseObject() = response(moshiDeserializerOf(T::class.java))
 
 fun <T : Any> moshiDeserializerOf(clazz: Class<T>) = object : ResponseDeserializable<T> {
-    override fun deserialize(content: String): T? = defaultMoshi
-            .build()
-            .adapter(clazz)
-            .fromJson(content)
+    override fun deserialize(inputStream: InputStream): T? = defaultMoshi.build().adapter(clazz).fromJson(Okio.buffer(Okio.source(inputStream)))
+
+    override fun deserialize(content: String): T? = defaultMoshi.build().adapter(clazz).fromJson(content)
 }
 
 inline fun <reified T : Any> moshiDeserializerOf(adapter: JsonAdapter<T>) = object : ResponseDeserializable<T> {

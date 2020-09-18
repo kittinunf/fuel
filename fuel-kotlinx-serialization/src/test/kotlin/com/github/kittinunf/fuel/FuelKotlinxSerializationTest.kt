@@ -8,9 +8,8 @@ import com.github.kittinunf.fuel.serialization.kotlinxDeserializerOf
 import com.github.kittinunf.fuel.serialization.responseObject
 import com.github.kittinunf.fuel.test.MockHttpTestCase
 import com.github.kittinunf.result.Result
-import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.ListSerializer
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.isA
@@ -24,7 +23,6 @@ import org.junit.Test
 import org.mockserver.matchers.Times
 import java.net.HttpURLConnection
 
-@ImplicitReflectionSerializer
 class FuelKotlinxSerializationTest : MockHttpTestCase() {
 
     // Model
@@ -175,7 +173,7 @@ class FuelKotlinxSerializationTest : MockHttpTestCase() {
                     " ]").withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        Fuel.get(mock.path("issues")).responseObject(loader = IssueInfo.serializer().list) { _, _, result ->
+        Fuel.get(mock.path("issues")).responseObject(loader = ListSerializer(IssueInfo.serializer())) { _, _, result ->
             val issues = result.get()
             assertNotEquals(issues.size, 0)
             assertThat(issues[0], isA(IssueInfo::class.java))

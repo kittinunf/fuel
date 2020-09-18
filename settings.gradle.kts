@@ -19,6 +19,7 @@ pluginManagement {
         }
     }
 }
+
 val projects = listOf(
         Fuel.name,
         Fuel.Android.name,

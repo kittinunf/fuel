@@ -75,7 +75,7 @@ object Fuel {
 
 // Core dependencies
 object Kotlin {
-    const val version = "1.3.70"
+    const val version = "1.4.10"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
     const val plugin = "kotlin"
     const val androidPlugin = "kotlin-android"
@@ -83,12 +83,12 @@ object Kotlin {
 }
 
 object Result {
-    const val version = "2.2.0"
+    const val version = "3.1.0"
     const val dependency = "com.github.kittinunf.result:result:$version"
 }
 
 object Json {
-    const val version = "20180813"
+    const val version = "20200518"
     const val dependency = "org.json:json:$version"
 }
 
@@ -129,37 +129,39 @@ object AndroidX {
 
 // Modules dependencies
 object Forge {
-    const val version = "1.0.0-alpha2"
+    const val version = "1.0.0-alpha3"
     const val dependency = "com.github.kittinunf.forge:forge:$version"
 }
 
 object Gson {
-    const val version = "2.8.5"
+    const val version = "2.8.6"
     const val dependency = "com.google.code.gson:gson:$version"
 }
 
 object Jackson {
-    const val version = "2.9.9"
+    const val version = "2.11.2"
     const val dependency = "com.fasterxml.jackson.module:jackson-module-kotlin:$version"
 }
 
 object KotlinX {
     object Coroutines {
-        const val version = "1.3.3"
+        const val version = "1.3.9"
         val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         val jvm = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     }
 
     object Serialization {
-        const val version = "0.20.0"
-        const val dependency = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$version"
+        const val version = "1.0.0-RC"
+        const val dependency = "org.jetbrains.kotlinx:kotlinx-serialization-core:$version"
         const val plugin = "kotlinx-serialization"
     }
 }
 
 object Moshi {
-    const val version = "1.8.0"
+    const val version = "1.10.0"
     const val dependency = "com.squareup.moshi:moshi:$version"
+
+    const val codegen = "com.squareup.moshi:moshi-kotlin-codegen:$version"
 }
 
 object Reactor {
