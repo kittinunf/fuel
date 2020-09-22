@@ -195,7 +195,7 @@ subprojects {
 
             fun MavenPom.addDependencies() = withXml {
                 asNode().appendNode("dependencies").let { depNode ->
-                    configurations.implementation.allDependencies.forEach {
+                    configurations.implementation.get().allDependencies.forEach {
                         depNode.appendNode("dependency").apply {
                             appendNode("groupId", it.group)
                             appendNode("artifactId", it.name)
