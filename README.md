@@ -1,6 +1,7 @@
 # Fuel
 
-[![bintray](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg)](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion)
+[![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg)](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion)
+[![mavenCentral](https://maven-badges.herokuapp.com/maven-central/com.github.kittinunf.fuel/fuel/badge.svg)](https://search.maven.org/search?q=g:com.github.kittinunf.fuel)
 [![Build Status](https://travis-ci.org/kittinunf/fuel.svg?branch=master)](https://travis-ci.org/kittinunf/fuel)
 [![Codecov](https://codecov.io/github/kittinunf/fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/fuel)
 
@@ -26,8 +27,8 @@ We offer maven and jitpack installations. Maven via bintray only has stable rele
 
 ### Maven
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `Fuel` with `Maven` and `Gradle`. The core package has the following dependencies:
-* Kotlin - [![Kotlin](https://img.shields.io/badge/Kotlin-1.3.30-blue.svg)](https://kotlinlang.org)
-* Result - 2.2.0
+* Kotlin - [![Kotlin](https://img.shields.io/badge/Kotlin-1.4.10-blue.svg)](https://kotlinlang.org)
+* [ Result ](https://github.com/kittinunf/result/) - 3.1.0
 
 ```groovy
   //core
@@ -40,7 +41,7 @@ You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersi
 Make sure to include `jcenter()` or `mavenCentral()` in your repositories 
 ```groovy
 repositories {
-  jcenter()
+  jcenter() //or mavenCentral()
 }
 ```
 

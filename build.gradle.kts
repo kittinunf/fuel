@@ -1,5 +1,6 @@
 import com.android.build.gradle.BaseExtension
 import com.dicedmelon.gradle.jacoco.android.JacocoAndroidUnitTestReportExtension
+import com.jfrog.bintray.gradle.BintrayExtension.GpgConfig
 import org.gradle.api.publish.maven.MavenPom
 import org.jmailen.gradle.kotlinter.KotlinterExtension
 import org.jmailen.gradle.kotlinter.support.ReporterType
@@ -184,13 +185,17 @@ subprojects {
                     setLicenses(Fuel.Package.licenseName)
                     with(version) {
                         name = Fuel.publishVersion
+                        gpg(delegateClosureOf<GpgConfig> {
+                            sign = true
+                            passphrase = System.getenv("GPG_PASSPHRASE") ?: ""
+                        })
                     }
                 }
             }
 
             fun MavenPom.addDependencies() = withXml {
                 asNode().appendNode("dependencies").let { depNode ->
-                    configurations.implementation.allDependencies.forEach {
+                    configurations.implementation.get().allDependencies.forEach {
                         depNode.appendNode("dependency").apply {
                             appendNode("groupId", it.group)
                             appendNode("artifactId", it.name)
