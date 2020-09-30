@@ -1,5 +1,5 @@
 // Inspired by https://github.com/coil-kt/coil/blob/master/coil-default/src/main/java/coil/Coil.kt
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("unused")
 
 package fuel
 
@@ -13,15 +13,18 @@ public object Fuel {
     public fun httpLoader(): HttpLoader = httpLoader ?: newHttpLoader()
 
     /**
-     * Set the default [HttpLoader]. Shutdown the current instance if there is one.
+     * Set the default [HttpLoader]. Prefer using `setHttpLoader(HttpLoaderFactory)`
+     * to create the [HttpLoader] lazily.
      */
+    @Synchronized
     public fun setHttpLoader(loader: HttpLoader) {
-        setHttpLoader { loader }
+        httpLoaderFactory = null
+        httpLoader = loader
     }
 
     /**
      * Set the [HttpLoaderFactory] that will be used to create the default [HttpLoader].
-     * Shutdown the current instance if there is one. The [factory] is guaranteed to be called at most once.
+     * The [factory] is guaranteed to be called at most once.
      */
     @Synchronized
     public fun setHttpLoader(factory: HttpLoaderFactory) {
@@ -38,7 +41,7 @@ public object Fuel {
         // Create a new HttpLoader.
         val loader = httpLoaderFactory?.newHttpLoader() ?: HttpLoader()
         httpLoaderFactory = null
-        setHttpLoader(loader)
+        httpLoader = loader
         return loader
     }
 }
