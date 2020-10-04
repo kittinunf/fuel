@@ -42,4 +42,5 @@ include(*(projects.toTypedArray()))
 val includeSample: String by settings
 if (includeSample == "true") {
     include(":sample")
+    include(":fuel-app")
 }
