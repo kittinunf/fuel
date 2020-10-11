@@ -17,13 +17,11 @@ import java.io.Reader
 val defaultMapper = ObjectMapper().registerKotlinModule()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) {
-    response(jacksonDeserializerOf(), handler)
-}
+inline fun <reified T : Any> Request.responseObject(noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) =
+        response(jacksonDeserializerOf(), handler)
 
-inline fun <reified T : Any> Request.responseObject(mapper: ObjectMapper, noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) {
-    response(jacksonDeserializerOf(mapper), handler)
-}
+inline fun <reified T : Any> Request.responseObject(mapper: ObjectMapper, noinline handler: (Request, Response, Result<T, FuelError>) -> Unit) =
+        response(jacksonDeserializerOf(mapper), handler)
 
 inline fun <reified T : Any> Request.responseObject(mapper: ObjectMapper, handler: ResponseHandler<T>) = response(jacksonDeserializerOf(mapper), handler)
 
