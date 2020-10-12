@@ -4,15 +4,15 @@ object Library {
     private const val COROUTINES_VERSION = "1.3.9"
     const val KOTLINX_COROUTINES_CORE = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$COROUTINES_VERSION"
 
-    private const val OKHTTP_VERSION = "4.9.0"
+    private const val OKHTTP_VERSION = "4.10.0-RC1"
     const val OKHTTP = "com.squareup.okhttp3:okhttp:$OKHTTP_VERSION"
     const val OKHTTP_MOCK_WEB_SERVER = "com.squareup.okhttp3:mockwebserver:$OKHTTP_VERSION"
 
     private const val FORGE_VERSION = "1.0.0-alpha2"
     const val FORGE = "com.github.kittinunf.forge:forge:$FORGE_VERSION"
 
-    private const val SERIALIZATION_VERSION = "1.0.0-RC"
-    const val KOTLINX_SERIALIZATION_RUNTIME = "org.jetbrains.kotlinx:kotlinx-serialization-core:$SERIALIZATION_VERSION"
+    private const val SERIALIZATION_VERSION = "1.0.0"
+    const val KOTLINX_SERIALIZATION_RUNTIME = "org.jetbrains.kotlinx:kotlinx-serialization-json:$SERIALIZATION_VERSION"
 
     private const val MOSHI_VERSION = "1.10.0"
     const val MOSHI = "com.squareup.moshi:moshi:$MOSHI_VERSION"
