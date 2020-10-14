@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.HttpException
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseHandler
@@ -20,6 +21,7 @@ import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertThat
+import org.junit.Assert.fail
 import org.junit.Test
 import org.mockserver.matchers.Times
 import java.net.HttpURLConnection
@@ -38,25 +40,33 @@ class FuelJacksonTest : MockHttpTestCase() {
 
         Fuel.get(mock.path("user-agent"))
             .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
-                assertThat(result.component1(), instanceOf(HttpBinUserAgentModel::class.java))
-                assertThat(result.component1()?.userAgent, not(""))
-                assertThat(result.component2(), instanceOf(FuelError::class.java))
+                assertThat(result, instanceOf(Result.Success::class.java))
+                with(result as Result.Success) {
+                    assertThat(value, instanceOf(HttpBinUserAgentModel::class.java))
+                    assertThat(value.userAgent, not(""))
+                }
             }
+            .get()
     }
 
     @Test
     fun jacksonTestResponseObjectWithCustomMapper() {
         mock.chain(
                 request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+                response = mock.response()
+                    .withBody("""{ "user_agent": "test" }""")
+                    .withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>(createCustomMapper())) { _, _, result ->
-                    assertThat(result.component1(), instanceOf(HttpBinUserAgentModel::class.java))
-                    assertThat(result.component1()?.userAgent, not(""))
-                    assertThat(result.component2(), instanceOf(FuelError::class.java))
+            .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>(createCustomMapper())) { _, _, result ->
+                assertThat(result, instanceOf(Result.Success::class.java))
+                with(result as Result.Success) {
+                    assertThat(value, instanceOf(HttpBinUserAgentModel::class.java))
+                    assertThat(value.userAgent, not(""))
                 }
+            }
+            .get()
     }
 
     @Test
@@ -68,9 +78,12 @@ class FuelJacksonTest : MockHttpTestCase() {
 
         Fuel.get(mock.path("user-agent"))
             .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>()) { _, _, result ->
-                assertThat(result.component1(), notNullValue())
-                assertThat(result.component2(), instanceOf(Result.Failure::class.java))
+                assertThat(result, instanceOf(Result.Failure::class.java))
+                with(result as Result.Failure) {
+                    assertThat(error, notNullValue())
+                }
             }
+            .get()
     }
 
     @Test
@@ -81,10 +94,13 @@ class FuelJacksonTest : MockHttpTestCase() {
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>(createCustomMapper())) { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), instanceOf(Result.Failure::class.java))
+            .responseObject(jacksonDeserializerOf<HttpBinUserAgentModel>(createCustomMapper())) { _, _, result ->
+                assertThat(result, instanceOf(Result.Failure::class.java))
+                with(result as Result.Failure) {
+                    assertThat(error, notNullValue())
                 }
+            }
+            .get()
     }
 
     @Test
@@ -96,23 +112,33 @@ class FuelJacksonTest : MockHttpTestCase() {
 
         Fuel.get(mock.path("user-agent"))
             .responseObject<HttpBinUserAgentModel> { _, _, result ->
-                assertThat(result.component1(), notNullValue())
-                assertThat(result.component2(), notNullValue())
+                assertThat(result, instanceOf(Result.Success::class.java))
+                with(result as Result.Success) {
+                    assertThat(value, instanceOf(HttpBinUserAgentModel::class.java))
+                    assertThat(value.userAgent, not(""))
+                }
             }
+            .get()
     }
 
     @Test
     fun jacksonTestResponseDeserializerObjectWithCustomMapper() {
         mock.chain(
                 request = mock.request().withPath("/user-agent"),
-                response = mock.reflect()
+                response = mock.response()
+                    .withBody("""{ "user_agent": "test" }""")
+                    .withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject<HttpBinUserAgentModel>(createCustomMapper()) { _, _, result ->
-                    assertThat(result.component1(), notNullValue())
-                    assertThat(result.component2(), notNullValue())
+            .responseObject<HttpBinUserAgentModel>(createCustomMapper()) { _, _, result ->
+                assertThat(result, instanceOf(Result.Success::class.java))
+                with(result as Result.Success) {
+                    assertThat(value, instanceOf(HttpBinUserAgentModel::class.java))
+                    assertThat(value.userAgent, not(""))
                 }
+            }
+            .get()
     }
 
     @Test
@@ -124,9 +150,12 @@ class FuelJacksonTest : MockHttpTestCase() {
 
         Fuel.get(mock.path("user-agent"))
             .responseObject<HttpBinUserAgentModel> { _, _, result ->
-                assertThat(result.component1(), notNullValue())
-                assertThat(result.component2(), instanceOf(Result.Failure::class.java))
+                assertThat(result, instanceOf(Result.Failure::class.java))
+                with(result as Result.Failure) {
+                    assertThat(error, notNullValue())
+                }
             }
+            .get()
     }
 
     @Test
@@ -143,9 +172,10 @@ class FuelJacksonTest : MockHttpTestCase() {
                 }
 
                 override fun failure(request: Request, response: Response, error: FuelError) {
-                    assertThat(error, notNullValue())
+                    fail("Request shouldn't have failed")
                 }
             })
+            .get()
     }
 
     @Test
@@ -156,15 +186,16 @@ class FuelJacksonTest : MockHttpTestCase() {
         )
 
         Fuel.get(mock.path("user-agent"))
-                .responseObject(createCustomMapper(), object : ResponseHandler<HttpBinUserAgentModel> {
-                    override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                        assertThat(value, notNullValue())
-                    }
+            .responseObject(createCustomMapper(), object : ResponseHandler<HttpBinUserAgentModel> {
+                override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
+                    assertThat(value, notNullValue())
+                }
 
-                    override fun failure(request: Request, response: Response, error: FuelError) {
-                        assertThat(error, notNullValue())
-                    }
-                })
+                override fun failure(request: Request, response: Response, error: FuelError) {
+                    fail("Request shouldn't have failed")
+                }
+            })
+            .get()
     }
 
     @Test
@@ -177,13 +208,14 @@ class FuelJacksonTest : MockHttpTestCase() {
         Fuel.get(mock.path("user-agent"))
             .responseObject(createCustomMapper(), object : ResponseHandler<HttpBinUserAgentModel> {
                 override fun success(request: Request, response: Response, value: HttpBinUserAgentModel) {
-                    assertThat(value, notNullValue())
+                    fail("Request should have failed")
                 }
 
                 override fun failure(request: Request, response: Response, error: FuelError) {
-                    assertThat(error, instanceOf(Result.Failure::class.java))
+                    assertThat(error.exception, instanceOf(HttpException::class.java))
                 }
             })
+            .get()
     }
 
     @Test
@@ -240,54 +272,94 @@ class FuelJacksonTest : MockHttpTestCase() {
     fun testProcessingGenericList() {
         mock.chain(
             request = mock.request().withPath("/issues"),
-            response = mock.response().withBody("[ " +
-                    "{ \"id\": 1, \"title\": \"issue 1\", \"number\": null }, " +
-                    "{ \"id\": 2, \"title\": \"issue 2\", \"number\": 32 }, " +
-                    " ]").withStatusCode(HttpURLConnection.HTTP_OK)
+            response = mock.response()
+                .withBody(
+                    """
+                      [
+                        {
+                          "id": 1,
+                          "title": "issue 1",
+                          "number": null
+                        },
+                        {
+                          "id": 2,
+                          "title": "issue 2",
+                          "number": 32
+                        }
+                      ]
+                    """
+                )
+                .withStatusCode(HttpURLConnection.HTTP_OK)
         )
 
-        Fuel.get(mock.path("issues")).responseObject<List<IssueInfo>> { _, _, result ->
-            val issues = result.get()
-            assertNotEquals(issues.size, 0)
-            assertThat(issues[0], isA(IssueInfo::class.java))
-        }
+        Fuel.get(mock.path("issues"))
+            .responseObject<List<IssueInfo>> { _, _, result ->
+                val issues = result.get()
+                assertNotEquals(issues.size, 0)
+                assertThat(issues[0], isA(IssueInfo::class.java))
+            }
+            .get()
     }
 
     @Test
     fun manualDeserializationShouldWork() {
         mock.chain(
             request = mock.request().withPath("/issues"),
-            response = mock.response().withBody("[ " +
-                    "{ \"id\": 1, \"title\": \"issue 1\", \"number\": null }, " +
-                    "{ \"id\": 2, \"title\": \"issue 2\", \"number\": 32 }, " +
-                    " ]").withStatusCode(HttpURLConnection.HTTP_OK),
-            times = Times.exactly(2)
+            response = mock.response()
+                .withBody(
+                    """
+                      [
+                        {
+                          "id": 1,
+                          "title": "issue 1",
+                          "number": null
+                        },
+                        {
+                          "id": 2,
+                          "title": "issue 2",
+                          "number": 32
+                        }
+                      ]
+                    """
+                )
+                .withStatusCode(HttpURLConnection.HTTP_OK),
+            times = Times.exactly(5)
         )
 
-        Fuel.get(mock.path("issues")).response { _: Request, response: Response, _ ->
-            val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response)
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-        }
+        Fuel.get(mock.path("issues"))
+            .response { _: Request, response: Response, _ ->
+                val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response)
+                assertThat(issueList[0], isA(IssueInfo::class.java))
+            }
+            .get()
 
-        Fuel.get(mock.path("issues")).response { _: Request, response: Response, _ ->
-            val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response.body().toStream())!!
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-        }
+        Fuel.get(mock.path("issues"))
+            .response { _: Request, response: Response, _ ->
+                val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response.body().toStream())!!
+                assertThat(issueList[0], isA(IssueInfo::class.java))
+            }
+            .get()
 
-        Fuel.get(mock.path("issues")).response { _: Request, response: Response, _ ->
-            val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response.body().toStream().reader())!!
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-        }
+        Fuel.get(mock.path("issues"))
+            .response { _: Request, response: Response, _ ->
+                val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(response.body().toStream().reader())!!
+                assertThat(issueList[0], isA(IssueInfo::class.java))
+            }
+            .get()
 
-        Fuel.get(mock.path("issues")).response { _: Request, _, result: Result<ByteArray, FuelError> ->
-            val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-        }
+        Fuel.get(mock.path("issues"))
+            .response { _: Request, _, result: Result<ByteArray, FuelError> ->
+                val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
+                assertThat(issueList[0], isA(IssueInfo::class.java))
+            }
+            .get()
 
-        Fuel.get(mock.path("issues")).responseString { _: Request, _: Response, result: Result<String, FuelError> ->
-            val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
-            assertThat(issueList[0], isA(IssueInfo::class.java))
-        }
+        Fuel.get(mock.path("issues"))
+            .responseString { _: Request, _: Response, result: Result<String, FuelError> ->
+                val issueList = jacksonDeserializerOf<List<IssueInfo>>().deserialize(result.get())!!
+                assertThat(issueList[0], isA(IssueInfo::class.java))
+            }
+            .get()
     }
 
     private fun createCustomMapper(): ObjectMapper {
