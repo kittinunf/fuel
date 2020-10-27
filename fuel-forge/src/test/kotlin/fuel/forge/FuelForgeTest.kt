@@ -1,11 +1,11 @@
 package fuel.forge
 
-import com.github.kittinunf.forge.core.DeserializedResult
 import com.github.kittinunf.forge.core.JSON
 import com.github.kittinunf.forge.core.apply
 import com.github.kittinunf.forge.core.at
 import com.github.kittinunf.forge.core.map
 import com.github.kittinunf.forge.util.create
+import com.github.kittinunf.result.Result
 import fuel.Fuel
 import fuel.get
 import kotlinx.coroutines.Dispatchers
@@ -39,8 +39,8 @@ class FuelForgeTest {
         val binUserAgentModel = HttpBinUserAgentModel("Fuel", "OK")
         val response = Fuel.get(mockWebServer.url("user-agent"))
         when (val forge = response.toForge(httpBinUserDeserializer)) {
-            is DeserializedResult.Success -> assertEquals(binUserAgentModel, forge.value)
-            is DeserializedResult.Failure -> fail(forge.error.localizedMessage)
+            is Result.Success -> assertEquals(binUserAgentModel, forge.value)
+            is Result.Failure -> fail(forge.error.localizedMessage)
         }
 
         withContext(Dispatchers.IO) {

@@ -24,5 +24,8 @@ object Library {
     private const val JACKSON_VERSION = "2.12.0-rc1"
     const val JACKSON_KOTLIN_MODULE = "com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_VERSION"
 
+    private const val RESULT_VERSION = "1.3.0"
+    const val RESULT = "com.github.kittinunf.result:result:$RESULT_VERSION"
+
     const val JUNIT = "junit:junit:4.13"
 }
