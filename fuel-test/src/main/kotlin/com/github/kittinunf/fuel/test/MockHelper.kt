@@ -137,6 +137,8 @@ class MockHelper {
      */
     fun path(path: String): String = URL("http://localhost:${server().localPort}/$path").toString()
 
+    fun securedPath(path: String): String = URL("https://localhost:${server().localPort}/$path").toString()
+
     companion object {
         const val REFLECT_TEMPLATE = """
             return {
