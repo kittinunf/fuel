@@ -26,4 +26,22 @@ class ForceMethodTest : MockHttpTestCase() {
         httpUrlConnection.forceMethod(Method.POST)
         assertThat(httpUrlConnection.requestMethod, equalTo(Method.POST.value))
     }
+
+    @Test
+    fun forceHttpsPatchMethod() {
+        val connection = URL(this.mock.securedPath("secured-force-patch-test")).openConnection()
+        assert(connection is HttpURLConnection)
+        val httpUrlConnection = connection as HttpURLConnection
+        httpUrlConnection.forceMethod(Method.PATCH)
+        assertThat(httpUrlConnection.requestMethod, equalTo(Method.PATCH.value))
+    }
+
+    @Test
+    fun forceHttpsPostMethod() {
+        val connection = URL(this.mock.securedPath("secured-force-post-test")).openConnection()
+        assert(connection is HttpURLConnection)
+        val httpUrlConnection = connection as HttpURLConnection
+        httpUrlConnection.forceMethod(Method.POST)
+        assertThat(httpUrlConnection.requestMethod, equalTo(Method.POST.value))
+    }
 }

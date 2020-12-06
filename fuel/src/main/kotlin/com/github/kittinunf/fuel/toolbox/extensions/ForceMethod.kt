@@ -20,16 +20,20 @@ fun HttpURLConnection.forceMethod(method: Method) {
             } catch (ex: NoSuchFieldException) {
                 // ignore
             }
-            (arrayOf(this.javaClass.superclass, this.javaClass)).forEach {
-                try {
-                    it.getDeclaredField("method").apply {
-                        this.isAccessible = true
-                    }.set(this, method.value)
-                } catch (ex: NoSuchFieldException) {
-                    // ignore
-                }
-            }
+            this.forceMethod(this.javaClass, method)
         }
         else -> this.requestMethod = method.value
+    }
+}
+
+private fun HttpURLConnection.forceMethod(clazz: Class<in HttpURLConnection>, method: Method) {
+    try {
+        clazz.getDeclaredField("method").apply {
+            this.isAccessible = true
+        }.set(this, method.value)
+    } catch (ex: NoSuchFieldException) {
+        if (HttpURLConnection::class.java.isAssignableFrom(clazz.superclass)) {
+            this.forceMethod(clazz.superclass, method)
+        }
     }
 }
