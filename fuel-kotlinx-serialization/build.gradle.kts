@@ -9,7 +9,7 @@ repositories {
 dependencies {
     api(project(Fuel.name))
 
-    implementation(KotlinX.Serialization.dependency)
+    implementation(KotlinX.Serialization.Json.dependency)
 
     testImplementation(project(Fuel.Test.name))
 }
