@@ -6,7 +6,7 @@ The kotlinx-serialization extension package for [`Fuel`](../README.md).
 
 You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion) and install `fuel-kotlinx-serialization` with `Maven` and `Gradle`. The kotlinx-serialization package has the following dependencies:
 * [`Fuel`](../fuel/README.md)
-* [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serialization#gradle): 0.10.0
+* [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serialization#gradle): 1.0.1
 
 ```groovy
 implementation 'com.github.kittinunf.fuel:fuel:<latest-version>'
