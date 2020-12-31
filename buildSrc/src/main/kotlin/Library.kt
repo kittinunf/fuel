@@ -1,7 +1,7 @@
 object Library {
-    const val KOTLIN_VERSION = "1.4.10"
+    const val KOTLIN_VERSION = "1.4.21"
 
-    private const val COROUTINES_VERSION = "1.4.0"
+    private const val COROUTINES_VERSION = "1.4.2"
     const val KOTLINX_COROUTINES_CORE = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$COROUTINES_VERSION"
 
     private const val OKHTTP_VERSION = "4.10.0-RC1"
@@ -11,17 +11,17 @@ object Library {
     private const val FORGE_VERSION = "1.0.0-alpha3"
     const val FORGE = "com.github.kittinunf.forge:forge:$FORGE_VERSION"
 
-    private const val SERIALIZATION_VERSION = "1.0.0"
+    private const val SERIALIZATION_VERSION = "1.0.1"
     const val KOTLINX_SERIALIZATION_RUNTIME = "org.jetbrains.kotlinx:kotlinx-serialization-json:$SERIALIZATION_VERSION"
 
     private const val MOSHI_VERSION = "1.11.0"
     const val MOSHI = "com.squareup.moshi:moshi:$MOSHI_VERSION"
     const val MOSHI_KOTLIN_CODEGEN = "com.squareup.moshi:moshi-kotlin-codegen:$MOSHI_VERSION"
 
-    private const val KTOR_VERSION = "1.4.1"
+    private const val KTOR_VERSION = "1.5.0"
     const val KTOR_CLIENT_JVM = "io.ktor:ktor-client-core-jvm:$KTOR_VERSION"
 
-    private const val JACKSON_VERSION = "2.12.0-rc1"
+    private const val JACKSON_VERSION = "2.12.0"
     const val JACKSON_KOTLIN_MODULE = "com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_VERSION"
 
     private const val RESULT_VERSION = "1.3.0"

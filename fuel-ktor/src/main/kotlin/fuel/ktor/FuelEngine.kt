@@ -46,7 +46,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 @KtorExperimentalAPI
-@ExperimentalCoroutinesApi
 @InternalAPI
 public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase("ktor-fuel") {
     override val dispatcher: CoroutineDispatcher by lazy {
@@ -71,6 +70,7 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
         requestsJob = SilentSupervisor(parent)
         coroutineContext = super.coroutineContext + requestsJob
 
+        @OptIn(ExperimentalCoroutinesApi::class)
         GlobalScope.launch(super.coroutineContext, start = CoroutineStart.ATOMIC) {
             try {
                 requestsJob[Job]!!.join()
