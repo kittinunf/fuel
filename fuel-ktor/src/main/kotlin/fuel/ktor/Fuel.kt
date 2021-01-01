@@ -10,7 +10,6 @@ import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.util.InternalAPI
 import io.ktor.util.KtorExperimentalAPI
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * [HttpClientEngineFactory] using a [Fuel] based backend implementation
