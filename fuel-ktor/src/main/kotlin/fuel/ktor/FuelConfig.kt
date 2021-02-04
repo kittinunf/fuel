@@ -3,6 +3,8 @@
  */
 // Copied By https://github.com/ktorio/ktor/blob/master/ktor-client/ktor-client-okhttp/jvm/src/io/ktor/client/engine/okhttp/OkHttpConfig.kt
 
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package fuel.ktor
 
 import io.ktor.client.engine.HttpClientEngineConfig

@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version Library.KOTLIN_VERSION
-    kotlin("kapt") version Library.KOTLIN_VERSION apply false
+    kotlin("jvm") version "1.4.21"
+    kotlin("kapt") version "1.4.21" apply false
     id("com.vanniktech.maven.publish") version "0.10.0" apply false
     jacoco
 }

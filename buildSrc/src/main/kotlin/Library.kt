@@ -1,10 +1,10 @@
 object Library {
-    const val KOTLIN_VERSION = "1.4.21"
+    const val KOTLIN_VERSION = "1.4.30"
 
     private const val COROUTINES_VERSION = "1.4.2"
     const val KOTLINX_COROUTINES_CORE = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$COROUTINES_VERSION"
 
-    private const val OKHTTP_VERSION = "4.10.0-RC1"
+    private const val OKHTTP_VERSION = "5.0.0-alpha.2"
     const val OKHTTP = "com.squareup.okhttp3:okhttp:$OKHTTP_VERSION"
     const val OKHTTP_MOCK_WEB_SERVER = "com.squareup.okhttp3:mockwebserver:$OKHTTP_VERSION"
 
@@ -18,10 +18,10 @@ object Library {
     const val MOSHI = "com.squareup.moshi:moshi:$MOSHI_VERSION"
     const val MOSHI_KOTLIN_CODEGEN = "com.squareup.moshi:moshi-kotlin-codegen:$MOSHI_VERSION"
 
-    private const val KTOR_VERSION = "1.5.0"
+    private const val KTOR_VERSION = "1.5.1"
     const val KTOR_CLIENT_JVM = "io.ktor:ktor-client-core-jvm:$KTOR_VERSION"
 
-    private const val JACKSON_VERSION = "2.12.0"
+    private const val JACKSON_VERSION = "2.12.1"
     const val JACKSON_KOTLIN_MODULE = "com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_VERSION"
 
     private const val RESULT_VERSION = "1.3.0"

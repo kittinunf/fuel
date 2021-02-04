@@ -198,7 +198,7 @@ private fun HttpRequestData.convertToFuelRequest(callContext: CoroutineContext):
     return builder.build()
 }
 
-internal fun OutgoingContent.convertToOkHttpBody(callContext: CoroutineContext): RequestBody? = when (this) {
+internal fun OutgoingContent.convertToOkHttpBody(callContext: CoroutineContext): RequestBody = when (this) {
     is OutgoingContent.ByteArrayContent -> bytes().toRequestBody(null, 0)
     is OutgoingContent.ReadChannelContent -> StreamRequestBody(contentLength) { readFrom() }
     is OutgoingContent.WriteChannelContent -> {
