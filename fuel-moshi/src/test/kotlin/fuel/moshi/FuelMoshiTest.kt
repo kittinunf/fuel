@@ -79,10 +79,10 @@ class FuelMoshiTest {
             enqueue(
                 MockResponse().setBody(
                     "[{" +
-                        "    \"rank\": \"4\"," +
+                        "    \"rank\": \"10\"," +
                         "    \"suit\": \"CLUBS\"" +
                         "  }, {" +
-                        "    \"rank\": \"A\"," +
+                        "    \"rank\": \"J\"," +
                         "    \"suit\": \"HEARTS\"" +
                         "  }, {" +
                         "    \"rank\": \"K\"," +

@@ -59,7 +59,7 @@ class HttpLoaderBuilderTest {
     @Test
     fun `setting call timeouts`() = runBlocking {
         val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse().setBody("Hello World"))
+            enqueue(MockResponse().setBody("Hello World 2"))
         }
 
         withContext(Dispatchers.IO) {
@@ -68,9 +68,9 @@ class HttpLoaderBuilderTest {
 
         val okhttp = OkHttpClient.Builder().callTimeout(30L, TimeUnit.MILLISECONDS).build()
         val httpLoader = HttpLoader.Builder().okHttpClient(okhttp).build()
-        val request = Request.Builder().data(mockWebServer.url("hello")).build()
+        val request = Request.Builder().data(mockWebServer.url("hello2")).build()
         val response = httpLoader.get(request).body!!.string()
-        assertEquals("Hello World", response)
+        assertEquals("Hello World 2", response)
 
         withContext(Dispatchers.IO) {
             mockWebServer.shutdown()

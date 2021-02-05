@@ -37,10 +37,10 @@ class RealHttpLoaderTest {
             mockWebServer.start()
         }
 
-        val request = Request.Builder().data(mockWebServer.url("get")).build()
+        val unsuccessfulRequest = Request.Builder().data(mockWebServer.url("get")).build()
 
         val string = withContext(Dispatchers.IO) {
-            realHttpLoader.get(request).body!!.string()
+            realHttpLoader.get(unsuccessfulRequest).body!!.string()
         }
 
         val request1 = withContext(Dispatchers.IO) {
