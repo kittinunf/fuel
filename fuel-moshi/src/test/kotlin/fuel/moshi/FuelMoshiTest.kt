@@ -85,7 +85,7 @@ class FuelMoshiTest {
                         "    \"rank\": \"A\"," +
                         "    \"suit\": \"HEARTS\"" +
                         "  }, {" +
-                        "    \"rank\": \"J\"," +
+                        "    \"rank\": \"K\"," +
                         "    \"suit\": \"SPADES\"" +
                         "  }" +
                         "]"

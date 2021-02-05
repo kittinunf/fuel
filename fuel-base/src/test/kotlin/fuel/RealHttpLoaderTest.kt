@@ -131,7 +131,7 @@ class RealHttpLoaderTest {
             mockWebServer.start()
         }
 
-        val requestBody = "Hello There".toRequestBody("text/html".toMediaType())
+        val requestBody = "Put There".toRequestBody("text/html".toMediaType())
         val request = Request.Builder()
             .data(mockWebServer.url("put"))
             .requestBody(requestBody)
@@ -149,7 +149,7 @@ class RealHttpLoaderTest {
         val utf8 = withContext(Dispatchers.IO) {
             request1.body.readUtf8()
         }
-        assertEquals("Hello There", utf8)
+        assertEquals("Put There", utf8)
     }
 
     @Test(expected = IllegalArgumentException::class)

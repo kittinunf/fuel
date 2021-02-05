@@ -1,5 +1,5 @@
 // Inspired by https://github.com/coil-kt/coil/blob/master/coil-base/src/main/java/coil/ImageLoader.kt
-@file:Suppress("FunctionName",  "MemberVisibilityCanBePrivate")
+@file:Suppress("FunctionName", "MemberVisibilityCanBePrivate")
 
 package fuel
 

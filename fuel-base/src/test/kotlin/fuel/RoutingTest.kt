@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.Headers
+import okhttp3.HttpUrl
 import okhttp3.RequestBody
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -13,11 +14,11 @@ import org.junit.Before
 import org.junit.Test
 
 class RoutingTest {
-    sealed class TestApi(private val host: String) : FuelRouting {
-        override val basePath = this.host
+    sealed class TestApi(private val host: HttpUrl) : FuelRouting {
+        override val basePath = this.host.toString()
 
-        class GetTest(host: String) : TestApi(host)
-        class GetParamsTest(host: String) : TestApi(host)
+        class GetTest(host: HttpUrl) : TestApi(host)
+        class GetParamsTest(host: HttpUrl) : TestApi(host)
 
         override val method: String
             get() {
@@ -67,7 +68,7 @@ class RoutingTest {
             mockWebServer.start()
         }
 
-        val getTest = TestApi.GetTest(mockWebServer.url("").toString())
+        val getTest = TestApi.GetTest(mockWebServer.url(""))
         val response = HttpLoader().method(getTest.request).body!!.string()
 
         val request1 = withContext(Dispatchers.IO) {
@@ -80,20 +81,20 @@ class RoutingTest {
 
     @Test
     fun httpRouterGetParams() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World"))
+        mockWebServer.enqueue(MockResponse().setBody("Hello World With Params"))
 
         withContext(Dispatchers.IO) {
             mockWebServer.start()
         }
 
-        val getTest = TestApi.GetParamsTest(mockWebServer.url("").toString())
+        val getTest = TestApi.GetParamsTest(mockWebServer.url(""))
         val response = HttpLoader().method(getTest.request).body!!.string()
 
         val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()
         }
 
-        assertEquals("Hello World", response)
+        assertEquals("Hello World With Params", response)
         assertEquals("GET", request1.method)
         assertEquals("///get?foo=bar", request1.path)
     }
