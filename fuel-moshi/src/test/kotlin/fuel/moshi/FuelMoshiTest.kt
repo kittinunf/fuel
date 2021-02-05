@@ -75,7 +75,7 @@ class FuelMoshiTest {
 
     @Test
     fun customMoshiAdapterWithGenericList() = runBlocking {
-        val mockWebServer = MockWebServer().apply {
+        val mockWebServer2 = MockWebServer().apply {
             enqueue(
                 MockResponse().setBody(
                     "[{" +
@@ -94,18 +94,18 @@ class FuelMoshiTest {
         }
 
         withContext(Dispatchers.IO) {
-            mockWebServer.start()
+            mockWebServer2.start()
         }
 
-        val response = Fuel.get(mockWebServer.url("user-agent"))
+        val userAgentResponse = Fuel.get(mockWebServer2.url("user-agent"))
         val listOfCardsType = Types.newParameterizedType(List::class.java, Card::class.java)
         val adapter = defaultMoshi.build().adapter<List<Card>>(listOfCardsType)
-        val cards = response.toMoshi<List<Card>>(adapter)!!
+        val cards = userAgentResponse.toMoshi<List<Card>>(adapter)!!
         assertEquals(3, cards.size)
         assertEquals("CLUBS", cards[0].suit)
 
         withContext(Dispatchers.IO) {
-            mockWebServer.shutdown()
+            mockWebServer2.shutdown()
         }
     }
 }
