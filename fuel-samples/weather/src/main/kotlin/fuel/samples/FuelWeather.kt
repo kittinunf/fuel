@@ -20,6 +20,7 @@ data class ConsolidatedWeather(
     val consolidated_weather: List<ConsolidatedWeatherEntry>
 )
 
+@JsonClass(generateAdapter = true)
 data class ConsolidatedWeatherEntry(
     val applicable_date: String,
     val weather_state_name: String,
