@@ -29,18 +29,18 @@ data class ConsolidatedWeatherEntry(
 
 fun main() {
     runBlocking {
-        val types = Types.newParameterizedType(MutableList::class.java, Location::class.java)
-
         val locations = listOf("London", "Tokyo")
         locations.forEach {
-            println("Weather for $it : ")
-            val location = Fuel.request(WeatherApi.WeatherFor(it)).toMoshi<List<Location>>(types)!!
-            val weathers = Fuel.request(WeatherApi.ConsolidatedWeatherFor(location.first().woeid)).toMoshi(ConsolidatedWeather::class.java)
-            println("Date           Weather            Temperature(°C) ")
-            println("--------------------------------------------------")
+            val location = Fuel.request(WeatherApi.WeatherFor(it)).toMoshi<List<Location>>(Types.newParameterizedType(List::class.java, Location::class.java))!!
+            println("Weather for $it : ${location.first().latt_long}")
+
+            val weathers = Fuel.request(WeatherApi.ConsolidatedWeatherFor(location.first().woeid)).toMoshi<ConsolidatedWeather>()
+            println("Date           Weather         Temperature(°C) ")
+            println("-----------------------------------------------")
             weathers?.consolidated_weather?.forEach { entry ->
                 println(entry.applicable_date + "     " + entry.weather_state_name + "     " + entry.the_temp)
             }
+            println("-----------------------------------------------")
         }
     }
     exitProcess(0)

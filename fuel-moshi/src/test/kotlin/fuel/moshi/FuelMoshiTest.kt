@@ -40,6 +40,25 @@ internal class FuelMoshiTest {
     }
 
     @Test
+    fun testReifiedTypeMoshiResponse() = runBlocking {
+        val mockWebServer = MockWebServer().apply {
+            enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel\"}"))
+        }
+
+        withContext(Dispatchers.IO) {
+            mockWebServer.start()
+        }
+
+        val response = Fuel.get(mockWebServer.url("user-agent"))
+        val moshi = response.toMoshi<HttpBinUserAgentModel>()!!
+        assertEquals("Fuel", moshi.userAgent)
+
+        withContext(Dispatchers.IO) {
+            mockWebServer.shutdown()
+        }
+    }
+
+    @Test
     fun testMoshiGenericList() = runBlocking {
         val mockWebServer = MockWebServer().apply {
             enqueue(
