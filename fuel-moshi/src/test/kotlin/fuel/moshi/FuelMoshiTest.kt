@@ -12,7 +12,8 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class FuelMoshiTest {
+internal class FuelMoshiTest {
+
     @JsonClass(generateAdapter = true)
     data class HttpBinUserAgentModel(var userAgent: String = "")
 

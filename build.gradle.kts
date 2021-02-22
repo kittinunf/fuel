@@ -27,7 +27,9 @@ allprojects {
     }
 
     val isSample = project.name in sampleModules
-    if (!isSample) {
+    if (isSample) {
+        apply(plugin = "org.gradle.application")
+    } else {
         kotlin {
             // for strict mode
             explicitApi()

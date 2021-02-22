@@ -12,7 +12,8 @@ import org.junit.Test
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 
-class HttpLoaderBuilderTest {
+internal class HttpLoaderBuilderTest {
+
     @Test
     fun `default okhttp settings`() = runBlocking {
         val mockWebServer = MockWebServer().apply {

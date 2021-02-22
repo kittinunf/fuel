@@ -6,13 +6,14 @@ import fuel.Fuel
 import fuel.get
 import fuel.moshi.toMoshi
 import kotlinx.coroutines.runBlocking
+import kotlin.system.exitProcess
 
 private const val ENDPOINT = "https://api.github.com/repos/kittinunf/fuel/contributors"
 
 @JsonClass(generateAdapter = true)
 data class Contributor(
-    val login: String,
-    val contributions: Int
+        val login: String,
+        val contributions: Int
 )
 
 fun main() {
@@ -28,4 +29,5 @@ fun main() {
             println("${contributor.login} : ${contributor.contributions}")
         }
     }
+    exitProcess(0)
 }
