@@ -33,12 +33,12 @@ val progressListener = object : ProgressListener {
 fun main() {
     runBlocking {
         val client = OkHttpClient.Builder()
-                .addNetworkInterceptor {
-                    val originalResponse = it.proceed(it.request())
-                    originalResponse.newBuilder()
-                            .body(ProgressResponseBody(originalResponse.body!!, progressListener))
-                            .build()
-                }.build()
+            .addNetworkInterceptor {
+                val originalResponse = it.proceed(it.request())
+                originalResponse.newBuilder()
+                    .body(ProgressResponseBody(originalResponse.body!!, progressListener))
+                    .build()
+            }.build()
         val httpLoader = HttpLoader.Builder().okHttpClient(client).build()
         val request = Request.Builder().data("https://publicobject.com/helloworld.txt").build()
         val string = httpLoader.get(request).body!!.string()
