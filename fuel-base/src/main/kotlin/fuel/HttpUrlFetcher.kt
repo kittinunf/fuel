@@ -4,11 +4,12 @@ package fuel
 
 import okhttp3.Call
 import okhttp3.HttpUrl
-import okhttp3.Request.Builder
+import okhttp3.Request
 import okhttp3.Response
 
 internal class HttpUrlFetcher(private val callFactory: Call.Factory) {
-    suspend fun fetch(httpUrl: HttpUrl, builder: Builder): Response {
+
+    suspend fun fetch(httpUrl: HttpUrl, builder: Request.Builder): Response {
         builder.url(httpUrl)
         val response = callFactory.newCall(builder.build()).await()
         if (!response.isSuccessful) {

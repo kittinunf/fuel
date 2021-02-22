@@ -22,6 +22,20 @@ public interface HttpLoader {
     public suspend fun head(request: Request): Response
     public suspend fun method(request: Request): Response
 
+    /**
+     * Synchronously load the [request]'s data and suspend until the operation is complete. Return the loaded [Response]. This is the counterpart of the suspend version above
+     *
+     * @param request The request to execute synchronously.
+     * @return The [Response] result.
+     */
+    public fun getBlocking(request: Request): Response
+    public fun postBlocking(request: Request): Response = TODO("Not implemented yet")
+    public fun putBlocking(request: Request): Response = TODO("Not implemented yet")
+    public fun patchBlocking(request: Request): Response = TODO("Not implemented yet")
+    public fun deleteBlocking(request: Request): Response = TODO("Not implemented yet")
+    public fun headBlocking(request: Request): Response = TODO("Not implemented yet")
+    public fun methodBlocking(request: Request): Response = TODO("Not implemented yet")
+
     public class Builder {
         private var callFactory: Call.Factory? = null
 

@@ -7,8 +7,11 @@ import okhttp3.Request.Builder
 import okhttp3.Response
 
 internal class RealHttpLoader(callFactory: Call.Factory) : HttpLoader {
-    private val fetcher = HttpUrlFetcher(callFactory)
 
+    private val fetcher by lazy { HttpUrlFetcher(callFactory) }
+    private val syncFetcher by lazy { HttpUrlFetcherBlocking(callFactory) }
+
+    //region suspend implementation
     override suspend fun get(request: Request): Response {
         val requestBuilder = Builder().headers(request.headers)
         return fetcher.fetch(request.data, requestBuilder)
@@ -50,4 +53,12 @@ internal class RealHttpLoader(callFactory: Call.Factory) : HttpLoader {
         val requestBuilder = Builder().headers(request.headers).method(method, request.requestBody)
         return fetcher.fetch(request.data, requestBuilder)
     }
+    //endregion
+
+    //region blocking implementation
+    override fun getBlocking(request: Request): Response {
+        val requestBuilder = Builder().headers(request.headers)
+        return syncFetcher.fetchBlocking(request.data, requestBuilder)
+    }
+    //endregion
 }

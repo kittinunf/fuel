@@ -3,5 +3,5 @@ application {
 }
 
 dependencies {
-    implementation(project(":fuel-singleton"))
+    api(project(":fuel-base"))
 }
