@@ -28,13 +28,13 @@ public interface HttpLoader {
      * @param request The request to execute synchronously.
      * @return The [Response] result.
      */
-    public fun getBlocking(request: Request): Response
-    public fun postBlocking(request: Request): Response = TODO("Not implemented yet")
-    public fun putBlocking(request: Request): Response = TODO("Not implemented yet")
-    public fun patchBlocking(request: Request): Response = TODO("Not implemented yet")
-    public fun deleteBlocking(request: Request): Response = TODO("Not implemented yet")
-    public fun headBlocking(request: Request): Response = TODO("Not implemented yet")
-    public fun methodBlocking(request: Request): Response = TODO("Not implemented yet")
+    public fun getCall(request: Request): Call
+    public fun postCall(request: Request): Call
+    public fun putCall(request: Request): Call
+    public fun patchCall(request: Request): Call
+    public fun deleteCall(request: Request): Call
+    public fun headCall(request: Request): Call
+    public fun methodCall(request: Request): Call
 
     public class Builder {
         private var callFactory: Call.Factory? = null
