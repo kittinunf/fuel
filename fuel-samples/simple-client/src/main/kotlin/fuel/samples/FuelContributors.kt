@@ -12,8 +12,8 @@ private const val ENDPOINT = "https://api.github.com/repos/kittinunf/fuel/contri
 
 @JsonClass(generateAdapter = true)
 data class Contributor(
-        val login: String,
-        val contributions: Int
+    val login: String,
+    val contributions: Int
 )
 
 fun main() {

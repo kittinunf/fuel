@@ -10,21 +10,21 @@ import kotlin.system.exitProcess
 
 @JsonClass(generateAdapter = true)
 data class Weather(
-        val title: String,
-        val latt_long: String,
-        val woeid: Int
+    val title: String,
+    val latt_long: String,
+    val woeid: Int
 )
 
 @JsonClass(generateAdapter = true)
 data class ConsolidatedWeather(
-        val consolidated_weather: List<ConsolidatedWeatherEntry>
+    val consolidated_weather: List<ConsolidatedWeatherEntry>
 )
 
 @JsonClass(generateAdapter = true)
 data class ConsolidatedWeatherEntry(
-        val applicable_date: String,
-        val weather_state_name: String,
-        val the_temp: Float
+    val applicable_date: String,
+    val weather_state_name: String,
+    val the_temp: Float
 )
 
 fun main() {
