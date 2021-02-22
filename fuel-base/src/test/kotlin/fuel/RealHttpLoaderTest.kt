@@ -266,7 +266,7 @@ internal class RealHttpLoaderTest {
             mockWebServer.takeRequest()
         }
 
-        assertEquals("GET", request1.method)
+        assertEquals("HEAD", request1.method)
     }
 
     @Test

@@ -45,7 +45,7 @@ internal class RealHttpLoader(callFactory: Call.Factory) : HttpLoader {
     }
     //endregion
 
-    //region blocking implementation
+    //region call implementation
     override fun getCall(request: Request): Call {
         return fetcher.fetch(request.data, createRequestBuilder(request, Method.GET))
     }
