@@ -37,9 +37,7 @@ fun main() {
             val weathers = Fuel.request(WeatherApi.ConsolidatedWeatherFor(location.first().woeid)).toMoshi<ConsolidatedWeather>()
             println("Date           Weather         Temperature(°C) ")
             println("-----------------------------------------------")
-            weathers?.consolidated_weather?.forEach { entry ->
-                println(entry.applicable_date + "     " + entry.weather_state_name + "     " + entry.the_temp)
-            }
+            weathers?.consolidated_weather?.forEach { println(it.applicable_date + "     " + it.weather_state_name + "     " + it.the_temp) }
             println("-----------------------------------------------")
         }
     }
