@@ -13,7 +13,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class RoutingTest {
+internal class RoutingTest {
+
     sealed class TestApi(private val host: HttpUrl) : FuelRouting {
         override val basePath = this.host.toString()
 

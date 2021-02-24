@@ -5,7 +5,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class RequestTest {
+internal class RequestTest {
+
     @Test
     fun `okhttp headers`() {
         val header = Headers.Builder()

@@ -4,6 +4,7 @@ import fuel.HttpLoader
 import fuel.Request
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
+import kotlin.system.exitProcess
 
 val progressListener = object : ProgressListener {
     var firstUpdate = true
@@ -29,16 +30,19 @@ val progressListener = object : ProgressListener {
     }
 }
 
-fun main() = runBlocking {
-    val client = OkHttpClient.Builder()
-        .addNetworkInterceptor {
-            val originalResponse = it.proceed(it.request())
-            originalResponse.newBuilder()
-                .body(ProgressResponseBody(originalResponse.body!!, progressListener))
-                .build()
-        }.build()
-    val httpLoader = HttpLoader.Builder().okHttpClient(client).build()
-    val request = Request.Builder().data("https://publicobject.com/helloworld.txt").build()
-    val string = httpLoader.get(request).body!!.string()
-    println(string)
+fun main() {
+    runBlocking {
+        val client = OkHttpClient.Builder()
+            .addNetworkInterceptor {
+                val originalResponse = it.proceed(it.request())
+                originalResponse.newBuilder()
+                    .body(ProgressResponseBody(originalResponse.body!!, progressListener))
+                    .build()
+            }.build()
+        val httpLoader = HttpLoader.Builder().okHttpClient(client).build()
+        val request = Request.Builder().data("https://publicobject.com/helloworld.txt").build()
+        val string = httpLoader.get(request).body!!.string()
+        println(string)
+    }
+    exitProcess(0)
 }
