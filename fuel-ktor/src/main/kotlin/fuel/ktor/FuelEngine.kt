@@ -5,8 +5,9 @@
 
 package fuel.ktor
 
-import fuel.HttpLoader
+import fuel.Builder
 import fuel.Request
+import fuel.SuspendHttpLoader
 import io.ktor.client.call.UnsupportedContentTypeException
 import io.ktor.client.engine.HttpClientEngineBase
 import io.ktor.client.engine.callContext
@@ -65,6 +66,7 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
      * Cache that keeps least recently used [OkHttpClient] instances.
      */
     private val clientCache = createLRUCache(::createOkHttpClient, {}, config.clientCacheSize)
+
     init {
         val parent = super.coroutineContext[Job]!!
         requestsJob = SilentSupervisor(parent)
@@ -90,7 +92,7 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
 
         val callContext = callContext()
         val engineRequest = data.convertToFuelRequest(callContext)
-        val httpLoader = HttpLoader.Builder().okHttpClient(requestEngine).build()
+        val httpLoader = Builder().okHttpClient(requestEngine).build()
 
         return executeHttpRequest(httpLoader, engineRequest, callContext)
     }
@@ -113,9 +115,9 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
     }*/
 
     private suspend fun executeHttpRequest(
-        engine: HttpLoader,
+        engine: SuspendHttpLoader,
         engineRequest: Request,
-        callContext: CoroutineContext,
+        callContext: CoroutineContext
     ): HttpResponseData {
         val requestTime = GMTDate()
         val response = engine.method(engineRequest)

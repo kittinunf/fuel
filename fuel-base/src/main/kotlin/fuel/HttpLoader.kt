@@ -4,90 +4,25 @@
 package fuel
 
 import okhttp3.Call
-import okhttp3.OkHttpClient
 import okhttp3.Response
 
 public interface HttpLoader {
-    /**
-     * Load the [request]'s data and suspend until the operation is complete. Return the loaded [Response].
-     *
-     * @param request The request to execute.
-     * @return The [Response] result.
-     */
-    public suspend fun get(request: Request): Response
-    public suspend fun post(request: Request): Response
-    public suspend fun put(request: Request): Response
-    public suspend fun patch(request: Request): Response
-    public suspend fun delete(request: Request): Response
-    public suspend fun head(request: Request): Response
-    public suspend fun method(request: Request): Response
 
     /**
-     * Lazily load the [request]'s data by representing with [Call]. This is the counterpart of the suspend version above
+     * Wrap the [request]'s data by representing with [Call] which has been prepared for execution
      *
      * @param request The request to execute synchronously.
      * @return The [Response] result.
      */
-    public fun getCall(request: Request): Call
-    public fun postCall(request: Request): Call
-    public fun putCall(request: Request): Call
-    public fun patchCall(request: Request): Call
-    public fun deleteCall(request: Request): Call
-    public fun headCall(request: Request): Call
-    public fun methodCall(request: Request): Call
-
-    public class Builder {
-        private var callFactory: Call.Factory? = null
-
-        /**
-         * Set the [OkHttpClient] used for network requests.
-         *
-         * This is a convenience function for calling `callFactory(Call.Factory)`.
-         */
-        public fun okHttpClient(okHttpClient: OkHttpClient): Builder = callFactory(okHttpClient)
-
-        /**
-         * Set a lazy callback to create the [OkHttpClient] used for network requests.
-         *
-         * This is a convenience function for calling `callFactory(() -> Call.Factory)`.
-         */
-        public fun okHttpClient(initializer: () -> OkHttpClient): Builder = callFactory(initializer)
-
-        /**
-         * Set the [Call.Factory] used for network requests.
-         *
-         * Calling [okHttpClient] automatically sets this value.
-         */
-        public fun callFactory(callFactory: Call.Factory): Builder = apply {
-            this.callFactory = callFactory
-        }
-
-        /**
-         * Set a lazy callback to create the [Call.Factory] used for network requests.
-         *
-         * This allows lazy creation of the [Call.Factory] on a background thread.
-         * [initializer] is guaranteed to be called at most once.
-         *
-         * Prefer using this instead of `callFactory(Call.Factory)`.
-         *
-         * Calling [okHttpClient] automatically sets this value.
-         */
-        public fun callFactory(initializer: () -> Call.Factory): Builder = apply {
-            this.callFactory = lazyCallFactory(initializer)
-        }
-
-        /**
-         * Create a new [HttpLoader] instance.
-         */
-        public fun build(): HttpLoader = RealHttpLoader(callFactory ?: buildDefaultCallFactory())
-
-        private fun buildDefaultCallFactory() = lazyCallFactory {
-            OkHttpClient.Builder().build()
-        }
-    }
+    public fun get(request: Request): Call
+    public fun post(request: Request): Call
+    public fun put(request: Request): Call
+    public fun patch(request: Request): Call
+    public fun delete(request: Request): Call
+    public fun head(request: Request): Call
+    public fun method(request: Request): Call
 
     public companion object {
-        /** Alias to create a new [HttpLoader] without configuration */
-        public operator fun invoke(): HttpLoader = Builder().build()
+        public operator fun invoke(): HttpLoader = Builder().buildBlocking()
     }
 }

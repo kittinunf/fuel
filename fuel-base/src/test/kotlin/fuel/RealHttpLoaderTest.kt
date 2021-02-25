@@ -15,12 +15,12 @@ import org.junit.Test
 
 internal class RealHttpLoaderTest {
 
-    private lateinit var realHttpLoader: RealHttpLoader
+    private lateinit var realHttpLoader: RealSuspendHttpLoader
     private lateinit var mockWebServer: MockWebServer
 
     @Before
     fun setUp() {
-        realHttpLoader = RealHttpLoader(OkHttpClient())
+        realHttpLoader = RealSuspendHttpLoader(OkHttpClient())
         mockWebServer = MockWebServer()
     }
 
