@@ -5,8 +5,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 dependencies {
-    implementation(Library.KTOR_CLIENT_JVM)
+    implementation("io.ktor:ktor-client-core-jvm:1.5.1")
     implementation(project(":fuel-base"))
 
-    testImplementation(Library.JUNIT)
+    testImplementation("junit:junit:4.13")
 }

@@ -4,13 +4,16 @@ plugins {
     kotlin("kapt")
 }
 
+val okhttpVersion: String by extra
+val moshiVersion: String by extra
+
 dependencies {
     api(project(":fuel-base"))
-    api(Library.MOSHI)
+    api("com.squareup.moshi:moshi:$moshiVersion")
 
-    kaptTest(Library.MOSHI_KOTLIN_CODEGEN)
+    kaptTest("com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion")
 
     testImplementation(project(":fuel-singleton"))
-    testImplementation(Library.JUNIT)
-    testImplementation(Library.OKHTTP_MOCK_WEB_SERVER)
+    testImplementation("junit:junit:4.13")
+    testImplementation("com.squareup.okhttp3:mockwebserver:$okhttpVersion")
 }

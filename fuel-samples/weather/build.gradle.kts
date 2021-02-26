@@ -6,8 +6,10 @@ application {
     mainClass.set("fuel.samples.FuelWeatherKt")
 }
 
+val moshiVersion: String by extra
+
 dependencies {
-    kapt(Library.MOSHI_KOTLIN_CODEGEN)
+    kapt("com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion")
 
     implementation(project(":fuel-singleton"))
     implementation(project(":fuel-moshi"))

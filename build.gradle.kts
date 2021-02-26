@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.21"
-    kotlin("kapt") version "1.4.21" apply false
+    kotlin("jvm") version "1.4.31"
+    kotlin("kapt") version "1.4.31" apply false
     id("com.vanniktech.maven.publish") version "0.10.0" apply false
     jacoco
 }
@@ -12,6 +12,9 @@ val sampleModules = listOf("progress", "simple-client", "weather")
 allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "jacoco")
+
+    val okhttpVersion by extra("5.0.0-alpha.2")
+    val moshiVersion by extra("1.11.0")
 
     repositories {
         mavenCentral()
