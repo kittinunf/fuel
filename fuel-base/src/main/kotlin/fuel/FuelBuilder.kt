@@ -3,7 +3,7 @@ package fuel
 import okhttp3.Call
 import okhttp3.OkHttpClient
 
-public class Builder {
+public class FuelBuilder {
 
     private var callFactory: Call.Factory? = null
 
@@ -12,21 +12,21 @@ public class Builder {
      *
      * This is a convenience function for calling `callFactory(Call.Factory)`.
      */
-    public fun okHttpClient(okHttpClient: OkHttpClient): Builder = callFactory(okHttpClient)
+    public fun okHttpClient(okHttpClient: OkHttpClient): FuelBuilder = callFactory(okHttpClient)
 
     /**
      * Set a lazy callback to create the [OkHttpClient] used for network requests.
      *
      * This is a convenience function for calling `callFactory(() -> Call.Factory)`.
      */
-    public fun okHttpClient(initializer: () -> OkHttpClient): Builder = callFactory(initializer)
+    public fun okHttpClient(initializer: () -> OkHttpClient): FuelBuilder = callFactory(initializer)
 
     /**
      * Set the [Call.Factory] used for network requests.
      *
      * Calling [okHttpClient] automatically sets this value.
      */
-    public fun callFactory(callFactory: Call.Factory): Builder = apply {
+    public fun callFactory(callFactory: Call.Factory): FuelBuilder = apply {
         this.callFactory = callFactory
     }
 
@@ -40,7 +40,7 @@ public class Builder {
      *
      * Calling [okHttpClient] automatically sets this value.
      */
-    public fun callFactory(initializer: () -> Call.Factory): Builder = apply {
+    public fun callFactory(initializer: () -> Call.Factory): FuelBuilder = apply {
         this.callFactory = lazyCallFactory(initializer)
     }
 

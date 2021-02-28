@@ -1,5 +1,8 @@
 package fuel
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -9,76 +12,91 @@ import org.junit.Test
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 
-internal class HttpLoaderBuilderTest {
+internal class SuspendHttpLoaderBuilderTest {
 
     @Test
-    fun `default okhttp settings`() {
+    fun `default okhttp settings`() = runBlocking {
         val mockWebServer = MockWebServer().apply {
             enqueue(MockResponse().setBody("Hello World"))
         }
 
-        mockWebServer.start()
+        withContext(Dispatchers.IO) {
+            mockWebServer.start()
+        }
 
         val request = Request.Builder().data(mockWebServer.url("hello")).build()
-        val response = HttpLoader().get(request).execute().body!!.string()
+        val response = SuspendHttpLoader().get(request).body!!.string()
         assertEquals("Hello World", response)
 
-        mockWebServer.shutdown()
+        withContext(Dispatchers.IO) {
+            mockWebServer.shutdown()
+        }
     }
 
     @Test
-    fun `setting connect timeouts`() {
+    fun `setting connect timeouts`() = runBlocking {
         val mockWebServer = MockWebServer().apply {
             enqueue(MockResponse().setBody("Hello World"))
         }
 
-        mockWebServer.start()
+        withContext(Dispatchers.IO) {
+            mockWebServer.start()
+        }
 
         val httpLoader = FuelBuilder()
             .okHttpClient {
                 OkHttpClient.Builder().connectTimeout(30L, TimeUnit.MILLISECONDS).build()
             }
-            .buildBlocking()
-
+            .build()
         val request = Request.Builder().data(mockWebServer.url("hello")).build()
-        val response = httpLoader.get(request).execute().body!!.string()
+        val response = httpLoader.get(request).body!!.string()
         assertEquals("Hello World", response)
 
-        mockWebServer.shutdown()
+        withContext(Dispatchers.IO) {
+            mockWebServer.shutdown()
+        }
     }
 
     @Test
-    fun `setting call timeouts`() {
+    fun `setting call timeouts`() = runBlocking {
         val mockWebServer = MockWebServer().apply {
             enqueue(MockResponse().setBody("Hello World 2"))
         }
 
-        mockWebServer.start()
+        withContext(Dispatchers.IO) {
+            mockWebServer.start()
+        }
 
         val okhttp = OkHttpClient.Builder().callTimeout(30L, TimeUnit.MILLISECONDS).build()
-        val httpLoader = FuelBuilder().okHttpClient(okhttp).buildBlocking()
+        val httpLoader = FuelBuilder().okHttpClient(okhttp).build()
         val request = Request.Builder().data(mockWebServer.url("hello2")).build()
-        val response = httpLoader.get(request).execute().body!!.string()
+        val response = httpLoader.get(request).body!!.string()
         assertEquals("Hello World 2", response)
 
-        mockWebServer.shutdown()
+        withContext(Dispatchers.IO) {
+            mockWebServer.shutdown()
+        }
     }
 
     @Test
-    fun `no socket response`() {
+    fun `no socket response`() = runBlocking {
         val mockWebServer = MockWebServer().apply {
             enqueue(MockResponse().setBody("{}").setSocketPolicy(SocketPolicy.NO_RESPONSE))
         }
 
-        mockWebServer.start()
+        withContext(Dispatchers.IO) {
+            mockWebServer.start()
+        }
 
         val request = Request.Builder().data(mockWebServer.url("socket")).build()
         try {
-            HttpLoader().get(request).execute().body!!.string()
+            SuspendHttpLoader().get(request).body!!.string()
         } catch (ste: SocketTimeoutException) {
             assertEquals("timeout", ste.message)
         }
 
-        mockWebServer.shutdown()
+        withContext(Dispatchers.IO) {
+            mockWebServer.shutdown()
+        }
     }
 }

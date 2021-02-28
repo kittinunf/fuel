@@ -5,7 +5,7 @@
 
 package fuel.ktor
 
-import fuel.Builder
+import fuel.FuelBuilder
 import fuel.Request
 import fuel.SuspendHttpLoader
 import io.ktor.client.call.UnsupportedContentTypeException
@@ -92,7 +92,7 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
 
         val callContext = callContext()
         val engineRequest = data.convertToFuelRequest(callContext)
-        val httpLoader = Builder().okHttpClient(requestEngine).build()
+        val httpLoader = FuelBuilder().okHttpClient(requestEngine).build()
 
         return executeHttpRequest(httpLoader, engineRequest, callContext)
     }

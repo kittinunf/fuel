@@ -23,6 +23,6 @@ public interface HttpLoader {
     public fun method(request: Request): Call
 
     public companion object {
-        public operator fun invoke(): HttpLoader = Builder().buildBlocking()
+        public operator fun invoke(): HttpLoader = FuelBuilder().buildBlocking()
     }
 }

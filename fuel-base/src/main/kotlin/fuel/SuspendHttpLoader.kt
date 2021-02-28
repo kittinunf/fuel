@@ -19,6 +19,6 @@ public interface SuspendHttpLoader {
     public suspend fun method(request: Request): Response
 
     public companion object {
-        public operator fun invoke(): SuspendHttpLoader = Builder().build()
+        public operator fun invoke(): SuspendHttpLoader = FuelBuilder().build()
     }
 }
