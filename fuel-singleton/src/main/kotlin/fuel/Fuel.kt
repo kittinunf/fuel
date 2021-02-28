@@ -12,9 +12,9 @@ public object Fuel {
     /**
      * Get the default [HttpLoader]. Creates a new instance if none has been set.
      */
-    public fun loader(): SuspendHttpLoader = suspendHttpLoader ?: newSuspendHttpLoader()
+    public fun suspendLoader(): SuspendHttpLoader = suspendHttpLoader ?: newSuspendHttpLoader()
 
-    public fun loaderBlocking(): HttpLoader = httpLoader ?: newHttpLoader()
+    public fun loader(): HttpLoader = httpLoader ?: newHttpLoader()
 
     /**
      * Set the default [HttpLoader]. Prefer using `setHttpLoader(HttpLoaderFactory)`

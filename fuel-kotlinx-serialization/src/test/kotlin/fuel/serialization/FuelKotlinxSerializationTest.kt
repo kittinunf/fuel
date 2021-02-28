@@ -12,6 +12,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class FuelKotlinxSerializationTest {
+
     @Serializable
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
