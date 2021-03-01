@@ -105,7 +105,7 @@ private fun createRequestBuilder(request: Request, method: Method): Builder {
     }
 }
 
-private fun Response.validate(): Response {
+internal fun Response.validate(): Response {
     if (!isSuccessful) {
         throw HttpException(this)
     }

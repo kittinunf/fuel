@@ -17,7 +17,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
 
-class FuelForgeTest {
+internal class FuelForgeTest {
+   
     data class HttpBinUserAgentModel(var userAgent: String = "", var status: String = "")
 
     private val httpBinUserDeserializer = { json: JSON ->

@@ -14,7 +14,8 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class FuelJacksonTest {
+internal class FuelJacksonTest {
+
     data class HttpBinUserAgentModel(var userAgent: String = "", var http_status: String = "")
 
     @Test
