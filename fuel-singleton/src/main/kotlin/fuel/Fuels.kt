@@ -75,5 +75,4 @@ public suspend inline fun Fuel.method(
     requestBody: RequestBody?
 ): Response = suspendLoader().method(Request.Builder().data(uri).method(method).requestBody(requestBody).build())
 
-public suspend inline fun Fuel.request(convertible: RequestConvertible): Response =
-    suspendLoader().method(convertible.request)
+public suspend inline fun Fuel.request(convertible: RequestConvertible): Response = suspendLoader().method(convertible.request)
