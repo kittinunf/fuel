@@ -85,15 +85,14 @@ internal class RealSuspendHttpLoader(callFactory: Call.Factory) : SuspendHttpLoa
     //endregion
 }
 
-private fun createRequestBuilder(request: Request, method: String): Builder {
-    return Builder().headers(request.headers).apply {
+private fun createRequestBuilder(request: Request, method: String): Builder =
+    Builder().headers(request.headers).apply {
         if (HttpMethod.permitsRequestBody(method)) {
-            method(method, null)
-        } else {
             method(method, request.requestBody)
+        } else {
+            method(method, null)
         }
     }
-}
 
 internal fun Response.validate(): Response {
     if (!isSuccessful) {
