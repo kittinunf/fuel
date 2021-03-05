@@ -1,0 +1,9 @@
+version: 2
+updates:
+  # Enable version updates for Gradle
+  - package-ecosystem: "gradle"
+    # Look for `build.gradle.kts` in the `root` directory
+    directory: "/"
+    # Check for updates once daily
+    schedule:
+      interval: "daily"
