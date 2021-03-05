@@ -32,6 +32,14 @@ internal suspend fun Call.await(): Response = suspendCancellableCoroutine { cont
 }
 
 /**
+ * Call response extension that allows to execute the Call with validator
+ *
+ * @return Response of response with validator by default it uses [Response.isSuccessful] to determine whether response
+ * is successful or not, otherwise throw exception
+ */
+public fun Call.response(validator: Response.() -> Response = Response::validate): Response = execute().validator()
+
+/**
  * Wrap a [Call.Factory] factory as a [Call.Factory] instance.
  * [initializer] is called only once the first time [Call.Factory.newCall] is called.
  */

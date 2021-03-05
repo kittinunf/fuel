@@ -70,7 +70,7 @@ internal class RoutingTest {
         }
 
         val getTest = TestApi.GetTest(mockWebServer.url(""))
-        val response = HttpLoader().method(getTest.request).body!!.string()
+        val response = SuspendHttpLoader().method(getTest.request).body!!.string()
 
         val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()
@@ -89,7 +89,7 @@ internal class RoutingTest {
         }
 
         val getTest = TestApi.GetParamsTest(mockWebServer.url(""))
-        val response = HttpLoader().method(getTest.request).body!!.string()
+        val response = SuspendHttpLoader().method(getTest.request).body!!.string()
 
         val request1 = withContext(Dispatchers.IO) {
             mockWebServer.takeRequest()

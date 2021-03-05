@@ -5,49 +5,98 @@ package fuel
 import okhttp3.Call
 import okhttp3.Request.Builder
 import okhttp3.Response
+import okhttp3.internal.http.HttpMethod
 
 internal class RealHttpLoader(callFactory: Call.Factory) : HttpLoader {
-    private val fetcher = HttpUrlFetcher(callFactory)
 
+    private val fetcher by lazy { HttpUrlFetcher(callFactory) }
+
+    //region call implementation
+    override fun get(request: Request): Call {
+        return fetcher.fetch(request.data, createRequestBuilder(request, "GET"))
+    }
+
+    override fun post(request: Request): Call {
+        requireNotNull(request.requestBody, { "RequestBody for method POST should not be null" })
+        return fetcher.fetch(request.data, createRequestBuilder(request, "POST"))
+    }
+
+    override fun put(request: Request): Call {
+        requireNotNull(request.requestBody, { "RequestBody for method PUT should not be null" })
+        return fetcher.fetch(request.data, createRequestBuilder(request, "PUT"))
+    }
+
+    override fun patch(request: Request): Call {
+        requireNotNull(request.requestBody, { "RequestBody for method PATCH should not be null" })
+        return fetcher.fetch(request.data, createRequestBuilder(request, "PATCH"))
+    }
+
+    override fun delete(request: Request): Call {
+        return fetcher.fetch(request.data, createRequestBuilder(request, "DELETE"))
+    }
+
+    override fun head(request: Request): Call {
+        return fetcher.fetch(request.data, createRequestBuilder(request, "HEAD"))
+    }
+
+    override fun method(request: Request): Call {
+        val method = requireNotNull(request.method, { "method should be not null" })
+        return fetcher.fetch(request.data, createRequestBuilder(request, method))
+    }
+    //endregion
+}
+
+internal class RealSuspendHttpLoader(callFactory: Call.Factory) : SuspendHttpLoader {
+
+    private val fetcher by lazy { HttpUrlFetcher(callFactory) }
+
+    //region suspend implementation
     override suspend fun get(request: Request): Response {
-        val requestBuilder = Builder().headers(request.headers)
-        return fetcher.fetch(request.data, requestBuilder)
+        return fetcher.fetch(request.data, createRequestBuilder(request, "GET")).await().validate()
     }
 
     override suspend fun post(request: Request): Response {
-        val requestBody = request.requestBody
-            ?: throw IllegalArgumentException("RequestBody should not be null")
-        val requestBuilder = Builder().headers(request.headers).post(requestBody)
-        return fetcher.fetch(request.data, requestBuilder)
+        requireNotNull(request.requestBody, { "RequestBody for method POST should not be null" })
+        return fetcher.fetch(request.data, createRequestBuilder(request, "POST")).await().validate()
     }
 
     override suspend fun put(request: Request): Response {
-        val requestBody = request.requestBody
-            ?: throw IllegalArgumentException("RequestBody should not be null")
-        val requestBuilder = Builder().headers(request.headers).put(requestBody)
-        return fetcher.fetch(request.data, requestBuilder)
+        requireNotNull(request.requestBody, { "RequestBody for method PUT should not be null" })
+        return fetcher.fetch(request.data, createRequestBuilder(request, "PUT")).await().validate()
     }
 
     override suspend fun patch(request: Request): Response {
-        val requestBody = request.requestBody
-            ?: throw IllegalArgumentException("RequestBody should not be null")
-        val requestBuilder = Builder().headers(request.headers).patch(requestBody)
-        return fetcher.fetch(request.data, requestBuilder)
+        requireNotNull(request.requestBody, { "RequestBody for method PATCH should not be null" })
+        return fetcher.fetch(request.data, createRequestBuilder(request, "PATCH")).await().validate()
     }
 
     override suspend fun delete(request: Request): Response {
-        val requestBuilder = Builder().headers(request.headers).delete(request.requestBody)
-        return fetcher.fetch(request.data, requestBuilder)
+        return fetcher.fetch(request.data, createRequestBuilder(request, "DELETE")).await().validate()
     }
 
     override suspend fun head(request: Request): Response {
-        val requestBuilder = Builder().headers(request.headers)
-        return fetcher.fetch(request.data, requestBuilder)
+        return fetcher.fetch(request.data, createRequestBuilder(request, "HEAD")).await().validate()
     }
 
     override suspend fun method(request: Request): Response {
-        val method = request.method ?: throw IllegalArgumentException("method should not be null")
-        val requestBuilder = Builder().headers(request.headers).method(method, request.requestBody)
-        return fetcher.fetch(request.data, requestBuilder)
+        val method = requireNotNull(request.method, { "method should not be null" })
+        return fetcher.fetch(request.data, createRequestBuilder(request, method)).await().validate()
     }
+    //endregion
+}
+
+private fun createRequestBuilder(request: Request, method: String): Builder =
+    Builder().headers(request.headers).apply {
+        if (HttpMethod.permitsRequestBody(method)) {
+            method(method, request.requestBody)
+        } else {
+            method(method, null)
+        }
+    }
+
+internal fun Response.validate(): Response {
+    if (!isSuccessful) {
+        throw HttpException(this)
+    }
+    return this
 }

@@ -1,6 +1,6 @@
 package fuel.samples
 
-import fuel.HttpLoader
+import fuel.FuelBuilder
 import fuel.Request
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
@@ -39,8 +39,9 @@ fun main() {
                     .body(ProgressResponseBody(originalResponse.body!!, progressListener))
                     .build()
             }.build()
-        val httpLoader = HttpLoader.Builder().okHttpClient(client).build()
+        val httpLoader = FuelBuilder().okHttpClient(client).build()
         val request = Request.Builder().data("https://publicobject.com/helloworld.txt").build()
+
         val string = httpLoader.get(request).body!!.string()
         println(string)
     }

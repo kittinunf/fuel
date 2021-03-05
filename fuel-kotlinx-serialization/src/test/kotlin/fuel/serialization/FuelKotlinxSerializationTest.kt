@@ -11,7 +11,8 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class FuelKotlinxSerializationTest {
+internal class FuelKotlinxSerializationTest {
+
     @Serializable
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
