@@ -23,4 +23,3 @@ public fun Fuel.patchBlocking(url: HttpUrl, requestBody: RequestBody): Response 
 public fun Fuel.deleteBlocking(url: HttpUrl, requestBody: RequestBody?): Response = loader().delete(Request.Builder().data(url).requestBody(requestBody).build()).execute()
 
 public fun Fuel.deleteBlocking(uri: String, requestBody: RequestBody?): Response = loader().delete(Request.Builder().data(uri).requestBody(requestBody).build()).execute()
-

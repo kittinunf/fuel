@@ -27,13 +27,9 @@ public suspend inline fun Fuel.delete(url: HttpUrl, requestBody: RequestBody?): 
 
 public suspend inline fun Fuel.delete(uri: String, requestBody: RequestBody?): Response = suspendLoader().delete(Request.Builder().data(uri).requestBody(requestBody).build())
 
-public suspend inline fun Fuel.head(
-    url: HttpUrl
-): Response = suspendLoader().head(Request.Builder().data(url).build())
+public suspend inline fun Fuel.head(url: HttpUrl): Response = suspendLoader().head(Request.Builder().data(url).build())
 
-public suspend inline fun Fuel.head(
-    uri: String
-): Response = suspendLoader().head(Request.Builder().data(uri).build())
+public suspend inline fun Fuel.head(uri: String): Response = suspendLoader().head(Request.Builder().data(uri).build())
 
 public suspend inline fun Fuel.method(
     url: HttpUrl,
