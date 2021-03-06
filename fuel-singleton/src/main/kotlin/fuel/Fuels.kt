@@ -7,53 +7,25 @@ import okhttp3.HttpUrl
 import okhttp3.RequestBody
 import okhttp3.Response
 
-public suspend inline fun Fuel.get(
-    uri: String
-): Response = suspendLoader().get(Request.Builder().data(uri).build())
+public suspend inline fun Fuel.get(uri: String): Response = suspendLoader().get(Request.Builder().data(uri).build())
 
-public suspend inline fun Fuel.get(
-    url: HttpUrl
-): Response = suspendLoader().get(Request.Builder().data(url).build())
+public suspend inline fun Fuel.get(url: HttpUrl): Response = suspendLoader().get(Request.Builder().data(url).build())
 
-public suspend inline fun Fuel.post(
-    uri: String,
-    requestBody: RequestBody
-): Response = suspendLoader().post(Request.Builder().data(uri).requestBody(requestBody).build())
+public suspend inline fun Fuel.post(uri: String, requestBody: RequestBody): Response = suspendLoader().post(Request.Builder().data(uri).requestBody(requestBody).build())
 
-public suspend inline fun Fuel.post(
-    url: HttpUrl,
-    requestBody: RequestBody
-): Response = suspendLoader().post(Request.Builder().data(url).requestBody(requestBody).build())
+public suspend inline fun Fuel.post(url: HttpUrl, requestBody: RequestBody): Response = suspendLoader().post(Request.Builder().data(url).requestBody(requestBody).build())
 
-public suspend inline fun Fuel.put(
-    uri: String,
-    requestBody: RequestBody
-): Response = suspendLoader().put(Request.Builder().data(uri).requestBody(requestBody).build())
+public suspend inline fun Fuel.put(uri: String, requestBody: RequestBody): Response = suspendLoader().put(Request.Builder().data(uri).requestBody(requestBody).build())
 
-public suspend inline fun Fuel.put(
-    url: HttpUrl,
-    requestBody: RequestBody
-): Response = suspendLoader().put(Request.Builder().data(url).requestBody(requestBody).build())
+public suspend inline fun Fuel.put(url: HttpUrl, requestBody: RequestBody): Response = suspendLoader().put(Request.Builder().data(url).requestBody(requestBody).build())
 
-public suspend inline fun Fuel.patch(
-    url: HttpUrl,
-    requestBody: RequestBody
-): Response = suspendLoader().patch(Request.Builder().data(url).requestBody(requestBody).build())
+public suspend inline fun Fuel.patch(url: HttpUrl, requestBody: RequestBody): Response = suspendLoader().patch(Request.Builder().data(url).requestBody(requestBody).build())
 
-public suspend inline fun Fuel.patch(
-    uri: String,
-    requestBody: RequestBody
-): Response = suspendLoader().patch(Request.Builder().data(uri).requestBody(requestBody).build())
+public suspend inline fun Fuel.patch(uri: String, requestBody: RequestBody): Response = suspendLoader().patch(Request.Builder().data(uri).requestBody(requestBody).build())
 
-public suspend inline fun Fuel.delete(
-    url: HttpUrl,
-    requestBody: RequestBody?
-): Response = suspendLoader().delete(Request.Builder().data(url).requestBody(requestBody).build())
+public suspend inline fun Fuel.delete(url: HttpUrl, requestBody: RequestBody?): Response = suspendLoader().delete(Request.Builder().data(url).requestBody(requestBody).build())
 
-public suspend inline fun Fuel.delete(
-    uri: String,
-    requestBody: RequestBody?
-): Response = suspendLoader().delete(Request.Builder().data(uri).requestBody(requestBody).build())
+public suspend inline fun Fuel.delete(uri: String, requestBody: RequestBody?): Response = suspendLoader().delete(Request.Builder().data(uri).requestBody(requestBody).build())
 
 public suspend inline fun Fuel.head(
     url: HttpUrl
