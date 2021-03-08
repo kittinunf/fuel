@@ -12,4 +12,6 @@ public fun Call.toMono(): Mono<Response> =
         } catch (ioe: IOException) {
             Mono.error(ioe)
         }
+    }.doOnCancel {
+        cancel()
     }

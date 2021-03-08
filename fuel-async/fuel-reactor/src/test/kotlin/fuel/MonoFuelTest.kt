@@ -1,9 +1,5 @@
 package fuel
 
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.SocketPolicy
@@ -11,8 +7,10 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import reactor.test.test
+import java.lang.AssertionError
 
-class CoroutinesTest {
+class MonoFuelTest {
     private lateinit var mockWebServer: MockWebServer
 
     @Before
@@ -27,24 +25,32 @@ class CoroutinesTest {
     }
 
     @Test
-    fun `get with url`() = runBlocking {
+    fun `get with url`() {
         mockWebServer.enqueue(MockResponse().setBody("Hello Get"))
 
         val request = Request.Builder().data(mockWebServer.url("url")).build()
-        val response = HttpLoader().get(request).toCoroutines()
-        assertEquals("Hello Get", response.body!!.string())
+        HttpLoader().get(request)
+            .toMono()
+            .test()
+            .assertNext {
+                assertEquals("Hello Get", it.body!!.string())
+            }
+            .thenCancel()
+            .verify()
     }
 
-    @Test
-    fun `no socket response error`() = runBlocking {
+    @Test(expected = AssertionError::class)
+    fun `no socket response error`() {
         mockWebServer.enqueue(MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE))
 
         val request = Request.Builder().data(mockWebServer.url("error")).build()
-        val job = launch {
-            HttpLoader().get(request).toCoroutines()
-        }
-
-        delay(500)
-        job.cancelAndJoin()
+        HttpLoader().get(request)
+            .toMono()
+            .test()
+            .assertNext {
+                assertEquals("", it.message)
+            }
+            .thenCancel()
+            .verify()
     }
 }
