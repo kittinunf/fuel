@@ -11,5 +11,7 @@ public fun Call.toSingle(): Single<Response> =
             Single.just(execute())
         } catch (ioe: IOException) {
             Single.error(ioe)
+        }.doOnDispose {
+            cancel()
         }
     }

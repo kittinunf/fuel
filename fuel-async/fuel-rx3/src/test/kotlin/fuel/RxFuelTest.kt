@@ -26,13 +26,16 @@ class RxFuelTest {
         mockWebServer.enqueue(MockResponse().setBody("Hello Get"))
 
         val request = Request.Builder().data(mockWebServer.url("url")).build()
-        val response = HttpLoader().get(request)
+        val testObserver = HttpLoader().get(request)
             .toSingle()
             .test()
             .assertNoErrors()
             .assertValueCount(1)
             .assertComplete()
-            .values()[0]
+        val response = testObserver.values()[0]
         assertEquals("Hello Get", response.body!!.string())
+
+        // clean up
+        testObserver.dispose()
     }
 }
