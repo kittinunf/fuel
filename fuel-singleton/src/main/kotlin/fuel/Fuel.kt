@@ -5,15 +5,11 @@ package fuel
 
 public object Fuel {
     private var httpLoader: HttpLoader? = null
-    private var suspendHttpLoader: SuspendHttpLoader? = null
-
     private var httpLoaderFactory: HttpLoaderFactory? = null
 
     /**
      * Get the default [HttpLoader]. Creates a new instance if none has been set.
      */
-    public fun suspendLoader(): SuspendHttpLoader = suspendHttpLoader ?: newSuspendHttpLoader()
-
     public fun loader(): HttpLoader = httpLoader ?: newHttpLoader()
 
     /**
@@ -24,16 +20,6 @@ public object Fuel {
     public fun setHttpLoader(loader: HttpLoader) {
         httpLoaderFactory = null
         httpLoader = loader
-    }
-
-    /**
-     * Set the default [SuspendHttpLoader]. Prefer using `setSuspendHttpLoader(HttpLoaderFactory)`
-     * to create the [SuspendHttpLoader] lazily.
-     */
-    @Synchronized
-    public fun setSuspendHttpLoader(loader: SuspendHttpLoader) {
-        httpLoaderFactory = null
-        suspendHttpLoader = loader
     }
 
     /**
@@ -56,18 +42,6 @@ public object Fuel {
         val loader = httpLoaderFactory?.newHttpLoader() ?: HttpLoader()
         httpLoaderFactory = null
         httpLoader = loader
-        return loader
-    }
-
-    @Synchronized
-    private fun newSuspendHttpLoader(): SuspendHttpLoader {
-        // Check again in case httpLoader was just set.
-        suspendHttpLoader?.let { return it }
-
-        // Create a new HttpLoader.
-        val loader = httpLoaderFactory?.newSuspendHttpLoader() ?: SuspendHttpLoader()
-        httpLoaderFactory = null
-        suspendHttpLoader = loader
         return loader
     }
 }

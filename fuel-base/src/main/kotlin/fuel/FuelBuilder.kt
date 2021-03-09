@@ -45,14 +45,9 @@ public class FuelBuilder {
     }
 
     /**
-     * Create a new [HttpLoader] instance with suspend capability.
-     */
-    public fun build(): SuspendHttpLoader = RealSuspendHttpLoader(callFactory ?: buildDefaultCallFactory())
-
-    /**
      * Create a new [HttpLoader] instance.
      */
-    public fun buildBlocking(): HttpLoader = RealHttpLoader(callFactory ?: buildDefaultCallFactory())
+    public fun build(): HttpLoader = RealHttpLoader(callFactory ?: buildDefaultCallFactory())
 
     private fun buildDefaultCallFactory() = lazyCallFactory {
         OkHttpClient.Builder().build()

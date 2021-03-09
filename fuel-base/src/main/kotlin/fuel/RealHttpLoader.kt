@@ -46,45 +46,6 @@ internal class RealHttpLoader(callFactory: Call.Factory) : HttpLoader {
     //endregion
 }
 
-internal class RealSuspendHttpLoader(callFactory: Call.Factory) : SuspendHttpLoader {
-
-    private val fetcher by lazy { HttpUrlFetcher(callFactory) }
-
-    //region suspend implementation
-    override suspend fun get(request: Request): Response {
-        return fetcher.fetch(request.data, createRequestBuilder(request, "GET")).await().validate()
-    }
-
-    override suspend fun post(request: Request): Response {
-        requireNotNull(request.requestBody, { "RequestBody for method POST should not be null" })
-        return fetcher.fetch(request.data, createRequestBuilder(request, "POST")).await().validate()
-    }
-
-    override suspend fun put(request: Request): Response {
-        requireNotNull(request.requestBody, { "RequestBody for method PUT should not be null" })
-        return fetcher.fetch(request.data, createRequestBuilder(request, "PUT")).await().validate()
-    }
-
-    override suspend fun patch(request: Request): Response {
-        requireNotNull(request.requestBody, { "RequestBody for method PATCH should not be null" })
-        return fetcher.fetch(request.data, createRequestBuilder(request, "PATCH")).await().validate()
-    }
-
-    override suspend fun delete(request: Request): Response {
-        return fetcher.fetch(request.data, createRequestBuilder(request, "DELETE")).await().validate()
-    }
-
-    override suspend fun head(request: Request): Response {
-        return fetcher.fetch(request.data, createRequestBuilder(request, "HEAD")).await().validate()
-    }
-
-    override suspend fun method(request: Request): Response {
-        val method = requireNotNull(request.method, { "method should not be null" })
-        return fetcher.fetch(request.data, createRequestBuilder(request, method)).await().validate()
-    }
-    //endregion
-}
-
 private fun createRequestBuilder(request: Request, method: String): Builder =
     Builder().headers(request.headers).apply {
         if (HttpMethod.permitsRequestBody(method)) {

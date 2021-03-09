@@ -7,7 +7,6 @@ package fuel.ktor
 
 import fuel.FuelBuilder
 import fuel.Request
-import fuel.SuspendHttpLoader
 import io.ktor.client.call.UnsupportedContentTypeException
 import io.ktor.client.engine.HttpClientEngineBase
 import io.ktor.client.engine.callContext

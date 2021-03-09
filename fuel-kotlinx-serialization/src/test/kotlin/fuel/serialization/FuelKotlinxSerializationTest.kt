@@ -2,9 +2,6 @@ package fuel.serialization
 
 import fuel.Fuel
 import fuel.get
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -17,21 +14,16 @@ internal class FuelKotlinxSerializationTest {
     data class HttpBinUserAgentModel(var userAgent: String = "")
 
     @Test
-    fun testSerializableResponse() = runBlocking {
+    fun testSerializableResponse() {
         val mockWebServer = MockWebServer().apply {
             enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel\"}"))
+            start()
         }
 
-        withContext(Dispatchers.IO) {
-            mockWebServer.start()
-        }
-
-        val response = Fuel.get(mockWebServer.url("user-agent"))
+        val response = Fuel.get(mockWebServer.url("user-agent")).execute()
         val json = response.toJson(deserialization = HttpBinUserAgentModel.serializer())
         assertEquals("Fuel", json.userAgent)
 
-        withContext(Dispatchers.IO) {
-            mockWebServer.shutdown()
-        }
+        mockWebServer.shutdown()
     }
 }

@@ -8,9 +8,6 @@ import com.github.kittinunf.forge.util.create
 import com.github.kittinunf.result.Result
 import fuel.Fuel
 import fuel.get
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
@@ -28,24 +25,19 @@ internal class FuelForgeTest {
     }
 
     @Test
-    fun testForgeResponse() = runBlocking {
+    fun testForgeResponse() {
         val mockWebServer = MockWebServer().apply {
             enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel\", \"status\": \"OK\"}"))
-        }
-
-        withContext(Dispatchers.IO) {
-            mockWebServer.start()
+            start()
         }
 
         val binUserAgentModel = HttpBinUserAgentModel("Fuel", "OK")
-        val response = Fuel.get(mockWebServer.url("user-agent"))
+        val response = Fuel.get(mockWebServer.url("user-agent")).execute()
         when (val forge = response.toForge(httpBinUserDeserializer)) {
             is Result.Success -> assertEquals(binUserAgentModel, forge.value)
             is Result.Failure -> fail(forge.error.localizedMessage)
         }
 
-        withContext(Dispatchers.IO) {
-            mockWebServer.shutdown()
-        }
+        mockWebServer.shutdown()
     }
 }
