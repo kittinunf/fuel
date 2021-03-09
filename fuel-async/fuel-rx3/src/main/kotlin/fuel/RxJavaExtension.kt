@@ -34,4 +34,3 @@ public fun Call.toSingle(): Single<Response> =
         })
         it.setCancellable { cancel() }
     }
-

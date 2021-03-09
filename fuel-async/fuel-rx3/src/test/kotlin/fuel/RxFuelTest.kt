@@ -1,5 +1,6 @@
 package fuel
 
+Hm, wimport io.reactivex.rxjava3.schedulers.Schedulers
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.SocketPolicy
@@ -28,17 +29,12 @@ class RxFuelTest {
         mockWebServer.enqueue(MockResponse().setBody("Hello Get"))
 
         val request = Request.Builder().data(mockWebServer.url("url")).build()
-        val testObserver = HttpLoader().get(request)
+        HttpLoader().get(request)
             .toSingle()
-            .test()
-            .assertNoErrors()
-            .assertValueCount(1)
-            .assertComplete()
-        val response = testObserver.values()[0]
-        assertEquals("Hello Get", response.body!!.string())
-
-        // clean up
-        testObserver.dispose()
+            .subscribeOn(Schedulers.io())
+            .doOnSuccess {
+                assertEquals("Hello Get", it.body!!.string())
+            }
     }
 
     @Test(expected = AssertionError::class)
@@ -49,9 +45,8 @@ class RxFuelTest {
         val testObserver = HttpLoader().get(request)
             .toSingle()
             .test()
-            .assertNoErrors()
-            .assertValueCount(1)
             .assertComplete()
+            .assertNoErrors()
 
         // clean up
         testObserver.dispose()
