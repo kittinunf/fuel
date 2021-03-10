@@ -1,16 +1,16 @@
 package fuel
 
-import io.reactivex.rxjava3.schedulers.Schedulers
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.SocketPolicy
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.lang.AssertionError
+import java.net.SocketTimeoutException
+import java.util.concurrent.TimeUnit
 
-class RxFuelTest {
+internal class RxJavaTest {
+
     private lateinit var mockWebServer: MockWebServer
 
     @Before
@@ -29,12 +29,33 @@ class RxFuelTest {
         mockWebServer.enqueue(MockResponse().setBody("Hello Get"))
 
         val request = Request.Builder().data(mockWebServer.url("url")).build()
-        HttpLoader().get(request)
+        val testObserver = HttpLoader().get(request)
             .toSingle()
-            .subscribeOn(Schedulers.io())
-            .doOnSuccess {
-                assertEquals("Hello Get", it.body!!.string())
+            .test()
+            .assertValueCount(1)
+            .assertValue {
+                it.body!!.string() == "Hello Get"
             }
+            .assertComplete()
+            .assertNoErrors()
+
+        testObserver.dispose()
+    }
+
+    @Test
+    fun `get with url and cancel mid-flight`() {
+        mockWebServer.enqueue(MockResponse().setBody("Hello Get").setHeadersDelay(10, TimeUnit.SECONDS))
+
+        val request = Request.Builder().data(mockWebServer.url("get")).build()
+        val testObserver = HttpLoader().get(request)
+            .toSingle()
+            .test()
+            .assertNoValues()
+            .assertError {
+                it is SocketTimeoutException
+            }
+
+        testObserver.dispose()
     }
 
     @Test(expected = AssertionError::class)

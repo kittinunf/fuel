@@ -8,9 +8,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import reactor.test.test
-import java.lang.AssertionError
 
-class MonoFuelTest {
+internal class ReactorTest {
+
     private lateinit var mockWebServer: MockWebServer
 
     @Before

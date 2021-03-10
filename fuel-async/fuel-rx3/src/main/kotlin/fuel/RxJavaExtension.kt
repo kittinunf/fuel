@@ -7,10 +7,16 @@ import java.io.IOException
 
 public fun Call.toSingle(): Single<Response> =
     Single.create {
+        val newCall = clone()
         try {
-            it.onSuccess(execute())
+            if (it.isDisposed.not()) {
+                it.onSuccess(newCall.execute())
+            }
         } catch (ioe: IOException) {
             it.onError(ioe)
         }
-        it.setCancellable { cancel() }
+
+        it.setCancellable {
+            newCall.cancel()
+        }
     }

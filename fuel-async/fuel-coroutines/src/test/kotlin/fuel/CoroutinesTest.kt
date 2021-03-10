@@ -12,7 +12,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class CoroutinesTest {
+internal class CoroutinesTest {
+   
     private lateinit var mockWebServer: MockWebServer
 
     @Before
