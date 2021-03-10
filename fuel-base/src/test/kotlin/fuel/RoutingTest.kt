@@ -50,7 +50,7 @@ internal class RoutingTest {
 
     @Before
     fun setUp() {
-        mockWebServer = MockWebServer()
+        mockWebServer = MockWebServer().apply { start() }
     }
 
     @After
@@ -62,8 +62,6 @@ internal class RoutingTest {
     fun httpRouterGet() {
         mockWebServer.enqueue(MockResponse().setBody("Hello World"))
 
-        mockWebServer.start()
-
         val getTest = TestApi.GetTest(mockWebServer.url(""))
         val response = HttpLoader().method(getTest.request).execute().body!!.string()
         val request1 = mockWebServer.takeRequest()
@@ -73,10 +71,8 @@ internal class RoutingTest {
     }
 
     @Test
-    fun httpRouterGetParams()  {
+    fun httpRouterGetParams() {
         mockWebServer.enqueue(MockResponse().setBody("Hello World With Params"))
-
-        mockWebServer.start()
 
         val getTest = TestApi.GetParamsTest(mockWebServer.url(""))
         val response = HttpLoader().method(getTest.request).execute().body!!.string()
