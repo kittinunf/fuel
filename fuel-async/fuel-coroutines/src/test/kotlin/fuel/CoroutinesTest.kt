@@ -13,7 +13,7 @@ import org.junit.Before
 import org.junit.Test
 
 internal class CoroutinesTest {
-   
+
     private lateinit var mockWebServer: MockWebServer
 
     @Before

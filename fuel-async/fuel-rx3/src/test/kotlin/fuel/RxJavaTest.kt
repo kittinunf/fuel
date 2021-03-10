@@ -33,9 +33,6 @@ internal class RxJavaTest {
             .toSingle()
             .test()
             .assertValueCount(1)
-            .assertValue {
-                it.body!!.string() == "Hello Get"
-            }
             .assertComplete()
             .assertNoErrors()
 
@@ -54,8 +51,6 @@ internal class RxJavaTest {
             .assertError {
                 it is SocketTimeoutException
             }
-
-        testObserver.dispose()
     }
 
     @Test(expected = AssertionError::class)
@@ -68,8 +63,5 @@ internal class RxJavaTest {
             .test()
             .assertComplete()
             .assertNoErrors()
-
-        // clean up
-        testObserver.dispose()
     }
 }
