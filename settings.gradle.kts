@@ -7,6 +7,10 @@ pluginManagement {
 }
 rootProject.name = "Fuel"
 
+include(":fuel-async:fuel-coroutines")
+include(":fuel-async:fuel-reactor")
+include(":fuel-async:fuel-rx3")
+
 include(":fuel-base")
 include(":fuel-singleton")
 include(":fuel-moshi")
