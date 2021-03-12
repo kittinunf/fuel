@@ -4,6 +4,7 @@ import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.SocketPolicy
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -46,13 +47,14 @@ internal class RxJavaTest {
         mockWebServer.enqueue(MockResponse().setBody("Hello Get").setHeadersDelay(10, TimeUnit.SECONDS))
 
         val request = Request.Builder().data(mockWebServer.url("get")).build()
-        HttpLoader().get(request)
+        val testObserver = HttpLoader().get(request)
             .toSingle()
             .test()
             .assertNoValues()
             .assertError {
                 it is SocketTimeoutException
             }
+        assertFalse("TestObserver Dispose", testObserver.isDisposed)
     }
 
     @Test(expected = AssertionError::class)
