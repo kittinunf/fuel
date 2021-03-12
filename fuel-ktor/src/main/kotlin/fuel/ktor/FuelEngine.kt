@@ -8,6 +8,7 @@ package fuel.ktor
 import fuel.FuelBuilder
 import fuel.HttpLoader
 import fuel.Request
+import fuel.toCoroutines
 import io.ktor.client.call.UnsupportedContentTypeException
 import io.ktor.client.engine.HttpClientEngineBase
 import io.ktor.client.engine.callContext
@@ -36,7 +37,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -121,7 +121,7 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
         callContext: CoroutineContext
     ): HttpResponseData {
         val requestTime = GMTDate()
-        val response = withContext(Dispatchers.IO) { engine.method(engineRequest).execute() }
+        val response = engine.method(engineRequest).toCoroutines()
 
         val body = response.body
         callContext[Job]!!.invokeOnCompletion { body?.close() }
