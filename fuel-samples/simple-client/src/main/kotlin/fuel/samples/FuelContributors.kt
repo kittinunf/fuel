@@ -5,6 +5,7 @@ import com.squareup.moshi.Types
 import fuel.Fuel
 import fuel.get
 import fuel.moshi.toMoshi
+import fuel.toCoroutines
 import kotlinx.coroutines.runBlocking
 import kotlin.system.exitProcess
 
@@ -18,7 +19,9 @@ data class Contributor(
 
 fun main() {
     runBlocking {
-        val contributors = Fuel.get(ENDPOINT).toMoshi<List<Contributor>>(Types.newParameterizedType(List::class.java, Contributor::class.java))
+        val contributors = Fuel.get(ENDPOINT)
+            .toCoroutines()
+            .toMoshi<List<Contributor>>(Types.newParameterizedType(List::class.java, Contributor::class.java))
 
         val newContributor = contributors?.sortedByDescending { contributor ->
             contributor.contributions

@@ -5,6 +5,7 @@ import com.squareup.moshi.Types
 import fuel.Fuel
 import fuel.moshi.toMoshi
 import fuel.request
+import fuel.toCoroutines
 import kotlinx.coroutines.runBlocking
 import kotlin.system.exitProcess
 
@@ -30,11 +31,15 @@ data class ConsolidatedWeatherEntry(
 fun main() {
     runBlocking {
         val locations = listOf("London", "Tokyo")
-        locations.forEach {
-            val location = Fuel.request(WeatherApi.WeatherFor(it)).toMoshi<List<Location>>(Types.newParameterizedType(List::class.java, Location::class.java))!!
-            println("Weather for $it : ${location.first().latt_long}")
+        locations.forEach { location ->
+            val locationsList = Fuel.request(WeatherApi.WeatherFor(location))
+                .toCoroutines()
+                .toMoshi<List<Location>>(Types.newParameterizedType(List::class.java, Location::class.java))!!
+            println("Weather for $locationsList : ${locationsList.first().latt_long}")
 
-            val weathers = Fuel.request(WeatherApi.ConsolidatedWeatherFor(location.first().woeid)).toMoshi<ConsolidatedWeather>()
+            val weathers = Fuel.request(WeatherApi.ConsolidatedWeatherFor(locationsList.first().woeid))
+                .toCoroutines()
+                .toMoshi<ConsolidatedWeather>()
             println("Date           Weather         Temperature(°C) ")
             println("-----------------------------------------------")
             weathers?.consolidated_weather?.forEach { println(it.applicable_date + "     " + it.weather_state_name + "     " + it.the_temp) }
