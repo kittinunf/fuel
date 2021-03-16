@@ -7,9 +7,4 @@ public interface HttpLoaderFactory {
      * Return a new [HttpLoader]
      */
     public fun newHttpLoader(): HttpLoader
-
-    /**
-     * Return a new [SuspendHttpLoader]
-     */
-    public fun newSuspendHttpLoader(): SuspendHttpLoader
 }

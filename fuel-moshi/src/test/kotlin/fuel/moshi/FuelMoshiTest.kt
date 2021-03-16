@@ -4,9 +4,6 @@ import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Types
 import fuel.Fuel
 import fuel.get
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
@@ -21,33 +18,29 @@ internal class FuelMoshiTest {
     data class Card(val rank: Char, val suit: String)
 
     @Test
-    fun testMoshiResponse() = runBlocking {
+    fun testMoshiResponse() {
         val mockWebServer = startMockServerWithBody("{\"userAgent\": \"Fuel\"}")
 
-        val response = Fuel.get(mockWebServer.url("user-agent"))
+        val response = Fuel.get(mockWebServer.url("user-agent")).execute()
         val moshi = response.toMoshi(HttpBinUserAgentModel::class.java)!!
         assertEquals("Fuel", moshi.userAgent)
 
-        withContext(Dispatchers.IO) {
-            mockWebServer.shutdown()
-        }
+        mockWebServer.shutdown()
     }
 
     @Test
-    fun testReifiedTypeMoshiResponse() = runBlocking {
+    fun testReifiedTypeMoshiResponse() {
         val mockWebServer = startMockServerWithBody("{\"userAgent\": \"Fuel\"}")
 
-        val response = Fuel.get(mockWebServer.url("user-agent"))
+        val response = Fuel.get(mockWebServer.url("user-agent")).execute()
         val moshi = response.toMoshi<HttpBinUserAgentModel>()!!
         assertEquals("Fuel", moshi.userAgent)
 
-        withContext(Dispatchers.IO) {
-            mockWebServer.shutdown()
-        }
+        mockWebServer.shutdown()
     }
 
     @Test
-    fun testMoshiGenericList() = runBlocking {
+    fun testMoshiGenericList() {
         val mockWebServer = startMockServerWithBody(
             "[{" +
                 "    \"rank\": \"4\"," +
@@ -62,19 +55,17 @@ internal class FuelMoshiTest {
                 "]"
         )
 
-        val response = Fuel.get(mockWebServer.url("user-agent"))
+        val response = Fuel.get(mockWebServer.url("user-agent")).execute()
         val listOfCardsType = Types.newParameterizedType(List::class.java, Card::class.java)
         val cards = response.toMoshi<List<Card>>(listOfCardsType)!!
         assertEquals(3, cards.size)
         assertEquals("CLUBS", cards[0].suit)
 
-        withContext(Dispatchers.IO) {
-            mockWebServer.shutdown()
-        }
+        mockWebServer.shutdown()
     }
 
     @Test
-    fun customMoshiAdapterWithGenericList() = runBlocking {
+    fun customMoshiAdapterWithGenericList() {
         val mockWebServer = startMockServerWithBody(
             "[{" +
                 "    \"rank\": \"1\"," +
@@ -89,25 +80,18 @@ internal class FuelMoshiTest {
                 "]"
         )
 
-        val userAgentResponse = Fuel.get(mockWebServer.url("user-agent"))
+        val userAgentResponse = Fuel.get(mockWebServer.url("user-agent")).execute()
         val listOfCardsType = Types.newParameterizedType(List::class.java, Card::class.java)
         val adapter = defaultMoshi.build().adapter<List<Card>>(listOfCardsType)
         val cards = userAgentResponse.toMoshi<List<Card>>(adapter)!!
         assertEquals(3, cards.size)
         assertEquals("CLUBS", cards[0].suit)
 
-        withContext(Dispatchers.IO) {
-            mockWebServer.shutdown()
-        }
+        mockWebServer.shutdown()
     }
 
-    private suspend fun startMockServerWithBody(body: String): MockWebServer {
-        return MockWebServer().apply {
-            enqueue(MockResponse().setBody(body))
-
-            withContext(Dispatchers.IO) {
-                start()
-            }
-        }
+    private fun startMockServerWithBody(body: String): MockWebServer = MockWebServer().apply {
+        enqueue(MockResponse().setBody(body))
+        start()
     }
 }

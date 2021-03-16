@@ -45,7 +45,7 @@ internal class HttpLoaderBuilderTest {
             .okHttpClient {
                 OkHttpClient.Builder().connectTimeout(30L, TimeUnit.MILLISECONDS).build()
             }
-            .buildBlocking()
+            .build()
 
         val request = Request.Builder().data(mockWebServer.url("hello")).build()
         val response = httpLoader.get(request).response().body!!.string()
@@ -57,7 +57,7 @@ internal class HttpLoaderBuilderTest {
         mockWebServer.enqueue(MockResponse().setBody("Hello World 2"))
 
         val okhttp = OkHttpClient.Builder().callTimeout(30L, TimeUnit.MILLISECONDS).build()
-        val httpLoader = FuelBuilder().okHttpClient(okhttp).buildBlocking()
+        val httpLoader = FuelBuilder().okHttpClient(okhttp).build()
         val request = Request.Builder().data(mockWebServer.url("hello2")).build()
         val response = httpLoader.get(request).response().body!!.string()
         assertEquals("Hello World 2", response)

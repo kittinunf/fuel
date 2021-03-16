@@ -2,9 +2,7 @@ package fuel.samples
 
 import fuel.FuelBuilder
 import fuel.Request
-import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
-import kotlin.system.exitProcess
 
 val progressListener = object : ProgressListener {
     var firstUpdate = true
@@ -31,19 +29,15 @@ val progressListener = object : ProgressListener {
 }
 
 fun main() {
-    runBlocking {
-        val client = OkHttpClient.Builder()
-            .addNetworkInterceptor {
-                val originalResponse = it.proceed(it.request())
-                originalResponse.newBuilder()
-                    .body(ProgressResponseBody(originalResponse.body!!, progressListener))
-                    .build()
-            }.build()
-        val httpLoader = FuelBuilder().okHttpClient(client).build()
-        val request = Request.Builder().data("https://publicobject.com/helloworld.txt").build()
+    val client = OkHttpClient.Builder().addNetworkInterceptor {
+        val originalResponse = it.proceed(it.request())
+        originalResponse.newBuilder()
+            .body(ProgressResponseBody(originalResponse.body!!, progressListener))
+            .build()
+    }.build()
+    val httpLoader = FuelBuilder().okHttpClient(client).build()
+    val request = Request.Builder().data("https://publicobject.com/helloworld.txt").build()
 
-        val string = httpLoader.get(request).body!!.string()
-        println(string)
-    }
-    exitProcess(0)
+    val string = httpLoader.get(request).execute().body!!.string()
+    println(string)
 }

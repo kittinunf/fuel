@@ -1,8 +1,5 @@
 package fuel
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.RequestBody
@@ -53,7 +50,7 @@ internal class RoutingTest {
 
     @Before
     fun setUp() {
-        mockWebServer = MockWebServer()
+        mockWebServer = MockWebServer().apply { start() }
     }
 
     @After
@@ -62,38 +59,24 @@ internal class RoutingTest {
     }
 
     @Test
-    fun httpRouterGet() = runBlocking {
+    fun httpRouterGet() {
         mockWebServer.enqueue(MockResponse().setBody("Hello World"))
 
-        withContext(Dispatchers.IO) {
-            mockWebServer.start()
-        }
-
         val getTest = TestApi.GetTest(mockWebServer.url(""))
-        val response = SuspendHttpLoader().method(getTest.request).body!!.string()
-
-        val request1 = withContext(Dispatchers.IO) {
-            mockWebServer.takeRequest()
-        }
+        val response = HttpLoader().method(getTest.request).execute().body!!.string()
+        val request1 = mockWebServer.takeRequest()
 
         assertEquals("Hello World", response)
         assertEquals("GET", request1.method)
     }
 
     @Test
-    fun httpRouterGetParams() = runBlocking {
+    fun httpRouterGetParams() {
         mockWebServer.enqueue(MockResponse().setBody("Hello World With Params"))
 
-        withContext(Dispatchers.IO) {
-            mockWebServer.start()
-        }
-
         val getTest = TestApi.GetParamsTest(mockWebServer.url(""))
-        val response = SuspendHttpLoader().method(getTest.request).body!!.string()
-
-        val request1 = withContext(Dispatchers.IO) {
-            mockWebServer.takeRequest()
-        }
+        val response = HttpLoader().method(getTest.request).execute().body!!.string()
+        val request1 = mockWebServer.takeRequest()
 
         assertEquals("Hello World With Params", response)
         assertEquals("GET", request1.method)

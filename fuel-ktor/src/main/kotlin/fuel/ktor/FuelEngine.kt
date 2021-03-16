@@ -6,8 +6,9 @@
 package fuel.ktor
 
 import fuel.FuelBuilder
+import fuel.HttpLoader
 import fuel.Request
-import fuel.SuspendHttpLoader
+import fuel.toCoroutines
 import io.ktor.client.call.UnsupportedContentTypeException
 import io.ktor.client.engine.HttpClientEngineBase
 import io.ktor.client.engine.callContext
@@ -115,12 +116,12 @@ public class FuelEngine(override val config: FuelConfig) : HttpClientEngineBase(
     }*/
 
     private suspend fun executeHttpRequest(
-        engine: SuspendHttpLoader,
+        engine: HttpLoader,
         engineRequest: Request,
         callContext: CoroutineContext
     ): HttpResponseData {
         val requestTime = GMTDate()
-        val response = engine.method(engineRequest)
+        val response = engine.method(engineRequest).toCoroutines()
 
         val body = response.body
         callContext[Job]!!.invokeOnCompletion { body?.close() }
