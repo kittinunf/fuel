@@ -123,7 +123,7 @@ Fuel requests can be made on the `Fuel` namespace object, any `FuelManager` or u
 
 ```kotlin
 import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.result.Result;
+import com.github.kittinunf.result.Result
 
 fun main(args: Array<String>) {
 
