@@ -1,24 +1,11 @@
-pluginManagement {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-        maven("https://dl.bintray.com/kotlin/kotlin-eap")
-    }
-}
-rootProject.name = "Fuel"
+rootProject.name = "Fuel-MPP"
 
-include(":fuel-async:fuel-coroutines")
-include(":fuel-async:fuel-reactor")
-include(":fuel-async:fuel-rx3")
+include ("fuel-core")
+include ("fuel-singleton")
+include ("fuel-moshi-jvm")
+include ("fuel-kotlinx-serialization")
+include ("fuel-jackson-jvm")
+include ("fuel-forge-jvm")
 
-include(":fuel-base")
-include(":fuel-singleton")
-include(":fuel-moshi")
-include(":fuel-kotlinx-serialization")
-include(":fuel-forge")
-include(":fuel-jackson")
-include(":fuel-ktor")
-
-include(":fuel-samples:simple-client")
-include(":fuel-samples:progress")
-include(":fuel-samples:weather")
+include ("fuel-samples:weather-jvm")
+include ("fuel-samples:httpbin-js")

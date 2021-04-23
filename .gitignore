@@ -1,18 +1,20 @@
-# Java class files
-*.class
-
-# generated files
-build/
-out/
-
-# IDEA/Android Studio project files, because
-# the project can be imported from settings.gradle
+build
+.gradle
 .idea
+bin
+gen
 *.iml
+.directory
+node_modules
 local.properties
 
-# Other
 .DS_Store
+.externalNativeBuild
+.database
 
-# Gradle
-.gradle
+Pods/
+
+.project
+.settings
+.classpath
+.gradletasknamecache
