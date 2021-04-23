@@ -10,6 +10,6 @@ kotlin {
 }
 
 dependencies {
-    api (project(":fuel-singleton"))
-    api ("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.1")
+    api(project(":fuel-singleton"))
+    api("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.1")
 }

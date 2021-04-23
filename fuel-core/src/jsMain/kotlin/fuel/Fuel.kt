@@ -14,12 +14,15 @@ public object Fuel : HttpLoader {
     override suspend fun head(request: Request): Any? = request(request.url, "HEAD")
     override suspend fun method(request: Request): Any? = request(request.url, request.method, request.body)
 
-    //TODO: Headers Support
+    // TODO: Headers Support
     private suspend fun request(url: String, method: String?, body: String? = null): Any? {
-        val res = window.fetch(url, object : RequestInit {
-            override var method: String? = method
-            override var body: dynamic = body.asDynamic()
-        }).await()
+        val res = window.fetch(
+            url,
+            object : RequestInit {
+                override var method: String? = method
+                override var body: dynamic = body.asDynamic()
+            }
+        ).await()
         return if (res.ok) res.json().await() else throw makeError(res)
     }
 

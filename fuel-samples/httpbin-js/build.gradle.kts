@@ -10,5 +10,5 @@ kotlin {
 }
 
 dependencies {
-    implementation (project(":fuel-singleton"))
+    implementation(project(":fuel-singleton"))
 }

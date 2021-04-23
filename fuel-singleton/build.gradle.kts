@@ -25,7 +25,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api (project(":fuel-core"))
+                api(project(":fuel-core"))
             }
         }
         val jvmMain by getting

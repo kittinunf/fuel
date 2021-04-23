@@ -29,15 +29,15 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation (kotlin("stdlib-common"))
-                api (project(":fuel-singleton"))
-                api ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
+                implementation(kotlin("stdlib-common"))
+                api(project(":fuel-singleton"))
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation (kotlin("test-common"))
-                implementation (kotlin("test-annotations-common"))
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
             }
         }
         val jvmMain by getting

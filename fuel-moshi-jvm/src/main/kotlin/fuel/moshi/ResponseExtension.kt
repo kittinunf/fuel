@@ -23,4 +23,3 @@ public fun <T : Any> Any?.toMoshi(jsonAdapter: JsonAdapter<T>): T? {
     require(this is Response)
     return jsonAdapter.fromJson(body!!.source())
 }
-

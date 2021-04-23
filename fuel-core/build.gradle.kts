@@ -43,20 +43,20 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation (kotlin("stdlib-common"))
-                api ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+                implementation(kotlin("stdlib-common"))
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation (kotlin("test-common"))
-                implementation (kotlin("test-annotations-common"))
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
             }
         }
         val jvmMain by getting {
             dependencies {
-                implementation (kotlin("stdlib"))
-                api ("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
+                implementation(kotlin("stdlib"))
+                api("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
             }
         }
         val jvmTest by getting
