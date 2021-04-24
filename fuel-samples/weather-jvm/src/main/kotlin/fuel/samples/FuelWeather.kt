@@ -3,8 +3,8 @@ package fuel.samples
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Types
 import fuel.Fuel
-import fuel.request
 import fuel.moshi.toMoshi
+import fuel.request
 import kotlinx.coroutines.runBlocking
 import kotlin.system.exitProcess
 
