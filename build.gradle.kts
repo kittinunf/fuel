@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.31"
-    kotlin("kapt") version "1.4.31" apply false
+    kotlin("jvm") version "1.5.0"
+    kotlin("kapt") version "1.5.0" apply false
     id("com.vanniktech.maven.publish") version "0.10.0" apply false
     jacoco
 }
@@ -40,7 +40,7 @@ allprojects {
     }
 
     jacoco {
-        toolVersion = "0.8.6"
+        toolVersion = "0.8.7"
     }
 
     tasks.jacocoTestReport {
