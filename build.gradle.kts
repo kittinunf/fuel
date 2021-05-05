@@ -14,7 +14,7 @@ allprojects {
     apply(plugin = "jacoco")
 
     val okhttpVersion by extra("5.0.0-alpha.2")
-    val moshiVersion by extra("1.11.0")
+    val moshiVersion by extra("1.12.0")
 
     repositories {
         mavenCentral()
