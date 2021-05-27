@@ -1,5 +1,5 @@
 plugins {
-    id(KotlinX.Serialization.plugin)
+    id(Kotlinx.Serialization.plugin)
 }
 
 repositories {
@@ -9,7 +9,7 @@ repositories {
 dependencies {
     api(project(Fuel.name))
 
-    implementation(KotlinX.Serialization.Json.dependency)
+    implementation(Kotlinx.Serialization.Json.dependency)
 
     testImplementation(project(Fuel.Test.name))
 }

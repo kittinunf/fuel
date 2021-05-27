@@ -16,20 +16,20 @@ dependencies {
     implementation(project(Fuel.Stetho.name))
 
     // dependencies
-    implementation(AndroidX.appCompat)
+    implementation(Androidx.appCompat)
     implementation(Gson.dependency)
     implementation(Kotlin.stdlib)
-    implementation(KotlinX.Coroutines.android)
+    implementation(Kotlinx.Coroutines.android)
     implementation(RxJava.Android.dependency)
     implementation(Stetho.StethoUrlConnection.dependency)
     implementation(Stetho.dependency)
 
     // test dependencies
-    androidTestImplementation(AndroidX.annotation)
-    androidTestImplementation(AndroidX.Test.junit)
-    androidTestImplementation(AndroidX.Test.rules)
-    androidTestImplementation(AndroidX.Espresso.core)
-    androidTestImplementation(AndroidX.Espresso.intents)
+    androidTestImplementation(Androidx.annotation)
+    androidTestImplementation(Androidx.Test.junit)
+    androidTestImplementation(Androidx.Test.rules)
+    androidTestImplementation(Androidx.Espresso.core)
+    androidTestImplementation(Androidx.Espresso.intents)
 }
 
 configure<BaseExtension> {
@@ -41,7 +41,7 @@ configure<BaseExtension> {
         targetSdkVersion(Fuel.compileSdkVersion)
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "Androidx.test.runner.AndroidJUnitRunner"
     }
 
     sourceSets {
