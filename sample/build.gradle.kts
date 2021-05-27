@@ -2,8 +2,8 @@ import com.android.build.gradle.BaseExtension
 
 plugins {
     id(Android.appPlugin)
-    id(Kotlin.androidPlugin)
-    id(Kotlin.androidExtensionsPlugin)
+    kotlin("android")
+    kotlin("android.extensions")
 }
 
 dependencies {
@@ -18,7 +18,7 @@ dependencies {
     // dependencies
     implementation(Androidx.appCompat)
     implementation(Gson.dependency)
-    implementation(Kotlin.stdlib)
+    implementation(Kotlin.stdlib.common)
     implementation(Kotlinx.Coroutines.android)
     implementation(RxJava.Android.dependency)
     implementation(Stetho.StethoUrlConnection.dependency)
@@ -41,7 +41,7 @@ configure<BaseExtension> {
         targetSdkVersion(Fuel.compileSdkVersion)
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "Androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     sourceSets {

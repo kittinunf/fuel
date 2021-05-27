@@ -39,7 +39,7 @@ subprojects {
 
     if (isJvmModule) {
         apply {
-            plugin(Kotlin.plugin)
+            plugin("org.jetbrains.kotlin.jvm")
             plugin(Jacoco.plugin)
         }
 
@@ -79,8 +79,8 @@ subprojects {
     if (isAndroidModule) {
         apply {
             plugin(Android.libPlugin)
-            plugin(Kotlin.androidPlugin)
-            plugin(Kotlin.androidExtensionsPlugin)
+            plugin("org.jetbrains.kotlin.android")
+            plugin("org.jetbrains.kotlin.android.extensions")
             //plugin(Jacoco.Android.plugin)
         }
 
@@ -165,7 +165,7 @@ subprojects {
         }
 
         dependencies {
-            implementation(Kotlin.stdlib)
+            implementation(Kotlin.stdlib.jdk7)
 
             testImplementation(JUnit.dependency)
         }

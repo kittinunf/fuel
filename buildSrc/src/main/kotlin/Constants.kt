@@ -73,14 +73,6 @@ object Fuel {
     }
 }
 
-// Core dependencies
-object Kotlin {
-    const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:_"
-    const val plugin = "org.jetbrains.kotlin.jvm"
-    const val androidPlugin = "kotlin-android"
-    const val androidExtensionsPlugin = "kotlin-android-extensions"
-}
-
 object Result {
     const val dependency = "com.github.kittinunf.result:result:_"
 }
