@@ -81,7 +81,7 @@ subprojects {
             plugin(Android.libPlugin)
             plugin(Kotlin.androidPlugin)
             plugin(Kotlin.androidExtensionsPlugin)
-            plugin(Jacoco.Android.plugin)
+            //plugin(Jacoco.Android.plugin)
         }
 
         configure<BaseExtension> {
@@ -132,11 +132,13 @@ subprojects {
             }
         }
 
+        /**
         configure<JacocoAndroidUnitTestReportExtension> {
             csv.enabled(false)
             html.enabled(true)
             xml.enabled(true)
         }
+        **/
     }
 
     if (!isSample) {
