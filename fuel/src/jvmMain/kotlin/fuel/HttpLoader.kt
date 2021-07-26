@@ -5,7 +5,7 @@ import okhttp3.Request.Builder
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.http.HttpMethod
 
-public actual class HttpLoader(callFactory: Call.Factory){
+public actual class HttpLoader(callFactory: Call.Factory) {
     private val fetcher: HttpUrlFetcher by lazy { HttpUrlFetcher(callFactory) }
 
     public actual suspend fun get(request: Request): HttpResponse =

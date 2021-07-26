@@ -32,8 +32,8 @@ import platform.Foundation.setValue
 import platform.darwin.NSObject
 import kotlin.native.concurrent.freeze
 
-internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConfiguration): NSObject(),
-    NSURLSessionDataDelegateProtocol {
+internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConfiguration) :
+    NSObject(), NSURLSessionDataDelegateProtocol {
 
     private val asyncQueue = NSOperationQueue()
     private val chunks = Channel<NSData>(Channel.UNLIMITED)

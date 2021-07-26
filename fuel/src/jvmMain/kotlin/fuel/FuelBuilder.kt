@@ -14,7 +14,7 @@ public actual class FuelBuilder {
         this.callFactory = lazyCallFactory(initializer)
     }
 
-    public actual fun build() : HttpLoader = HttpLoader(callFactory ?: buildDefaultCallFactory())
+    public actual fun build(): HttpLoader = HttpLoader(callFactory ?: buildDefaultCallFactory())
 
     private fun buildDefaultCallFactory() = lazyCallFactory {
         OkHttpClient.Builder().build()
