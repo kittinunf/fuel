@@ -2,7 +2,7 @@ package fuel
 
 import platform.Foundation.NSURLSessionConfiguration
 
-public actual class HttpLoader(sessionConfiguration: NSURLSessionConfiguration)  {
+public actual class HttpLoader(sessionConfiguration: NSURLSessionConfiguration) {
     private val fetcher by lazy { HttpUrlFetcher(sessionConfiguration) }
 
     public actual suspend fun get(request: Request): HttpResponse =

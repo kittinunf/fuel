@@ -17,7 +17,7 @@ public class Request internal constructor(
          */
          public fun url(url: String): Builder = apply {
             this.url = url
-        }
+         }
 
         /**
          * Set the [MutableMap] for any network operations performed by this request.

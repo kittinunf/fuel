@@ -11,8 +11,8 @@ internal class HttpUrlFetcher {
             object : RequestInit {
                 override var method: String? = method
                 override var body: dynamic = body.asDynamic()
-        })
-            .await()
+            }
+        ).await()
         return HttpResponse().apply {
             this.statusCode = res.status.toInt()
             this.body = res.text().await()

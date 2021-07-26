@@ -13,7 +13,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     }
 }
 
-
 dependencies {
     api(project(":fuel"))
     api("com.github.kittinunf.forge:forge:1.0.0-alpha3")
