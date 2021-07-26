@@ -41,7 +41,8 @@ class FuelMoshiTest {
 
     @Test
     fun testMoshiGenericList() = runBlocking {
-        val mockWebServer = startMockServerWithBody("[{ " +
+        val mockWebServer = startMockServerWithBody(
+            "[{ " +
                 "    \"rank\": \"4\"," +
                 "    \"suit\": \"CLUBS\"" +
                 "  }, {" +
@@ -65,7 +66,8 @@ class FuelMoshiTest {
 
     @Test
     fun customMoshiAdapterWithGenericList() = runBlocking {
-        val mockWebServer = startMockServerWithBody("[{" +
+        val mockWebServer = startMockServerWithBody(
+            "[{" +
                 "    \"rank\": \"1\"," +
                 "    \"suit\": \"CLUBS\"" +
                 "  }, {" +
