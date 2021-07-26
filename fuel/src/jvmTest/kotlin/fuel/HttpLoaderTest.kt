@@ -112,7 +112,7 @@ internal class HttpLoaderTest {
         assertEquals("PUT", request1.method)
     }
 
-   @Test
+    @Test
     fun `patch test data`() = runBlocking {
         mockWebServer.enqueue(MockResponse())
 

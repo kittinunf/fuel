@@ -13,11 +13,11 @@ public class Request internal constructor(
         private var method: String? = null
 
         /**
-         * Set the url to load.
+         * Set the url to load
          */
-         public fun url(url: String): Builder = apply {
+        public fun url(url: String): Builder = apply {
             this.url = url
-         }
+        }
 
         /**
          * Set the [MutableMap] for any network operations performed by this request.

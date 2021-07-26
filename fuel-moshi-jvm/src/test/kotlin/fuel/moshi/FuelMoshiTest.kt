@@ -41,18 +41,17 @@ class FuelMoshiTest {
 
     @Test
     fun testMoshiGenericList() = runBlocking {
-        val mockWebServer = startMockServerWithBody(
-            "[{" +
-                    "    \"rank\": \"4\"," +
-                    "    \"suit\": \"CLUBS\"" +
-                    "  }, {" +
-                    "    \"rank\": \"A\"," +
-                    "    \"suit\": \"HEARTS\"" +
-                    "  }, {" +
-                    "    \"rank\": \"J\"," +
-                    "    \"suit\": \"SPADES\"" +
-                    "  }" +
-                    "]"
+        val mockWebServer = startMockServerWithBody("[{ " +
+                "    \"rank\": \"4\"," +
+                "    \"suit\": \"CLUBS\"" +
+                "  }, {" +
+                "    \"rank\": \"A\"," +
+                "    \"suit\": \"HEARTS\"" +
+                "  }, {" +
+                "    \"rank\": \"J\"," +
+                "    \"suit\": \"SPADES\"" +
+                "  }" +
+                "]"
         )
 
         val response = Fuel.get(mockWebServer.url("user-agent").toString())
@@ -66,18 +65,17 @@ class FuelMoshiTest {
 
     @Test
     fun customMoshiAdapterWithGenericList() = runBlocking {
-        val mockWebServer = startMockServerWithBody(
-            "[{" +
-                    "    \"rank\": \"1\"," +
-                    "    \"suit\": \"CLUBS\"" +
-                    "  }, {" +
-                    "    \"rank\": \"J\"," +
-                    "    \"suit\": \"HEARTS\"" +
-                    "  }, {" +
-                    "    \"rank\": \"K\"," +
-                    "    \"suit\": \"SPADES\"" +
-                    "  }" +
-                    "]"
+        val mockWebServer = startMockServerWithBody("[{" +
+                "    \"rank\": \"1\"," +
+                "    \"suit\": \"CLUBS\"" +
+                "  }, {" +
+                "    \"rank\": \"J\"," +
+                "    \"suit\": \"HEARTS\"" +
+                "  }, {" +
+                "    \"rank\": \"K\"," +
+                "    \"suit\": \"SPADES\"" +
+                "  }" +
+                "]"
         )
 
         val userAgentResponse = Fuel.get(mockWebServer.url("user-agent").toString())
