@@ -3,9 +3,7 @@ package fuel.forge
 import com.github.kittinunf.forge.Forge
 import com.github.kittinunf.forge.core.DeserializedResult
 import com.github.kittinunf.forge.core.JSON
-import okhttp3.Response
+import fuel.HttpResponse
 
-public fun <T : Any> Any?.toForge(deserializer: JSON.() -> DeserializedResult<T>): DeserializedResult<T> {
-    require(this is Response)
-    return Forge.modelFromJson(body!!.string(), deserializer)
-}
+public fun <T : Any> HttpResponse.toForge(deserializer: JSON.() -> DeserializedResult<T>): DeserializedResult<T> =
+    Forge.modelFromJson(body, deserializer)
