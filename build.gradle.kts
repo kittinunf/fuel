@@ -11,10 +11,17 @@ allprojects {
         mavenCentral()
     }
 
+    group = "com.github.kittinunf.fuel"
+    version = "3.0.0-SNAPSHOT"
+
     jacoco {
         toolVersion = "0.8.7"
     }
 
-    group = "com.github.kittinunf.fuel"
-    version = "3.0.0-SNAPSHOT"
+    tasks.withType<JacocoReport> {
+        reports {
+            xml.required.set(true)
+            csv.required.set(false)
+        }
+    }
 }
