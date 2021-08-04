@@ -22,7 +22,7 @@ kotlin {
             }
         }
     }
-    iosX64 {
+    ios {
         binaries {
             framework {
                 baseName = "Fuel"
@@ -38,7 +38,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
             }
         }
         val commonTest by getting {
@@ -58,8 +58,8 @@ kotlin {
         }
         val jsMain by getting
         val jsTest by getting
-        val iosX64Main by getting
-        val iosX64Test by getting
+        val iosMain by getting
+        val iosTest by getting
     }
 }
 

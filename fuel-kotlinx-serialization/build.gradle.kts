@@ -21,7 +21,7 @@ kotlin {
             }
         }
     }
-    iosX64 {
+    ios {
         binaries {
             framework {
                 baseName = "Fuel-Serialization"
@@ -49,7 +49,7 @@ kotlin {
         }
         val jsMain by getting
         val jsTest by getting
-        val iosX64Main by getting
-        val iosX64Test by getting
+        val iosMain by getting
+        val iosTest by getting
     }
 }
