@@ -1,9 +1,9 @@
 package fuel.moshi
 
+import com.github.kittinunf.result.Result
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import fuel.HttpResponse
-import com.github.kittinunf.result.Result
 import java.io.IOException
 import java.lang.reflect.Type
 
