@@ -14,13 +14,14 @@ kotlin {
             useJUnit()
         }
     }
-    js(IR) {
+    js {
         binaries.executable()
         browser {
             commonWebpackConfig {
                 cssSupport.enabled = true
             }
         }
+        //nodejs()
     }
     ios {
         binaries {
@@ -31,11 +32,6 @@ kotlin {
     }
     explicitApi()
     sourceSets {
-        all {
-            languageSettings.apply {
-                useExperimentalAnnotation("kotlin.RequiresOptIn")
-            }
-        }
         val commonMain by getting {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
@@ -56,7 +52,12 @@ kotlin {
                 implementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.2")
             }
         }
-        val jsMain by getting
+        val jsMain by getting {
+            /*dependencies {
+                api(npm("node-fetch", "2.6.1"))
+                api(npm("abort-controller", "3.0.0"))
+            }*/
+        }
         val jsTest by getting
         val iosMain by getting
         val iosTest by getting

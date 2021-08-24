@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.30-M1"
+    kotlin("plugin.serialization") version "1.5.30-RC"
     `maven-publish`
 }
 
@@ -13,13 +13,14 @@ kotlin {
             useJUnit()
         }
     }
-    js(IR) {
+    js {
         binaries.executable()
         browser {
             commonWebpackConfig {
                 cssSupport.enabled = true
             }
         }
+        //nodejs()
     }
     ios {
         binaries {
@@ -34,6 +35,7 @@ kotlin {
             dependencies {
                 api(project(":fuel"))
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+                api("com.github.kittinunf.result:result:5.2.0")
             }
         }
         val commonTest by getting {

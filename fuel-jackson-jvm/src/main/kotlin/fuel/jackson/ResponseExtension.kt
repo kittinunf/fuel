@@ -5,9 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import fuel.HttpResponse
+import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.doTry
 
 public val defaultMapper: ObjectMapper = ObjectMapper().registerKotlinModule()
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-public inline fun <reified T : Any> HttpResponse.toJackson(mapper: ObjectMapper = defaultMapper): T =
-    mapper.readValue(body)
+public inline fun <reified T : Any> HttpResponse.toJackson(mapper: ObjectMapper = defaultMapper): Result<T, Throwable> =
+    doTry(work = {
+        Result.success(mapper.readValue(body))
+    }, errorHandler = {
+        Result.failure(it)
+    })

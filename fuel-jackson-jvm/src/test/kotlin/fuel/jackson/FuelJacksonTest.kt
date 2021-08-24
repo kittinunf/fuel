@@ -10,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Test
 
 class FuelJacksonTest {
@@ -24,7 +25,11 @@ class FuelJacksonTest {
 
         val response = Fuel.get(mockWebServer.url("user-agent").toString())
         val jackson = response.toJackson<HttpBinUserAgentModel>()
-        assertEquals("Fuel", jackson.userAgent)
+        jackson.fold({
+            assertEquals("Fuel", it.userAgent)
+        }, {
+            fail(it.localizedMessage)
+        })
 
         mockWebServer.shutdown()
     }
@@ -38,8 +43,12 @@ class FuelJacksonTest {
 
         val response = Fuel.get(mockWebServer.url("user-agent").toString())
         val jackson = response.toJackson<HttpBinUserAgentModel>(createCustomMapper())
-        assertEquals("", jackson.userAgent)
-        assertEquals("OK", jackson.http_status)
+        jackson.fold({
+            assertEquals("", it.userAgent)
+            assertEquals("OK", it.http_status)
+        }, {
+            fail(it.localizedMessage)
+        })
 
         mockWebServer.shutdown()
     }

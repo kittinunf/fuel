@@ -1,5 +1,6 @@
 package fuel.samples
 
+import com.github.kittinunf.result.onSuccess
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Types
 import fuel.Fuel
@@ -29,19 +30,30 @@ data class ConsolidatedWeatherEntry(
 
 fun main() {
     runBlocking {
-        val locations = listOf("London", "Tokyo")
-        locations.forEach { location ->
-            val locationsList = Fuel.request(WeatherApi.WeatherFor(location))
-                .toMoshi<List<Location>>(Types.newParameterizedType(List::class.java, Location::class.java))?.first()
-            println("Weather for ${locationsList?.title} : ${locationsList?.latt_long}")
+        val cityLocation = listOf("London", "Tokyo")
+        cityLocation.forEach { city ->
+            val locationList = Fuel.request(WeatherApi.WeatherFor(city))
+                .toMoshi<List<Location>>(Types.newParameterizedType(List::class.java, Location::class.java))
+            locationList.fold({ locations ->
+                val firstLocation = locations?.first()
+                println("Weather for ${firstLocation?.title} : ${firstLocation?.latt_long}")
 
-            val weathers = locationsList?.woeid?.let { WeatherApi.ConsolidatedWeatherFor(it) }?.let {
-                Fuel.request(it).toMoshi<ConsolidatedWeather>()
-            }
-            println("Date           Weather         Temperature(°C) ")
-            println("-----------------------------------------------")
-            weathers?.consolidated_weather?.forEach { println(it.applicable_date + "     " + it.weather_state_name + "     " + it.the_temp) }
-            println("-----------------------------------------------")
+                val weathers = firstLocation?.woeid?.let {
+                    WeatherApi.ConsolidatedWeatherFor(it)
+                }?.let {
+                    Fuel.request(it).toMoshi<ConsolidatedWeather>()
+                }
+                println("Date           Weather         Temperature(°C) ")
+                println("-----------------------------------------------")
+                weathers?.onSuccess {
+                    it?.consolidated_weather?.forEach { weather ->
+                        println(weather.applicable_date + "     " + weather.weather_state_name + "     " + weather.the_temp)
+                    }
+                }
+                println("-----------------------------------------------")
+            }, {
+                println(it.localizedMessage)
+            })
         }
     }
     exitProcess(0)

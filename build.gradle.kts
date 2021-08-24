@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.5.30-M1" apply false
+    kotlin("multiplatform") version "1.5.30-RC" apply false
     jacoco
 }
 
@@ -7,7 +7,6 @@ allprojects {
     apply(plugin = "jacoco")
 
     repositories {
-        jcenter()
         mavenCentral()
     }
 

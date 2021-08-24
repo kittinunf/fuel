@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Test
 
 class FuelMoshiTest {
@@ -22,8 +23,12 @@ class FuelMoshiTest {
         val mockWebServer = startMockServerWithBody("{\"userAgent\": \"Fuel\"}")
 
         val response = Fuel.get(mockWebServer.url("user-agent").toString())
-        val moshi = response.toMoshi(HttpBinUserAgentModel::class.java)!!
-        assertEquals("Fuel", moshi.userAgent)
+        val moshi = response.toMoshi(HttpBinUserAgentModel::class.java)
+        moshi.fold({
+            assertEquals("Fuel", it?.userAgent)
+        }, {
+            fail(it.localizedMessage)
+        })
 
         mockWebServer.shutdown()
     }
@@ -33,8 +38,12 @@ class FuelMoshiTest {
         val mockWebServer = startMockServerWithBody("{\"userAgent\": \"Fuel\"}")
 
         val response = Fuel.get(mockWebServer.url("user-agent").toString())
-        val moshi = response.toMoshi<HttpBinUserAgentModel>()!!
-        assertEquals("Fuel", moshi.userAgent)
+        val moshi = response.toMoshi<HttpBinUserAgentModel>()
+        moshi.fold({
+            assertEquals("Fuel", it?.userAgent)
+        }, {
+            fail(it.localizedMessage)
+        })
 
         mockWebServer.shutdown()
     }
@@ -57,9 +66,13 @@ class FuelMoshiTest {
 
         val response = Fuel.get(mockWebServer.url("user-agent").toString())
         val listOfCardsType = Types.newParameterizedType(List::class.java, Card::class.java)
-        val cards = response.toMoshi<List<Card>>(listOfCardsType)!!
-        assertEquals(3, cards.size)
-        assertEquals("CLUBS", cards[0].suit)
+        val cards = response.toMoshi<List<Card>>(listOfCardsType)
+        cards.fold({
+            assertEquals(3, it?.size)
+            assertEquals("CLUBS", it?.get(0)?.suit)
+        }, {
+            fail(it.localizedMessage)
+        })
 
         mockWebServer.shutdown()
     }
@@ -83,9 +96,13 @@ class FuelMoshiTest {
         val userAgentResponse = Fuel.get(mockWebServer.url("user-agent").toString())
         val listOfCardsType = Types.newParameterizedType(List::class.java, Card::class.java)
         val adapter = defaultMoshi.build().adapter<List<Card>>(listOfCardsType)
-        val cards = userAgentResponse.toMoshi<List<Card>>(adapter)!!
-        assertEquals(3, cards.size)
-        assertEquals("CLUBS", cards[0].suit)
+        val cards = userAgentResponse.toMoshi<List<Card>>(adapter)
+        cards.fold({
+            assertEquals(3, it?.size)
+            assertEquals("CLUBS", it?.get(0)?.suit)
+        }, {
+            fail(it.localizedMessage)
+        })
 
         mockWebServer.shutdown()
     }

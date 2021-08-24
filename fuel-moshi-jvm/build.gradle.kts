@@ -31,6 +31,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 dependencies {
     api(project(":fuel"))
     api("com.squareup.moshi:moshi:1.12.0")
+    api("com.github.kittinunf.result:result-jvm:5.2.0")
 
     kaptTest("com.squareup.moshi:moshi-kotlin-codegen:1.12.0")
 
