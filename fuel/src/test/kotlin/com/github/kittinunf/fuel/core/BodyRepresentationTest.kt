@@ -152,6 +152,21 @@ class BodyRepresentationTest : MockHttpTestCase() {
     }
 
     @Test
+    fun textRepresentationOfJsonWithMultibyteCharacterSets() {
+        val contentTypes = listOf("application/json")
+        val content = "{ \"foo\": \"４２\" }"
+
+        contentTypes.forEach { contentType ->
+            assertThat(
+                DefaultBody
+                    .from({ ByteArrayInputStream(content.toByteArray()) }, { content.length.toLong() })
+                    .asString(),
+                equalTo(content)
+            )
+        }
+    }
+
+    @Test
     fun textRepresentationOfJsonWithUtf8Charset() {
         val contentTypes = listOf("application/json;charset=utf-8", "application/json; charset=utf-8")
         val content = "{ \"foo\": 42 }"

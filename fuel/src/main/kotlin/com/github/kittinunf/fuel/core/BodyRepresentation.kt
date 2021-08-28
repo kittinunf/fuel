@@ -26,7 +26,7 @@ fun Body.representationOfBytes(contentType: String?): String {
         val charset: Charset = try {
             Charset.forName(parameters.find { charsetRegex.matches(it) }?.substringAfter("CHARSET=") ?: "")
         } catch (e: IllegalCharsetNameException) {
-            Charsets.US_ASCII
+            Charsets.UTF-8
         }
 
         return String(toByteArray(), charset)
