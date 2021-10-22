@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.30-RC"
+    kotlin("plugin.serialization") version "1.5.30"
     `maven-publish`
 }
 
@@ -34,7 +34,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":fuel"))
-                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
                 api("com.github.kittinunf.result:result:5.2.0")
             }
         }

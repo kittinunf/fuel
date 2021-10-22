@@ -29,9 +29,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 dependencies {
     api(project(":fuel"))
-    api("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0-rc1")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
     api("com.github.kittinunf.result:result-jvm:5.2.0")
 
-    testImplementation("junit:junit:4.13")
+    testImplementation("junit:junit:4.13.2")
     testImplementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.2")
 }

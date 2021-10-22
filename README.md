@@ -1,9 +1,9 @@
 # Fuel
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.4.30-blue.svg)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.5.31-blue.svg)](http://kotlinlang.org)
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io)
 ![Run Gradle](https://github.com/kittinunf/fuel/workflows/Run%20Gradle/badge.svg?branch=okfuel)
-[![Codecov](https://codecov.io/github/kittinunf/fuel/coverage.svg?branch=3.x)](https://codecov.io/gh/kittinunf/fuel/branch/3.x)
+[![Codecov](https://codecov.io/github/kittinunf/fuel/coverage.svg?branch=fuel-mpp)](https://codecov.io/gh/kittinunf/fuel/branch/3.x)
 
 The easiest HTTP networking library for Kotlin backed by Kotlinx Coroutines.
 
