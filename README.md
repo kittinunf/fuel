@@ -1,6 +1,5 @@
 # Fuel
 
-[![jcenter](https://api.bintray.com/packages/kittinunf/maven/Fuel-Android/images/download.svg)](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersion)
 [![mavenCentral](https://maven-badges.herokuapp.com/maven-central/com.github.kittinunf.fuel/fuel/badge.svg)](https://search.maven.org/search?q=g:com.github.kittinunf.fuel)
 [![Build Status](https://travis-ci.org/kittinunf/fuel.svg?branch=master)](https://travis-ci.org/kittinunf/fuel)
 [![Codecov](https://codecov.io/github/kittinunf/fuel/coverage.svg?branch=master)](https://codecov.io/gh/kittinunf/fuel)
@@ -38,10 +37,10 @@ You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersi
   implementation 'com.github.kittinunf.fuel:<package>:<latest-version>'
 ```
 
-Make sure to include `jcenter()` or `mavenCentral()` in your repositories 
+Make sure to include or `mavenCentral()` in your repositories (`jcenter()` is deprecated, new releases starting from 2.2.3 are hosted on `mavenCentral()`)
 ```groovy
 repositories {
-  jcenter() //or mavenCentral()
+  mavenCentral()
 }
 ```
 
