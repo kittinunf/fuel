@@ -37,7 +37,7 @@ You can [download](https://bintray.com/kittinunf/maven/Fuel-Android/_latestVersi
   implementation 'com.github.kittinunf.fuel:<package>:<latest-version>'
 ```
 
-Make sure to include or `mavenCentral()` in your repositories (`jcenter()` is deprecated, new releases starting from 2.2.3 are hosted on `mavenCentral()`)
+Make sure to include `mavenCentral()` in your repositories (`jcenter()` is deprecated, new releases starting from 2.2.3 are hosted on `mavenCentral()`)
 ```groovy
 repositories {
   mavenCentral()
