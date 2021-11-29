@@ -238,3 +238,8 @@ object Stetho {
         const val dependency = "com.facebook.stetho:stetho-urlconnection:$version"
     }
 }
+
+object ICU {
+    const val version = "70.1"
+    const val dependency = "com.ibm.icu:icu4j:$version"
+}
