@@ -37,13 +37,17 @@ jobs:
       # Checkout the code base #
       ##########################
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+         # Full git history is needed to get a proper list of changed files within `super-linter`
+         fetch-depth: 0
+          
 
       ################################
       # Run Linter against code base #
       ################################
       - name: Lint Code Base
-        uses: docker://github/super-linter:v3
+        uses: docker://github/super-linter:v4
         env:
           VALIDATE_BASH: false
           DEFAULT_BRANCH: 3.x
