@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.5.31" apply false
+    kotlin("multiplatform") version "1.7.0" apply false
     jacoco
 }
 
@@ -14,7 +14,7 @@ allprojects {
     version = "3.0.0-SNAPSHOT"
 
     jacoco {
-        toolVersion = "0.8.7"
+        toolVersion = "0.8.8"
     }
 
     tasks.withType<JacocoReport> {

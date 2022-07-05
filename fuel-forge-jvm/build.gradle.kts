@@ -30,7 +30,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 dependencies {
     api(project(":fuel"))
     api("com.github.kittinunf.forge:forge:1.0.0-alpha3")
-    api("com.github.kittinunf.result:result-jvm:5.2.0")
+    api("com.github.kittinunf.result:result-jvm:5.2.1")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.2")

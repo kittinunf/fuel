@@ -32,6 +32,7 @@ fun main() {
     runBlocking {
         val cityLocation = listOf("London", "Tokyo")
         cityLocation.forEach { city ->
+
             val locationList = Fuel.request(WeatherApi.WeatherFor(city))
                 .toMoshi<List<Location>>(Types.newParameterizedType(List::class.java, Location::class.java))
             locationList.fold({ locations ->

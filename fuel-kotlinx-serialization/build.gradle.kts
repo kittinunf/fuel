@@ -34,7 +34,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":fuel"))
-                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
                 api("com.github.kittinunf.result:result:5.2.0")
             }
         }
@@ -46,7 +46,7 @@ kotlin {
         val jvmMain by getting
         val jvmTest by getting {
             dependencies {
-                implementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.2")
+                implementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.10")
             }
         }
         val jsMain by getting
