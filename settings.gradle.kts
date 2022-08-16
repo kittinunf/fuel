@@ -7,4 +7,5 @@ include(":fuel-kotlinx-serialization")
 include(":fuel-moshi-jvm")
 
 include(":samples:httpbin-js")
+include(":samples:mockbin-native")
 include(":samples:weather-jvm")

@@ -1,5 +1,7 @@
 package fuel
 
+import kotlin.native.concurrent.ThreadLocal
+
 @ThreadLocal
 private var httpLoader: HttpLoader? = null
 

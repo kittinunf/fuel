@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
@@ -30,7 +31,23 @@ kotlin {
             }
         }
     }
+    macosArm64 {
+        binaries {
+            framework {
+                baseName = "Fuel"
+            }
+        }
+    }
+    macosX64 {
+        binaries {
+            framework {
+                baseName = "Fuel"
+            }
+        }
+    }
+
     explicitApi()
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -42,6 +59,7 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+
         val jvmMain by getting {
             dependencies {
                 implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.10")
@@ -52,6 +70,7 @@ kotlin {
                 implementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.10")
             }
         }
+
         val jsMain by getting {
             /*dependencies {
                 api(npm("node-fetch", "2.6.1"))
@@ -59,8 +78,29 @@ kotlin {
             }*/
         }
         val jsTest by getting
-        val iosMain by getting
+
+        val appleMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                implementation("com.squareup.okio:okio:3.2.0")
+            }
+        }
+        val iosMain by getting {
+            dependsOn(appleMain)
+        }
+        val macosArm64Main by getting {
+            dependsOn(appleMain)
+        }
+        val macosX64Main by getting {
+            dependsOn(appleMain)
+        }
         val iosTest by getting
+    }
+
+    kotlin.targets.withType(KotlinNativeTarget::class.java) {
+        binaries.all {
+            binaryOptions["memoryModel"] = "experimental"
+        }
     }
 }
 
