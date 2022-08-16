@@ -30,7 +30,7 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
                 buildHttpResponse(
                     data = httpData,
                     httpResponse = nsUrlResponse as? NSHTTPURLResponse,
-                    error = error,
+                    error = error
                 )
             )
         }
