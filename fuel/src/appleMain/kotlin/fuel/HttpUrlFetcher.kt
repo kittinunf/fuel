@@ -57,7 +57,7 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
     private fun buildHttpResponse(
         data: NSData?,
         httpResponse: NSHTTPURLResponse?,
-        error: NSError?,
+        error: NSError?
     ): HttpResponse {
         if (error != null) {
             throw Throwable(error.localizedDescription)
