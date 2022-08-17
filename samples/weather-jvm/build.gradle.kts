@@ -15,7 +15,7 @@ tasks.withType<JavaCompile> {
 }*/
 
 dependencies {
-    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.13.0")
+    kapt(libs.moshi.kotlin.codegen)
 
     implementation(project(":fuel"))
     implementation(project(":fuel-moshi-jvm"))

@@ -9,8 +9,8 @@ import com.github.kittinunf.result.Result
 import fuel.Fuel
 import fuel.get
 import kotlinx.coroutines.runBlocking
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
+import mockwebserver3.MockResponse
+import mockwebserver3.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test

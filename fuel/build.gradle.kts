@@ -51,7 +51,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3-native-mt")
+                api(libs.kotlinx.coroutines.core)
             }
         }
         val commonTest by getting {
@@ -62,12 +62,12 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
-                implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.10")
+                implementation(libs.okhttp)
             }
         }
         val jvmTest by getting {
             dependencies {
-                implementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.10")
+                implementation(libs.mockwebserver)
             }
         }
 
@@ -82,7 +82,7 @@ kotlin {
         val appleMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation("com.squareup.okio:okio:3.2.0")
+                implementation(libs.okio)
             }
         }
         val iosMain by getting {

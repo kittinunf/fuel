@@ -1,0 +1,25 @@
+[versions]
+coroutines = "1.6.4"
+jackson = "2.13.3"
+junit = "4.13.2"
+moshi = "1.13.0"
+okhttp = "5.0.0-alpha.10"
+okio = "3.2.0"
+forge = "1.0.0-alpha3"
+result = "5.2.1"
+serialization = "1.3.3"
+
+[libraries]
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp" }
+moshi = { group = "com.squareup.moshi", name = "moshi", version.ref = "moshi" }
+moshi-kotlin-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshi" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio"}
+forge = { group = "com.github.kittinunf.forge", name = "forge", version.ref = "forge" }
+result = { group = "com.github.kittinunf.result", name = "result", version.ref = "result"}
+result-jvm = { group = "com.github.kittinunf.result", name = "result-jvm", version.ref = "result"}
+

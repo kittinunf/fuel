@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.30"
+    kotlin("plugin.serialization") version "1.7.10"
     `maven-publish`
 }
 
@@ -34,8 +34,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":fuel"))
-                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
-                api("com.github.kittinunf.result:result:5.2.0")
+                api(libs.kotlinx.serialization.json)
+                api(libs.result)
             }
         }
         val commonTest by getting {
@@ -46,7 +46,7 @@ kotlin {
         val jvmMain by getting
         val jvmTest by getting {
             dependencies {
-                implementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.10")
+                implementation(libs.mockwebserver)
             }
         }
         val jsMain by getting
