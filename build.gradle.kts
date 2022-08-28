@@ -1,10 +1,10 @@
 plugins {
     kotlin("multiplatform") version "1.7.10" apply false
-    jacoco
+    id("org.jetbrains.kotlinx.kover") version "0.6.0" apply false
 }
 
 allprojects {
-    apply(plugin = "jacoco")
+    apply(plugin = "kover")
 
     repositories {
         mavenCentral()
@@ -12,15 +12,4 @@ allprojects {
 
     group = "com.github.kittinunf.fuel"
     version = "3.0.0-SNAPSHOT"
-
-    jacoco {
-        toolVersion = "0.8.8"
-    }
-
-    tasks.withType<JacocoReport> {
-        reports {
-            xml.required.set(true)
-            csv.required.set(false)
-        }
-    }
 }
