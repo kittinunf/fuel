@@ -1,5 +1,6 @@
-name: Run Gradle on PRs
-on: pull_request
+name: Run Gradle
+on: [push, pull_request]
+
 jobs:
   gradle:
     runs-on: macos-latest
@@ -8,7 +9,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
         java-version: 8
-        
+
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
     
