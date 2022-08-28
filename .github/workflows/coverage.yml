@@ -1,3 +1,4 @@
+---
 name: Measure coverage
 on: pull_request
 
