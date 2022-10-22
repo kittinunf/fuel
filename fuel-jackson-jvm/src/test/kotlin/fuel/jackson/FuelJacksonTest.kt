@@ -14,7 +14,7 @@ import org.junit.Assert.fail
 import org.junit.Test
 
 class FuelJacksonTest {
-    data class HttpBinUserAgentModel(var userAgent: String = "", var http_status: String = "")
+    data class HttpBinUserAgentModel(var userAgent: String = "", var httpStatus: String = "")
 
     @Test
     fun jacksonTestResponseObject() = runBlocking {
@@ -37,7 +37,7 @@ class FuelJacksonTest {
     @Test
     fun jacksonTestResponseObjectWithCustomMapper() = runBlocking {
         val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel\", \"http_status\": \"OK\"}"))
+            enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel\", \"httpStatus\": \"OK\"}"))
             start()
         }
 
@@ -45,7 +45,7 @@ class FuelJacksonTest {
         val jackson = response.toJackson<HttpBinUserAgentModel>(createCustomMapper())
         jackson.fold({
             assertEquals("", it.userAgent)
-            assertEquals("OK", it.http_status)
+            assertEquals("OK", it.httpStatus)
         }, {
             fail(it.localizedMessage)
         })

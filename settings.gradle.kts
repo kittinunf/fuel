@@ -8,4 +8,3 @@ include(":fuel-moshi-jvm")
 
 include(":samples:httpbin-js")
 include(":samples:mockbin-native")
-include(":samples:weather-jvm")
