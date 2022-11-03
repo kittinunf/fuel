@@ -45,6 +45,13 @@ kotlin {
             }
         }
     }
+    iosSimulatorArm64 {
+        binaries {
+            framework {
+                baseName = "Fuel"
+            }
+        }
+    }
 
     explicitApi()
 
@@ -85,6 +92,7 @@ kotlin {
                 implementation(libs.okio)
             }
         }
+
         val iosMain by getting {
             dependsOn(appleMain)
         }
@@ -92,6 +100,9 @@ kotlin {
             dependsOn(appleMain)
         }
         val macosX64Main by getting {
+            dependsOn(appleMain)
+        }
+        val iosSimulatorArm64Main by getting {
             dependsOn(appleMain)
         }
         val iosTest by getting

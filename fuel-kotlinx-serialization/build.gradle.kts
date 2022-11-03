@@ -29,20 +29,27 @@ kotlin {
             }
         }
     }
-    /*macosX64 {
+    /*macosArm64 {
         binaries {
             framework {
                 baseName = "Fuel-Serialization"
             }
         }
     }
-    macosArm64 {
+    macosX64 {
         binaries {
             framework {
                 baseName = "Fuel-Serialization"
             }
         }
     }*/
+    iosSimulatorArm64 {
+        binaries {
+            framework {
+                baseName = "Fuel-Serialization"
+            }
+        }
+    }
     explicitApi()
     sourceSets {
         val commonMain by getting {
