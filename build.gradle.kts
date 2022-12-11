@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.0"
-    kotlin("kapt") version "1.5.0" apply false
+    kotlin("jvm") version "1.7.21"
+    kotlin("kapt") version "1.7.21" apply false
     id("com.vanniktech.maven.publish") version "0.10.0" apply false
     jacoco
 }
@@ -13,8 +13,8 @@ allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "jacoco")
 
-    val okhttpVersion by extra("5.0.0-alpha.2")
-    val moshiVersion by extra("1.12.0")
+    val okhttpVersion by extra("5.0.0-alpha.10")
+    val moshiVersion by extra("1.14.0")
 
     repositories {
         mavenCentral()

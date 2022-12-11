@@ -29,4 +29,5 @@ internal fun Protocol.fromOkHttp(): HttpProtocolVersion = when (this) {
     Protocol.HTTP_2 -> HttpProtocolVersion.HTTP_2_0
     Protocol.H2_PRIOR_KNOWLEDGE -> HttpProtocolVersion.HTTP_2_0
     Protocol.QUIC -> HttpProtocolVersion.QUIC
+    Protocol.HTTP_3 -> HttpProtocolVersion("HTTP", 3, 0)
 }

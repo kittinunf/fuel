@@ -33,7 +33,7 @@ internal class ReactorTest {
             .toMono()
             .test()
             .assertNext {
-                assertEquals("Hello Get", it.body!!.string())
+                assertEquals("Hello Get", it.body.string())
             }
             .thenCancel()
             .verify()

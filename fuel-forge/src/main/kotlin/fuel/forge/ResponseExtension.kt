@@ -6,4 +6,4 @@ import com.github.kittinunf.forge.core.JSON
 import okhttp3.Response
 
 public fun <T : Any> Response.toForge(deserializer: JSON.() -> DeserializedResult<T>): DeserializedResult<T> =
-    Forge.modelFromJson(body!!.string(), deserializer)
+    Forge.modelFromJson(body.string(), deserializer)

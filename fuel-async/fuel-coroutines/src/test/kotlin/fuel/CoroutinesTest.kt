@@ -33,7 +33,7 @@ internal class CoroutinesTest {
 
         val request = Request.Builder().data(mockWebServer.url("url")).build()
         val response = HttpLoader().get(request).toCoroutines()
-        assertEquals("Hello Get", response.body!!.string())
+        assertEquals("Hello Get", response.body.string())
     }
 
     @Test

@@ -63,7 +63,7 @@ internal class RoutingTest {
         mockWebServer.enqueue(MockResponse().setBody("Hello World"))
 
         val getTest = TestApi.GetTest(mockWebServer.url(""))
-        val response = HttpLoader().method(getTest.request).execute().body!!.string()
+        val response = HttpLoader().method(getTest.request).execute().body.string()
         val request1 = mockWebServer.takeRequest()
 
         assertEquals("Hello World", response)
@@ -75,7 +75,7 @@ internal class RoutingTest {
         mockWebServer.enqueue(MockResponse().setBody("Hello World With Params"))
 
         val getTest = TestApi.GetParamsTest(mockWebServer.url(""))
-        val response = HttpLoader().method(getTest.request).execute().body!!.string()
+        val response = HttpLoader().method(getTest.request).execute().body.string()
         val request1 = mockWebServer.takeRequest()
 
         assertEquals("Hello World With Params", response)

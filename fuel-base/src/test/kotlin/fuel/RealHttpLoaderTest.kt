@@ -34,7 +34,7 @@ internal class RealHttpLoaderTest {
 
         val unsuccessfulRequest = Request.Builder().data(mockWebServer.url("get")).build()
 
-        val string = realHttpLoader.get(unsuccessfulRequest).response().body!!.string()
+        val string = realHttpLoader.get(unsuccessfulRequest).response().body.string()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -48,7 +48,7 @@ internal class RealHttpLoaderTest {
 
         val request = Request.Builder().data(mockWebServer.url("get")).build()
 
-        val string = realHttpLoader.get(request).response().body!!.string()
+        val string = realHttpLoader.get(request).response().body.string()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -160,7 +160,7 @@ internal class RealHttpLoaderTest {
             .requestBody(null)
             .build()
 
-        val string = realHttpLoader.delete(request).response().body!!.string()
+        val string = realHttpLoader.delete(request).response().body.string()
 
         val request1 = mockWebServer.takeRequest()
 
