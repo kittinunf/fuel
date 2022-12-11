@@ -7,7 +7,7 @@
 
 The easiest HTTP networking library for Kotlin backed by Kotlinx Coroutines.
 
-### Migration
+## Migration
 From 3.x onwards, we are using [main](https://github.com/kittinunf/fuel/tree/main) as our new based. If you are finding the old version [2.x](https://github.com/kittinunf/fuel/tree/2.x), please take a look at our old branch.
 
 ## Download
