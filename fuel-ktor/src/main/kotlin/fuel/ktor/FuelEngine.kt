@@ -191,9 +191,9 @@ private fun HttpRequestData.convertToFuelRequest(callContext: CoroutineContext):
 
         method(method.value)
 
-        val bodyBytes = if (HttpMethod.permitsRequestBody(method.value)) {
+        val bodyBytes = method.value.takeIf(HttpMethod::permitsRequestBody).let {
             body.convertToOkHttpBody(callContext)
-        } else null
+        }
 
         requestBody(bodyBytes)
     }
