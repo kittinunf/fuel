@@ -9,5 +9,5 @@ fun main() = runBlocking {
         .url("http://mockbin.com/request?foo=bar&foo=baz")
         .build()
     val response = fuel.post(request)
-    println(response.body)
+    println(response.body.utf8())
 }

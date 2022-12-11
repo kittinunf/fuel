@@ -1,6 +1,7 @@
 package fuel
 
 import kotlinx.coroutines.suspendCancellableCoroutine
+import okio.ByteString
 import okio.toByteString
 import platform.Foundation.NSData
 import platform.Foundation.NSError
@@ -71,15 +72,15 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
          * data can be empty if there is no body.
          * In that case, trying to create a ByteString fails
          */
-        val bodyString = if (data == null || data.length.toInt() == 0) {
-            null
+        val byteString = if (data == null || data.length.toInt() == 0) {
+            ByteString.EMPTY
         } else {
-            data.toByteString().utf8()
+            data.toByteString()
         }
 
         return HttpResponse().apply {
             statusCode = httpResponse.statusCode.toInt()
-            body = bodyString ?: ""
+            body = byteString
         }
     }
 
