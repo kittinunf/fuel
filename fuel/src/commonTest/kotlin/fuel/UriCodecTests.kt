@@ -44,8 +44,7 @@ class UriCodecTests {
                 throwOnFailure = true
             )
             fail("Expected URISyntaxException")
-        }
-        catch (expected: IllegalArgumentException) {
+        } catch (expected: IllegalArgumentException) {
             // Expected.
         }
     }
@@ -60,8 +59,7 @@ class UriCodecTests {
                 throwOnFailure = true
             )
             fail("Expected URISyntaxException")
-        }
-        catch (expected: IllegalArgumentException) {
+        } catch (expected: IllegalArgumentException) {
             // Expected.
         }
     }
@@ -76,8 +74,7 @@ class UriCodecTests {
                 throwOnFailure = true /* throwOnFailure */
             )
             fail("Expected URISyntaxException")
-        }
-        catch (expected: IllegalArgumentException) {
+        } catch (expected: IllegalArgumentException) {
             // Expected.
         }
     }
