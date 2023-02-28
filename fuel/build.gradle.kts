@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
     kotlin("multiplatform")
+    id("org.jetbrains.kotlinx.kover")
     `maven-publish`
 }
 
@@ -115,6 +116,16 @@ kotlin {
             binaryOptions["memoryModel"] = "experimental"
         }
     }
+}
+
+/*
+ * Kover configs
+ */
+dependencies {
+    kover(project(":fuel-forge-jvm"))
+    kover(project(":fuel-jackson-jvm"))
+    kover(project(":fuel-kotlinx-serialization"))
+    kover(project(":fuel-moshi-jvm"))
 }
 
 tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack") {

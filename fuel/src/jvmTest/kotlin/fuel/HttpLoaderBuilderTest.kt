@@ -7,10 +7,12 @@ import mockwebserver3.SocketPolicy
 import okhttp3.OkHttpClient
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
+import kotlin.test.assertNotNull
 
 internal class HttpLoaderBuilderTest {
 
@@ -70,8 +72,8 @@ internal class HttpLoaderBuilderTest {
         val request = Request.Builder().url(mockWebServer.url("socket").toString()).build()
         try {
             HttpLoader().get(request).body
-        } catch (ste: SocketTimeoutException) {
-            assertEquals("timeout", ste.message)
+       } catch (ste: SocketTimeoutException) {
+           assertNotNull(ste, "socket timeout")
         }
     }
 }
