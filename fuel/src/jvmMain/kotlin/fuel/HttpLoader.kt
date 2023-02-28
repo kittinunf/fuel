@@ -8,33 +8,36 @@ import okhttp3.internal.http.HttpMethod
 public actual class HttpLoader(callFactory: Call.Factory) {
     private val fetcher: HttpUrlFetcher by lazy { HttpUrlFetcher(callFactory) }
 
-    public actual suspend fun get(request: Request): HttpResponse =
-        fetcher.fetch(request.url, createRequestBuilder(request, "GET")).await()
+    public actual suspend fun get(request: Request): HttpResponse {
+        return fetcher.fetch(request, createRequestBuilder(request, "GET")).await()
+    }
 
     public actual suspend fun post(request: Request): HttpResponse {
         requireNotNull(request.body) { "body for method POST should not be null" }
-        return fetcher.fetch(request.url, createRequestBuilder(request, "POST")).await()
+        return fetcher.fetch(request, createRequestBuilder(request, "POST")).await()
     }
 
     public actual suspend fun put(request: Request): HttpResponse {
         requireNotNull(request.body) { "body for method PUT should not be null" }
-        return fetcher.fetch(request.url, createRequestBuilder(request, "PUT")).await()
+        return fetcher.fetch(request, createRequestBuilder(request, "PUT")).await()
     }
 
     public actual suspend fun patch(request: Request): HttpResponse {
         requireNotNull(request.body) { "body for method PATCH should not be null" }
-        return fetcher.fetch(request.url, createRequestBuilder(request, "PATCH")).await()
+        return fetcher.fetch(request, createRequestBuilder(request, "PATCH")).await()
     }
 
-    public actual suspend fun delete(request: Request): HttpResponse =
-        fetcher.fetch(request.url, createRequestBuilder(request, "DELETE")).await()
+    public actual suspend fun delete(request: Request): HttpResponse {
+        return fetcher.fetch(request, createRequestBuilder(request, "DELETE")).await()
+    }
 
-    public actual suspend fun head(request: Request): HttpResponse =
-        fetcher.fetch(request.url, createRequestBuilder(request, "HEAD")).await()
+    public actual suspend fun head(request: Request): HttpResponse {
+        return fetcher.fetch(request, createRequestBuilder(request, "HEAD")).await()
+    }
 
     public actual suspend fun method(request: Request): HttpResponse {
         val method = requireNotNull(request.method) { "method should be not null" }
-        return fetcher.fetch(request.url, createRequestBuilder(request, method)).await()
+        return fetcher.fetch(request, createRequestBuilder(request, method)).await()
     }
 
     private fun createRequestBuilder(request: Request, method: String): Builder {

@@ -35,7 +35,11 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
             )
         }
 
-        val mutableURLRequest = NSMutableURLRequest.requestWithURL(NSURL(string = request.url)).apply {
+        val url = request.parameters?.let {
+            request.url.fillURLWithParameters(it)
+        } ?: request.url
+
+        val mutableURLRequest = NSMutableURLRequest.requestWithURL(NSURL(string = url)).apply {
             request.body?.let {
                 setHTTPBody(it.encode())
             }
