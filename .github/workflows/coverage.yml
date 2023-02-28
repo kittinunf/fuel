@@ -4,28 +4,17 @@ on:
   pull_request:
 
 jobs:
-  build:
+   collect_coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v2
+      - uses: stevenleadbeater/kotlin-kover-action@v1.0.0
+        id: kover-tests
         with:
-          distribution: temurin
-          java-version: 11
-      - name: Set up Gradle
-        uses: gradle/gradle-build-action@v2
-      - name: Generate kover coverage report
-        run: ./gradlew koverXmlReport
-
-      - name: Add coverage report to PR
-        id: kover
-        uses: mi-kas/kover-report@v1
-        with:
-          path: ${{ github.workspace }}/build/reports/kover/report.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: Code Coverage
-          update-comment: true
-          min-coverage-overall: 80
-          min-coverage-changed-files: 80
-          coverage-counter-type: LINE
+          coverage-threshold: 80
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          proxy-url: https://add-pr-comment-proxy-94idvmwyie-uc.a.run.app
+      - name: Check coverage
+        if: ${{(steps.kover-tests.outputs.line-coverage) < 80}}
+        shell: bash
+        run: exit "Line coverage expected to be > 80 but was ${{steps.kover-tests.outputs.line-coverage}}"
