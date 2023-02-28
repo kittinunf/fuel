@@ -11,6 +11,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
+          distribution: temurin
           java-version: 11
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
