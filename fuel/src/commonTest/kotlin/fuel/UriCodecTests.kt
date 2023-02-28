@@ -45,7 +45,7 @@ class UriCodecTests {
             )
             fail("Expected URISyntaxException")
         }
-        catch(expected: IllegalArgumentException) {
+        catch (expected: IllegalArgumentException) {
             // Expected.
         }
     }
@@ -61,7 +61,7 @@ class UriCodecTests {
             )
             fail("Expected URISyntaxException")
         }
-        catch(expected: IllegalArgumentException) {
+        catch (expected: IllegalArgumentException) {
             // Expected.
         }
     }
@@ -70,12 +70,14 @@ class UriCodecTests {
     fun testDecode_endsWithPercent_fails() {
         try {
             // % in the end.
-            UriCodec.decode("ab%2f$%c4%82%25%e0%a1%80%",
+            UriCodec.decode(
+                "ab%2f$%c4%82%25%e0%a1%80%",
                 convertPlus = false /* convertPlus */,
-                throwOnFailure = true /* throwOnFailure */)
+                throwOnFailure = true /* throwOnFailure */
+            )
             fail("Expected URISyntaxException")
         }
-        catch(expected: IllegalArgumentException) {
+        catch (expected: IllegalArgumentException) {
             // Expected.
         }
     }

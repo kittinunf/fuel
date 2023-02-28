@@ -7,7 +7,7 @@ public class Request internal constructor(
     public val parameters: Parameters?,
     public val headers: Map<String, String>?,
     public val body: String?,
-    public val method: String?,
+    public val method: String?
 ) {
     public open class Builder {
         private var url: String? = null

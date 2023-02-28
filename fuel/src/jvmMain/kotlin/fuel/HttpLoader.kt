@@ -47,10 +47,11 @@ public actual class HttpLoader(callFactory: Call.Factory) {
                 addHeader(it.key, it.value)
             }
 
-            if (HttpMethod.permitsRequestBody(method))
+            if (HttpMethod.permitsRequestBody(method)) {
                 method(method, request.body?.toRequestBody())
-            else
+            } else {
                 method(method, null)
+            }
         }
         return builder
     }

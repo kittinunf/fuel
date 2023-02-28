@@ -68,7 +68,7 @@ public suspend fun Fuel.delete(
 
 public suspend fun Fuel.head(
     url: String,
-    parameters: Parameters? = null,
+    parameters: Parameters? = null
 ): HttpResponse = loader().head(
     Request.Builder()
         .url(url)

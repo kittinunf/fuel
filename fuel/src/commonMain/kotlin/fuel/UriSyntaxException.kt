@@ -45,7 +45,7 @@ public class UriSyntaxException(
     public override val message: String
         get() = buildString {
             append(internalReason)
-            if(index > -1) {
+            if (index > -1) {
                 append(" at index ")
                 append(index)
             }

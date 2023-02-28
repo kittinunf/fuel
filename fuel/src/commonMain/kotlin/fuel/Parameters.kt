@@ -2,10 +2,15 @@ package fuel
 
 public fun String.fillURLWithParameters(parameters: List<Pair<String, String>>): String {
     val joiner = if (this.contains("?")) {
-        if (parameters.isNotEmpty()) "&"
-        else ""
-        // There is already a trailing ?
-    } else "?"
+        if (parameters.isNotEmpty()) {
+            "&"
+        } else {
+            // There is already a trailing ?
+            ""
+        }
+    } else {
+        "?"
+    }
     return this + joiner + parameters.formUrlEncode()
 }
 
