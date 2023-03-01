@@ -1,6 +1,7 @@
 ---
 name: Measure coverage
-on: pull_request
+on:
+  pull_request
 
 jobs:
   build:
@@ -11,7 +12,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 8
+          java-version: 11
           
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
@@ -29,3 +30,4 @@ jobs:
           update-comment: true
           min-coverage-overall: 80
           min-coverage-changed-files: 80
+          coverage-counter-type: LINE
