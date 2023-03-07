@@ -1,6 +1,5 @@
 plugins {
     kotlin("multiplatform") version "1.8.10" apply false
-    id("org.jetbrains.kotlinx.kover") version "0.7.0-Alpha" apply false
 }
 
 allprojects {

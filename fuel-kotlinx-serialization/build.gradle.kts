@@ -1,7 +1,6 @@
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization") version "1.8.10"
-    id("org.jetbrains.kotlinx.kover")
     `maven-publish`
 }
 
