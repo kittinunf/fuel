@@ -1,11 +1,8 @@
 plugins {
-    kotlin("multiplatform") version "1.7.20" apply false
-    id("org.jetbrains.kotlinx.kover") version "0.6.1" apply false
+    kotlin("multiplatform") version "1.8.10" apply false
 }
 
 allprojects {
-    apply(plugin = "kover")
-
     repositories {
         mavenCentral()
     }

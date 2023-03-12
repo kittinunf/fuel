@@ -17,6 +17,12 @@ public interface FuelRouting : RequestConvertible {
     public val path: String
 
     /**
+     * Parameters for the remote call.
+     * It uses a pair with String, String.
+     */
+    public val parameters: Parameters?
+
+    /**
      * Headers for remote call.
      */
     public val headers: Map<String, String>?
@@ -29,6 +35,7 @@ public interface FuelRouting : RequestConvertible {
     override val request: Request
         get() = Request(
             "$basePath/$path",
+            parameters,
             headers.orEmpty(),
             body,
             method

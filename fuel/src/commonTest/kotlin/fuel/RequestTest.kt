@@ -1,11 +1,10 @@
 package fuel
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
-
+import kotlin.test.Test
+import kotlin.test.assertEquals
 internal class RequestTest {
     @Test
-    fun `add headers`() {
+    fun testAdd_headers() {
         val request = Request.Builder()
             .url("http://example.com")
             .headers(mapOf("X-Test" to "true"))
@@ -14,7 +13,7 @@ internal class RequestTest {
     }
 
     @Test
-    fun `errors when data is empty`() {
+    fun test_errorsWhenDataIsEmpty() {
         try {
             Request.Builder().build()
         } catch (ise: IllegalStateException) {

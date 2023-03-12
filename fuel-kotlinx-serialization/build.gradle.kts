@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.7.20"
+    kotlin("plugin.serialization") version "1.8.10"
     `maven-publish`
 }
 
@@ -13,11 +13,13 @@ kotlin {
             useJUnit()
         }
     }
-    js {
+    js(LEGACY) {
         binaries.executable()
         browser {
             commonWebpackConfig {
-                cssSupport.enabled = true
+                cssSupport {
+                    enabled.set(true)
+                }
             }
         }
         // nodejs()
@@ -29,7 +31,7 @@ kotlin {
             }
         }
     }
-    /*macosArm64 {
+    macosArm64 {
         binaries {
             framework {
                 baseName = "Fuel-Serialization"
@@ -42,7 +44,7 @@ kotlin {
                 baseName = "Fuel-Serialization"
             }
         }
-    }*/
+    }
     iosSimulatorArm64 {
         binaries {
             framework {

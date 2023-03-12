@@ -16,6 +16,9 @@ internal class RoutingTest {
         class GetTest(host: String) : TestApi(host)
         class GetParamsTest(host: String) : TestApi(host)
 
+        override val parameters: Parameters?
+            get() = null
+
         override val method: String
             get() {
                 return when (this) {
