@@ -1,5 +1,7 @@
 rootProject.name = "Fuel-MPP"
 
+includeBuild("plugins")
+
 include(":fuel")
 include(":fuel-forge-jvm")
 include(":fuel-jackson-jvm")
