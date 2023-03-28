@@ -1,7 +1,5 @@
 rootProject.name = "Fuel-MPP"
 
-includeBuild("plugins")
-
 include(":fuel")
 include(":fuel-forge-jvm")
 include(":fuel-jackson-jvm")
@@ -10,3 +8,7 @@ include(":fuel-moshi-jvm")
 
 include(":samples:httpbin-js")
 include(":samples:mockbin-native")
+
+pluginManagement {
+    includeBuild("plugins")
+}
