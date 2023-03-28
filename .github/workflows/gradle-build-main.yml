@@ -1,5 +1,7 @@
-name: Run Gradle
-on: [push, pull_request]
+name: Run Gradle Push
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   gradle:
