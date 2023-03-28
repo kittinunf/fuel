@@ -1,19 +1,10 @@
 plugins {
     kotlin("jvm")
-    `maven-publish`
+    id("publication")
 }
 
 kotlin {
     explicitApi()
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            artifactId = "fuel-forge-jvm"
-            from(components["java"])
-        }
-    }
 }
 
 tasks.withType<JavaCompile> {

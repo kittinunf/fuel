@@ -6,5 +6,9 @@ include(":fuel-jackson-jvm")
 include(":fuel-kotlinx-serialization")
 include(":fuel-moshi-jvm")
 
-include(":samples:httpbin-js")
+// include(":samples:httpbin-js")
 include(":samples:mockbin-native")
+
+pluginManagement {
+    includeBuild("plugins")
+}

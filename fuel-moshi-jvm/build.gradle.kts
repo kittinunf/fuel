@@ -1,20 +1,11 @@
 plugins {
     kotlin("jvm")
     kotlin("kapt")
-    `maven-publish`
+    id("publication")
 }
 
 kotlin {
     explicitApi()
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            artifactId = "fuel-moshi-jvm"
-            from(components["java"])
-        }
-    }
 }
 
 tasks.withType<JavaCompile> {

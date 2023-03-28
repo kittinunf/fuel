@@ -6,7 +6,8 @@ allprojects {
     repositories {
         mavenCentral()
     }
-
-    group = "com.github.kittinunf.fuel"
-    version = "3.0.0-SNAPSHOT"
+    val artifactPublishVersion: String by project
+    val artifactGroupId: String by project
+    group = artifactGroupId
+    version = artifactPublishVersion
 }
