@@ -13,11 +13,10 @@ jobs:
         distribution: temurin
         java-version: 8
 
-    - name: Setup Gradle
+    - name: Gradle build
       uses: gradle/gradle-build-action@v2
-    
-    - name: Execute Gradle build
-      run: ./gradlew build
+      with:
+        arguments: build
 
     - name: Publish to SNAPSHOT
       uses: gradle/gradle-build-action@v2
