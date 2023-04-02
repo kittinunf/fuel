@@ -1,7 +1,5 @@
-name: Run Gradle Push
-on:
-  push:
-    branches: [ main ]
+name: Run Gradle PR
+on: [pull_request]
 
 jobs:
   gradle:
@@ -13,8 +11,7 @@ jobs:
         distribution: temurin
         java-version: 8
 
-    - name: Setup Gradle
+    - name: Gradle build
       uses: gradle/gradle-build-action@v2
-    
-    - name: Execute Gradle build
-      run: ./gradlew build
+      with:
+        arguments: build

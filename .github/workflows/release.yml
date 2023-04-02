@@ -1,0 +1,29 @@
+name: Run Gradle Push
+on:
+  release:
+    types: [ released ]
+
+jobs:
+  gradle:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 8
+
+      - name: Gradle build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+
+      - name: Publish to MavenCentral
+        uses: gradle/gradle-build-action@v2
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        with:
+          arguments: publish --max-workers 1 -Prelease=true
