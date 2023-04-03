@@ -1,6 +1,7 @@
 # Fuel
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.7.20-blue.svg)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.8.20-blue.svg)](http://kotlinlang.org)
+[![MavenCentral](https://maven-badges.herokuapp.com/maven-central/com.github.kittinunf.fuel/fuel-jvm/badge.svg)](https://search.maven.org/search?q=com.github.kittinunf.fuel)
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io)
 ![Run Gradle](https://github.com/kittinunf/fuel/workflows/Run%20Gradle/badge.svg?branch=main)
 [![Codecov](https://codecov.io/github/kittinunf/fuel/coverage.svg?branch=main)](https://codecov.io/gh/kittinunf/fuel/branch/main)
@@ -12,8 +13,9 @@ From 3.x onwards, we are using [main](https://github.com/kittinunf/fuel/tree/mai
 
 ## Download
 
+### For release version
 ```kotlin
-implementation("com.github.kittinunf.fuel:fuel:3.0.0-SNAPSHOT")
+implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha01")
 ```
 
 ## Quick Start
