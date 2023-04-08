@@ -52,6 +52,15 @@ publishing {
         }
     }
 
+    // Creating maven artifacts for jvm
+    publications {
+        if (project.name.substringAfterLast("-") == "jvm") {
+            create<MavenPublication>("maven") {
+                from(components["java"])
+            }
+        }
+    }
+
     // Configure all publications
     publications.withType<MavenPublication> {
         val artifactName: String by project
