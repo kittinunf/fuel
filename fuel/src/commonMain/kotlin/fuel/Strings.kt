@@ -1,8 +1,10 @@
 package fuel
 
 public suspend fun String.httpGet(
-    parameters: Parameters? = null
-): HttpResponse = Fuel.get(this, parameters)
+    parameters: Parameters? = null,
+    headers: Map<String, String> = emptyMap()
+): HttpResponse =
+    Fuel.get(this, parameters, headers)
 
 public suspend fun String.httpPost(
     parameters: Parameters? = null,
