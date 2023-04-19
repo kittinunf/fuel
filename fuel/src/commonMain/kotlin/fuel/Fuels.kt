@@ -2,11 +2,13 @@ package fuel
 
 public suspend fun Fuel.get(
     url: String,
-    parameters: Parameters? = null
+    parameters: Parameters? = null,
+    headers: Map<String, String> = emptyMap()
 ): HttpResponse = loader().get(
     Request.Builder()
         .url(url)
         .parameters(parameters)
+        .headers(headers)
         .build()
 )
 
