@@ -26,7 +26,7 @@ public actual object Fuel {
         httpLoader?.let { return it }
 
         // Create a new HttpLoader.
-        val loader = httpLoaderFactory?.newHttpLoader() ?: HttpLoader()
+        val loader = httpLoaderFactory?.newHttpLoader() ?: AppleHttpLoader()
         httpLoaderFactory = null
         httpLoader = loader
         return loader

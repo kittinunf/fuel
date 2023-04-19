@@ -15,7 +15,7 @@ internal class HttpLoaderTest {
 
     @Before
     fun `before test`() {
-        httpLoader = HttpLoader(OkHttpClient())
+        httpLoader = JVMHttpLoader(lazyOf(OkHttpClient()))
         mockWebServer = MockWebServer().apply { start() }
     }
 

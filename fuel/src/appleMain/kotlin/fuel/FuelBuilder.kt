@@ -15,5 +15,5 @@ public actual class FuelBuilder {
         this.sessionConfiguration = sessionConfiguration
     }
 
-    public actual fun build(): HttpLoader = HttpLoader(sessionConfiguration ?: defaultSessionConfiguration)
+    public actual fun build(): HttpLoader = AppleHttpLoader(sessionConfiguration ?: defaultSessionConfiguration)
 }
