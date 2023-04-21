@@ -7,13 +7,9 @@ public actual class FuelBuilder {
 
     private val defaultSessionConfiguration by lazy { NSURLSessionConfiguration.defaultSessionConfiguration }
 
-    init {
-        failOnNativeIfLegacyMemoryManager()
-    }
-
     public fun config(sessionConfiguration: NSURLSessionConfiguration): FuelBuilder = apply {
         this.sessionConfiguration = sessionConfiguration
     }
 
-    public actual fun build(): HttpLoader = HttpLoader(sessionConfiguration ?: defaultSessionConfiguration)
+    public actual fun build(): HttpLoader = AppleHttpLoader(sessionConfiguration ?: defaultSessionConfiguration)
 }

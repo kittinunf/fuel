@@ -27,12 +27,3 @@ internal suspend fun Call.await(): HttpResponse = suspendCancellableCoroutine {
         cancel()
     }
 }
-
-/**
- * Wrap a [Call.Factory] factory as a [Call.Factory] instance.
- * [initializer] is called only once the first time [Call.Factory.newCall] is called.
- */
-internal fun lazyCallFactory(initializer: () -> Call.Factory): Call.Factory {
-    val lazy: Lazy<Call.Factory> = lazy(initializer)
-    return Call.Factory { request -> lazy.value.newCall(request) }
-}

@@ -5,12 +5,12 @@ package fuel
 import okhttp3.Call
 import okhttp3.Request
 
-internal class HttpUrlFetcher(private val callFactory: Call.Factory) {
+internal class HttpUrlFetcher(private val callFactory: Lazy<Call.Factory>) {
     fun fetch(request: fuel.Request, builder: Request.Builder): Call {
         val urlString = request.parameters?.let {
             request.url.fillURLWithParameters(it)
         } ?: request.url
         builder.url(urlString)
-        return callFactory.newCall(builder.build())
+        return callFactory.value.newCall(builder.build())
     }
 }

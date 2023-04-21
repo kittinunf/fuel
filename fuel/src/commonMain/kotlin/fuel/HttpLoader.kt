@@ -1,6 +1,6 @@
 package fuel
 
-public expect class HttpLoader {
+public interface HttpLoader {
     public suspend fun get(request: Request): HttpResponse
     public suspend fun post(request: Request): HttpResponse
     public suspend fun put(request: Request): HttpResponse

@@ -4,19 +4,16 @@ import okhttp3.Call
 import okhttp3.OkHttpClient
 
 public actual class FuelBuilder {
-    private var callFactory: Call.Factory? = null
+    private var callFactory: Lazy<Call.Factory>? = null
 
     public fun config(callFactory: Call.Factory): FuelBuilder = apply {
-        this.callFactory = callFactory
+        this.callFactory = lazyOf(callFactory)
     }
 
     public fun config(initializer: () -> Call.Factory): FuelBuilder = apply {
-        this.callFactory = lazyCallFactory(initializer)
+        this.callFactory = lazy(initializer)
     }
 
-    public actual fun build(): HttpLoader = HttpLoader(callFactory ?: buildDefaultCallFactory())
-
-    private fun buildDefaultCallFactory() = lazyCallFactory {
-        OkHttpClient.Builder().build()
-    }
+    public actual fun build(): HttpLoader =
+        JVMHttpLoader(callFactoryLazy = callFactory ?: lazy { OkHttpClient() })
 }
