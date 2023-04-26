@@ -15,7 +15,7 @@ From 3.x onwards, we are using [main](https://github.com/kittinunf/fuel/tree/mai
 
 ### For release version
 ```kotlin
-implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha01")
+implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha1")
 ```
 
 ## Quick Start
