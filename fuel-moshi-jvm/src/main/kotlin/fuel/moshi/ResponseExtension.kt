@@ -12,19 +12,19 @@ public val defaultMoshi: Moshi.Builder = Moshi.Builder()
 public inline fun <reified T : Any> HttpResponse.toMoshi(): Result<T?, IOException> = toMoshi(T::class.java)
 
 public fun <T : Any> HttpResponse.toMoshi(clazz: Class<T>): Result<T?, IOException> = try {
-    Result.success(defaultMoshi.build().adapter(clazz).fromJson(body))
+    Result.success(defaultMoshi.build().adapter(clazz).fromJson(source))
 } catch (ioe: IOException) {
     Result.failure(ioe)
 }
 
 public fun <T : Any> HttpResponse.toMoshi(type: Type): Result<T?, IOException> = try {
-    Result.success(defaultMoshi.build().adapter<T>(type).fromJson(body))
+    Result.success(defaultMoshi.build().adapter<T>(type).fromJson(source))
 } catch (ioe: IOException) {
     Result.failure(ioe)
 }
 
 public fun <T : Any> HttpResponse.toMoshi(jsonAdapter: JsonAdapter<T>): Result<T?, IOException> = try {
-    Result.success(jsonAdapter.fromJson(body))
+    Result.success(jsonAdapter.fromJson(source))
 } catch (ioe: IOException) {
     Result.failure(ioe)
 }
