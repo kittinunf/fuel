@@ -3,7 +3,6 @@ package fuel
 import kotlinx.browser.window
 import kotlinx.coroutines.await
 import org.w3c.fetch.RequestInit
-
 internal class HttpUrlFetcher {
     suspend fun fetch(request: Request, method: String?, body: String? = null): HttpResponse {
         val urlString = request.parameters?.let {
@@ -19,7 +18,9 @@ internal class HttpUrlFetcher {
         ).await()
         return HttpResponse().apply {
             this.statusCode = res.status.toInt()
+            this.array = res.arrayBuffer().await()
             this.body = res.text().await()
+            this.blob = res.blob().await()
         }
     }
 }
