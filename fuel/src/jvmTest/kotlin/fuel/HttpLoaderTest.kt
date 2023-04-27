@@ -30,7 +30,7 @@ internal class HttpLoaderTest {
 
         val unsuccessfulRequest = Request.Builder().url(mockWebServer.url("get").toString()).build()
 
-        val string = httpLoader.get(unsuccessfulRequest).body
+        val string = httpLoader.get(unsuccessfulRequest).body.string()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -44,7 +44,7 @@ internal class HttpLoaderTest {
 
         val request = Request.Builder().url(mockWebServer.url("get").toString()).build()
 
-        val string = httpLoader.get(request).body
+        val string = httpLoader.get(request).body.string()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -151,7 +151,7 @@ internal class HttpLoaderTest {
             .url(mockWebServer.url("delete").toString())
             .build()
 
-        val string = httpLoader.delete(request).body
+        val string = httpLoader.delete(request).body.string()
 
         val request1 = mockWebServer.takeRequest()
 
