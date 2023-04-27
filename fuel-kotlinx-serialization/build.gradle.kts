@@ -74,7 +74,39 @@ kotlin {
         }
         val jsMain by getting
         val jsTest by getting
-        val iosMain by getting
-        val iosTest by getting
+
+        val appleMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val iosMain by getting {
+            dependsOn(appleMain)
+        }
+        val macosArm64Main by getting {
+            dependsOn(appleMain)
+        }
+        val macosX64Main by getting {
+            dependsOn(appleMain)
+        }
+        val iosSimulatorArm64Main by getting {
+            dependsOn(appleMain)
+        }
+
+        val appleTest by creating {
+            dependsOn(commonTest)
+        }
+
+        val iosTest by getting {
+            dependsOn(appleTest)
+        }
+        val macosArm64Test by getting {
+            dependsOn(appleTest)
+        }
+        val macosX64Test by getting {
+            dependsOn(appleTest)
+        }
+        val iosSimulatorArm64Test by getting {
+            dependsOn(appleTest)
+        }
     }
 }
