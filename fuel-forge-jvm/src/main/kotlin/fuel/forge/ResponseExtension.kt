@@ -7,4 +7,3 @@ import fuel.HttpResponse
 
 public fun <T : Any> HttpResponse.toForge(deserializer: JSON.() -> DeserializedResult<T>): DeserializedResult<T> =
     Forge.modelFromJson(body.string(), deserializer)
-
