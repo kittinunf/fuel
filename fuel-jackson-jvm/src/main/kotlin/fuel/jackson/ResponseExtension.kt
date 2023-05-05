@@ -13,7 +13,7 @@ public val defaultMapper: ObjectMapper = ObjectMapper().registerKotlinModule()
 
 public inline fun <reified T : Any> HttpResponse.toJackson(mapper: ObjectMapper = defaultMapper): Result<T, Throwable> =
     doTry(work = {
-        Result.success(mapper.readValue(body))
+        Result.success(mapper.readValue(body.string()))
     }, errorHandler = {
         Result.failure(it)
     })

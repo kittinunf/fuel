@@ -6,4 +6,4 @@ import com.github.kittinunf.forge.core.JSON
 import fuel.HttpResponse
 
 public fun <T : Any> HttpResponse.toForge(deserializer: JSON.() -> DeserializedResult<T>): DeserializedResult<T> =
-    Forge.modelFromJson(body, deserializer)
+    Forge.modelFromJson(body.string(), deserializer)

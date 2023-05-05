@@ -83,7 +83,8 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
 
         return HttpResponse().apply {
             statusCode = httpResponse.statusCode.toInt()
-            body = bodyString ?: ""
+            nsData = data
+            body = bodyString
         }
     }
 

@@ -32,7 +32,7 @@ internal class HttpLoaderBuilderTest {
         mockWebServer.enqueue(MockResponse().setBody("Hello World"))
 
         val request = Request.Builder().url(mockWebServer.url("hello").toString()).build()
-        val response = JVMHttpLoader().get(request).body
+        val response = JVMHttpLoader().get(request).body.string()
         assertEquals("Hello World", response)
 
         mockWebServer.shutdown()
@@ -49,7 +49,7 @@ internal class HttpLoaderBuilderTest {
             .build()
 
         val request = Request.Builder().url(mockWebServer.url("hello").toString()).build()
-        val response = httpLoader.get(request).body
+        val response = httpLoader.get(request).body.string()
         assertEquals("Hello World", response)
     }
 
@@ -60,7 +60,7 @@ internal class HttpLoaderBuilderTest {
         val okhttp = OkHttpClient.Builder().callTimeout(30L, TimeUnit.MILLISECONDS).build()
         val httpLoader = FuelBuilder().config(okhttp).build()
         val request = Request.Builder().url(mockWebServer.url("hello2").toString()).build()
-        val response = httpLoader.get(request).body
+        val response = httpLoader.get(request).body.string()
         assertEquals("Hello World 2", response)
     }
 
@@ -70,7 +70,7 @@ internal class HttpLoaderBuilderTest {
 
         val request = Request.Builder().url(mockWebServer.url("socket").toString()).build()
         try {
-            JVMHttpLoader().get(request).body
+            JVMHttpLoader().get(request).body.string()
         } catch (ste: SocketTimeoutException) {
             assertNotNull(ste, "socket timeout")
         }

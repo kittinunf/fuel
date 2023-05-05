@@ -17,7 +17,7 @@ internal suspend fun Call.await(): HttpResponse = suspendCancellableCoroutine {
         override fun onResponse(call: Call, response: Response) {
             val httpResponse = HttpResponse().apply {
                 statusCode = response.code
-                body = response.body.string()
+                body = response.body
             }
             it.resume(httpResponse)
         }
