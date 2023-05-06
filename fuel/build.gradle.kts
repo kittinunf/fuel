@@ -71,7 +71,7 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
-                api(libs.okhttp)
+                api(libs.okhttp.coroutines)
             }
         }
         val jvmTest by getting {

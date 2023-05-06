@@ -1,9 +1,9 @@
 [versions]
-coroutines = "1.6.4"
+coroutines = "1.7.0"
 jackson = "2.13.4"
 junit = "4.13.2"
 moshi = "1.14.0"
-okhttp = "5.0.0-alpha.10"
+okhttp = "5.0.0-alpha.11"
 okio = "3.2.0"
 forge = "1.0.0-alpha3"
 result = "5.4.0"
@@ -17,7 +17,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp" }
 moshi = { group = "com.squareup.moshi", name = "moshi", version.ref = "moshi" }
 moshi-kotlin-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshi" }
-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okhttp-coroutines = { group = "com.squareup.okhttp3", name = "okhttp-coroutines", version.ref = "okhttp" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio"}
 forge = { group = "com.github.kittinunf.forge", name = "forge", version.ref = "forge" }
 result = { group = "com.github.kittinunf.result", name = "result", version.ref = "result"}
