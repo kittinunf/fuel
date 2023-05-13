@@ -54,7 +54,7 @@ internal class HttpLoaderTest {
 
     @Test
     fun `get test data with parameters`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World"))
+        mockWebServer.enqueue(MockResponse().setBody("Hello There"))
 
         val request = Request.Builder()
             .url(mockWebServer.url("get").toString())
@@ -66,12 +66,12 @@ internal class HttpLoaderTest {
         val request1 = mockWebServer.takeRequest()
 
         assertEquals("GET", request1.method)
-        assertEquals(string, "Hello World")
+        assertEquals(string, "Hello There")
     }
 
     @Test
     fun `get test data with headers`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World"))
+        mockWebServer.enqueue(MockResponse().setBody("Greeting Everyone"))
 
         val request = Request.Builder()
             .url(mockWebServer.url("get").toString())
@@ -83,7 +83,7 @@ internal class HttpLoaderTest {
         val request1 = mockWebServer.takeRequest()
 
         assertEquals("GET", request1.method)
-        assertEquals(string, "Hello World")
+        assertEquals(string, "Greeting Everyone")
     }
 
     @Test

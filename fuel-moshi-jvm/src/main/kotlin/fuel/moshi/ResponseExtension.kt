@@ -20,4 +20,4 @@ public fun <T : Any> HttpResponse.toMoshi(type: Type): Result<T?, Throwable> =
 public fun <T : Any> HttpResponse.toMoshi(jsonAdapter: JsonAdapter<T>): Result<T?, Throwable> =
     runCatching {
         jsonAdapter.fromJson(body.source())
-}
+    }

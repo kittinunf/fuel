@@ -36,14 +36,14 @@ class FuelKotlinxSerializationTest {
     @Test
     fun testSerializableResponseWithDefaultJson() = runBlocking {
         val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel\"}"))
+            enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel2\"}"))
             start()
         }
 
         val response = Fuel.get(mockWebServer.url("user-agent").toString())
         val json = response.toJson(deserializationStrategy = HttpBinUserAgentModel.serializer())
         json.fold({
-            assertEquals("Fuel", it?.userAgent)
+            assertEquals("Fuel2", it?.userAgent)
         }, {
             fail(it.message)
         })
