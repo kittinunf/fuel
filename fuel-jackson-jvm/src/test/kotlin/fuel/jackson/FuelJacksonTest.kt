@@ -14,6 +14,12 @@ import org.junit.Assert.fail
 import org.junit.Test
 
 class FuelJacksonTest {
+
+    private val createCustomMapper: ObjectMapper = ObjectMapper().registerKotlinModule()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).apply {
+            propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE
+        }
+
     data class HttpBinUserAgentModel(
         val userAgent: String = "",
         val http_status: String = ""
@@ -29,7 +35,7 @@ class FuelJacksonTest {
         val response = Fuel.get(mockWebServer.url("user-agent").toString())
         val jackson = response.toJackson<HttpBinUserAgentModel>()
         jackson.fold({
-            assertEquals("Fuel", it.userAgent)
+            assertEquals("Fuel", it?.userAgent)
         }, {
             fail(it.localizedMessage)
         })
@@ -45,19 +51,14 @@ class FuelJacksonTest {
         }
 
         val response = Fuel.get(mockWebServer.url("user-agent").toString())
-        val jackson = response.toJackson<HttpBinUserAgentModel>(createCustomMapper())
+        val jackson = response.toJackson<HttpBinUserAgentModel>(createCustomMapper)
         jackson.fold({
-            assertEquals("", it.userAgent)
-            assertEquals("OK", it.http_status)
+            assertEquals("", it?.userAgent)
+            assertEquals("OK", it?.http_status)
         }, {
             fail(it.localizedMessage)
         })
 
         mockWebServer.shutdown()
     }
-
-    private fun createCustomMapper(): ObjectMapper = ObjectMapper().registerKotlinModule()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).apply {
-            propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE
-        }
 }
