@@ -1,6 +1,6 @@
 [versions]
 coroutines = "1.7.0"
-jackson = "2.13.4"
+jackson = "2.15.0"
 junit = "4.13.2"
 moshi = "1.14.0"
 okhttp = "5.0.0-alpha.11"
