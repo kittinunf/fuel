@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization") version "1.8.21"
     id("publication")
+    id("org.jetbrains.kotlinx.kover")
 }
 
 kotlin {

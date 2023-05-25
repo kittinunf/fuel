@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 plugins {
     kotlin("multiplatform")
     id("publication")
+    id("org.jetbrains.kotlinx.kover")
 }
 
 kotlin {
@@ -21,6 +22,11 @@ kotlin {
             commonWebpackConfig {
                 cssSupport {
                     enabled.set(true)
+                }
+            }
+            testTask {
+                useKarma {
+                    useSafari()
                 }
             }
         }
@@ -115,6 +121,13 @@ kotlin {
             binaryOptions["memoryModel"] = "experimental"
         }
     }
+}
+
+dependencies {
+    kover(project(":fuel-forge-jvm"))
+    kover(project(":fuel-jackson-jvm"))
+    kover(project(":fuel-kotlinx-serialization"))
+    kover(project(":fuel-moshi-jvm"))
 }
 
 tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack") {
