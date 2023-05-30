@@ -24,6 +24,7 @@ kotlin {
                     enabled.set(true)
                 }
             }
+        }
         // nodejs()
     }
     ios {
