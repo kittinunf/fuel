@@ -24,12 +24,6 @@ kotlin {
                     enabled.set(true)
                 }
             }
-            /*testTask {
-                useKarma {
-                    useSafari()
-                }
-            }
-        }*/
         // nodejs()
     }
     ios {
