@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.21"
+    kotlin("plugin.serialization") version "1.9.0"
     id("publication")
     id("org.jetbrains.kotlinx.kover")
 }
@@ -15,15 +15,8 @@ kotlin {
         }
     }
     js(IR) {
+        browser()
         binaries.executable()
-        browser {
-            commonWebpackConfig {
-                cssSupport {
-                    enabled.set(true)
-                }
-            }
-        }
-        // nodejs()
     }
     ios {
         binaries {

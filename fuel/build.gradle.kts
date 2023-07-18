@@ -17,15 +17,8 @@ kotlin {
         }
     }
     js(IR) {
+        browser()
         binaries.executable()
-        browser {
-            commonWebpackConfig {
-                cssSupport {
-                    enabled.set(true)
-                }
-            }
-        }
-        // nodejs()
     }
     ios {
         binaries {
@@ -110,12 +103,6 @@ kotlin {
         }
         val iosTest by getting
     }
-
-    kotlin.targets.withType(KotlinNativeTarget::class.java) {
-        binaries.all {
-            binaryOptions["memoryModel"] = "experimental"
-        }
-    }
 }
 
 dependencies {
@@ -123,8 +110,4 @@ dependencies {
     kover(project(":fuel-jackson-jvm"))
     kover(project(":fuel-kotlinx-serialization"))
     kover(project(":fuel-moshi-jvm"))
-}
-
-tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack") {
-    outputFileName = "js.js"
 }
