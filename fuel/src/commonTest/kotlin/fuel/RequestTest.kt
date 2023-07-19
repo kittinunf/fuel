@@ -5,10 +5,10 @@ import kotlin.test.assertEquals
 internal class RequestTest {
     @Test
     fun testAdd_headers() {
-        val request = Request.Builder()
-            .url("http://example.com")
-            .headers(mapOf("X-Test" to "true"))
-            .build()
+        val request = Request.Builder().apply {
+            url = "http://example.com"
+            headers = mapOf("X-Test" to "true")
+        }.build()
         assertEquals("true", request.headers?.get("X-Test"))
     }
 

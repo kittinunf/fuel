@@ -24,13 +24,18 @@ use the `any http method` [suspend](https://kotlinlang.org/docs/reference/corout
 
 ```kotlin
 runBlocking {
-    val string = Fuel.get("https://publicobject.com/helloworld.txt").body!!.string()
+    val string = Fuel.get("https://publicobject.com/helloworld.txt").body.string()
     println(string)
 }
 
 runBlocking {
-    val string = "https://publicobject.com/helloworld.txt".httpGet().body!!.string()
+    val string = "https://publicobject.com/helloworld.txt".httpGet().body.string()
     println(string)
+}
+
+runBlocking {
+    val fuel = FuelBuilder().build()
+    val string = fuel.get(request = { url = "https://publicobject.com/helloworld.txt" }).body.string()
 }
 
 ```

@@ -30,9 +30,9 @@ internal class HttpLoaderBuilderTest {
     @Test
     fun `default okhttp settings`() = runBlocking {
         mockWebServer.enqueue(MockResponse().setBody("Hello World"))
-
-        val request = Request.Builder().url(mockWebServer.url("hello").toString()).build()
-        val response = JVMHttpLoader().get(request).body.string()
+        val response = JVMHttpLoader().get {
+            url = mockWebServer.url("hello").toString()
+        }.body.string()
         assertEquals("Hello World", response)
 
         mockWebServer.shutdown()
@@ -47,9 +47,9 @@ internal class HttpLoaderBuilderTest {
                 OkHttpClient.Builder().connectTimeout(30L, TimeUnit.MILLISECONDS).build()
             }
             .build()
-
-        val request = Request.Builder().url(mockWebServer.url("hello").toString()).build()
-        val response = httpLoader.get(request).body.string()
+        val response = httpLoader.get {
+            url = mockWebServer.url("hello").toString()
+        }.body.string()
         assertEquals("Hello World", response)
     }
 
@@ -59,18 +59,19 @@ internal class HttpLoaderBuilderTest {
 
         val okhttp = OkHttpClient.Builder().callTimeout(30L, TimeUnit.MILLISECONDS).build()
         val httpLoader = FuelBuilder().config(okhttp).build()
-        val request = Request.Builder().url(mockWebServer.url("hello2").toString()).build()
-        val response = httpLoader.get(request).body.string()
+        val response = httpLoader.get {
+            url = mockWebServer.url("hello2").toString()
+        }.body.string()
         assertEquals("Hello World 2", response)
     }
 
     @Test
     fun `no socket response`(): Unit = runBlocking {
         mockWebServer.enqueue(MockResponse().setBody("{}").setSocketPolicy(SocketPolicy.NO_RESPONSE))
-
-        val request = Request.Builder().url(mockWebServer.url("socket").toString()).build()
         try {
-            JVMHttpLoader().get(request).body.string()
+            JVMHttpLoader().get {
+                url = mockWebServer.url("socket").toString()
+            }.body.string()
         } catch (ste: SocketTimeoutException) {
             assertNotNull(ste, "socket timeout")
         }
