@@ -73,7 +73,7 @@ internal class HttpLoaderTest {
 
         val string = httpLoader.get {
             url = mockWebServer.url("get").toString()
-            parameters = listOf("foo" to "bar")
+            headers = mapOf("foo" to "bar")
         }.body.string()
 
         val request1 = mockWebServer.takeRequest()
