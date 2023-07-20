@@ -46,9 +46,9 @@ internal class HttpLoaderTest {
             url = mockWebServer.url("get").toString()
         }.body.string()
 
-        val request1 = mockWebServer.takeRequest()
+        val request2 = mockWebServer.takeRequest()
 
-        assertEquals("GET", request1.method)
+        assertEquals("GET", request2.method)
         assertEquals(string, "Hello World")
     }
 
