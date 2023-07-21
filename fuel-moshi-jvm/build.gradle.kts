@@ -1,8 +1,8 @@
 plugins {
     kotlin("jvm")
-    kotlin("kapt")
     id("publication")
     id("org.jetbrains.kotlinx.kover")
+    id("com.google.devtools.ksp") version "1.9.0-1.0.11"
 }
 
 kotlin {
@@ -25,7 +25,7 @@ dependencies {
     api(libs.moshi)
     api(libs.result.jvm)
 
-    kaptTest(libs.moshi.kotlin.codegen)
+    kspTest(libs.moshi.kotlin.codegen)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockwebserver)

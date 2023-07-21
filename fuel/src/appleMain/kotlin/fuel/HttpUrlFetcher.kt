@@ -1,7 +1,8 @@
 package fuel
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.suspendCancellableCoroutine
-import okio.toByteString
+import okio.ByteString.Companion.toByteString
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSHTTPURLResponse
@@ -22,10 +23,9 @@ import platform.Foundation.setValue
 import kotlin.coroutines.resume
 
 internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConfiguration) {
+    @OptIn(BetaInteropApi::class)
     suspend fun fetch(method: String, request: Request): HttpResponse = suspendCancellableCoroutine { continuation ->
         val delegate = { httpData: NSData?, nsUrlResponse: NSURLResponse?, error: NSError? ->
-            initRuntimeIfNeeded()
-
             continuation.resume(
                 buildHttpResponse(
                     data = httpData,
@@ -88,5 +88,6 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
         }
     }
 
+    @BetaInteropApi
     private fun String.encode(): NSData = NSString.create(string = this).dataUsingEncoding(NSWindowsCP1251StringEncoding)!!
 }
