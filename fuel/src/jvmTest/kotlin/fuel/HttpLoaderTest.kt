@@ -28,9 +28,9 @@ internal class HttpLoaderTest {
     fun `unsuccessful 404 Error`() = runBlocking {
         mockWebServer.enqueue(MockResponse().setResponseCode(404).setBody("Hello World"))
 
-        val unsuccessfulRequest = Request.Builder().url(mockWebServer.url("get").toString()).build()
-
-        val string = httpLoader.get(unsuccessfulRequest).body.string()
+        val string = httpLoader.get {
+            url = mockWebServer.url("get").toString()
+        }.body.string()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -42,13 +42,13 @@ internal class HttpLoaderTest {
     fun `get test data`() = runBlocking {
         mockWebServer.enqueue(MockResponse().setBody("Hello World"))
 
-        val request = Request.Builder().url(mockWebServer.url("get").toString()).build()
+        val string = httpLoader.get {
+            url = mockWebServer.url("get").toString()
+        }.body.string()
 
-        val string = httpLoader.get(request).body.string()
+        val request2 = mockWebServer.takeRequest()
 
-        val request1 = mockWebServer.takeRequest()
-
-        assertEquals("GET", request1.method)
+        assertEquals("GET", request2.method)
         assertEquals(string, "Hello World")
     }
 
@@ -56,12 +56,10 @@ internal class HttpLoaderTest {
     fun `get test data with parameters`() = runBlocking {
         mockWebServer.enqueue(MockResponse().setBody("Hello There"))
 
-        val request = Request.Builder()
-            .url(mockWebServer.url("get").toString())
-            .parameters(listOf("foo" to "bar"))
-            .build()
-
-        val string = httpLoader.get(request).body.string()
+        val string = httpLoader.get {
+            url = mockWebServer.url("get").toString()
+            parameters = listOf("foo" to "bar")
+        }.body.string()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -73,12 +71,10 @@ internal class HttpLoaderTest {
     fun `get test data with headers`() = runBlocking {
         mockWebServer.enqueue(MockResponse().setBody("Greeting Everyone"))
 
-        val request = Request.Builder()
-            .url(mockWebServer.url("get").toString())
-            .headers(mapOf("Foo" to "bar"))
-            .build()
-
-        val string = httpLoader.get(request).body.string()
+        val string = httpLoader.get {
+            url = mockWebServer.url("get").toString()
+            headers = mapOf("foo" to "bar")
+        }.body.string()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -90,12 +86,10 @@ internal class HttpLoaderTest {
     fun `post test data`() = runBlocking {
         mockWebServer.enqueue(MockResponse())
 
-        val request = Request.Builder()
-            .url(mockWebServer.url("post").toString())
-            .body("Hi?")
-            .build()
-
-        httpLoader.post(request)
+        httpLoader.post {
+            url = mockWebServer.url("post").toString()
+            body = "Hi?"
+        }
         val request1 = mockWebServer.takeRequest()
 
         assertEquals("POST", request1.method)
@@ -107,9 +101,9 @@ internal class HttpLoaderTest {
     fun `empty response body for post`() = runBlocking {
         mockWebServer.enqueue(MockResponse())
 
-        val request = Request.Builder().url(mockWebServer.url("post").toString()).build()
-
-        httpLoader.post(request)
+        httpLoader.post {
+            url = mockWebServer.url("post").toString()
+        }
 
         val request1 = mockWebServer.takeRequest()
         assertEquals("POST", request1.method)
@@ -119,12 +113,10 @@ internal class HttpLoaderTest {
     fun `put test data`() = runBlocking {
         mockWebServer.enqueue(MockResponse())
 
-        val request = Request.Builder()
-            .url(mockWebServer.url("put").toString())
-            .body("Put There")
-            .build()
-
-        httpLoader.put(request)
+        httpLoader.put {
+            url = mockWebServer.url("put").toString()
+            body = "Put There"
+        }
 
         val request1 = mockWebServer.takeRequest()
 
@@ -137,9 +129,9 @@ internal class HttpLoaderTest {
     fun `empty response body for put`() = runBlocking {
         mockWebServer.enqueue(MockResponse())
 
-        val request = Request.Builder().url(mockWebServer.url("put").toString()).build()
-
-        httpLoader.put(request)
+        httpLoader.put {
+            url = mockWebServer.url("put").toString()
+        }
 
         val request1 = mockWebServer.takeRequest()
 
@@ -150,12 +142,10 @@ internal class HttpLoaderTest {
     fun `patch test data`() = runBlocking {
         mockWebServer.enqueue(MockResponse())
 
-        val request = Request.Builder()
-            .url(mockWebServer.url("patch").toString())
-            .body("Hello There")
-            .build()
-
-        httpLoader.patch(request)
+        httpLoader.patch {
+            url = mockWebServer.url("patch").toString()
+            body = "Hello There"
+        }
 
         val request1 = mockWebServer.takeRequest()
 
@@ -168,9 +158,9 @@ internal class HttpLoaderTest {
     fun `empty response body for patch`() = runBlocking {
         mockWebServer.enqueue(MockResponse())
 
-        val request = Request.Builder().url(mockWebServer.url("patch").toString()).build()
-
-        httpLoader.patch(request)
+        httpLoader.patch {
+            url = mockWebServer.url("patch").toString()
+        }
 
         val request1 = mockWebServer.takeRequest()
 
@@ -181,11 +171,9 @@ internal class HttpLoaderTest {
     fun `delete test data`() = runBlocking {
         mockWebServer.enqueue(MockResponse().setBody("Hello World"))
 
-        val request = Request.Builder()
-            .url(mockWebServer.url("delete").toString())
-            .build()
-
-        val string = httpLoader.delete(request).body.string()
+        val string = httpLoader.delete {
+            url = mockWebServer.url("delete").toString()
+        }.body.string()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -197,9 +185,9 @@ internal class HttpLoaderTest {
     fun `head test data`() = runBlocking {
         mockWebServer.enqueue(MockResponse())
 
-        val request = Request.Builder().url(mockWebServer.url("head").toString()).build()
-
-        httpLoader.head(request)
+        httpLoader.head {
+            url = mockWebServer.url("head").toString()
+        }
 
         val request1 = mockWebServer.takeRequest()
 
@@ -210,12 +198,10 @@ internal class HttpLoaderTest {
     fun `connect test data`() = runBlocking {
         mockWebServer.enqueue(MockResponse())
 
-        val request = Request.Builder()
-            .url(mockWebServer.url("connect").toString())
-            .method("CONNECT")
-            .build()
-
-        httpLoader.method(request)
+        httpLoader.method {
+            url = mockWebServer.url("connect").toString()
+            method = "CONNECT"
+        }
 
         val request1 = mockWebServer.takeRequest()
 
@@ -226,9 +212,9 @@ internal class HttpLoaderTest {
     fun `empty method for CONNECT`() = runBlocking {
         mockWebServer.enqueue(MockResponse())
 
-        val request = Request.Builder().url(mockWebServer.url("connect").toString()).build()
-
-        httpLoader.method(request)
+        httpLoader.method {
+            url = mockWebServer.url("connect").toString()
+        }
 
         val request1 = mockWebServer.takeRequest()
 

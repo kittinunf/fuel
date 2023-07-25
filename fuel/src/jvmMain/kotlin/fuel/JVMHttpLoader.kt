@@ -9,36 +9,57 @@ import okhttp3.internal.http.HttpMethod
 public class JVMHttpLoader(callFactoryLazy: Lazy<Call.Factory>) : HttpLoader {
     private val fetcher: HttpUrlFetcher by lazy { HttpUrlFetcher(callFactoryLazy) }
 
-    public override suspend fun get(request: Request): HttpResponse {
-        return fetcher.fetch(request, createRequestBuilder(request, "GET")).performAsync()
+    public override suspend fun get(request: Request.Builder.() -> Unit): HttpResponse {
+        val requestBuilder = Request.Builder().apply(request).build()
+        return fetcher
+            .fetch(requestBuilder, createRequestBuilder(requestBuilder, "GET"))
+            .performAsync()
     }
 
-    public override suspend fun post(request: Request): HttpResponse {
-        requireNotNull(request.body) { "body for method POST should not be null" }
-        return fetcher.fetch(request, createRequestBuilder(request, "POST")).performAsync()
+    public override suspend fun post(request: Request.Builder.() -> Unit): HttpResponse {
+        val requestBuilder = Request.Builder().apply(request).build()
+        requireNotNull(requestBuilder.body) { "body for method POST should not be null" }
+        return fetcher
+            .fetch(requestBuilder, createRequestBuilder(requestBuilder, "POST"))
+            .performAsync()
     }
 
-    public override suspend fun put(request: Request): HttpResponse {
-        requireNotNull(request.body) { "body for method PUT should not be null" }
-        return fetcher.fetch(request, createRequestBuilder(request, "PUT")).performAsync()
+    public override suspend fun put(request: Request.Builder.() -> Unit): HttpResponse {
+        val requestBuilder = Request.Builder().apply(request).build()
+        requireNotNull(requestBuilder.body) { "body for method PUT should not be null" }
+        return fetcher
+            .fetch(requestBuilder, createRequestBuilder(requestBuilder, "PUT"))
+            .performAsync()
     }
 
-    public override suspend fun patch(request: Request): HttpResponse {
-        requireNotNull(request.body) { "body for method PATCH should not be null" }
-        return fetcher.fetch(request, createRequestBuilder(request, "PATCH")).performAsync()
+    public override suspend fun patch(request: Request.Builder.() -> Unit): HttpResponse {
+        val requestBuilder = Request.Builder().apply(request).build()
+        requireNotNull(requestBuilder.body) { "body for method PATCH should not be null" }
+        return fetcher
+            .fetch(requestBuilder, createRequestBuilder(requestBuilder, "PATCH"))
+            .performAsync()
     }
 
-    public override suspend fun delete(request: Request): HttpResponse {
-        return fetcher.fetch(request, createRequestBuilder(request, "DELETE")).performAsync()
+    public override suspend fun delete(request: Request.Builder.() -> Unit): HttpResponse {
+        val requestBuilder = Request.Builder().apply(request).build()
+        return fetcher
+            .fetch(requestBuilder, createRequestBuilder(requestBuilder, "DELETE"))
+            .performAsync()
     }
 
-    public override suspend fun head(request: Request): HttpResponse {
-        return fetcher.fetch(request, createRequestBuilder(request, "HEAD")).performAsync()
+    public override suspend fun head(request: Request.Builder.() -> Unit): HttpResponse {
+        val requestBuilder = Request.Builder().apply(request).build()
+        return fetcher
+            .fetch(requestBuilder, createRequestBuilder(requestBuilder, "HEAD"))
+            .performAsync()
     }
 
-    public override suspend fun method(request: Request): HttpResponse {
-        val method = requireNotNull(request.method) { "method should be not null" }
-        return fetcher.fetch(request, createRequestBuilder(request, method)).performAsync()
+    public override suspend fun method(request: Request.Builder.() -> Unit): HttpResponse {
+        val requestBuilder = Request.Builder().apply(request).build()
+        val method = requireNotNull(requestBuilder.method) { "method should be not null" }
+        return fetcher
+            .fetch(requestBuilder, createRequestBuilder(requestBuilder, method))
+            .performAsync()
     }
 
     private suspend fun Call.performAsync(): HttpResponse {
