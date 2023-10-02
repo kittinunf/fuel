@@ -284,18 +284,6 @@ data class BlobDataPart(
 }
 
 /**
- * Create a FileDataPart from a [directory] and [filename]
- *
- * @param directory [File] the directory
- * @param filename [String] the filename relative to the [directory]
- * @param name [String] the name for the field, uses [filename] without the extension by default
- * @param remoteFileName [String] the filename parameter for the DataPart, set to null to exclude, empty to use [filename]
- * @param contentType [String] the Content-Type for the DataPart, set to null to [guessContentType]
- *
- * @return [FileDataPart] the DataPart
- */
-
-/**
  * Escape "filename" in Content-Disposition
  *
  * https://html.spec.whatwg.org/#multipart-form-data
