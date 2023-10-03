@@ -20,15 +20,15 @@ class DataPartTest {
 
         assertThat(
                 "ContentDisposition filename must escape Double-Quote and CRLF",
-                specialCharInlinePart.contentDisposition.contains(exceptEscapedFilename)
+                specialCharInlinePart.contentDisposition == "form-data; name=\"first\"; filename=\"$exceptEscapedFilename\""
         )
         assertThat(
                 "ContentDisposition filename must escape Double-Quote and CRLF",
-                specialCharFilePart.contentDisposition.contains(exceptEscapedFilename)
+                specialCharFilePart.contentDisposition == "form-data; name=\"second\"; filename=\"$exceptEscapedFilename\""
         )
         assertThat(
                 "ContentDisposition filename must escape Double-Quote and CRLF",
-                specialCharBlobPart.contentDisposition.contains(exceptEscapedFilename)
+                specialCharBlobPart.contentDisposition == "form-data; name=\"third\"; filename=\"$exceptEscapedFilename\""
         )
 
         val normalFileName = "abc.txt"
@@ -38,15 +38,16 @@ class DataPartTest {
 
         assertThat(
                 "filename should be output as is if it does not contain special characters(Double-Quote, CRLF)",
-                normalCharInlinePart.contentDisposition.contains("abc.txt")
+                normalCharInlinePart.contentDisposition == "form-data; name=\"first\"; filename=\"abc.txt\""
+
         )
         assertThat(
                 "filename should be output as is if it does not contain special characters(Double-Quote, CRLF)",
-                normalFilePart.contentDisposition.contains("abc.txt")
+                normalFilePart.contentDisposition == "form-data; name=\"second\"; filename=\"abc.txt\""
         )
         assertThat(
                 "filename should be output as is if it does not contain special characters(Double-Quote, CRLF)",
-                normalBlobPart.contentDisposition.contains("abc.txt")
+                normalBlobPart.contentDisposition == "form-data; name=\"third\"; filename=\"abc.txt\""
         )
     }
 }
