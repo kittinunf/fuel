@@ -12,7 +12,7 @@ class DataPartTest {
         val shortFile = File(currentDir, "lorem_ipsum_short.tmp")
         val file = File(currentDir, "lorem_ipsum_short.tmp")
         val filename = "malicious.sh\";\r\ndummy=a.txt"
-        val exceptEscapedFilename = "malicious.sh%22;%0D%0Adummy=a.txt"
+        val expectEscapedFilename = "malicious.sh%22;%0D%0Adummy=a.txt"
 
         val specialCharInlinePart = InlineDataPart("first", name = "first", contentType = "application/json", filename = filename)
         val specialCharFilePart = FileDataPart(shortFile, name = "second", filename = filename)
@@ -20,15 +20,15 @@ class DataPartTest {
 
         assertThat(
                 "ContentDisposition filename must escape Double-Quote and CRLF",
-                specialCharInlinePart.contentDisposition == "form-data; name=\"first\"; filename=\"$exceptEscapedFilename\""
+                specialCharInlinePart.contentDisposition == "form-data; name=\"first\"; filename=\"$expectEscapedFilename\""
         )
         assertThat(
                 "ContentDisposition filename must escape Double-Quote and CRLF",
-                specialCharFilePart.contentDisposition == "form-data; name=\"second\"; filename=\"$exceptEscapedFilename\""
+                specialCharFilePart.contentDisposition == "form-data; name=\"second\"; filename=\"$expectEscapedFilename\""
         )
         assertThat(
                 "ContentDisposition filename must escape Double-Quote and CRLF",
-                specialCharBlobPart.contentDisposition == "form-data; name=\"third\"; filename=\"$exceptEscapedFilename\""
+                specialCharBlobPart.contentDisposition == "form-data; name=\"third\"; filename=\"$expectEscapedFilename\""
         )
 
         val normalFileName = "abc.txt"
