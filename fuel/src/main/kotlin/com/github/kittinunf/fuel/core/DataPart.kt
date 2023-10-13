@@ -97,7 +97,7 @@ data class InlineDataPart(
     val name: String,
     val filename: String? = null,
     override val contentType: String = "$GENERIC_CONTENT; charset=utf-8",
-    override val contentDisposition: String = "form-data; name=\"$name\"${if (filename != null) "; filename=\"$filename\"" else "" }"
+    override val contentDisposition: String = "form-data; name=\"$name\"${if (filename != null) "; filename=\"${escapeFilename(filename)}\"" else "" }"
 ) : DataPart() {
     override fun inputStream() = content.byteInputStream()
     override val contentLength get() = content.toByteArray(Charsets.UTF_8).size.toLong()
@@ -173,7 +173,7 @@ data class FileDataPart(
     //   private; this might result, for example, when selection or drag-and-
     //   drop is used or when the form data content is streamed directly from
     //   a device.
-    override val contentDisposition: String = "form-data; name=\"$name\"${if (filename != null) "; filename=\"$filename\"" else "" }"
+    override val contentDisposition: String = "form-data; name=\"$name\"${if (filename != null) "; filename=\"${escapeFilename(filename)}\"" else "" }"
 ) : DataPart() {
     override fun inputStream() = file.inputStream()
     override val contentLength get() = file.length()
@@ -269,7 +269,7 @@ data class BlobDataPart(
     val filename: String? = null,
     override val contentLength: Long? = null,
     override val contentType: String = BlobDataPart.guessContentType(inputStream),
-    override val contentDisposition: String = "form-data; name=\"$name\"${if (filename != null) "; filename=\"$filename\"" else "" }"
+    override val contentDisposition: String = "form-data; name=\"$name\"${if (filename != null) "; filename=\"${escapeFilename(filename)}\"" else "" }"
 ) : DataPart() {
     override fun inputStream() = inputStream
     companion object {
@@ -281,4 +281,22 @@ data class BlobDataPart(
             GENERIC_BYTE_CONTENT
         }
     }
+}
+
+/**
+ * Escape "filename" in Content-Disposition
+ *
+ * https://html.spec.whatwg.org/#multipart-form-data
+ * > For field names and filenames for file fields, the result of the encoding in the previous bullet point must be
+ * > escaped by replacing any 0x0A (LF) bytes with the byte sequence `%0A`, 0x0D (CR) with `%0D` and 0x22 (") with `%22`.
+ * > The user agent must not perform any other escapes.
+ *
+ * @param filename [String] the filename on Content-Disposition header
+ *
+ * @return [String] the escaped filename
+ */
+private fun escapeFilename(filename: String): String {
+    return filename.replace("\"", "%22")
+        .replace("\r", "%0D")
+        .replace("\n", "%0A")
 }
