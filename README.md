@@ -40,6 +40,19 @@ runBlocking {
 
 ```
 
+## Custom Configuration
+JVM uses [OkHttpClient](https://square.github.io/okhttp/4.x/okhttp/okhttp3/-ok-http-client/) configurations 
+```
+val fuel = FuelBuilder().config(OKHttpClient()).build()
+val string = fuel.get(request = { url = "https://publicobject.com/helloworld.txt" }).body.string()
+```
+
+Apple uses [NSURLSessionConfiguration](https://developer.apple.com/documentation/foundation/nsurlsessionconfiguration)
+```
+val fuel = FuelBuilder().config(NSURLSessionConfiguration.defaultSessionConfiguration).build()
+val string = fuel.get(request = { url = "https://publicobject.com/helloworld.txt" }).body.string()
+```
+
 Please note it will throw Exceptions. Make sure you catch it on the production apps.
 
 Fuel requires Java 8 byte code.
