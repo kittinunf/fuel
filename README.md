@@ -41,7 +41,7 @@ runBlocking {
 ```
 
 ## Custom Configuration
-JVM uses [OkHttpClient](https://square.github.io/okhttp/4.x/okhttp/okhttp3/-ok-http-client/) configurations 
+JVM uses [OkHttpClient](https://square.github.io/okhttp/4.x/okhttp/okhttp3/-ok-http-client/) configurations
 ```kotlin
 val fuel = FuelBuilder().config(OKHttpClient()).build()
 val string = fuel.get(request = { url = "https://publicobject.com/helloworld.txt" }).body.string()
