@@ -1,7 +1,8 @@
+---
 name: Run Gradle Push
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   gradle:
