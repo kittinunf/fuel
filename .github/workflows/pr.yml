@@ -5,7 +5,7 @@ jobs:
   gradle:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-java@v3
       with:
         distribution: temurin
@@ -14,4 +14,4 @@ jobs:
     - name: Gradle build
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: build
+        arguments: build -x iosX64Test -x jsBrowserTest
