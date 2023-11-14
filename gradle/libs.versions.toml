@@ -1,13 +1,13 @@
 [versions]
-coroutines = "1.7.2"
-jackson = "2.15.2"
+coroutines = "1.7.3"
+jackson = "2.15.3"
 junit = "4.13.2"
 moshi = "1.15.0"
 okhttp = "5.0.0-alpha.11"
-okio = "3.4.0"
+okio = "3.6.0"
 forge = "1.0.0-alpha3"
-result = "5.4.0"
-serialization = "1.5.1"
+result = "5.5.0"
+serialization = "1.6.0"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -22,4 +22,3 @@ okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio"}
 forge = { group = "com.github.kittinunf.forge", name = "forge", version.ref = "forge" }
 result = { group = "com.github.kittinunf.result", name = "result", version.ref = "result"}
 result-jvm = { group = "com.github.kittinunf.result", name = "result-jvm", version.ref = "result"}
-

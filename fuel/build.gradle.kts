@@ -13,11 +13,11 @@ kotlin {
             useJUnit()
         }
     }
-    js(IR) {
+    js {
         browser()
         binaries.executable()
     }
-    ios {
+    iosArm64 {
         binaries {
             framework {
                 baseName = "Fuel"
@@ -25,6 +25,13 @@ kotlin {
         }
     }
     macosArm64 {
+        binaries {
+            framework {
+                baseName = "Fuel"
+            }
+        }
+    }
+    iosX64 {
         binaries {
             framework {
                 baseName = "Fuel"
@@ -48,57 +55,41 @@ kotlin {
 
     explicitApi()
 
+    targets.configureEach {
+        compilations.configureEach {
+            compilerOptions.configure {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
+        }
+    }
+
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 api(libs.kotlinx.coroutines.core)
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
 
-        val jvmMain by getting {
+        jvmMain {
             dependencies {
                 api(libs.okhttp.coroutines)
             }
         }
-        val jvmTest by getting {
+        jvmTest {
             dependencies {
                 implementation(libs.mockwebserver)
             }
         }
-
-        val jsMain by getting {
-            /*dependencies {
-                api(npm("node-fetch", "2.6.1"))
-                api(npm("abort-controller", "3.0.0"))
-            }*/
-        }
-        val jsTest by getting
-
-        val appleMain by creating {
-            dependsOn(commonMain)
+        appleMain {
             dependencies {
                 implementation(libs.okio)
             }
         }
-
-        val iosMain by getting {
-            dependsOn(appleMain)
-        }
-        val macosArm64Main by getting {
-            dependsOn(appleMain)
-        }
-        val macosX64Main by getting {
-            dependsOn(appleMain)
-        }
-        val iosSimulatorArm64Main by getting {
-            dependsOn(appleMain)
-        }
-        val iosTest by getting
     }
 }
 
