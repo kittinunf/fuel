@@ -1,6 +1,7 @@
 import java.util.Properties
 
 plugins {
+    java
     `maven-publish`
     signing
 }
@@ -52,6 +53,11 @@ publishing {
         }
     }
 
+    val sources by tasks.creating(Jar::class) {
+        archiveClassifier.set("sources")
+        from(java.sourceSets.main.get().allSource)
+    }
+
     // Creating maven artifacts for jvm
     publications {
         if (project.name.substringAfterLast("-") == "jvm") {
@@ -73,6 +79,9 @@ publishing {
         artifactId = project.name
 
         artifact(javadocJar)
+        if (project.name.substringAfterLast("-") == "jvm") {
+            artifact(sources)
+        }
 
         pom {
             name.set(artifactName)
