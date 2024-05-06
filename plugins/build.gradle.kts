@@ -6,11 +6,11 @@ repositories {
     gradlePluginPortal()
 }
 
-/*kotlin {
-    jvmToolchain(8)
-}*/
+kotlin {
+    jvmToolchain(17)
+}
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11_7
+    targetCompatibility = JavaVersion.VERSION_11_7
 }
