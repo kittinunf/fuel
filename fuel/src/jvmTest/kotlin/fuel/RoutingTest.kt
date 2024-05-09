@@ -3,11 +3,13 @@ package fuel
 import kotlinx.coroutines.runBlocking
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
+import okhttp3.ExperimentalOkHttpApi
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalOkHttpApi::class)
 internal class RoutingTest {
 
     sealed class TestApi(private val host: String) : FuelRouting {
@@ -61,7 +63,7 @@ internal class RoutingTest {
 
     @Test
     fun httpRouterGet() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World"))
+        mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
         val getTest = TestApi.GetTest(mockWebServer.url("").toString())
         val response = Fuel.request(getTest).body.string()
@@ -73,7 +75,7 @@ internal class RoutingTest {
 
     @Test
     fun httpRouterGetParams() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World With Params"))
+        mockWebServer.enqueue(MockResponse(body = "Hello World With Params"))
 
         val getTest = TestApi.GetParamsTest(mockWebServer.url("").toString())
         val response = Fuel.request(getTest).body.string()

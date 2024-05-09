@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.SocketPolicy
+import okhttp3.ExperimentalOkHttpApi
 import okhttp3.OkHttpClient
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -13,6 +14,7 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertNotNull
 
+@OptIn(ExperimentalOkHttpApi::class)
 internal class HttpLoaderBuilderTest {
 
     private lateinit var mockWebServer: MockWebServer
@@ -29,7 +31,7 @@ internal class HttpLoaderBuilderTest {
 
     @Test
     fun `default okhttp settings`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World"))
+        mockWebServer.enqueue(MockResponse(body = "Hello World"))
         val response = JVMHttpLoader().get {
             url = mockWebServer.url("hello").toString()
         }.body.string()
@@ -40,7 +42,7 @@ internal class HttpLoaderBuilderTest {
 
     @Test
     fun `setting connect timeouts`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World"))
+        mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
         val httpLoader = FuelBuilder()
             .config {
@@ -55,7 +57,7 @@ internal class HttpLoaderBuilderTest {
 
     @Test
     fun `setting call timeouts`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World 2"))
+        mockWebServer.enqueue(MockResponse(body = "Hello World 2"))
 
         val okhttp = OkHttpClient.Builder().callTimeout(30L, TimeUnit.MILLISECONDS).build()
         val httpLoader = FuelBuilder().config(okhttp).build()
@@ -67,7 +69,7 @@ internal class HttpLoaderBuilderTest {
 
     @Test
     fun `no socket response`(): Unit = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("{}").setSocketPolicy(SocketPolicy.NO_RESPONSE))
+        mockWebServer.enqueue(MockResponse(body = "{}", socketPolicy = SocketPolicy.NoResponse))
         try {
             JVMHttpLoader().get {
                 url = mockWebServer.url("socket").toString()

@@ -9,10 +9,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v3
         with:
-          distribution: temurin
-          java-version: 8
+          distribution: 'temurin'
+          java-version: '17'
 
       - name: Gradle build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build -x iosX64Test -x jsBrowserTest
+          arguments: build -x iosX64Test

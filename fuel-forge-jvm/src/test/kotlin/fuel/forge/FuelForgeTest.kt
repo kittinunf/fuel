@@ -11,6 +11,7 @@ import fuel.get
 import kotlinx.coroutines.runBlocking
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
+import okhttp3.ExperimentalOkHttpApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
@@ -24,10 +25,11 @@ class FuelForgeTest {
             .apply(json at "status")
     }
 
+    @OptIn(ExperimentalOkHttpApi::class)
     @Test
     fun testForgeResponse() = runBlocking {
         val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel\", \"status\": \"OK\"}"))
+            enqueue(MockResponse(body = "{\"userAgent\": \"Fuel\", \"status\": \"OK\"}"))
             start()
         }
 

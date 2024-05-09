@@ -3,12 +3,14 @@ package fuel
 import kotlinx.coroutines.runBlocking
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
+import okhttp3.ExperimentalOkHttpApi
 import okhttp3.OkHttpClient
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalOkHttpApi::class)
 internal class HttpLoaderTest {
     private lateinit var httpLoader: HttpLoader
     private lateinit var mockWebServer: MockWebServer
@@ -26,7 +28,7 @@ internal class HttpLoaderTest {
 
     @Test
     fun `unsuccessful 404 Error`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setResponseCode(404).setBody("Hello World"))
+        mockWebServer.enqueue(MockResponse(code = 404, body = "Hello World"))
 
         val string = httpLoader.get {
             url = mockWebServer.url("get").toString()
@@ -40,7 +42,7 @@ internal class HttpLoaderTest {
 
     @Test
     fun `get test data`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World"))
+        mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
         val string = httpLoader.get {
             url = mockWebServer.url("get").toString()
@@ -54,7 +56,7 @@ internal class HttpLoaderTest {
 
     @Test
     fun `get test data with parameters`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello There"))
+        mockWebServer.enqueue(MockResponse(body = "Hello There"))
 
         val string = httpLoader.get {
             url = mockWebServer.url("get").toString()
@@ -69,7 +71,7 @@ internal class HttpLoaderTest {
 
     @Test
     fun `get test data with headers`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Greeting Everyone"))
+        mockWebServer.enqueue(MockResponse(body = "Greeting Everyone"))
 
         val string = httpLoader.get {
             url = mockWebServer.url("get").toString()
@@ -169,7 +171,7 @@ internal class HttpLoaderTest {
 
     @Test
     fun `delete test data`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World"))
+        mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
         val string = httpLoader.delete {
             url = mockWebServer.url("delete").toString()
