@@ -9,11 +9,6 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
-  - package-ecosystem: "gradle"
-    directory: "/examples/" # Location of package manifests
-    schedule:
-      interval: "daily"
-
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
