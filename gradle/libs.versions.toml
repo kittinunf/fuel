@@ -1,5 +1,5 @@
 [versions]
-coroutines = "1.7.3"
+coroutines = "1.8.1"
 jackson = "2.16.1"
 junit = "4.13.2"
 moshi = "1.15.0"
