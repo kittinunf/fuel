@@ -13,6 +13,6 @@ jobs:
           java-version: '17'
 
       - name: Gradle build
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: build -x iosX64Test -x jsBrowserTest
