@@ -3,6 +3,7 @@ package fuel
 import okhttp3.Call
 import okhttp3.Request.Builder
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import okhttp3.executeAsync
 import okhttp3.internal.http.HttpMethod
 
@@ -67,7 +68,18 @@ public class JVMHttpLoader(callFactoryLazy: Lazy<Call.Factory>) : HttpLoader {
         return HttpResponse().apply {
             statusCode = response.code
             body = response.body
+            headers = response.toHeaders()
         }
+    }
+
+    private fun Response.toHeaders(): Map<String, String> {
+        val header = mutableMapOf<String, String>()
+        for ((key, values) in headers) {
+            for (value in values) {
+                header[key] = value.toString()
+            }
+        }
+        return header
     }
 
     private fun createRequestBuilder(request: Request, method: String): Builder {

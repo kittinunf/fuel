@@ -85,7 +85,16 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
             statusCode = httpResponse.statusCode.toInt()
             nsData = data
             body = bodyString
+            headers = httpResponse.readHeaders()
         }
+    }
+
+    private fun NSHTTPURLResponse.readHeaders(): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        allHeaderFields.forEach {
+            map[it.key as String] = it.value as String
+        }
+        return map
     }
 
     @BetaInteropApi
