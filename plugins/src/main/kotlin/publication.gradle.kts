@@ -72,7 +72,9 @@ publishing {
 
         artifactId = project.name
 
-        artifact(javadocJar)
+        if (project.name.substringAfterLast("-") != "jvm") {
+            artifact(javadocJar)
+        }
 
         pom {
             name.set(artifactName)
