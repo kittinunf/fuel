@@ -1,9 +1,9 @@
 # Fuel
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-blue.svg)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.21-blue.svg)](http://kotlinlang.org)
 [![MavenCentral](https://maven-badges.herokuapp.com/maven-central/com.github.kittinunf.fuel/fuel-jvm/badge.svg)](https://search.maven.org/search?q=com.github.kittinunf.fuel)
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io)
-![Run Gradle](https://github.com/kittinunf/fuel/workflows/Run%20Gradle/badge.svg?branch=main)
+[![Run Gradle Push](https://github.com/kittinunf/fuel/actions/workflows/main.yml/badge.svg)](https://github.com/kittinunf/fuel/actions/workflows/main.yml)
 [![Codecov](https://codecov.io/github/kittinunf/fuel/coverage.svg?branch=main)](https://codecov.io/gh/kittinunf/fuel/branch/main)
 
 The easiest HTTP networking library for Kotlin backed by Kotlinx Coroutines.
@@ -24,18 +24,19 @@ use the `any http method` [suspend](https://kotlinlang.org/docs/reference/corout
 
 ```kotlin
 runBlocking {
-    val string = Fuel.get("https://publicobject.com/helloworld.txt").body.string()
+    val string: String = Fuel.get("https://publicobject.com/helloworld.txt").body.string()
     println(string)
 }
 
 runBlocking {
-    val string = "https://publicobject.com/helloworld.txt".httpGet().body.string()
+    val string: String = "https://publicobject.com/helloworld.txt".httpGet().body.string()
     println(string)
 }
 
 runBlocking {
     val fuel = FuelBuilder().build()
-    val string = fuel.get(request = { url = "https://publicobject.com/helloworld.txt" }).body.string()
+    val string: String = fuel.get(request = { url = "https://publicobject.com/helloworld.txt" }).body.string()
+    println(string)
 }
 
 ```

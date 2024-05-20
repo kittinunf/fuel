@@ -20,10 +20,10 @@ internal class HttpUrlFetcher {
             window.fetch(urlString, requestInit)
                 .then {
                     if (it.ok) {
-                        continuation.resume(HttpResponse().apply {
+                        continuation.resume( HttpResponse().apply {
                             statusCode = it.status
                             response = it
-                        })
+                        } )
                         null
                     } else {
                         continuation.resumeWithException(Exception("Failed to fetch data: ${it.status}"))
