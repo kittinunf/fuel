@@ -15,7 +15,7 @@ fun main() {
                     appendText(it.toString())
                 }?.catch {
                     appendText(it.toString())
-            }
+                }
         }
     }
 }
