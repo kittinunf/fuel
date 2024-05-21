@@ -46,6 +46,17 @@ class HttpLoaderBuilderTest {
             parameters = listOf("foo" to "bar")
         }.body.string()
         assertEquals("Hello World 3", response)
+        
+         mockWebServer.shutdown()
+    }
+    
+    @Test
+    fun `default okhttp settings with headers`() = runBlocking {
+        mockWebServer.enqueue(MockResponse().setBody("Hello World"))
+        val response = JVMHttpLoader().get {
+            url = mockWebServer.url("hello").toString()
+        }.headers
+        assertEquals("1", response["Content-Length"])
 
         mockWebServer.shutdown()
     }
