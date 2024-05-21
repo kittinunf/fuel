@@ -5,7 +5,7 @@ public typealias Parameters = List<Pair<String, String>>
 public class Request(
     public val url: String,
     public val parameters: Parameters?,
-    public val headers: Map<String, String>?,
+    public val headers: Map<String, String>,
     public val body: String?,
     public val method: String?
 ) {

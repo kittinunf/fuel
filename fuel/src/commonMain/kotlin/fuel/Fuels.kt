@@ -87,6 +87,6 @@ public suspend fun Fuel.request(convertible: RequestConvertible): HttpResponse {
         parameters = request.parameters
         method = request.method
         body = request.body
-        headers = request.headers ?: emptyMap()
+        headers = request.headers
     }
 }

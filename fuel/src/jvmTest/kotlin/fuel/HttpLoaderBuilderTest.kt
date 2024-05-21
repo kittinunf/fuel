@@ -13,7 +13,7 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertNotNull
 
-internal class HttpLoaderBuilderTest {
+class HttpLoaderBuilderTest {
 
     private lateinit var mockWebServer: MockWebServer
 
@@ -39,8 +39,20 @@ internal class HttpLoaderBuilderTest {
     }
 
     @Test
+    fun `default okhttp settings with parameter`() = runBlocking {
+        mockWebServer.enqueue(MockResponse().setBody("Hello World 3"))
+        val response = JVMHttpLoader().get {
+            url = mockWebServer.url("hello").toString()
+            parameters = listOf("foo" to "bar")
+        }.body.string()
+        assertEquals("Hello World 3", response)
+
+        mockWebServer.shutdown()
+    }
+
+    @Test
     fun `setting connect timeouts`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World"))
+        mockWebServer.enqueue(MockResponse().setBody("Hello World 4"))
 
         val httpLoader = FuelBuilder()
             .config {
@@ -50,19 +62,19 @@ internal class HttpLoaderBuilderTest {
         val response = httpLoader.get {
             url = mockWebServer.url("hello").toString()
         }.body.string()
-        assertEquals("Hello World", response)
+        assertEquals("Hello World 4", response)
     }
 
     @Test
     fun `setting call timeouts`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody("Hello World 2"))
+        mockWebServer.enqueue(MockResponse().setBody("Hello World 5"))
 
         val okhttp = OkHttpClient.Builder().callTimeout(30L, TimeUnit.MILLISECONDS).build()
         val httpLoader = FuelBuilder().config(okhttp).build()
         val response = httpLoader.get {
             url = mockWebServer.url("hello2").toString()
         }.body.string()
-        assertEquals("Hello World 2", response)
+        assertEquals("Hello World 5", response)
     }
 
     @Test
