@@ -46,10 +46,10 @@ class HttpLoaderBuilderTest {
             parameters = listOf("foo" to "bar")
         }.body.string()
         assertEquals("Hello World 3", response)
-        
-         mockWebServer.shutdown()
+
+        mockWebServer.shutdown()
     }
-    
+
     @Test
     fun `default okhttp settings with headers`() = runBlocking {
         mockWebServer.enqueue(MockResponse().setBody("Hello World"))
