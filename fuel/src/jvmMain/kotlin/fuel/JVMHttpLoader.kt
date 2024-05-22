@@ -1,10 +1,11 @@
 package fuel
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.Call
 import okhttp3.Request.Builder
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import okhttp3.executeAsync
+import okhttp3.coroutines.executeAsync
 import okhttp3.internal.http.HttpMethod
 
 public class JVMHttpLoader(callFactoryLazy: Lazy<Call.Factory>) : HttpLoader {

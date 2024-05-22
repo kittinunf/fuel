@@ -18,3 +18,6 @@ public inline fun <T : JsAny> obj(init: T.() -> Unit): T {
 public operator fun JsAny.set(key: String, value: JsAny) {
     this[key] = value
 }
+
+public fun getKeys(headers: org.w3c.fetch.Headers): JsArray<JsString> =
+    js("Array.from(headers.keys())")
