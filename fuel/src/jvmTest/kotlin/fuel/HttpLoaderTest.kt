@@ -11,7 +11,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalOkHttpApi::class)
-internal class HttpLoaderTest {
+class HttpLoaderTest {
     private lateinit var httpLoader: HttpLoader
     private lateinit var mockWebServer: MockWebServer
 

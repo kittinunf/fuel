@@ -20,7 +20,7 @@ jobs:
           arguments: build -x iosX64Test
 
       - name: Publish to MavenCentral
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
