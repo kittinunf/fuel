@@ -9,7 +9,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-internal class HttpLoaderTest {
+class HttpLoaderTest {
     private lateinit var httpLoader: HttpLoader
     private lateinit var mockWebServer: MockWebServer
 

@@ -43,7 +43,7 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
             request.body?.let {
                 setHTTPBody(it.encode())
             }
-            request.headers?.forEach {
+            request.headers.forEach {
                 setValue(it.value, it.key)
             }
             setCachePolicy(NSURLRequestReloadIgnoringCacheData)
