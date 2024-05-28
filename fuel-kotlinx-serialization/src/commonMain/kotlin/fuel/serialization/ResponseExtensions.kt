@@ -6,6 +6,6 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 
 public expect fun <T : Any> HttpResponse.toJson(
-    json: Json = Json { allowStructuredMapKeys = true },
+    json: Json = Json,
     deserializationStrategy: DeserializationStrategy<T>
 ): Result<T?, Throwable>
