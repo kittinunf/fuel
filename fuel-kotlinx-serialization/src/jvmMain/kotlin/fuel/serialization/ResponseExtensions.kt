@@ -6,8 +6,8 @@ import fuel.HttpResponse
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 
-public fun <T : Any> HttpResponse.toJson(
-    json: Json = Json { allowStructuredMapKeys = true },
+public actual fun <T : Any> HttpResponse.toJson(
+    json: Json,
     deserializationStrategy: DeserializationStrategy<T>
 ): Result<T?, Throwable> = runCatching {
     json.decodeFromString(deserializationStrategy, body.string())
