@@ -21,11 +21,13 @@ internal class HttpUrlFetcher {
             window.fetch(urlString, requestInit)
                 .then {
                     if (it.ok) {
-                        continuation.resume(HttpResponse().apply {
-                            statusCode = it.status
-                            response = it
-                            headers = it.headers.mapToFuel()
-                        })
+                        continuation.resume(
+                            HttpResponse().apply {
+                               statusCode = it.status
+                               response = it
+                               headers = it.headers.mapToFuel()
+                            }
+                        )
                         null
                     } else {
                         continuation.resumeWithException(Exception("Failed to fetch data: ${it.status}"))
