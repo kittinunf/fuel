@@ -23,9 +23,9 @@ internal class HttpUrlFetcher {
                     if (it.ok) {
                         continuation.resume(
                             HttpResponse().apply {
-                               statusCode = it.status
-                               response = it
-                               headers = it.headers.mapToFuel()
+                                statusCode = it.status
+                                response = it
+                                headers = it.headers.mapToFuel()
                             }
                         )
                         null
