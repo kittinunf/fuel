@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalOkHttpApi::class)
+
 package fuel.jackson
 
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -9,6 +11,7 @@ import fuel.get
 import kotlinx.coroutines.runBlocking
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
+import okhttp3.ExperimentalOkHttpApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
@@ -28,7 +31,7 @@ class FuelJacksonTest {
     @Test
     fun jacksonTestResponseObject() = runBlocking {
         val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel\"}"))
+            enqueue(MockResponse(body = "{\"userAgent\": \"Fuel\"}"))
             start()
         }
 
@@ -46,7 +49,7 @@ class FuelJacksonTest {
     @Test
     fun jacksonTestResponseObjectWithCustomMapper() = runBlocking {
         val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel\", \"http_status\": \"OK\"}"))
+            enqueue(MockResponse(body = "{\"userAgent\": \"Fuel\", \"http_status\": \"OK\"}"))
             start()
         }
 

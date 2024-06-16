@@ -17,7 +17,7 @@ jobs:
       - name: Gradle build
         uses: gradle/gradle-build-action@v3
         with:
-          arguments: build -x iosX64Test -x jsBrowserTest
+          arguments: build -x iosX64Test
 
       - name: Publish to SNAPSHOT
         uses: gradle/actions/setup-gradle@v3

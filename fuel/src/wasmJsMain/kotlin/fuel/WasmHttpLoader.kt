@@ -1,6 +1,6 @@
 package fuel
 
-public class JSHttpLoader : HttpLoader {
+public class WasmHttpLoader : HttpLoader {
     private val fetcher by lazy { HttpUrlFetcher() }
 
     public override suspend fun get(request: Request.Builder.() -> Unit): HttpResponse {
