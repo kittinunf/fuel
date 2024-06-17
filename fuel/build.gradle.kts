@@ -17,7 +17,8 @@ kotlin {
             useJUnit()
         }
     }
-    js {
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
         browser()
         binaries.executable()
     }

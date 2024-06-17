@@ -7,10 +7,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
+import okhttp3.ExperimentalOkHttpApi
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.test.fail
 
+@OptIn(ExperimentalOkHttpApi::class)
 class FuelKotlinxSerializationTest {
     @Serializable
     data class HttpBinUserAgentModel(var userAgent: String = "")
@@ -18,7 +20,7 @@ class FuelKotlinxSerializationTest {
     @Test
     fun testSerializableResponse() = runBlocking {
         val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel\"}"))
+            enqueue(MockResponse(body = "{\"userAgent\": \"Fuel\"}"))
             start()
         }
 
@@ -36,7 +38,7 @@ class FuelKotlinxSerializationTest {
     @Test
     fun testSerializableResponseWithDefaultJson() = runBlocking {
         val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse().setBody("{\"userAgent\": \"Fuel2\"}"))
+            enqueue(MockResponse(body = "{\"userAgent\": \"Fuel2\"}"))
             start()
         }
 

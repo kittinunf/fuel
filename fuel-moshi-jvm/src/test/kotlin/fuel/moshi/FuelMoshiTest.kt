@@ -7,10 +7,12 @@ import fuel.get
 import kotlinx.coroutines.runBlocking
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
+import okhttp3.ExperimentalOkHttpApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
 
+@OptIn(ExperimentalOkHttpApi::class)
 class FuelMoshiTest {
     @JsonClass(generateAdapter = true)
     data class HttpBinUserAgentModel(var userAgent: String = "")
@@ -108,7 +110,7 @@ class FuelMoshiTest {
     }
 
     private fun startMockServerWithBody(body: String): MockWebServer = MockWebServer().apply {
-        enqueue(MockResponse().setBody(body))
+        enqueue(MockResponse(body = body))
         start()
     }
 }
