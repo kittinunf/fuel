@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
@@ -8,8 +10,9 @@ plugins {
 
 kotlin {
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_1_8)
         }
         testRuns["test"].executionTask.configure {
             useJUnit()
@@ -58,13 +61,18 @@ kotlin {
 
     explicitApi()
 
-    targets.configureEach {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
+    /*targets.configureEach {
         compilations.configureEach {
             compilerOptions.configure {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
             }
         }
-    }
+    }*/
 
     sourceSets {
         commonMain {
