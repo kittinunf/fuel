@@ -132,5 +132,4 @@ class StringsTest {
 
         assertEquals("CONNECT", request1.method)
     }
-
 }
