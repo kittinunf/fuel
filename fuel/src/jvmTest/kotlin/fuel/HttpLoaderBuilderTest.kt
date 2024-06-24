@@ -16,7 +16,6 @@ import kotlin.test.assertNotNull
 
 @OptIn(ExperimentalOkHttpApi::class)
 class HttpLoaderBuilderTest {
-
     private lateinit var mockWebServer: MockWebServer
 
     @Before
