@@ -7,7 +7,7 @@ okhttp = "5.0.0-alpha.14"
 okio = "3.9.0"
 forge = "1.0.0-alpha3"
 result = "5.6.0"
-serialization = "1.7.0"
+serialization = "1.7.1"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
