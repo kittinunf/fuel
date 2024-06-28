@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform") version "2.0.0" apply false
-    id("org.jetbrains.kotlinx.kover") version "0.8.1" apply false
+    id("org.jetbrains.kotlinx.kover") version "0.8.2" apply false
 }
 
 val isReleaseBuild: Boolean
