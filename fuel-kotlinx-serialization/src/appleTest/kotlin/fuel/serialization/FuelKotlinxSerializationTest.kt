@@ -37,7 +37,7 @@ class FuelKotlinxSerializationTest {
         val jsonBuffer =
             Buffer().also {
                 it.writeString(
-                    "{\"rocket\":\"5e9d0d95eda69973a809d1ec\", \"success\":true,\"details\":\"Second GTO launch for Falcon 9. The USAF evaluated launch data from this flight as part of a separate certification program for SpaceX to qualify to fly U.S. military payloads and found that the Thaicom 6 launch had \"unacceptable fuel reserves at engine cutoff of the stage 2 second burnoff\"}"
+                    "{\"rocket\":\"5e9d0d95eda69973a809d1ec\", \"success\":true,\"details\":\"Second GTO launch for Falcon 9. The USAF evaluated launch data from this flight as part of a separate certification program for SpaceX to qualify to fly U.S. military payloads and found that the Thaicom 6 launch had \\\"unacceptable fuel reserves at engine cutoff of the stage 2 second burnoff\\\"\"}"
                 )
             }
         val httpResponse =

@@ -45,7 +45,7 @@ public object UriCodec {
      */
     public fun encodeOrNull(
         s: String?,
-        allow: String?,
+        allow: String?
     ): String? = if (s == null) null else encode(s, allow)
 
     /**
@@ -74,7 +74,7 @@ public object UriCodec {
      */
     public fun encode(
         s: String,
-        allow: String?,
+        allow: String?
     ): String {
         // Lazily-initialized buffers.
         var encoded: StringBuilder? = null
@@ -159,7 +159,7 @@ public object UriCodec {
      */
     private fun isAllowed(
         c: Char,
-        allow: String?,
+        allow: String?
     ): Boolean =
         c in lowercaseAsciiAlphaRange ||
             c in uppercaseAsciiAlphaRange ||
@@ -183,7 +183,7 @@ public object UriCodec {
     public fun decodeOrNull(
         s: String?,
         convertPlus: Boolean = false,
-        throwOnFailure: Boolean = false,
+        throwOnFailure: Boolean = false
     ): String? = if (s == null) null else decode(s, convertPlus, throwOnFailure)
 
     /**
@@ -201,7 +201,7 @@ public object UriCodec {
     public fun decode(
         s: String,
         convertPlus: Boolean = false,
-        throwOnFailure: Boolean = false,
+        throwOnFailure: Boolean = false
     ): String {
         val builder = StringBuilder(s.length)
 
@@ -290,7 +290,7 @@ public object UriCodec {
 
     private fun ByteBuffer.flushDecodingByteAccumulator(
         builder: StringBuilder,
-        throwOnFailure: Boolean,
+        throwOnFailure: Boolean
     ) {
         if (writePosition == 0) return
 
@@ -309,7 +309,7 @@ public object UriCodec {
         uri: String,
         name: String?,
         unexpected: Char,
-        index: Int,
+        index: Int
     ): UriSyntaxException {
         val nameString = if (name == null) "" else " in [$name]"
         return UriSyntaxException(
@@ -323,7 +323,7 @@ public object UriCodec {
         uri: String,
         index: Int,
         end: Int,
-        name: String?,
+        name: String?
     ): Char {
         if (index >= end) {
             val nameString = if (name == null) "" else " in [$name]"

@@ -24,7 +24,7 @@ class FuelJacksonTest {
 
     data class HttpBinUserAgentModel(
         val userAgent: String = "",
-        val http_status: String = "",
+        val http_status: String = ""
     )
 
     @Test
