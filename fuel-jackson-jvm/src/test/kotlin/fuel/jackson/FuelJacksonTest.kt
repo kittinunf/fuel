@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalOkHttpApi::class)
-
 package fuel.jackson
 
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -16,6 +14,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
 
+@ExperimentalOkHttpApi
 class FuelJacksonTest {
     private val createCustomMapper: ObjectMapper =
         ObjectMapper().registerKotlinModule()
@@ -25,7 +24,7 @@ class FuelJacksonTest {
 
     data class HttpBinUserAgentModel(
         val userAgent: String = "",
-        val http_status: String = "",
+        val httpStatus: String = ""
     )
 
     @Test
@@ -53,7 +52,7 @@ class FuelJacksonTest {
         runBlocking {
             val mockWebServer =
                 MockWebServer().apply {
-                    enqueue(MockResponse(body = "{\"userAgent\": \"Fuel\", \"http_status\": \"OK\"}"))
+                    enqueue(MockResponse(body = "{\"userAgent\": \"Fuel\", \"httpStatus\": \"OK\"}"))
                     start()
                 }
 
@@ -61,7 +60,7 @@ class FuelJacksonTest {
             val jackson = response.toJackson<HttpBinUserAgentModel>(createCustomMapper)
             jackson.fold({
                 assertEquals("", it?.userAgent)
-                assertEquals("OK", it?.http_status)
+                assertEquals("OK", it?.httpStatus)
             }, {
                 fail(it.localizedMessage)
             })

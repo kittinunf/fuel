@@ -3,7 +3,7 @@ package fuel
 public suspend fun Fuel.get(
     url: String,
     parameters: Parameters? = null,
-    headers: Map<String, String> = emptyMap(),
+    headers: Map<String, String> = emptyMap()
 ): HttpResponse =
     loader().get {
         this.url = url
@@ -15,7 +15,7 @@ public suspend fun Fuel.post(
     url: String,
     parameters: Parameters? = null,
     body: String? = null,
-    headers: Map<String, String> = emptyMap(),
+    headers: Map<String, String> = emptyMap()
 ): HttpResponse =
     loader().post {
         this.url = url
@@ -28,7 +28,7 @@ public suspend fun Fuel.put(
     url: String,
     parameters: Parameters? = null,
     body: String? = null,
-    headers: Map<String, String> = emptyMap(),
+    headers: Map<String, String> = emptyMap()
 ): HttpResponse =
     loader().put {
         this.url = url
@@ -41,7 +41,7 @@ public suspend fun Fuel.patch(
     url: String,
     parameters: Parameters? = null,
     body: String? = null,
-    headers: Map<String, String> = emptyMap(),
+    headers: Map<String, String> = emptyMap()
 ): HttpResponse =
     loader().patch {
         this.url = url
@@ -54,7 +54,7 @@ public suspend fun Fuel.delete(
     url: String,
     parameters: Parameters? = null,
     body: String? = null,
-    headers: Map<String, String> = emptyMap(),
+    headers: Map<String, String> = emptyMap()
 ): HttpResponse =
     loader().delete {
         this.url = url
@@ -65,7 +65,7 @@ public suspend fun Fuel.delete(
 
 public suspend fun Fuel.head(
     url: String,
-    parameters: Parameters? = null,
+    parameters: Parameters? = null
 ): HttpResponse =
     loader().head {
         this.url = url
@@ -77,7 +77,7 @@ public suspend fun Fuel.method(
     parameters: Parameters? = null,
     method: String? = null,
     body: String? = null,
-    headers: Map<String, String> = emptyMap(),
+    headers: Map<String, String> = emptyMap()
 ): HttpResponse =
     loader().method {
         this.url = url

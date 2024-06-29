@@ -67,7 +67,7 @@ class FuelMoshiTest {
                         "    \"rank\": \"J\"," +
                         "    \"suit\": \"SPADES\"" +
                         "  }" +
-                        "]",
+                        "]"
                 )
 
             val response = Fuel.get(mockWebServer.url("user-agent").toString())
@@ -98,7 +98,7 @@ class FuelMoshiTest {
                         "    \"rank\": \"K\"," +
                         "    \"suit\": \"SPADES\"" +
                         "  }" +
-                        "]",
+                        "]"
                 )
 
             val userAgentResponse = Fuel.get(mockWebServer.url("user-agent").toString())

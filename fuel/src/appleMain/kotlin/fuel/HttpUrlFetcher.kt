@@ -29,7 +29,7 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
     @OptIn(BetaInteropApi::class)
     suspend fun fetch(
         method: String,
-        request: Request,
+        request: Request
     ): HttpResponse =
         suspendCancellableCoroutine { continuation ->
             val delegate = { httpData: NSData?, nsUrlResponse: NSURLResponse?, error: NSError? ->
@@ -37,8 +37,8 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
                     buildHttpResponse(
                         data = httpData,
                         httpResponse = nsUrlResponse as? NSHTTPURLResponse,
-                        error = error,
-                    ),
+                        error = error
+                    )
                 )
             }
 
@@ -70,7 +70,7 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
     private fun buildHttpResponse(
         data: NSData?,
         httpResponse: NSHTTPURLResponse?,
-        error: NSError?,
+        error: NSError?
     ): HttpResponse {
         if (error != null) {
             throw Throwable(error.localizedDescription)
