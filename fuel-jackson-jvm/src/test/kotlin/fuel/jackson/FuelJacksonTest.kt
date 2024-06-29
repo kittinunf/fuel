@@ -24,7 +24,7 @@ class FuelJacksonTest {
 
     data class HttpBinUserAgentModel(
         val userAgent: String = "",
-        val httpStatus: String = ""
+        val http_status: String = "",
     )
 
     @Test
@@ -52,7 +52,7 @@ class FuelJacksonTest {
         runBlocking {
             val mockWebServer =
                 MockWebServer().apply {
-                    enqueue(MockResponse(body = "{\"userAgent\": \"Fuel\", \"httpStatus\": \"OK\"}"))
+                    enqueue(MockResponse(body = "{\"userAgent\": \"Fuel\", \"http_status\": \"OK\"}"))
                     start()
                 }
 
@@ -60,7 +60,7 @@ class FuelJacksonTest {
             val jackson = response.toJackson<HttpBinUserAgentModel>(createCustomMapper)
             jackson.fold({
                 assertEquals("", it?.userAgent)
-                assertEquals("OK", it?.httpStatus)
+                assertEquals("OK", it?.http_status)
             }, {
                 fail(it.localizedMessage)
             })

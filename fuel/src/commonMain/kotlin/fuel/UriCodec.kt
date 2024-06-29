@@ -288,7 +288,7 @@ public object UriCodec {
             }
     }
 
-    private inline fun ByteBuffer.flushDecodingByteAccumulator(
+    private fun ByteBuffer.flushDecodingByteAccumulator(
         builder: StringBuilder,
         throwOnFailure: Boolean,
     ) {
