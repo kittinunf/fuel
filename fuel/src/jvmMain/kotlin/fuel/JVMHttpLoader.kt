@@ -86,7 +86,10 @@ public class JVMHttpLoader(callFactoryLazy: Lazy<Call.Factory>) : HttpLoader {
         return header
     }
 
-    private fun createRequestBuilder(request: Request, method: String): Builder {
+    private fun createRequestBuilder(
+        request: Request,
+        method: String,
+    ): Builder {
         val builder = Builder()
         with(builder) {
             request.headers.forEach {

@@ -8,9 +8,7 @@ import com.github.kittinunf.result.runCatching
 import fuel.HttpResponse
 import kotlinx.io.readString
 
-public inline fun <reified T : Any> HttpResponse.toJackson(
-    mapper: ObjectMapper = jacksonObjectMapper()
-): Result<T?, Throwable> =
+public inline fun <reified T : Any> HttpResponse.toJackson(mapper: ObjectMapper = jacksonObjectMapper()): Result<T?, Throwable> =
     runCatching {
         mapper.readValue(source.readString())
     }

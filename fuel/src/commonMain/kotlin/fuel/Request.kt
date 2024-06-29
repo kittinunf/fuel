@@ -7,14 +7,14 @@ public class Request(
     public val parameters: Parameters?,
     public val headers: Map<String, String>,
     public val body: String?,
-    public val method: String?
+    public val method: String?,
 ) {
     private constructor(builder: Builder) : this(
         checkNotNull(builder.url) { "url == null" },
         builder.parameters,
         builder.headers,
         builder.body,
-        builder.method
+        builder.method,
     )
 
     public class Builder {

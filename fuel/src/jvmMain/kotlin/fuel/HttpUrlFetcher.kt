@@ -6,7 +6,10 @@ import okhttp3.Call
 import okhttp3.Request
 
 internal class HttpUrlFetcher(private val callFactory: Lazy<Call.Factory>) {
-    fun fetch(request: fuel.Request, builder: Request.Builder): Call {
+    fun fetch(
+        request: fuel.Request,
+        builder: Request.Builder,
+    ): Call {
         if (request.parameters != null) {
             builder.url(request.url.fillURLWithParameters(request.parameters))
         } else {

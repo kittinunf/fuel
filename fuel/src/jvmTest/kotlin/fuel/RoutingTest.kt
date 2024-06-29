@@ -12,11 +12,11 @@ import org.junit.Test
 
 @OptIn(ExperimentalOkHttpApi::class)
 class RoutingTest {
-
     sealed class TestApi(private val host: String) : FuelRouting {
         override val basePath = this.host
 
         class GetTest(host: String) : TestApi(host)
+
         class GetParamsTest(host: String) : TestApi(host)
 
         override val parameters: Parameters?
@@ -63,27 +63,29 @@ class RoutingTest {
     }
 
     @Test
-    fun httpRouterGet() = runBlocking {
-        mockWebServer.enqueue(MockResponse(body = "Hello World"))
+    fun httpRouterGet() =
+        runBlocking {
+            mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
-        val getTest = TestApi.GetTest(mockWebServer.url("").toString())
-        val response = Fuel.request(getTest).source.readString()
-        val request1 = mockWebServer.takeRequest()
+            val getTest = TestApi.GetTest(mockWebServer.url("").toString())
+            val response = Fuel.request(getTest).source.readString()
+            val request1 = mockWebServer.takeRequest()
 
-        assertEquals("Hello World", response)
-        assertEquals("GET", request1.method)
-    }
+            assertEquals("Hello World", response)
+            assertEquals("GET", request1.method)
+        }
 
     @Test
-    fun httpRouterGetParams() = runBlocking {
-        mockWebServer.enqueue(MockResponse(body = "Hello World With Params"))
+    fun httpRouterGetParams() =
+        runBlocking {
+            mockWebServer.enqueue(MockResponse(body = "Hello World With Params"))
 
-        val getTest = TestApi.GetParamsTest(mockWebServer.url("").toString())
-        val response = Fuel.request(getTest).source.readString()
-        val request1 = mockWebServer.takeRequest()
+            val getTest = TestApi.GetParamsTest(mockWebServer.url("").toString())
+            val response = Fuel.request(getTest).source.readString()
+            val request1 = mockWebServer.takeRequest()
 
-        assertEquals("Hello World With Params", response)
-        assertEquals("GET", request1.method)
-        assertEquals("///get?foo=bar", request1.path)
-    }
+            assertEquals("Hello World With Params", response)
+            assertEquals("GET", request1.method)
+            assertEquals("///get?foo=bar", request1.path)
+        }
 }

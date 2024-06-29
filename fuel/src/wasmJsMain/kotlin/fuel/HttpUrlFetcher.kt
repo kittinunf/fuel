@@ -4,7 +4,6 @@ import kotlinx.browser.window
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.io.Buffer
 import org.khronos.webgl.ArrayBuffer
-
 import org.khronos.webgl.Uint8Array
 import org.khronos.webgl.get
 import org.w3c.fetch.Headers
@@ -13,10 +12,15 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 internal class HttpUrlFetcher {
-    suspend fun fetch(request: Request, method: String?, body: String? = null): HttpResponse {
-        val urlString = request.parameters?.let {
-            request.url.fillURLWithParameters(it)
-        } ?: request.url
+    suspend fun fetch(
+        request: Request,
+        method: String?,
+        body: String? = null,
+    ): HttpResponse {
+        val urlString =
+            request.parameters?.let {
+                request.url.fillURLWithParameters(it)
+            } ?: request.url
 
         val requestInit = obj<RequestInit> {}
         requestInit.method = method
@@ -29,11 +33,13 @@ internal class HttpUrlFetcher {
                         response.arrayBuffer()
                             .then { arrayBuffer ->
                                 val byteArray = arrayBuffer.toBuffer()
-                                continuation.resume(HttpResponse().apply {
-                                    statusCode = response.status.toInt()
-                                    source = byteArray
-                                    headers = response.headers.mapToFuel()
-                                })
+                                continuation.resume(
+                                    HttpResponse().apply {
+                                        statusCode = response.status.toInt()
+                                        source = byteArray
+                                        headers = response.headers.mapToFuel()
+                                    },
+                                )
                                 null
                             }
                         null

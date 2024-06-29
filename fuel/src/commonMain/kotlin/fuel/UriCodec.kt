@@ -28,7 +28,7 @@ public object UriCodec {
      * @return an encoded version of s suitable for use as a URI component,
      *  or null if s is null
      */
-    public fun encodeOrNull(s: String?): String? = if(s == null) null else encode(s, null)
+    public fun encodeOrNull(s: String?): String? = if (s == null) null else encode(s, null)
 
     /**
      * Encodes characters in the given string as '%'-escaped octets
@@ -43,7 +43,10 @@ public object UriCodec {
      * @return an encoded version of s suitable for use as a URI component,
      *  or null if s is null
      */
-    public fun encodeOrNull(s: String?, allow: String?): String? = if(s == null) null else encode(s, allow)
+    public fun encodeOrNull(
+        s: String?,
+        allow: String?,
+    ): String? = if (s == null) null else encode(s, allow)
 
     /**
      * Encodes characters in the given string as '%'-escaped octets
@@ -69,7 +72,10 @@ public object UriCodec {
      *  null if no characters should be skipped
      * @return an encoded version of s suitable for use as a URI component
      */
-    public fun encode(s: String, allow: String?): String {
+    public fun encode(
+        s: String,
+        allow: String?,
+    ): String {
         // Lazily-initialized buffers.
         var encoded: StringBuilder? = null
 
@@ -79,37 +85,35 @@ public object UriCodec {
         // encoding in chunks. This results in fewer method calls and
         // allocations than encoding one character at a time.
         var current = 0
-        while(current < oldLength) {
+        while (current < oldLength) {
             // Start in "copying" mode where we copy over allowed chars.
 
             // Find the next character which needs to be encoded.
             var nextToEncode = current
-            while(nextToEncode < oldLength && isAllowed(s[nextToEncode], allow)) {
+            while (nextToEncode < oldLength && isAllowed(s[nextToEncode], allow)) {
                 nextToEncode++
             }
 
             // If there's nothing more to encode...
-            if(nextToEncode == oldLength) {
-                return if(current == 0) {
+            if (nextToEncode == oldLength) {
+                return if (current == 0) {
                     // We didn't need to encode anything!
                     s
-                }
-                else {
+                } else {
                     // Presumably, we've already done some encoding.
                     encoded!!.append(s, current, oldLength)
                     encoded.toString()
                 }
             }
 
-            if(encoded == null) {
+            if (encoded == null) {
                 encoded = StringBuilder()
             }
 
-            if(nextToEncode > current) {
+            if (nextToEncode > current) {
                 // Append allowed characters leading up to this point.
                 encoded.append(s, current, nextToEncode)
-            }
-            else {
+            } else {
                 // assert nextToEncode == current
             }
 
@@ -118,7 +122,7 @@ public object UriCodec {
             // Find the next allowed character.
             current = nextToEncode
             var nextAllowed = current + 1
-            while(nextAllowed < oldLength && !isAllowed(s[nextAllowed], allow)) {
+            while (nextAllowed < oldLength && !isAllowed(s[nextAllowed], allow)) {
                 nextAllowed++
             }
 
@@ -128,13 +132,12 @@ public object UriCodec {
             try {
                 val bytes: ByteArray = toEncode.encodeToByteArray()
                 val bytesLength = bytes.size
-                for(i in 0 until bytesLength) {
+                for (i in 0 until bytesLength) {
                     encoded.append('%')
                     encoded.append(hexDigits[bytes[i].toInt() and 0xf0 shr 4])
                     encoded.append(hexDigits[bytes[i].toInt() and 0xf])
                 }
-            }
-            catch(e: Exception) {
+            } catch (e: Exception) {
                 throw AssertionError(e)
             }
             current = nextAllowed
@@ -154,13 +157,16 @@ public object UriCodec {
      * @return true if the character is allowed or false if it should be
      * encoded
      */
-    private fun isAllowed(c: Char, allow: String?): Boolean =
+    private fun isAllowed(
+        c: Char,
+        allow: String?,
+    ): Boolean =
         c in lowercaseAsciiAlphaRange ||
-                c in uppercaseAsciiAlphaRange ||
-                c in digitAsciiRange ||
-                c in defaultAllowedSet ||
-                allow != null &&
-                allow.indexOf(c) != -1
+            c in uppercaseAsciiAlphaRange ||
+            c in digitAsciiRange ||
+            c in defaultAllowedSet ||
+            allow != null &&
+            allow.indexOf(c) != -1
 
     /**
      * Decodes '%'-escaped octets in the given string using the UTF-8 scheme.
@@ -177,8 +183,8 @@ public object UriCodec {
     public fun decodeOrNull(
         s: String?,
         convertPlus: Boolean = false,
-        throwOnFailure: Boolean = false
-    ): String? = if(s == null) null else decode(s, convertPlus, throwOnFailure)
+        throwOnFailure: Boolean = false,
+    ): String? = if (s == null) null else decode(s, convertPlus, throwOnFailure)
 
     /**
      * Decodes '%'-escaped octets in the given string using the UTF-8 scheme.
@@ -195,7 +201,7 @@ public object UriCodec {
     public fun decode(
         s: String,
         convertPlus: Boolean = false,
-        throwOnFailure: Boolean = false
+        throwOnFailure: Boolean = false,
     ): String {
         val builder = StringBuilder(s.length)
 
@@ -203,40 +209,38 @@ public object UriCodec {
         // (empty if the last char wasn't a escaped char).
         ByteBuffer(s.length).apply {
             var i = 0
-            while(i < s.length) {
-                when(val c = s[i++]) {
+            while (i < s.length) {
+                when (val c = s[i++]) {
                     '+' -> {
                         flushDecodingByteAccumulator(builder, throwOnFailure)
-                        builder.append(if(convertPlus) ' ' else '+')
+                        builder.append(if (convertPlus) ' ' else '+')
                     }
 
                     '%' -> {
                         // Expect two characters representing a number in hex.
                         var hexValue: Byte = 0
-                        for(@Suppress("UnusedPrivateProperty") j in 0..1) {
-                            val nextC = try {
-                                getNextCharacter(s, i, s.length, name = null)
-                            }
-                            catch(e: UriSyntaxException) {
-                                // Unexpected end of input.
-                                if(throwOnFailure) {
-                                    throw IllegalArgumentException(e)
+                        for (@Suppress("UnusedPrivateProperty") j in 0..1) {
+                            val nextC =
+                                try {
+                                    getNextCharacter(s, i, s.length, name = null)
+                                } catch (e: UriSyntaxException) {
+                                    // Unexpected end of input.
+                                    if (throwOnFailure) {
+                                        throw IllegalArgumentException(e)
+                                    } else {
+                                        flushDecodingByteAccumulator(builder, throwOnFailure)
+                                        builder.append(INVALID_INPUT_CHARACTER)
+                                        return builder.toString()
+                                    }
                                 }
-                                else {
-                                    flushDecodingByteAccumulator(builder, throwOnFailure)
-                                    builder.append(INVALID_INPUT_CHARACTER)
-                                    return builder.toString()
-                                }
-                            }
                             i++
                             val newDigit: Int = hexCharToValue(nextC)
-                            if(newDigit < 0) {
-                                if(throwOnFailure) {
+                            if (newDigit < 0) {
+                                if (throwOnFailure) {
                                     throw IllegalArgumentException(
-                                        unexpectedCharacterException(s, name = null, nextC, i - 1)
+                                        unexpectedCharacterException(s, name = null, nextC, i - 1),
                                     )
-                                }
-                                else {
+                                } else {
                                     flushDecodingByteAccumulator(builder, throwOnFailure)
                                     builder.append(INVALID_INPUT_CHARACTER)
                                     break
@@ -272,32 +276,30 @@ public object UriCodec {
             buffer[writePosition++] = byte
         }
 
-        fun decodeToStringAndReset() = try {
-            buffer.decodeToString(
-                startIndex = 0,
-                endIndex = writePosition,
-                throwOnInvalidSequence = false
-            )
-        }
-        finally {
-            writePosition = 0
-        }
+        fun decodeToStringAndReset() =
+            try {
+                buffer.decodeToString(
+                    startIndex = 0,
+                    endIndex = writePosition,
+                    throwOnInvalidSequence = false,
+                )
+            } finally {
+                writePosition = 0
+            }
     }
 
     private inline fun ByteBuffer.flushDecodingByteAccumulator(
         builder: StringBuilder,
-        throwOnFailure: Boolean
+        throwOnFailure: Boolean,
     ) {
-        if(writePosition == 0) return
+        if (writePosition == 0) return
 
         try {
             builder.append(decodeToStringAndReset())
-        }
-        catch(e: Exception) {
-            if(throwOnFailure) {
+        } catch (e: Exception) {
+            if (throwOnFailure) {
                 throw IllegalArgumentException(e)
-            }
-            else {
+            } else {
                 builder.append(INVALID_INPUT_CHARACTER)
             }
         }
@@ -307,13 +309,13 @@ public object UriCodec {
         uri: String,
         name: String?,
         unexpected: Char,
-        index: Int
+        index: Int,
     ): UriSyntaxException {
-        val nameString = if(name == null) "" else " in [$name]"
+        val nameString = if (name == null) "" else " in [$name]"
         return UriSyntaxException(
             uri,
             "Unexpected character$nameString: $unexpected",
-            index
+            index,
         )
     }
 
@@ -321,10 +323,10 @@ public object UriCodec {
         uri: String,
         index: Int,
         end: Int,
-        name: String?
+        name: String?,
     ): Char {
-        if(index >= end) {
-            val nameString = if(name == null) "" else " in [$name]"
+        if (index >= end) {
+            val nameString = if (name == null) "" else " in [$name]"
             throw UriSyntaxException(uri, "Unexpected end of string $nameString", index)
         }
         return uri[index]
@@ -333,12 +335,13 @@ public object UriCodec {
     /**
      * Interprets a char as hex digits, returning a number from -1 (invalid char) to 15 ('f').
      */
-    private fun hexCharToValue(c: Char): Int = when(c) {
-        in digitAsciiRange -> c.code - '0'.code
-        in lowercaseHexRange -> 10 + c.code - 'a'.code
-        in uppercaseHexRange -> 10 + c.code - 'A'.code
-        else -> -1
-    }
+    private fun hexCharToValue(c: Char): Int =
+        when (c) {
+            in digitAsciiRange -> c.code - '0'.code
+            in lowercaseHexRange -> 10 + c.code - 'a'.code
+            in uppercaseHexRange -> 10 + c.code - 'A'.code
+            else -> -1
+        }
 
     private val lowercaseAsciiAlphaRange = 'a'..'z'
     private val lowercaseHexRange = 'a'..'f'

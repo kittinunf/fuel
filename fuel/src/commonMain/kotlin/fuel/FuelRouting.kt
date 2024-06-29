@@ -33,11 +33,12 @@ public interface FuelRouting : RequestConvertible {
     public val body: String?
 
     override val request: Request
-        get() = Request(
-            "$basePath/$path",
-            parameters,
-            headers.orEmpty(),
-            body,
-            method
-        )
+        get() =
+            Request(
+                "$basePath/$path",
+                parameters,
+                headers.orEmpty(),
+                body,
+                method,
+            )
 }
