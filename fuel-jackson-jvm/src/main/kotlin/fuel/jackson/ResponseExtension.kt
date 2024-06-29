@@ -6,10 +6,11 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.runCatching
 import fuel.HttpResponse
+import kotlinx.io.readString
 
 public inline fun <reified T : Any> HttpResponse.toJackson(
     mapper: ObjectMapper = jacksonObjectMapper()
 ): Result<T?, Throwable> =
     runCatching {
-        mapper.readValue(body.string())
+        mapper.readValue(source.readString())
     }

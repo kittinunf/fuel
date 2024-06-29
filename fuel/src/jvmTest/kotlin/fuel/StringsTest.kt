@@ -1,6 +1,7 @@
 package fuel
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.readString
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import okhttp3.ExperimentalOkHttpApi
@@ -29,7 +30,7 @@ class StringsTest {
     fun `get test data`() = runBlocking {
         mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
-        val string = mockWebServer.url("get").toString().httpGet().body.string()
+        val string = mockWebServer.url("get").toString().httpGet().source.readString()
         val request2 = mockWebServer.takeRequest()
 
         assertEquals("GET", request2.method)
@@ -106,7 +107,7 @@ class StringsTest {
     fun `delete test data`() = runBlocking {
         mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
-        val string = mockWebServer.url("delete").toString().httpDelete().body.string()
+        val string = mockWebServer.url("delete").toString().httpDelete().source.readString()
         val request1 = mockWebServer.takeRequest()
 
         assertEquals("DELETE", request1.method)

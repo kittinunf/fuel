@@ -1,8 +1,10 @@
 package fuel
 
 import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.refTo
 import kotlinx.coroutines.suspendCancellableCoroutine
-import okio.ByteString.Companion.toByteString
+import kotlinx.io.Buffer
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSHTTPURLResponse
@@ -20,6 +22,7 @@ import platform.Foundation.dataUsingEncoding
 import platform.Foundation.setHTTPBody
 import platform.Foundation.setHTTPMethod
 import platform.Foundation.setValue
+import platform.posix.memcpy
 import kotlin.coroutines.resume
 
 internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConfiguration) {
@@ -71,20 +74,10 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
             throw Throwable("Failed to parse http network response: EOF")
         }
 
-        /**
-         * data can be empty if there is no body.
-         * In that case, trying to create a ByteString fails
-         */
-        val bodyString = if (data == null || data.length.toInt() == 0) {
-            null
-        } else {
-            data.toByteString().utf8()
-        }
-
+        val buffer = Buffer().apply { write(data?.toByteArray() ?: ByteArray(0)) }
         return HttpResponse().apply {
             statusCode = httpResponse.statusCode.toInt()
-            nsData = data
-            body = bodyString
+            source = buffer
             headers = httpResponse.readHeaders()
         }
     }
@@ -95,6 +88,13 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
             map[it.key as String] = it.value as String
         }
         return map
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun NSData.toByteArray() = ByteArray(length.toInt()).apply {
+        if (isNotEmpty()) {
+            memcpy(refTo(0), bytes, length)
+        }
     }
 
     @BetaInteropApi

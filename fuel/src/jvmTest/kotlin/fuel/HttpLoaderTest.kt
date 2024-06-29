@@ -1,6 +1,7 @@
 package fuel
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.readString
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import okhttp3.ExperimentalOkHttpApi
@@ -32,7 +33,7 @@ class HttpLoaderTest {
 
         val string = httpLoader.get {
             url = mockWebServer.url("get").toString()
-        }.body.string()
+        }.source.readString()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -46,7 +47,7 @@ class HttpLoaderTest {
 
         val string = httpLoader.get {
             url = mockWebServer.url("get").toString()
-        }.body.string()
+        }.source.readString()
 
         val request2 = mockWebServer.takeRequest()
 
@@ -61,7 +62,7 @@ class HttpLoaderTest {
         val string = httpLoader.get {
             url = mockWebServer.url("get").toString()
             parameters = listOf("foo" to "bar")
-        }.body.string()
+        }.source.readString()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -76,7 +77,7 @@ class HttpLoaderTest {
         val string = httpLoader.get {
             url = mockWebServer.url("get").toString()
             headers = mapOf("foo" to "bar")
-        }.body.string()
+        }.source.readString()
 
         val request1 = mockWebServer.takeRequest()
 
@@ -175,7 +176,7 @@ class HttpLoaderTest {
 
         val string = httpLoader.delete {
             url = mockWebServer.url("delete").toString()
-        }.body.string()
+        }.source.readString()
 
         val request1 = mockWebServer.takeRequest()
 

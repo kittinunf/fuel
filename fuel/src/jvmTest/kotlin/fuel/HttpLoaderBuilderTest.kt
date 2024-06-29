@@ -1,6 +1,7 @@
 package fuel
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.readString
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.SocketPolicy
@@ -33,7 +34,7 @@ class HttpLoaderBuilderTest {
         mockWebServer.enqueue(MockResponse(body = "Hello World"))
         val response = JVMHttpLoader().get {
             url = mockWebServer.url("hello").toString()
-        }.body.string()
+        }.source.readString()
         assertEquals("Hello World", response)
 
         mockWebServer.shutdown()
@@ -45,7 +46,7 @@ class HttpLoaderBuilderTest {
         val response = JVMHttpLoader().get {
             url = mockWebServer.url("hello").toString()
             parameters = listOf("foo" to "bar")
-        }.body.string()
+        }.source.readString()
         assertEquals("Hello World 3", response)
 
         mockWebServer.shutdown()
@@ -73,7 +74,7 @@ class HttpLoaderBuilderTest {
             .build()
         val response = httpLoader.get {
             url = mockWebServer.url("hello").toString()
-        }.body.string()
+        }.source.readString()
         assertEquals("Hello World 4", response)
     }
 
@@ -85,7 +86,7 @@ class HttpLoaderBuilderTest {
         val httpLoader = FuelBuilder().config(okhttp).build()
         val response = httpLoader.get {
             url = mockWebServer.url("hello2").toString()
-        }.body.string()
+        }.source.readString()
         assertEquals("Hello World 5", response)
     }
 
@@ -95,7 +96,7 @@ class HttpLoaderBuilderTest {
         try {
             JVMHttpLoader().get {
                 url = mockWebServer.url("socket").toString()
-            }.body.string()
+            }.source.readString()
         } catch (ste: SocketTimeoutException) {
             assertNotNull(ste, "socket timeout")
         }

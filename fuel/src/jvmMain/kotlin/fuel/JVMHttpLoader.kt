@@ -1,6 +1,7 @@
 package fuel
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.io.Buffer
 import okhttp3.Call
 import okhttp3.Request.Builder
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -67,9 +68,10 @@ public class JVMHttpLoader(callFactoryLazy: Lazy<Call.Factory>) : HttpLoader {
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun Call.performAsync(): HttpResponse {
         val response = executeAsync()
+        val sourceBuffer = Buffer().apply { write(response.body.bytes()) }
         return HttpResponse().apply {
             statusCode = response.code
-            body = response.body
+            source = sourceBuffer
             headers = response.toHeaders()
         }
     }

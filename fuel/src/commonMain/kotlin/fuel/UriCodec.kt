@@ -159,7 +159,8 @@ public object UriCodec {
                 c in uppercaseAsciiAlphaRange ||
                 c in digitAsciiRange ||
                 c in defaultAllowedSet ||
-                allow != null && allow.indexOf(c) != -1
+                allow != null &&
+                allow.indexOf(c) != -1
 
     /**
      * Decodes '%'-escaped octets in the given string using the UTF-8 scheme.
@@ -212,7 +213,7 @@ public object UriCodec {
                     '%' -> {
                         // Expect two characters representing a number in hex.
                         var hexValue: Byte = 0
-                        for(j in 0..1) {
+                        for(@Suppress("UnusedPrivateProperty") j in 0..1) {
                             val nextC = try {
                                 getNextCharacter(s, i, s.length, name = null)
                             }
@@ -283,7 +284,7 @@ public object UriCodec {
         }
     }
 
-    private fun ByteBuffer.flushDecodingByteAccumulator(
+    private inline fun ByteBuffer.flushDecodingByteAccumulator(
         builder: StringBuilder,
         throwOnFailure: Boolean
     ) {
@@ -310,7 +311,9 @@ public object UriCodec {
     ): UriSyntaxException {
         val nameString = if(name == null) "" else " in [$name]"
         return UriSyntaxException(
-            uri, "Unexpected character$nameString: $unexpected", index
+            uri,
+            "Unexpected character$nameString: $unexpected",
+            index
         )
     }
 
