@@ -1,8 +1,10 @@
 package fuel
 
 import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.refTo
 import kotlinx.coroutines.suspendCancellableCoroutine
-import okio.ByteString.Companion.toByteString
+import kotlinx.io.Buffer
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSHTTPURLResponse
@@ -20,43 +22,50 @@ import platform.Foundation.dataUsingEncoding
 import platform.Foundation.setHTTPBody
 import platform.Foundation.setHTTPMethod
 import platform.Foundation.setValue
+import platform.posix.memcpy
 import kotlin.coroutines.resume
 
 internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConfiguration) {
     @OptIn(BetaInteropApi::class)
-    suspend fun fetch(method: String, request: Request): HttpResponse = suspendCancellableCoroutine { continuation ->
-        val delegate = { httpData: NSData?, nsUrlResponse: NSURLResponse?, error: NSError? ->
-            continuation.resume(
-                buildHttpResponse(
-                    data = httpData,
-                    httpResponse = nsUrlResponse as? NSHTTPURLResponse,
-                    error = error
+    suspend fun fetch(
+        method: String,
+        request: Request
+    ): HttpResponse =
+        suspendCancellableCoroutine { continuation ->
+            val delegate = { httpData: NSData?, nsUrlResponse: NSURLResponse?, error: NSError? ->
+                continuation.resume(
+                    buildHttpResponse(
+                        data = httpData,
+                        httpResponse = nsUrlResponse as? NSHTTPURLResponse,
+                        error = error
+                    )
                 )
-            )
-        }
-
-        val url = request.parameters?.let {
-            request.url.fillURLWithParameters(it)
-        } ?: request.url
-
-        val mutableURLRequest = NSMutableURLRequest.requestWithURL(NSURL(string = url)).apply {
-            request.body?.let {
-                setHTTPBody(it.encode())
             }
-            request.headers.forEach {
-                setValue(it.value, it.key)
-            }
-            setCachePolicy(NSURLRequestReloadIgnoringCacheData)
-            setHTTPMethod(method)
-        }
 
-        val session = NSURLSession.sessionWithConfiguration(sessionConfiguration)
-        val task = session.dataTaskWithRequest(mutableURLRequest, delegate)
-        continuation.invokeOnCancellation {
-            task.cancel()
+            val url =
+                request.parameters?.let {
+                    request.url.fillURLWithParameters(it)
+                } ?: request.url
+
+            val mutableURLRequest =
+                NSMutableURLRequest.requestWithURL(NSURL(string = url)).apply {
+                    request.body?.let {
+                        setHTTPBody(it.encode())
+                    }
+                    request.headers.forEach {
+                        setValue(it.value, it.key)
+                    }
+                    setCachePolicy(NSURLRequestReloadIgnoringCacheData)
+                    setHTTPMethod(method)
+                }
+
+            val session = NSURLSession.sessionWithConfiguration(sessionConfiguration)
+            val task = session.dataTaskWithRequest(mutableURLRequest, delegate)
+            continuation.invokeOnCancellation {
+                task.cancel()
+            }
+            task.resume()
         }
-        task.resume()
-    }
 
     private fun buildHttpResponse(
         data: NSData?,
@@ -71,20 +80,10 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
             throw Throwable("Failed to parse http network response: EOF")
         }
 
-        /**
-         * data can be empty if there is no body.
-         * In that case, trying to create a ByteString fails
-         */
-        val bodyString = if (data == null || data.length.toInt() == 0) {
-            null
-        } else {
-            data.toByteString().utf8()
-        }
-
+        val buffer = Buffer().apply { write(data?.toByteArray() ?: ByteArray(0)) }
         return HttpResponse().apply {
             statusCode = httpResponse.statusCode.toInt()
-            nsData = data
-            body = bodyString
+            source = buffer
             headers = httpResponse.readHeaders()
         }
     }
@@ -96,6 +95,14 @@ internal class HttpUrlFetcher(private val sessionConfiguration: NSURLSessionConf
         }
         return map
     }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun NSData.toByteArray() =
+        ByteArray(length.toInt()).apply {
+            if (isNotEmpty()) {
+                memcpy(refTo(0), bytes, length)
+            }
+        }
 
     @BetaInteropApi
     private fun String.encode(): NSData = NSString.create(string = this).dataUsingEncoding(NSWindowsCP1251StringEncoding)!!

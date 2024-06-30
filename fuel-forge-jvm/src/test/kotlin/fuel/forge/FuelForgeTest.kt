@@ -27,19 +27,21 @@ class FuelForgeTest {
 
     @OptIn(ExperimentalOkHttpApi::class)
     @Test
-    fun testForgeResponse() = runBlocking {
-        val mockWebServer = MockWebServer().apply {
-            enqueue(MockResponse(body = "{\"userAgent\": \"Fuel\", \"status\": \"OK\"}"))
-            start()
-        }
+    fun testForgeResponse() =
+        runBlocking {
+            val mockWebServer =
+                MockWebServer().apply {
+                    enqueue(MockResponse(body = "{\"userAgent\": \"Fuel\", \"status\": \"OK\"}"))
+                    start()
+                }
 
-        val binUserAgentModel = HttpBinUserAgentModel("Fuel", "OK")
-        val response = Fuel.get(mockWebServer.url("user-agent").toString())
-        when (val forge = response.toForge(httpBinUserDeserializer)) {
-            is Result.Success -> assertEquals(binUserAgentModel, forge.value)
-            is Result.Failure -> fail(forge.error.localizedMessage)
-        }
+            val binUserAgentModel = HttpBinUserAgentModel("Fuel", "OK")
+            val response = Fuel.get(mockWebServer.url("user-agent").toString())
+            when (val forge = response.toForge(httpBinUserDeserializer)) {
+                is Result.Success -> assertEquals(binUserAgentModel, forge.value)
+                is Result.Failure -> fail(forge.error.localizedMessage)
+            }
 
-        mockWebServer.shutdown()
-    }
+            mockWebServer.shutdown()
+        }
 }

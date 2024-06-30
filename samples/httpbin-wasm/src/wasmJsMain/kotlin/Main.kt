@@ -6,16 +6,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.dom.appendElement
 import kotlinx.dom.appendText
+import kotlinx.io.readString
 
 fun main() {
     document.body?.appendElement("div") {
         CoroutineScope(Dispatchers.Main).launch {
-            Fuel.get("http://httpbin.org/get").response?.text()
-                ?.then {
-                    appendText(it.toString())
-                }?.catch {
-                    appendText(it.toString())
-                }
+            val string = Fuel.get("http://httpbin.org/get").source.readString()
+            appendText(string)
         }
     }
 }

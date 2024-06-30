@@ -37,13 +37,14 @@ publishing {
     repositories {
         maven {
             name = "sonatype"
-            url = uri(
-                if (isReleaseBuild) {
-                    "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                } else {
-                    "https://oss.sonatype.org/content/repositories/snapshots"
-                }
-            )
+            url =
+                uri(
+                    if (isReleaseBuild) {
+                        "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                    } else {
+                        "https://oss.sonatype.org/content/repositories/snapshots"
+                    },
+                )
 
             credentials {
                 username = getExtraString("sonatype.username")

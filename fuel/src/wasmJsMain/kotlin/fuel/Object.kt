@@ -15,9 +15,11 @@ public inline fun <T : JsAny> obj(init: T.() -> Unit): T {
 /**
  * Operator to set property on JS Object
  */
-public operator fun JsAny.set(key: String, value: JsAny) {
+public operator fun JsAny.set(
+    key: String,
+    value: JsAny,
+) {
     this[key] = value
 }
 
-public fun getKeys(headers: org.w3c.fetch.Headers): JsArray<JsString> =
-    js("Array.from(headers.keys())")
+public fun getKeys(headers: org.w3c.fetch.Headers): JsArray<JsString> = js("Array.from(headers.keys())")

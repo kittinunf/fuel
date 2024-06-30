@@ -29,8 +29,8 @@ class UriCodecTests {
             UriCodec.decode(
                 "",
                 convertPlus = false,
-                throwOnFailure = true
-            )
+                throwOnFailure = true,
+            ),
         )
     }
 
@@ -41,7 +41,7 @@ class UriCodecTests {
             UriCodec.decode(
                 "ab%2f$%C4%82%25%e0%a1%80%p",
                 convertPlus = false,
-                throwOnFailure = true
+                throwOnFailure = true,
             )
             fail("Expected URISyntaxException")
         } catch (expected: IllegalArgumentException) {
@@ -56,7 +56,7 @@ class UriCodecTests {
             UriCodec.decode(
                 "ab%2f$%c4%82%25%e0%a1%80%1p",
                 convertPlus = false,
-                throwOnFailure = true
+                throwOnFailure = true,
             )
             fail("Expected URISyntaxException")
         } catch (expected: IllegalArgumentException) {
@@ -70,8 +70,8 @@ class UriCodecTests {
             // % in the end.
             UriCodec.decode(
                 "ab%2f$%c4%82%25%e0%a1%80%",
-                convertPlus = false /* convertPlus */,
-                throwOnFailure = true /* throwOnFailure */
+                convertPlus = false,
+                throwOnFailure = true,
             )
             fail("Expected URISyntaxException")
         } catch (expected: IllegalArgumentException) {
@@ -86,8 +86,8 @@ class UriCodecTests {
             UriCodec.decode(
                 "ab%2f$%c4%82%25%e0%a1%80%",
                 convertPlus = false,
-                throwOnFailure = false
-            )
+                throwOnFailure = false,
+            ),
         )
     }
 
@@ -98,8 +98,8 @@ class UriCodecTests {
             UriCodec.decode(
                 "ab%2f$%c4%82%25+%e0%a1%80",
                 convertPlus = true,
-                throwOnFailure = false
-            )
+                throwOnFailure = false,
+            ),
         )
     }
 
@@ -111,8 +111,8 @@ class UriCodecTests {
             UriCodec.decode(
                 "ab%2f$%c4%82%25%e0%a1%80",
                 convertPlus = false,
-                throwOnFailure = true
-            )
+                throwOnFailure = true,
+            ),
         )
     }
 
@@ -125,8 +125,8 @@ class UriCodecTests {
             UriCodec.decode(
                 "ab%2f$%c4%82%25%e0%a1%80aa%e0%a1%80",
                 convertPlus = false,
-                throwOnFailure = true
-            )
+                throwOnFailure = true,
+            ),
         )
     }
 }
