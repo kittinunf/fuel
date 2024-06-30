@@ -1,5 +1,6 @@
 import fuel.FuelBuilder
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.readString
 
 fun main() =
     runBlocking {
@@ -9,5 +10,5 @@ fun main() =
                 url = "http://mockbin.com/request?foo=bar&foo=baz"
                 body = "{\"foo\": \"bar\"}"
             })
-        println(response.body)
+        println(response.source.readString())
     }
