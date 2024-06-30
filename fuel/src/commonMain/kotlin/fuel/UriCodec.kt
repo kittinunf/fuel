@@ -238,7 +238,7 @@ public object UriCodec {
                             if (newDigit < 0) {
                                 if (throwOnFailure) {
                                     throw IllegalArgumentException(
-                                        unexpectedCharacterException(s, name = null, nextC, i - 1),
+                                        unexpectedCharacterException(s, name = null, nextC, i - 1)
                                     )
                                 } else {
                                     flushDecodingByteAccumulator(builder, throwOnFailure)
@@ -281,7 +281,7 @@ public object UriCodec {
                 buffer.decodeToString(
                     startIndex = 0,
                     endIndex = writePosition,
-                    throwOnInvalidSequence = false,
+                    throwOnInvalidSequence = false
                 )
             } finally {
                 writePosition = 0
@@ -315,7 +315,7 @@ public object UriCodec {
         return UriSyntaxException(
             uri,
             "Unexpected character$nameString: $unexpected",
-            index,
+            index
         )
     }
 
