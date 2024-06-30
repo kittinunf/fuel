@@ -14,17 +14,16 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
       - name: Gradle build
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: build -x iosX64Test
+        run: ./gradlew build -x iosX64Test
 
       - name: Publish to MavenCentral
-        uses: gradle/actions/setup-gradle@v3
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-        with:
-          arguments: publish --max-workers 1 -Prelease=true
+        run: ./gradlew publish --max-workers 1 -Prelease=true
