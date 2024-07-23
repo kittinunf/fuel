@@ -12,11 +12,13 @@ kotlin {
         browser {
             browser {
                 commonWebpackConfig {
-                    devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                        static = (static ?: mutableListOf()).apply {
-                            add(project.rootDir.path)
+                    devServer =
+                        (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                            static =
+                                (static ?: mutableListOf()).apply {
+                                    add(project.rootDir.path)
+                                }
                         }
-                    }
                 }
             }
         }

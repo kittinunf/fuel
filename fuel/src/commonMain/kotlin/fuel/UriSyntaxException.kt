@@ -33,7 +33,7 @@ public class UriSyntaxException(
      * An index into the input string of the position at which the
      * parse error occurred, or `-1` if this position is not known.
      */
-    public val index: Int = -1
+    public val index: Int = -1,
 ) : Exception(internalReason) {
     init {
         require(index >= -1)
@@ -43,13 +43,14 @@ public class UriSyntaxException(
         get() = message
 
     public override val message: String
-        get() = buildString {
-            append(internalReason)
-            if (index > -1) {
-                append(" at index ")
-                append(index)
+        get() =
+            buildString {
+                append(internalReason)
+                if (index > -1) {
+                    append(" at index ")
+                    append(index)
+                }
+                append(": ")
+                append(input)
             }
-            append(": ")
-            append(input)
-        }
 }
