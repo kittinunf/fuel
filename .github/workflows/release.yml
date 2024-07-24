@@ -4,6 +4,7 @@ on:
   release:
     types: [released]
 
+permissions: read-all
 jobs:
   gradle:
     runs-on: macos-latest
