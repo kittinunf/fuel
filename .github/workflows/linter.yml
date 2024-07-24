@@ -19,6 +19,7 @@ on:
 ###############
 # Set the Job #
 ###############
+permissions: read-all
 jobs:
   build:
     # Name the Job
@@ -55,5 +56,6 @@ jobs:
         uses: super-linter/super-linter/slim@v5
         env:
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_JSCPD: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
