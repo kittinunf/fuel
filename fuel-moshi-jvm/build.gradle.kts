@@ -4,7 +4,7 @@ plugins {
     kotlin("jvm")
     id("publication")
     id("org.jetbrains.kotlinx.kover")
-    id("com.google.devtools.ksp") version "2.0.10-1.0.24"
+    id("com.google.devtools.ksp") version "2.0.20-1.0.24"
 }
 
 kotlin {
