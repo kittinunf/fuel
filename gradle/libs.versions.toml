@@ -6,7 +6,7 @@ moshi = "1.15.1"
 okhttp = "5.0.0-alpha.14"
 forge = "1.0.0-alpha3"
 result = "5.6.0"
-serialization = "1.7.1"
+serialization = "1.7.2"
 kotlinx-io = "0.5.3"
 
 [libraries]
