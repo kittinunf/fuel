@@ -2,7 +2,7 @@
 name: Run Gradle Push
 on:
   release:
-    types: [released]
+    types: [published]
 
 permissions: read-all
 jobs:
