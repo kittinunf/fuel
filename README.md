@@ -9,11 +9,13 @@
 The easiest HTTP networking library for Kotlin backed by Kotlinx Coroutines.
 
 ## Migration
+
 From 3.x onwards, we are using [main](https://github.com/kittinunf/fuel/tree/main) as our new base branch. If you are finding the old version [2.x](https://github.com/kittinunf/fuel/tree/2.x), please take a look at our old branch.
 
 ## Download
 
 ### For release version
+
 ```kotlin
 implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha04")
 ```
@@ -42,13 +44,16 @@ runBlocking {
 ```
 
 ## Custom Configuration
+
 JVM uses [OkHttpClient](https://square.github.io/okhttp/4.x/okhttp/okhttp3/-ok-http-client/) configurations
+
 ```kotlin
 val fuel = FuelBuilder().config(OKHttpClient()).build()
 val string = fuel.get(request = { url = "https://publicobject.com/helloworld.txt" }).body.string()
 ```
 
 Apple uses [NSURLSessionConfiguration](https://developer.apple.com/documentation/foundation/nsurlsessionconfiguration)
+
 ```kotlin
 val fuel = FuelBuilder().config(NSURLSessionConfiguration.defaultSessionConfiguration).build()
 val string = fuel.get(request = { url = "https://publicobject.com/helloworld.txt" }).body.string()
@@ -59,6 +64,7 @@ Please note it will throw Exceptions. Make sure you catch it on the production a
 Fuel requires Java 8 byte code.
 
 ## Requirements
+
 - If you are using Android, It needs to be Android 5+.
 - Java 8+
 
@@ -75,10 +81,11 @@ If you use the fuel-moshi modules, you may need to add rules for [Moshi](https:/
 ## Other libraries
 
 If you like Fuel, you might also like other libraries of mine;
-* [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
-* [Fuse](https://github.com/kittinunf/Fuse) - A simple generic LRU memory/disk cache for Android written in Kotlin
-* [Forge](https://github.com/kittinunf/Forge) - Functional style JSON parsing written in Kotlin
-* [ReactiveAndroid](https://github.com/kittinunf/ReactiveAndroid) - Reactive events and properties with RxJava for Android SDK
+
+- [Result](https://github.com/kittinunf/Result) - The modelling for success/failure of operations in Kotlin
+- [Fuse](https://github.com/kittinunf/Fuse) - A simple generic LRU memory/disk cache for Android written in Kotlin
+- [Forge](https://github.com/kittinunf/Forge) - Functional style JSON parsing written in Kotlin
+- [ReactiveAndroid](https://github.com/kittinunf/ReactiveAndroid) - Reactive events and properties with RxJava for Android SDK
 
 ## Credits
 
