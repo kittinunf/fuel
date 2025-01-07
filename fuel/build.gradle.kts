@@ -1,15 +1,13 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("multiplatform")
+    alias(libs.plugins.multiplatform)
     id("publication")
-    id("org.jetbrains.kotlinx.kover")
+    alias(libs.plugins.kover)
 }
 
 kotlin {
     jvm {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_1_8)
         }
@@ -55,7 +53,6 @@ kotlin {
 
     explicitApi()
 
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
