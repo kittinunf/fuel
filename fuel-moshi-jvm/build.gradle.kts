@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     kotlin("jvm")
     id("publication")
-    id("org.jetbrains.kotlinx.kover")
-    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
+    alias(libs.plugins.kover)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {

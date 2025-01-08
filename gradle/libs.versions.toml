@@ -8,6 +8,9 @@ forge = "1.0.0-alpha3"
 result = "5.6.0"
 serialization = "1.8.0"
 kotlinx-io = "0.6.0"
+kover = "0.9.0"
+kotlin = "2.1.0"
+ksp = "2.1.0-1.0.29"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -22,3 +25,9 @@ okhttp-coroutines = { group = "com.squareup.okhttp3", name = "okhttp-coroutines"
 forge = { group = "com.github.kittinunf.forge", name = "forge", version.ref = "forge" }
 result = { group = "com.github.kittinunf.result", name = "result", version.ref = "result"}
 result-jvm = { group = "com.github.kittinunf.result", name = "result-jvm", version.ref = "result"}
+
+[plugins]
+multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = {id = "com.google.devtools.ksp", version.ref="ksp" }
