@@ -1,5 +1,7 @@
 package fuel
 
+import kotlinx.coroutines.flow.Flow
+
 public suspend fun Fuel.get(
     url: String,
     parameters: Parameters? = null,
@@ -84,6 +86,17 @@ public suspend fun Fuel.method(
         this.parameters = parameters
         this.method = method
         this.body = body
+        this.headers = headers
+    }
+
+public suspend fun Fuel.sse(
+    url: String,
+    parameters: Parameters?,
+    headers: Map<String, String>
+): Flow<String> =
+    loader().sse {
+        this.url = url
+        this.parameters = parameters
         this.headers = headers
     }
 

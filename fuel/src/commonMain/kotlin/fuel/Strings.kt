@@ -1,5 +1,7 @@
 package fuel
 
+import kotlinx.coroutines.flow.Flow
+
 public suspend fun String.httpGet(
     parameters: Parameters? = null,
     headers: Map<String, String> = emptyMap(),
@@ -30,6 +32,11 @@ public suspend fun String.httpDelete(
 ): HttpResponse = Fuel.delete(this, parameters, body, headers)
 
 public suspend fun String.httpHead(parameters: Parameters? = null): HttpResponse = Fuel.head(this, parameters)
+
+public suspend fun String.httpSSE(
+    parameters: Parameters?,
+    headers: Map<String, String> = emptyMap()
+): Flow<String> = Fuel.sse(this, parameters, headers)
 
 public suspend fun String.httpMethod(
     parameters: Parameters? = null,

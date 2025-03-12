@@ -1,12 +1,9 @@
 package fuel
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.io.Buffer
+import kotlinx.coroutines.flow.Flow
 import okhttp3.Call
 import okhttp3.Request.Builder
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import okhttp3.coroutines.executeAsync
 import okhttp3.internal.http.HttpMethod
 
 public class JVMHttpLoader(callFactoryLazy: Lazy<Call.Factory>) : HttpLoader {
@@ -57,33 +54,19 @@ public class JVMHttpLoader(callFactoryLazy: Lazy<Call.Factory>) : HttpLoader {
             .performAsync()
     }
 
+    public override suspend fun sse(request: Request.Builder.() -> Unit): Flow<String> {
+        val requestBuilder = Request.Builder().apply(request).build()
+        return fetcher
+            .fetch(requestBuilder, createRequestBuilder(requestBuilder, "GET"))
+            .performAsyncWithSSE()
+    }
+
     public override suspend fun method(request: Request.Builder.() -> Unit): HttpResponse {
         val requestBuilder = Request.Builder().apply(request).build()
         val method = requireNotNull(requestBuilder.method) { "method should be not null" }
         return fetcher
             .fetch(requestBuilder, createRequestBuilder(requestBuilder, method))
             .performAsync()
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun Call.performAsync(): HttpResponse {
-        val response = executeAsync()
-        val sourceBuffer = Buffer().apply { write(response.body.bytes()) }
-        return HttpResponse().apply {
-            statusCode = response.code
-            source = sourceBuffer
-            headers = response.toHeaders()
-        }
-    }
-
-    private fun Response.toHeaders(): Map<String, String> {
-        val header = mutableMapOf<String, String>()
-        for ((key, values) in headers) {
-            for (value in values) {
-                header[key] = value.toString()
-            }
-        }
-        return header
     }
 
     private fun createRequestBuilder(
