@@ -12,11 +12,13 @@ ext["sonatype.password"] = null
 
 val secretPropsFile = project.rootProject.file("local.properties")
 if (secretPropsFile.exists()) {
-    secretPropsFile.reader().use {
-        Properties().apply { load(it) }
-    }.onEach { (name, value) ->
-        ext[name.toString()] = value
-    }
+    secretPropsFile
+        .reader()
+        .use {
+            Properties().apply { load(it) }
+        }.onEach { (name, value) ->
+            ext[name.toString()] = value
+        }
 } else {
     ext["signing.key"] = System.getenv("SIGNING_KEY")
     ext["signing.password"] = System.getenv("SIGNING_PASSWORD")

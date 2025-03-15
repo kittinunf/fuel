@@ -35,7 +35,7 @@ public suspend fun String.httpHead(parameters: Parameters? = null): HttpResponse
 
 public suspend fun String.httpSSE(
     parameters: Parameters?,
-    headers: Map<String, String> = emptyMap()
+    headers: Map<String, String> = emptyMap(),
 ): Flow<String> = Fuel.sse(this, parameters, headers)
 
 public suspend fun String.httpMethod(

@@ -39,6 +39,6 @@ public interface FuelRouting : RequestConvertible {
                 parameters,
                 headers.orEmpty(),
                 body,
-                method
+                method,
             )
 }

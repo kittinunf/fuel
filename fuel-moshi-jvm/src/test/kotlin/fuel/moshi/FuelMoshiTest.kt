@@ -15,10 +15,15 @@ import org.junit.Test
 @OptIn(ExperimentalOkHttpApi::class)
 class FuelMoshiTest {
     @JsonClass(generateAdapter = true)
-    data class HttpBinUserAgentModel(var userAgent: String = "")
+    data class HttpBinUserAgentModel(
+        var userAgent: String = "",
+    )
 
     @JsonClass(generateAdapter = true)
-    data class Card(val rank: Char, val suit: String)
+    data class Card(
+        val rank: Char,
+        val suit: String,
+    )
 
     @Test
     fun testMoshiResponse(): Unit =
@@ -67,7 +72,7 @@ class FuelMoshiTest {
                         "    \"rank\": \"J\"," +
                         "    \"suit\": \"SPADES\"" +
                         "  }" +
-                        "]"
+                        "]",
                 )
 
             val response = Fuel.get(mockWebServer.url("user-agent").toString())
@@ -98,7 +103,7 @@ class FuelMoshiTest {
                         "    \"rank\": \"K\"," +
                         "    \"suit\": \"SPADES\"" +
                         "  }" +
-                        "]"
+                        "]",
                 )
 
             val userAgentResponse = Fuel.get(mockWebServer.url("user-agent").toString())

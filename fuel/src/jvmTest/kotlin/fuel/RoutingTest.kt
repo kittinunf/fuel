@@ -12,12 +12,18 @@ import org.junit.Test
 
 @OptIn(ExperimentalOkHttpApi::class)
 class RoutingTest {
-    sealed class TestApi(private val host: String) : FuelRouting {
+    sealed class TestApi(
+        private val host: String,
+    ) : FuelRouting {
         override val basePath = this.host
 
-        class GetTest(host: String) : TestApi(host)
+        class GetTest(
+            host: String,
+        ) : TestApi(host)
 
-        class GetParamsTest(host: String) : TestApi(host)
+        class GetParamsTest(
+            host: String,
+        ) : TestApi(host)
 
         override val parameters: Parameters?
             get() = null

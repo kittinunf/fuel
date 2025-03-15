@@ -28,5 +28,4 @@ public fun NSData.toByteArray(): ByteArray =
     }
 
 @BetaInteropApi
-public fun String.encode(): NSData =
-    NSString.create(string = this).dataUsingEncoding(NSUTF8StringEncoding)!!
+public fun String.encode(): NSData = NSString.create(string = this).dataUsingEncoding(NSUTF8StringEncoding)!!

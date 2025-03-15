@@ -31,7 +31,13 @@ class StringsTest {
         runBlocking {
             mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
-            val string = mockWebServer.url("get").toString().httpGet().source.readString()
+            val string =
+                mockWebServer
+                    .url("get")
+                    .toString()
+                    .httpGet()
+                    .source
+                    .readString()
             val request2 = mockWebServer.takeRequest()
 
             assertEquals("GET", request2.method)
@@ -115,7 +121,13 @@ class StringsTest {
         runBlocking {
             mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
-            val string = mockWebServer.url("delete").toString().httpDelete().source.readString()
+            val string =
+                mockWebServer
+                    .url("delete")
+                    .toString()
+                    .httpDelete()
+                    .source
+                    .readString()
             val request1 = mockWebServer.takeRequest()
 
             assertEquals("DELETE", request1.method)

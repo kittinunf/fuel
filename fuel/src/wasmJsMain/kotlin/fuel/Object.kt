@@ -8,9 +8,7 @@ public fun obj(): JsAny = js("{}")
 /**
  * Helper function for creating JavaScript objects with given type.
  */
-public inline fun <T : JsAny> obj(init: T.() -> Unit): T {
-    return (obj().unsafeCast<T>()).apply(init)
-}
+public inline fun <T : JsAny> obj(init: T.() -> Unit): T = (obj().unsafeCast<T>()).apply(init)
 
 /**
  * Operator to set property on JS Object
