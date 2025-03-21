@@ -33,9 +33,11 @@ class HttpLoaderTest {
             mockWebServer.enqueue(MockResponse(code = 404, body = "Hello World"))
 
             val string =
-                httpLoader.get {
-                    url = mockWebServer.url("get").toString()
-                }.source.readString()
+                httpLoader
+                    .get {
+                        url = mockWebServer.url("get").toString()
+                    }.source
+                    .readString()
 
             val request1 = mockWebServer.takeRequest()
 
@@ -49,9 +51,11 @@ class HttpLoaderTest {
             mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
             val string =
-                httpLoader.get {
-                    url = mockWebServer.url("get").toString()
-                }.source.readString()
+                httpLoader
+                    .get {
+                        url = mockWebServer.url("get").toString()
+                    }.source
+                    .readString()
 
             val request2 = mockWebServer.takeRequest()
 
@@ -65,10 +69,12 @@ class HttpLoaderTest {
             mockWebServer.enqueue(MockResponse(body = "Hello There"))
 
             val string =
-                httpLoader.get {
-                    url = mockWebServer.url("get").toString()
-                    parameters = listOf("foo" to "bar")
-                }.source.readString()
+                httpLoader
+                    .get {
+                        url = mockWebServer.url("get").toString()
+                        parameters = listOf("foo" to "bar")
+                    }.source
+                    .readString()
 
             val request1 = mockWebServer.takeRequest()
 
@@ -82,10 +88,12 @@ class HttpLoaderTest {
             mockWebServer.enqueue(MockResponse(body = "Greeting Everyone"))
 
             val string =
-                httpLoader.get {
-                    url = mockWebServer.url("get").toString()
-                    headers = mapOf("foo" to "bar")
-                }.source.readString()
+                httpLoader
+                    .get {
+                        url = mockWebServer.url("get").toString()
+                        headers = mapOf("foo" to "bar")
+                    }.source
+                    .readString()
 
             val request1 = mockWebServer.takeRequest()
 
@@ -190,9 +198,11 @@ class HttpLoaderTest {
             mockWebServer.enqueue(MockResponse(body = "Hello World"))
 
             val string =
-                httpLoader.delete {
-                    url = mockWebServer.url("delete").toString()
-                }.source.readString()
+                httpLoader
+                    .delete {
+                        url = mockWebServer.url("delete").toString()
+                    }.source
+                    .readString()
 
             val request1 = mockWebServer.takeRequest()
 

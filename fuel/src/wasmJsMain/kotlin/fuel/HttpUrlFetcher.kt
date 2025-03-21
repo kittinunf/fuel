@@ -27,10 +27,12 @@ internal class HttpUrlFetcher {
         requestInit.headers = request.headers.toJsReference()
         requestInit.body = body?.toJsString()
         return suspendCancellableCoroutine { continuation ->
-            window.fetch(urlString, requestInit)
+            window
+                .fetch(urlString, requestInit)
                 .then { response ->
                     if (response.ok) {
-                        response.arrayBuffer()
+                        response
+                            .arrayBuffer()
                             .then { arrayBuffer ->
                                 val byteArray = arrayBuffer.toBuffer()
                                 continuation.resume(
@@ -47,8 +49,7 @@ internal class HttpUrlFetcher {
                         continuation.resumeWithException(Exception("Failed to fetch data: ${response.status}"))
                         null
                     }
-                }
-                .catch {
+                }.catch {
                     continuation.resumeWithException(Exception("Failed to fetch data: $it"))
                     null
                 }

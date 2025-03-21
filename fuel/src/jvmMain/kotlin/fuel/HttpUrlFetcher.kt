@@ -5,7 +5,9 @@ package fuel
 import okhttp3.Call
 import okhttp3.Request
 
-internal class HttpUrlFetcher(private val callFactory: Lazy<Call.Factory>) {
+internal class HttpUrlFetcher(
+    private val callFactory: Lazy<Call.Factory>,
+) {
     fun fetch(
         request: fuel.Request,
         builder: Request.Builder,

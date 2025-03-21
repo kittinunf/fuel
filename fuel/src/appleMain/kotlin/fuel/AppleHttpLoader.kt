@@ -1,8 +1,11 @@
 package fuel
 
+import kotlinx.coroutines.flow.Flow
 import platform.Foundation.NSURLSessionConfiguration
 
-public class AppleHttpLoader(sessionConfiguration: NSURLSessionConfiguration) : HttpLoader {
+public class AppleHttpLoader(
+    sessionConfiguration: NSURLSessionConfiguration,
+) : HttpLoader {
     private val fetcher by lazy { HttpUrlFetcher(sessionConfiguration) }
 
     public override suspend fun get(request: Request.Builder.() -> Unit): HttpResponse {
@@ -36,6 +39,11 @@ public class AppleHttpLoader(sessionConfiguration: NSURLSessionConfiguration) : 
     public override suspend fun head(request: Request.Builder.() -> Unit): HttpResponse {
         val requestBuilder = Request.Builder().apply(request).build()
         return fetcher.fetch("HEAD", requestBuilder)
+    }
+
+    override suspend fun sse(request: Request.Builder.() -> Unit): Flow<String> {
+        val requestBuilder = Request.Builder().apply(request).build()
+        return fetcher.fetchSSE(requestBuilder)
     }
 
     public override suspend fun method(request: Request.Builder.() -> Unit): HttpResponse {

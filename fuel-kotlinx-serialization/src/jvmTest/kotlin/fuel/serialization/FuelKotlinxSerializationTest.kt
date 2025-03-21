@@ -15,7 +15,9 @@ import kotlin.test.fail
 @OptIn(ExperimentalOkHttpApi::class)
 class FuelKotlinxSerializationTest {
     @Serializable
-    data class HttpBinUserAgentModel(var userAgent: String = "")
+    data class HttpBinUserAgentModel(
+        var userAgent: String = "",
+    )
 
     @Test
     fun testSerializableResponse() =

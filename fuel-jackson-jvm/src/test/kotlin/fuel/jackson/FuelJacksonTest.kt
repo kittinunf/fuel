@@ -17,14 +17,16 @@ import org.junit.Test
 @ExperimentalOkHttpApi
 class FuelJacksonTest {
     private val createCustomMapper: ObjectMapper =
-        ObjectMapper().registerKotlinModule()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).apply {
+        ObjectMapper()
+            .registerKotlinModule()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .apply {
                 propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE
             }
 
     data class HttpBinUserAgentModel(
         val userAgent: String = "",
-        val http_status: String = ""
+        val http_status: String = "",
     )
 
     @Test

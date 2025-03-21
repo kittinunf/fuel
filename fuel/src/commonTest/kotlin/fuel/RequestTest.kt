@@ -7,10 +7,12 @@ class RequestTest {
     @Test
     fun testAdd_headers() {
         val request =
-            Request.Builder().apply {
-                url = "http://example.com"
-                headers = mapOf("X-Test" to "true")
-            }.build()
+            Request
+                .Builder()
+                .apply {
+                    url = "http://example.com"
+                    headers = mapOf("X-Test" to "true")
+                }.build()
         assertEquals("true", request.headers["X-Test"])
     }
 
