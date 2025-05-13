@@ -10,7 +10,7 @@ serialization = "1.8.1"
 kotlinx-io = "0.7.0"
 kover = "0.9.1"
 kotlin = "2.1.20"
-ksp = "2.1.20-2.0.0"
+ksp = "2.1.20-2.0.1"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
