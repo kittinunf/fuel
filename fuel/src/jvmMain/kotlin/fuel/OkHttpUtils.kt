@@ -52,5 +52,4 @@ public fun Call.performAsyncWithSSE(): Flow<String> =
         }
     }
 
-public fun Response.toHeaders(): Map<String, String> =
-    headers.names().associateWith { name -> headers[name] ?: "" }
+public fun Response.toHeaders(): Map<String, String> = headers.names().associateWith { name -> headers[name] ?: "" }
