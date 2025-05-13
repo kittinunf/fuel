@@ -69,8 +69,7 @@ class HttpLoaderBuilderTest {
                     .get {
                         url = mockWebServer.url("hello").toString()
                     }.headers
-            assertEquals("1", response["Content-Length"])
-
+            assertEquals("11", response["Content-Length"])
             mockWebServer.shutdown()
         }
 
