@@ -53,6 +53,8 @@ public fun Call.performAsyncWithSSE(): Flow<String> =
     }
 
 public fun Response.toHeaders(): Map<String, String> =
-    headers.names().mapNotNull { name ->
-        headers[name]?.let { value -> name to value }
-    }.toMap()
+    headers
+        .names()
+        .mapNotNull { name ->
+            headers[name]?.let { value -> name to value }
+        }.toMap()
