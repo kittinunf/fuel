@@ -9,7 +9,7 @@ result = "5.6.0"
 serialization = "1.10.0"
 kotlinx-io = "0.8.2"
 kover = "0.9.4"
-kotlin = "2.2.21"
+kotlin = "2.3.0"
 ksp = "2.3.4"
 
 [libraries]
